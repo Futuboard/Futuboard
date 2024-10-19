@@ -33,3 +33,6 @@ backend/tests/coverage_report
 *.py[cod]
 __pycache__
 env
+
+# Database local data
+db/
