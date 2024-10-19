@@ -172,7 +172,7 @@ npm run lint
 To automatically fix detected errors run:
 
 ```
-npm run lint --fix
+npm run lint -- --fix
 ```
 
 ## Instructions for future developers

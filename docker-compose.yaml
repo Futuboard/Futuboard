@@ -1,6 +1,5 @@
 services:
   database:
-    container_name: database
     image: postgres:17.0
     restart: "no"
     ports:
@@ -13,3 +12,37 @@ services:
       start_period: 30s
     volumes:
       - ./db:/var/lib/postgresql/data
+  frontend:
+    build: ./frontend
+    command: "npm run dev -- --host"
+    restart: "no"
+    ports:
+      - "5173:5173"
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore:
+            - ./frontend/node_modules/
+        - action: rebuild
+          path: ./frontend/package.json
+  backend:
+    build: ./backend
+    command: sh -c "python manage.py runserver 0.0.0.0:8000 & daphne -b 0.0.0.0 -p 5555 backend.asgi:application"
+    restart: "no"
+    env_file:
+      - .env
+    ports:
+      - "5555:5555"
+      - "8000:8000"
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app
+        - action: rebuild
+          path: ./backend/requirements.txt
+    depends_on:
+      database:
+        condition: service_healthy
