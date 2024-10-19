@@ -18,7 +18,6 @@ class Action(models.Model):
     creation_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'Action'
 
 
@@ -32,7 +31,6 @@ class Board(models.Model):
     salt = models.TextField()
 
     class Meta:
-        managed = False
         db_table = 'Board'
 
 
@@ -49,7 +47,6 @@ class Column(models.Model):
     wip_limit_story = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'Column'
 
 
@@ -62,7 +59,6 @@ class Event(models.Model):
     action = models.TextField()  # This field type is a guess.
 
     class Meta:
-        managed = False
         db_table = 'Event'
 
 
@@ -74,7 +70,6 @@ class Swimlanecolumn(models.Model):
     ordernum = models.IntegerField(db_column='orderNum')  # Field name made lowercase.
 
     class Meta:
-        managed = False
         db_table = 'SwimlaneColumn'
 
 
@@ -91,7 +86,6 @@ class Ticket(models.Model):
     cornernote = models.TextField(db_column='cornerNote', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
         db_table = 'Ticket'
 
 
@@ -101,7 +95,6 @@ class User(models.Model):
     color = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'User'
 
 
@@ -113,7 +106,6 @@ class Usergroup(models.Model):
     type = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'UserGroup'
 
 
@@ -122,7 +114,6 @@ class UsergroupUser(models.Model):
     userid = models.ForeignKey(User, models.DO_NOTHING, db_column='userID')  # Field name made lowercase.
 
     class Meta:
-        managed = False
         db_table = 'UserGroup_User'
         unique_together = (('usergroupid', 'userid'),)
         
