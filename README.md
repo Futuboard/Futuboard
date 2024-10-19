@@ -82,12 +82,28 @@ The following sections include information about how to start using the tool in 
 
 ## Getting started in a local environment
 
+You can either do a fully Dockerized development environment or run the frontend, backend and database separately.  
+You need to setup the environment variables in either case.
+
 ### Environment variables
 
-You will need an environment variable file `.env` in the frontend folder for the frontend and in the root folder for the backend.
+You will need a `.env` file in the frontend folder for the frontend and in the root folder for the backend.
 You can look at the `.env.example` files in the frontend and root folders for the required variables.
 
-The simplest development setup is to just copy-paste the `.env.example` files and rename them to `.env`.
+The simplest development setup is to just make a copy of the two `.env.example` files in the same folders they are already in, and rename them to `.env`.
+
+## Fully Dockerized development environment
+
+Do the environment variable setup as described above, and have the latest version of Docker installed on your computer.
+Then simply run:
+
+```
+docker compose up --watch
+```
+
+The frontend will be available at `localhost:5173` and the backend at `localhost:8000`.
+
+## Running frontend, backend and database separately
 
 ### Frontend
 
