@@ -1,7 +1,0 @@
-{
-  "name": "Frontend container",
-  "dockerComposeFile": ["../../docker-compose.yaml"],
-  "service": "frontend",
-  "shutdownAction": "none",
-  "workspaceFolder": "/app"
-}
