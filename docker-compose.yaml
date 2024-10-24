@@ -51,7 +51,6 @@ services:
           target: /app
           ignore:
             - .env
-            - ./backend/.venv/
         - action: rebuild
           path: ./backend/requirements.txt
     depends_on:

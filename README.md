@@ -122,17 +122,17 @@ npm run dev
 First make sure python 3.x is installed. Next we reccommend creating a virtual environment to avoid installing required packages globally.
 
 ```
-cd backend/
 python -m venv .venv
 ```
 
-Activate the created virtual environment using:
+Activate the created virtual environment using:  
+On Windows:
 
 ```
 .venv/Scripts/activate
 ```
 
-NOTE: On linux/Mac use:
+On Linux/Mac:
 
 ```
 source .venv/bin/activate
@@ -141,6 +141,7 @@ source .venv/bin/activate
 After this you can install required packages by running:
 
 ```
+cd backend/
 pip install -r requirements.txt
 ```
 
