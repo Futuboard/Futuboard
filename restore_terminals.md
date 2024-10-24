@@ -4,7 +4,8 @@
 2. Make a virtual environment (.venv) for the backend, and install all pip packages from requirements.txt. The process is described in the README.
 3. Install [Restore Terminals](https://marketplace.visualstudio.com/items?itemName=EthanSK.restore-terminals) extension in VS Code.
 4. Add following content to .vscode/restore-terminals.json:
-5. When opening VS Code, Restore Terminals will automatically open terminals and start all services.
+5. When opening VS Code, Restore Terminals will automatically open terminals and start all services. You can also run the extension manually by pressing `Ctrl+Shift+P` and typing `Restore Terminals`.
+6. Then, if you didn't do it already, you have to run the migrations for the backend. You can do this by running `python manage.py migrate` in the backend terminal.
 
 Windows:
 
