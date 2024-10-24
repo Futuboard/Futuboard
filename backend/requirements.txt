@@ -2,7 +2,7 @@ Django==4.2.9
 djangorestframework==3.14.0
 python-decouple==3.8
 django-cors-headers==4.3.1
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10
 pytest==7.3.1
 pytest-asyncio==0.21.0
 pytest-html==3.2.0
