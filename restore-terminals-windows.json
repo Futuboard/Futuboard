@@ -1,0 +1,34 @@
+{
+  "keepExistingTerminalsOpen": false,
+  "runOnStartup": true,
+  "terminals": [
+    {
+      "splitTerminals": [
+        {
+          "name": "frontend",
+          "commands": ["cd frontend", "npm install", "npm run dev"]
+        },
+        {
+          "name": "backend",
+          "commands": [
+            ".venv/Scripts/activate",
+            "cd backend",
+            "python manage.py runserver 0.0.0.0:8000"
+          ]
+        },
+        {
+          "name": "websocket",
+          "commands": [
+            ".venv/Scripts/activate",
+            "cd backend",
+            "daphne -b 0.0.0.0 -p 5555 backend.asgi:application"
+          ]
+        },
+        {
+          "name": "backend",
+          "commands": ["docker compose up database"]
+        }
+      ]
+    }
+  ]
+}
