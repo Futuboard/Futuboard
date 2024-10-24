@@ -80,41 +80,24 @@ Picture 9: The swimlane can be opened with the arrow button on the column. New a
 
 The following sections include information about how to start using the tool in a local development environment and about how the project file structure and libraries work.
 
-## Getting started in a local environment
-
-You can either do a fully Dockerized development environment or run the frontend, backend and database separately.  
-You need to setup the environment variables in either case.
-
-### Environment variables
+## Step 1: Environment variables
 
 You will need a `.env` file in the frontend folder for the frontend and in the root folder for the backend.
 You can look at the `.env.example` files in the frontend and root folders for the required variables.
 
 The simplest development setup is to just make a copy of the two `.env.example` files in the same folders they are already in, and rename them to `.env`.
 
-## Fully Dockerized development environment
-
-Do the environment variable setup as described above, and have the latest version of Docker installed on your computer.
-Then simply run:
-
-```
-docker compose up --watch
-```
-
-The frontend will be available at `localhost:5173` and the backend at `localhost:8000`.
-
-## Running frontend, backend and database separately
+## Step 2: Installing dependencies
 
 ### Frontend
 
 First make sure that you have at least v20 of node installed on your computer.
 
-After this the frontend can be started with:
+After this the frontend dependencies can be installed by running:
 
 ```
 cd frontend/
 npm install
-npm run dev
 ```
 
 ### Backend
@@ -145,14 +128,49 @@ cd backend/
 pip install -r requirements.txt
 ```
 
-After this you you need to run the database migrations, so the local database has the correct tables.  
-You can do this by running: (You also have to have the database running for this to work. Instructions for that in the "Database" section)
+## Step 3: Running the project
+
+You can either run the frontend and backend separately or use the fully dockerized development environment.
+
+### Option 1: Fully Dockerized development environment
+
+Simply run:
+
+```
+docker compose up --watch
+```
+
+The frontend will be available at `localhost:5173` and the backend at `localhost:8000`.
+
+### Option 2: Running frontend, backend and database separately
+
+You can use the following command to start a local PostgreSQL database using Docker (you need to have Docker installed):
+
+```
+docker compose up database
+```
+
+The data in the local database is stored in the db/ folder. You can delete the folder, if you want to reset the database.
+
+#### Option 2.1: Using the Restore Terminals extension in VS Code
+
+If you're using VS Code, you can use the [Restore Terminals](https://marketplace.visualstudio.com/items?itemName=EthanSK.restore-terminals) extension to automatically start the backend and frontend servers when you open the folder. .
+
+1. Install the extension
+2. Copy and rename the "restore-terminals-windows.json" or "restore-terminals-linux-or-mac.json" to `./vscode/restore-terminals.json` in the root of the project
+3. Press `Ctrl+Shift+P` and run the `Restore Terminals` command
+4. You might need to restart some of the services, if e.g. the database was not running when the backend tries to connect to it.
+
+#### Option 2.2: Running the backend and frontend manually
+
+You need to run the database migrations, so the local database has the correct tables.  
+You can do this by running (in the backend folder, with .venv activated):
 
 ```
 python manage.py migrate
 ```
 
-After this the backend server can be run using:
+After this the backend server can be run using (in the backend folder, with .venv activated):
 
 ```
 python manage.py runserver
@@ -167,15 +185,12 @@ cd backend/
 daphne -p 5555 backend.asgi:application
 ```
 
-### Database
-
-You can use the following command to start a local PostgreSQL database using Docker (you need to have Docker installed):
+After this the frontend can be run using:
 
 ```
-docker compose up database
+cd frontend/
+npm run dev
 ```
-
-The data in the local database is stored in the db/ folder. You can delete the folder, if you want to reset the database.
 
 ### Linting
 
