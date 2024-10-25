@@ -1,11 +1,11 @@
 # Introduction
 
-* Our goal is to make a free, easy to use and open source web tool for team workflow management
-* The tool has all the required features required for managing workflows without over complicating the tool
-* The tool allows for more efficient work in teams where all members are not often in the same space
-* Team members can access the team's board remotely.
-* Allows for automatic visualizations and statistics about the progress of work.
-* Allows for an easier to use platform then alternative tools with the same features.
+- Our goal is to make a free, easy to use and open source web tool for team workflow management
+- The tool has all the required features required for managing workflows without over complicating the tool
+- The tool allows for more efficient work in teams where all members are not often in the same space
+- Team members can access the team's board remotely.
+- Allows for automatic visualizations and statistics about the progress of work.
+- Allows for an easier to use platform then alternative tools with the same features.
 
 This README includes a users manual, instructions for setting up development, information about what we've used to create this project with documentation links and guides on deploying your own instance.
 
@@ -18,6 +18,7 @@ From the front page the user can either create a new blank board or import a new
 When the user creates a new board the tool asks for the name of the board and for an optional password. Creating the board will redirect the user to the newly created board. If the board had a password, then the user will have to enter it first.
 
 ## User's manual:
+
 ![image](https://github.com/Kasipallot/Futuboard/assets/135588324/89b3a5bd-ee83-4948-ab3c-895d03a2a097)
 Picture 1: A screenshot of the user interface
 
@@ -39,7 +40,6 @@ Picture 4: A user on the board which can be connected as a magnet to a ticket or
 
 Picture 5: After adding a column the user can add tickets by pressing the plus button on the column. Editing tickets is also possible by pressing the edit button.
 
-
 ![image](https://github.com/Kasipallot/Futuboard/assets/135588324/c02087c7-2026-442e-ac08-daea3c5a3d8d)
 
 Picture 6: After pressing the plus button on a column, this form appears which allows you to edit its data. Finalize the creation of the ticket by pressing submit or enter.
@@ -54,106 +54,157 @@ Picture 8: You can move tickets between columns by dragging and dropping. The Te
 
 ![image](https://github.com/Kasipallot/Futuboard/assets/135588324/4050f4c5-fd05-4dc1-a5b7-75b40e84a76a)
 
-
 Picture 9: The swimlane can be opened with the arrow button on the column. New actions can be created by pressing the + button on the left side of the opened up swimlane. Actions can be moved by dragging and dropping and they stay in the ticket even when the ticket is moved away from the column containing the swimlanes. A user magnet can be added to an action.
-
-
-
-
-
-
 
 ## Features
 
-* The user can create a board with a name and optional password
-* The user gets a link to the board, which they have to store personally
-* The user can create a Column
-* The column can be given a name and whether or not it contains swimlane columns
-* After creation the name of the column can be changed
-* Tickets can be created in a column
-* A tickets name, story points, corner notes, description and color can be chosen.
-* Tickets in Columns containing swimlanes can be given actions with descriptions
-* Tickets can be moved between columns and columns can be moved
-* Actions can be moved between swimlane columns
-* Actions, tickets and columns can be deleted
-* A user can create new users for the board
-* A user magnet can be placed on a ticket or action
-* Users, tickets and columns can be deleted, deleting actions has not yet been implemented.
-* The data of the board can be exported in a CSV file
-* A board can be deleted
-* A new board can be imported from a previously exported CSV file
+- The user can create a board with a name and optional password
+- The user gets a link to the board, which they have to store personally
+- The user can create a Column
+- The column can be given a name and whether or not it contains swimlane columns
+- After creation the name of the column can be changed
+- Tickets can be created in a column
+- A tickets name, story points, corner notes, description and color can be chosen.
+- Tickets in Columns containing swimlanes can be given actions with descriptions
+- Tickets can be moved between columns and columns can be moved
+- Actions can be moved between swimlane columns
+- Actions, tickets and columns can be deleted
+- A user can create new users for the board
+- A user magnet can be placed on a ticket or action
+- Users, tickets and columns can be deleted, deleting actions has not yet been implemented.
+- The data of the board can be exported in a CSV file
+- A board can be deleted
+- A new board can be imported from a previously exported CSV file
 
 # Instructions for local development
 
 The following sections include information about how to start using the tool in a local development environment and about how the project file structure and libraries work.
 
-## Getting started in a local environment
+## Step 1: Environment variables
 
-### Environment variables
+You will need a `.env` file in the frontend folder for the frontend and in the root folder for the backend.
+You can look at the `.env.example` files in the frontend and root folders for the required variables.
 
-You will need an environment variable file (.env) in the frontend folder for the frontend and in the root folder for the backend.
+The simplest development setup is to just make a copy of the two `.env.example` files in the same folders they are already in, and rename them to `.env`.
 
-In the frontend folder .env place:
-* VITE_DB_ADDRESS = "your backend address"
-* VITE_WEBSOCKET_ADDRESS = "your websocket address"
-
-In the backend .env in root place:
-* DB_NAME="Your database name"
-* DB_USER="Your database user"
-* DB_PASSWORD="Your database password"
-* DB_HOST="Your database host"
-* DB_PORT="Your database port"
-* DB_SCHEMA="Your database schema", this is in case two instances of the website with seperate database schemas are needed to run.
-
-Another way for you to get the backend running will be to fix the django database settings to your liking.
-
+## Step 2: Installing dependencies
 
 ### Frontend
 
 First make sure that you have at least v20 of node installed on your computer.
 
-After this the frontend can be started using the following commands:
+After this the frontend dependencies can be installed by running:
+
 ```
+cd frontend/
 npm install
-npm run dev
-```
-To run linting to make sure that the code is written according to the styling standards run:
-```
-npm run lint
-```
-To automatically fix detected errors run:
-```
-npm run lint -- --fix
 ```
 
 ### Backend
 
 First make sure python 3.x is installed. Next we reccommend creating a virtual environment to avoid installing required packages globally.
+
 ```
-python -m venv /path/to/new/virtual/environment
+python -m venv .venv
 ```
-Activate the created virtual environment using:
+
+Activate the created virtual environment using:  
+On Windows:
+
 ```
-cd .venv/Scripts
-activate
+.venv/Scripts/activate
 ```
-NOTE: On linux use:
+
+On Linux/Mac:
+
 ```
 source .venv/bin/activate
 ```
+
 After this you can install required packages by running:
+
 ```
 cd backend/
 pip install -r requirements.txt
 ```
 
-After this the backend server can be run using:
+## Step 3: Running the project
+
+You can either run the frontend and backend separately or use the fully dockerized development environment.
+
+### Option 1: Fully Dockerized development environment
+
+Simply run:
+
 ```
-python3 manage.py runserver 
+docker compose up --watch
 ```
-Websockets can be enabled locally using the command below, replace PORT with your desired port.
+
+The frontend will be available at `localhost:5173` and the backend at `localhost:8000`.
+
+### Option 2: Running frontend, backend and database separately
+
+You can use the following command to start a local PostgreSQL database using Docker (you need to have Docker installed):
+
 ```
-daphne -p PORT backend.asgi:application  
+docker compose up database
+```
+
+The data in the local database is stored in the db/ folder. You can delete the folder, if you want to reset the database.
+
+#### Option 2.1: Using the Restore Terminals extension in VS Code
+
+If you're using VS Code, you can use the [Restore Terminals](https://marketplace.visualstudio.com/items?itemName=EthanSK.restore-terminals) extension to automatically start the backend and frontend servers when you open the folder. .
+
+1. Install the extension
+2. Copy and rename the "restore-terminals-windows.json" or "restore-terminals-linux-or-mac.json" to `./vscode/restore-terminals.json` in the root of the project
+3. Press `Ctrl+Shift+P` and run the `Restore Terminals` command
+4. You might need to restart some of the services, if e.g. the database was not running when the backend tries to connect to it.
+
+#### Option 2.2: Running the backend and frontend manually
+
+You need to run the database migrations, so the local database has the correct tables.  
+You can do this by running (in the backend folder, with .venv activated):
+
+```
+python manage.py migrate
+```
+
+After this the backend server can be run using (in the backend folder, with .venv activated):
+
+```
+python manage.py runserver
+```
+
+Websocket are needed, if you want the board to update on another users browser when a user makes a change, without needing to refresh the page.  
+Websockets can be enabled locally using the command below. You need to run this in a separate terminal window.
+
+```
+cd backend/
+.venv/Scripts/activate
+daphne -p 5555 backend.asgi:application
+```
+
+After this the frontend can be run using:
+
+```
+cd frontend/
+npm run dev
+```
+
+### Linting
+
+To run linting to make sure that the code is written according to the styling standards run:
+
+```
+cd frontend/
+npm run lint
+```
+
+To automatically fix detected errors run:
+
+```
+npm run lint -- --fix
 ```
 
 ## Instructions for future developers
@@ -263,24 +314,31 @@ Deployment of the backend can be accomplished through Azure's App Service Web Ap
 
 The publish style is code and the runtime stack is Python 3.9. Newer Python versions may not work. After this, choose your preferred region and agreement. Then, from the deployment section, continuous deployment must be activated. Choose the correct GitHub folder for this. After these settings, you are ready to proceed from this view. Leave all other values at their defaults and create the Web App. This will create a new workflow file in GitHub again. At this stage, change all the initial commands in the file’s working-directory: ./backend. Also change the paths in the path to include backend.
 
-Once the Azure deployment is complete, more important settings can be set. From the CORS section, set allowed origins to all (*). However, if the application is no longer in development, set valid CORS values here. If you want to use websockets, add the following command to the startup command section of the configuration: daphne -b 0.0.0.0 -p 8000 backend.asgi:application.
+Once the Azure deployment is complete, more important settings can be set. From the CORS section, set allowed origins to all (\*). However, if the application is no longer in development, set valid CORS values here. If you want to use websockets, add the following command to the startup command section of the configuration: daphne -b 0.0.0.0 -p 8000 backend.asgi:application.
 
 In the environment variables section, you need to include all the used env variables:
 ![image](https://github.com/Kasipallot/Futuboard/assets/135588324/4679f713-0983-42c3-8ef9-504e134359e3)
-
 
 DB-prefixed variables are database variables. The value of SCM_DO_BUILD_DURING_DEPLOYMENT should be 1 to ensure the deployment works as intended. After this, restart the application from Azure.
 
 ### Database creation
 
 You can create database migrations in django using
+
 ```
-python3 manage.py makemigrations
+
+python manage.py makemigrations
+
 ```
+
 And then to apply made migrations run:
+
 ```
-python3 manage.py migrate
+
+python manage.py migrate
+
 ```
+
 If you want django to run the migrations, switch "managed" to "true" in the created migration file, otherwise keep as it is.
 
 To setup the database in Azure, follow this guide:
@@ -290,3 +348,7 @@ To setup the database in Azure, follow this guide:
 ### Common issues:
 
 If changes are not visible in the backend or it does not work for some reason, it is advisable in Azure to "kill" the application and keep it turned off for about 10 minutes. Then restart it. If you do not wait long enough, the application may not actually have shut down.
+
+```
+
+```
