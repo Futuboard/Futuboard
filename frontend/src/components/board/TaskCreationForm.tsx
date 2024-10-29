@@ -110,8 +110,8 @@ const TaskCreationForm: React.FC<TaskCreationFormProps> = (props) => {
                             message: "Size must be at least 0"
                         },
                         max: {
-                            value: 99,
-                            message: "Size must be at smaller than 100"
+                            value: 9999,
+                            message: "Size can not exceed 9999"
                         }
                     })} />
                 </Grid>

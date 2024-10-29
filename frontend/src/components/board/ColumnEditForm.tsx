@@ -146,8 +146,8 @@ const ColumnEditForm : React.FC<AddColumnCreationFormProps> = (props) => {
                         message: "Limit must be at least 1"
                         },
                         max: {
-                        value: 99,
-                        message: "Limit must be smaller than 100"
+                        value: 100,
+                        message: "Limit can not exceed 100"
                         }
                         })} />
                     </Grid>
@@ -159,8 +159,8 @@ const ColumnEditForm : React.FC<AddColumnCreationFormProps> = (props) => {
                         message: "Limit must be at least 1"
                         },
                         max: {
-                        value: 9999,
-                        message: "Limit must be smaller than 9999"
+                        value: 999900,
+                        message: "Limit can not exceed 999900"
                         }
                         })} />
                     </Grid>
