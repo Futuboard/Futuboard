@@ -194,9 +194,18 @@ npm run dev
 
 ### Linting and code style
 
-To make sure that the code doesn't have any lint/style issues run:
-
 #### Frontend
+
+The easiest way to lint and format frontend code is to install the [Prettier VS Code extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) and edit your VSCode settings to include
+
+```
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+```
+
+Alternatively, you can use the following commands:  
+To check for lint/style errors run:
 
 ```
 cd frontend/
