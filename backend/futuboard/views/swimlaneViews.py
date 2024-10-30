@@ -30,7 +30,7 @@ def swimlanecolumn_view(request, column_id):
             new_swimlanecolumn.save()
             serializer = SwimlaneColumnSerializer(new_swimlanecolumn)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("Cannot create swinlane column")
 
 
@@ -54,7 +54,7 @@ def action_view(request, swimlanecolumn_id, ticket_id):
                 action.save()
             return JsonResponse({"message": "Action order updated successfully"}, status=200)
 
-        except:
+        except:  # noqa: E722
             raise Http404("Cannot update actions")
 
     if request.method == "GET":
@@ -84,7 +84,7 @@ def action_view(request, swimlanecolumn_id, ticket_id):
 
             serializer = ActionSerializer(new_action)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("Cannot create action")
 
 
@@ -102,7 +102,7 @@ def update_swimlanecolumn(request, swimlanecolumn_id):
 
             serializer = SwimlaneColumnSerializer(swimlanecolumn)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("Cannot update Column")
 
 
@@ -120,7 +120,7 @@ def update_action(request, action_id):
 
             serializer = ActionSerializer(action)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("Cannot update Action")
 
 
@@ -150,7 +150,7 @@ def get_users_from_action(request, action_id):
                 for user in request.data:
                     new_usergroup = UsergroupUser(usergroupid=usergroup, userid=User.objects.get(pk=user["userid"]))
                     new_usergroup.save()
-        except:
+        except:  # noqa: E722
             raise Http404("User update failed")
         # TODO: implement
         print("TO BE IMPLEMENTED")
@@ -167,5 +167,5 @@ def get_users_from_action(request, action_id):
 
             serializer = UserSerializer(new_user)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("User creation failed")

@@ -35,7 +35,7 @@ def verify_password(password, id, hash: str):
     try:
         ph.verify(hash, password)
         return True
-    except:
+    except:  # noqa: E722
         return False
 
 

@@ -52,7 +52,7 @@ def test_import_export():
         usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), boardid=board, type="board")
         # Usergroupusers
         for user in users:
-            usergroupuser = md.UsergroupUser.objects.create(usergroupid=usergroup, userid=user)
+            md.UsergroupUser.objects.create(usergroupid=usergroup, userid=user)
         # Create n columns for the board
         n_columns = random.randint(1, 10)
         for i in range(n_columns - 1):
@@ -68,8 +68,8 @@ def test_import_export():
                 usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), ticketid=ticket, type="ticket")
                 n_users = random.randint(1, 10)
                 random.shuffle(users)
-                for l in range(n_users):
-                    usergroupuser = md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[l])
+                for k in range(n_users):
+                    md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[k])
         # One column that is a swimlane
         column = md.Column.objects.create(
             columnid=uuid.uuid4(), boardid=board, title=f"column{n_columns-1}", ordernum=n_columns - 1, swimlane=True
@@ -92,8 +92,8 @@ def test_import_export():
             usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), ticketid=tickets[j], type="ticket")
             n_users = random.randint(1, 10)
             random.shuffle(users)
-            for l in range(n_users):
-                usergroupuser = md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[l])
+            for k in range(n_users):
+                md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[k])
         # Actions for the ticket
         for swimlanecolumn in md.Swimlanecolumn.objects.filter(columnid=column):
             n_actions = random.randint(1, 10)
@@ -110,8 +110,8 @@ def test_import_export():
                 usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), actionid=action, type="action")
                 n_users = random.randint(1, 10)
                 random.shuffle(users)
-                for l in range(n_users):
-                    usergroupuser = md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[l])
+                for ii in range(n_users):
+                    md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[ii])
         # Export the board
         response = client.get(reverse("export_board_data", args=[boards[num].boardid, "test.csv"]))
         data = response.content

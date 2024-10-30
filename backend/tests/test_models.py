@@ -109,7 +109,7 @@ def test_column():
         assert column.description == f"description{i}"
         assert column.title == f"title{i}"
         assert column.ordernum == i
-        assert column.swimlane == False
+        assert column.swimlane is False
         i += 1
         column.delete()
     assert md.Column.objects.count() == 0

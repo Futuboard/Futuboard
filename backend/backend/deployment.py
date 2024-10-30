@@ -1,5 +1,5 @@
 import os
-from .settings import *
+from .settings import *  # noqa: F403
 
 ALLOWED_HOSTS = [os.environ["WEBSITE_HOSTNAME"]] if "WEBSITE_HOSTNAME" in os.environ else []
 CORS_ALLOWED_ORIGINS = ["*"]

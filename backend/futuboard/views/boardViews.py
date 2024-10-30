@@ -29,7 +29,7 @@ def get_all_boards(request: rest_framework.request.Request, format=None):
 
             serializer = BoardSerializer(new_board)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("Cannot create Board")
     if request.method == "GET":
         query_set = Board.objects.all()
@@ -102,5 +102,5 @@ def get_board_by_id(request, board_id):
 
             board.delete()
             return JsonResponse({"message": "Board deleted successfully"}, status=200)
-        except:
+        except:  # noqa: E722
             raise Http404("Board deletion failed")

@@ -63,13 +63,13 @@ def test_get_board_by_id():
         response = api_client.post(reverse("get_board_by_id", args=[boardids[i]]), {"password": "password" + str(i)})
         data = response.json()
         print(data)
-        assert data["success"] == True
+        assert data["success"] is True
         assert response.status_code == 200
     # Test getting board by id with wrong password
     response = api_client.post(reverse("get_board_by_id", args=[boardids[0]]), {"password": "wrongpassword"})
     data = response.json()
     print(data)
-    assert data["success"] == False
+    assert data["success"] is False
     assert response.status_code == 200
     # Get board by id for all boards
     for i in range(5):
@@ -117,8 +117,8 @@ def test_get_columns_from_board():
     data = response.json()
     assert len(data) == 5
     # Make sure there are 4 non-swimlane columns and 1 swimlane column
-    assert len([column for column in data if column["swimlane"] == False]) == 4
-    assert len([column for column in data if column["swimlane"] == True]) == 1
+    assert len([column for column in data if column["swimlane"] is False]) == 4
+    assert len([column for column in data if column["swimlane"] is True]) == 1
     assert md.Swimlanecolumn.objects.count() == 4
     assert md.Column.objects.count() == 5
     assert response.status_code == 200

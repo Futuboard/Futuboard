@@ -43,7 +43,7 @@ def get_columns_from_board(request, board_id):
                     swimlanecolumn.save()
             serializer = ColumnSerializer(new_column)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("Column creation failed")
     if request.method == "PUT":
         try:
@@ -53,7 +53,7 @@ def get_columns_from_board(request, board_id):
                 column.ordernum = index
                 column.save()
             return JsonResponse({"message": "Columns order updated successfully"}, status=200)
-        except:
+        except:  # noqa: E722
             raise Http404("Error updating columns order.")
 
 
@@ -79,7 +79,7 @@ def get_tickets_from_column(request, board_id, column_id):
             return JsonResponse({"message": "Tasks order updated successfully"}, status=200)
         except Ticket.DoesNotExist:
             raise Http404("Task does not exist")
-        except:
+        except:  # noqa: E722
             raise Http404("Error updating tasks order.")
     if request.method == "POST":
         try:
@@ -104,14 +104,14 @@ def get_tickets_from_column(request, board_id, column_id):
 
             serializer = TicketSerializer(new_ticket)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("Cannot create Ticket")
     if request.method == "GET":
         try:
             query_set = Ticket.objects.filter(columnid=column_id).order_by("order")
             serializer = TicketSerializer(query_set, many=True)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("Error getting tickets.")
 
 
@@ -141,7 +141,7 @@ def update_ticket(request, column_id, ticket_id):
 
             ticket.delete()
             return JsonResponse({"message": "Ticket deleted successfully"}, status=200)
-        except:
+        except:  # noqa: E722
             raise Http404("Cannot delete Ticket")
 
     if request.method == "PUT":
@@ -156,7 +156,7 @@ def update_ticket(request, column_id, ticket_id):
 
             serializer = TicketSerializer(ticket)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("Cannot update Ticket")
 
 
@@ -189,7 +189,7 @@ def update_column(request, board_id, column_id):
                         user.delete()
             column.delete()
             return JsonResponse({"message": "Column deleted successfully"}, status=200)
-        except:
+        except:  # noqa: E722
             raise Http404("Cannot delete Column")
 
     if request.method == "PUT":
@@ -201,7 +201,7 @@ def update_column(request, board_id, column_id):
 
             serializer = ColumnSerializer(column)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("Cannot update Column")
 
 
@@ -229,7 +229,7 @@ def get_users_from_board(request, board_id):
 
             serializer = UserSerializer(new_user)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("User creation failed")
 
 
@@ -260,7 +260,7 @@ def get_users_from_ticket(request, ticket_id):
                     new_usergroup = UsergroupUser(usergroupid=usergroup, userid=User.objects.get(pk=user["userid"]))
                     new_usergroup.save()
 
-        except:
+        except:  # noqa: E722
             raise Http404("User update failed")
         # TODO: implement
         print("TO BE IMPLEMENTED")
@@ -277,7 +277,7 @@ def get_users_from_ticket(request, ticket_id):
 
             serializer = UserSerializer(new_user)
             return JsonResponse(serializer.data, safe=False)
-        except:
+        except:  # noqa: E722
             raise Http404("User creation failed")
 
 
@@ -289,7 +289,7 @@ def update_user(request, user_id):
             response = "Successfully deleted user: {}".format(user_id)
             user.delete()
             return HttpResponse(response)
-        except:
+        except:  # noqa: E722
             raise Http404("User deletion failed")
 
 
