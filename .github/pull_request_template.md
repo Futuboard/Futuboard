@@ -1,16 +1,13 @@
 ## Changes
 
 Replace this text with a brief description of the changes in this PR, e.g.
-
 - Switched to using Material-UI for styling
 - Added a new page for user profile
 - Fixed bug with user login
 
 ## Checklist (check all that apply, once you have confirmed they are OK)
 
-- [] **Eslint:** Ensure that `npm run lint` passes with no errors or warnings.
 - [] **Styles:**
-
   1. No global styles.
   2. Root element (App component) should not have any specific styles.
   3. Utilize the MUI (Material-UI) library for styling.
@@ -18,7 +15,6 @@ Replace this text with a brief description of the changes in this PR, e.g.
   5. Define styles using `sx` prop rather than `style` prop.
 
 - [] **File Naming and Folder Structure:**
-
   1. File naming conventions: React components in PascalCase, others in camelCase
   2. Database types and api logic is handled in an `entities` directory.
   3. 'Pages' directory for primary page components handled by the router.
