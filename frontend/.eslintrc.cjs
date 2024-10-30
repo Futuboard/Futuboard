@@ -15,14 +15,7 @@ module.exports = {
       "warn",
       { allowConstantExport: true },
     ],
-    "quotes": ["error", "double"], // Enforce double quotes
-    "jsx-quotes": ["error", "prefer-double"], // Enforce double quotes in JSX
     "react/jsx-props-no-spreading": "off", // Allow props spreading in JSX
-    "react/jsx-curly-spacing": ["error", "never"],
-    "react/jsx-equals-spacing": ["error", "never"], // Disallow spaces around equal signs in JSX attributes
-    "semi": ["error", "always"], // Enforce semicolons
-    "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 1, "maxBOF": 0 }], // Enforce max 1 empty line
-    "no-trailing-spaces": "error", // Disallow trailing spaces
     // File Naming and Folder Structure
     "unicorn/filename-case": [
       "error",
@@ -36,8 +29,6 @@ module.exports = {
     // General
     "no-console": ["error", { allow: ["warn", "error"] }],
     "no-unused-vars": "off",
-    "comma-spacing": ["error", { before: false, after: true }], // Ensure spacing after commas
-    "object-curly-spacing": ["error", "always"], // Enforce spacing inside object literals
     "@typescript-eslint/no-unused-vars": ["error"],
     "import/order": [
       "error",
