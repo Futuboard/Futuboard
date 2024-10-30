@@ -1,28 +1,28 @@
+import styled from "@emotion/styled";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useForm } from "react-hook-form";
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 import { NewBoardFormImport } from "../../types";
-import styled from "@emotion/styled";
 
 interface AddBoardCreationFormProps {
     onSubmit: (_: NewBoardFormImport) => void,
     onCancel: () => void,
 }
 
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
+const VisuallyHiddenInput = styled("input")({
+    clip: "rect(0 0 0 0)",
+    clipPath: "inset(50%)",
     height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
+    overflow: "hidden",
+    position: "absolute",
     bottom: 0,
     left: 0,
-    whiteSpace: 'nowrap',
+    whiteSpace: "nowrap",
     width: 1,
 });
 
@@ -74,7 +74,7 @@ const BoardImportForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCanc
                         variant="contained"
                         tabIndex={-1}
                         startIcon={<CloudUploadIcon />}
-                        sx={{ width: "84%"}}
+                        sx={{ width: "84%" }}
                     >
                         Upload file
                         <VisuallyHiddenInput type="file" {...register("file")} />

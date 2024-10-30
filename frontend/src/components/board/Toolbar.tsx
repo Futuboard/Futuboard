@@ -107,7 +107,7 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
     const date = new Date();
     const timestamp = date.toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/[^a-zA-Z0-9]/g, "_");
     const filename = title + "-" + timestamp;
-    const response = await fetch(`${import.meta.env.VITE_DB_ADDRESS}export/${boardId}/${filename.replace(/[^A-Za-z0-9\-._~]/g, '_')}/`, {
+    const response = await fetch(`${import.meta.env.VITE_DB_ADDRESS}export/${boardId}/${filename.replace(/[^A-Za-z0-9\-._~]/g, "_")}/`, {
       method: "GET",
       headers: {
         "Content-Type": "text/csv"
