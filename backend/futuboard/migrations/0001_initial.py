@@ -6,147 +6,234 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Action',
+            name="Action",
             fields=[
-                ('actionid', models.UUIDField(db_column='actionID', primary_key=True, serialize=False)),
-                ('title', models.TextField(blank=True, null=True)),
-                ('color', models.TextField(blank=True, null=True)),
-                ('order', models.IntegerField()),
-                ('creation_date', models.DateTimeField(blank=True, null=True)),
+                ("actionid", models.UUIDField(db_column="actionID", primary_key=True, serialize=False)),
+                ("title", models.TextField(blank=True, null=True)),
+                ("color", models.TextField(blank=True, null=True)),
+                ("order", models.IntegerField()),
+                ("creation_date", models.DateTimeField(blank=True, null=True)),
             ],
             options={
-                'db_table': 'Action',
+                "db_table": "Action",
             },
         ),
         migrations.CreateModel(
-            name='Board',
+            name="Board",
             fields=[
-                ('boardid', models.UUIDField(db_column='boardID', primary_key=True, serialize=False)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('title', models.TextField()),
-                ('creator', models.TextField()),
-                ('creation_date', models.DateTimeField()),
-                ('passwordhash', models.TextField(db_column='passwordHash')),
-                ('salt', models.TextField()),
+                ("boardid", models.UUIDField(db_column="boardID", primary_key=True, serialize=False)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("title", models.TextField()),
+                ("creator", models.TextField()),
+                ("creation_date", models.DateTimeField()),
+                ("passwordhash", models.TextField(db_column="passwordHash")),
+                ("salt", models.TextField()),
             ],
             options={
-                'db_table': 'Board',
+                "db_table": "Board",
             },
         ),
         migrations.CreateModel(
-            name='Column',
+            name="Column",
             fields=[
-                ('columnid', models.UUIDField(db_column='columnID', primary_key=True, serialize=False)),
-                ('wip_limit', models.IntegerField(blank=True, null=True)),
-                ('color', models.TextField(blank=True, null=True)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('title', models.TextField(blank=True, null=True)),
-                ('ordernum', models.IntegerField(db_column='orderNum')),
-                ('creation_date', models.DateTimeField(blank=True, null=True)),
-                ('swimlane', models.BooleanField()),
-                ('wip_limit_story', models.IntegerField(blank=True, null=True)),
-                ('boardid', models.ForeignKey(db_column='boardID', on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.board')),
+                ("columnid", models.UUIDField(db_column="columnID", primary_key=True, serialize=False)),
+                ("wip_limit", models.IntegerField(blank=True, null=True)),
+                ("color", models.TextField(blank=True, null=True)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("title", models.TextField(blank=True, null=True)),
+                ("ordernum", models.IntegerField(db_column="orderNum")),
+                ("creation_date", models.DateTimeField(blank=True, null=True)),
+                ("swimlane", models.BooleanField()),
+                ("wip_limit_story", models.IntegerField(blank=True, null=True)),
+                (
+                    "boardid",
+                    models.ForeignKey(
+                        db_column="boardID", on_delete=django.db.models.deletion.DO_NOTHING, to="futuboard.board"
+                    ),
+                ),
             ],
             options={
-                'db_table': 'Column',
+                "db_table": "Column",
             },
         ),
         migrations.CreateModel(
-            name='Ticket',
+            name="Ticket",
             fields=[
-                ('ticketid', models.UUIDField(db_column='ticketID', primary_key=True, serialize=False)),
-                ('title', models.TextField(blank=True, null=True)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('color', models.TextField(blank=True, null=True)),
-                ('storypoints', models.IntegerField(blank=True, null=True)),
-                ('size', models.IntegerField(blank=True, null=True)),
-                ('order', models.IntegerField()),
-                ('creation_date', models.DateTimeField(blank=True, null=True)),
-                ('cornernote', models.TextField(blank=True, db_column='cornerNote', null=True)),
-                ('columnid', models.ForeignKey(db_column='columnID', on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.column')),
+                ("ticketid", models.UUIDField(db_column="ticketID", primary_key=True, serialize=False)),
+                ("title", models.TextField(blank=True, null=True)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("color", models.TextField(blank=True, null=True)),
+                ("storypoints", models.IntegerField(blank=True, null=True)),
+                ("size", models.IntegerField(blank=True, null=True)),
+                ("order", models.IntegerField()),
+                ("creation_date", models.DateTimeField(blank=True, null=True)),
+                ("cornernote", models.TextField(blank=True, db_column="cornerNote", null=True)),
+                (
+                    "columnid",
+                    models.ForeignKey(
+                        db_column="columnID", on_delete=django.db.models.deletion.DO_NOTHING, to="futuboard.column"
+                    ),
+                ),
             ],
             options={
-                'db_table': 'Ticket',
+                "db_table": "Ticket",
             },
         ),
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('userid', models.UUIDField(db_column='userID', default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('name', models.TextField(blank=True, null=True)),
-                ('color', models.TextField(blank=True, null=True)),
+                (
+                    "userid",
+                    models.UUIDField(db_column="userID", default=uuid.uuid4, primary_key=True, serialize=False),
+                ),
+                ("name", models.TextField(blank=True, null=True)),
+                ("color", models.TextField(blank=True, null=True)),
             ],
             options={
-                'db_table': 'User',
+                "db_table": "User",
             },
         ),
         migrations.CreateModel(
-            name='Usergroup',
+            name="Usergroup",
             fields=[
-                ('usergroupid', models.UUIDField(db_column='usergroupID', default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('type', models.TextField(blank=True, null=True)),
-                ('actionid', models.ForeignKey(blank=True, db_column='actionID', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.action')),
-                ('boardid', models.ForeignKey(blank=True, db_column='boardID', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.board')),
-                ('ticketid', models.ForeignKey(blank=True, db_column='ticketID', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.ticket')),
+                (
+                    "usergroupid",
+                    models.UUIDField(db_column="usergroupID", default=uuid.uuid4, primary_key=True, serialize=False),
+                ),
+                ("type", models.TextField(blank=True, null=True)),
+                (
+                    "actionid",
+                    models.ForeignKey(
+                        blank=True,
+                        db_column="actionID",
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="futuboard.action",
+                    ),
+                ),
+                (
+                    "boardid",
+                    models.ForeignKey(
+                        blank=True,
+                        db_column="boardID",
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="futuboard.board",
+                    ),
+                ),
+                (
+                    "ticketid",
+                    models.ForeignKey(
+                        blank=True,
+                        db_column="ticketID",
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="futuboard.ticket",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'UserGroup',
+                "db_table": "UserGroup",
             },
         ),
         migrations.CreateModel(
-            name='Swimlanecolumn',
+            name="Swimlanecolumn",
             fields=[
-                ('swimlanecolumnid', models.UUIDField(db_column='swimlaneColumnID', default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('color', models.TextField(blank=True, null=True)),
-                ('title', models.TextField(blank=True, null=True)),
-                ('ordernum', models.IntegerField(db_column='orderNum')),
-                ('columnid', models.ForeignKey(blank=True, db_column='columnID', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.column')),
+                (
+                    "swimlanecolumnid",
+                    models.UUIDField(
+                        db_column="swimlaneColumnID", default=uuid.uuid4, primary_key=True, serialize=False
+                    ),
+                ),
+                ("color", models.TextField(blank=True, null=True)),
+                ("title", models.TextField(blank=True, null=True)),
+                ("ordernum", models.IntegerField(db_column="orderNum")),
+                (
+                    "columnid",
+                    models.ForeignKey(
+                        blank=True,
+                        db_column="columnID",
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="futuboard.column",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'SwimlaneColumn',
+                "db_table": "SwimlaneColumn",
             },
         ),
         migrations.CreateModel(
-            name='Event',
+            name="Event",
             fields=[
-                ('eventid', models.UUIDField(db_column='eventID', primary_key=True, serialize=False)),
-                ('timestamp', models.DateTimeField()),
-                ('objecttype', models.TextField(db_column='objectType')),
-                ('objectid', models.UUIDField(db_column='objectID')),
-                ('action', models.TextField()),
-                ('boardid', models.ForeignKey(db_column='boardID', on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.board')),
+                ("eventid", models.UUIDField(db_column="eventID", primary_key=True, serialize=False)),
+                ("timestamp", models.DateTimeField()),
+                ("objecttype", models.TextField(db_column="objectType")),
+                ("objectid", models.UUIDField(db_column="objectID")),
+                ("action", models.TextField()),
+                (
+                    "boardid",
+                    models.ForeignKey(
+                        db_column="boardID", on_delete=django.db.models.deletion.DO_NOTHING, to="futuboard.board"
+                    ),
+                ),
             ],
             options={
-                'db_table': 'Event',
+                "db_table": "Event",
             },
         ),
         migrations.AddField(
-            model_name='action',
-            name='swimlanecolumnid',
-            field=models.ForeignKey(blank=True, db_column='swimlaneColumnID', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.swimlanecolumn'),
+            model_name="action",
+            name="swimlanecolumnid",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="swimlaneColumnID",
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="futuboard.swimlanecolumn",
+            ),
         ),
         migrations.AddField(
-            model_name='action',
-            name='ticketid',
-            field=models.ForeignKey(blank=True, db_column='ticketID', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.ticket'),
+            model_name="action",
+            name="ticketid",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="ticketID",
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="futuboard.ticket",
+            ),
         ),
         migrations.CreateModel(
-            name='UsergroupUser',
+            name="UsergroupUser",
             fields=[
-                ('usergroupid', models.OneToOneField(db_column='usergroupID', default=uuid.uuid4, on_delete=django.db.models.deletion.DO_NOTHING, primary_key=True, serialize=False, to='futuboard.usergroup')),
-                ('userid', models.ForeignKey(db_column='userID', on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.user')),
+                (
+                    "usergroupid",
+                    models.OneToOneField(
+                        db_column="usergroupID",
+                        default=uuid.uuid4,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        primary_key=True,
+                        serialize=False,
+                        to="futuboard.usergroup",
+                    ),
+                ),
+                (
+                    "userid",
+                    models.ForeignKey(
+                        db_column="userID", on_delete=django.db.models.deletion.DO_NOTHING, to="futuboard.user"
+                    ),
+                ),
             ],
             options={
-                'db_table': 'UserGroup_User',
-                'unique_together': {('usergroupid', 'userid')},
+                "db_table": "UserGroup_User",
+                "unique_together": {("usergroupid", "userid")},
             },
         ),
     ]
