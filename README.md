@@ -192,19 +192,21 @@ cd frontend/
 npm run dev
 ```
 
-### Linting
+### Linting and code style
 
-To run linting to make sure that the code is written according to the styling standards run:
+To make sure that the code doesn't have any lint/style issues run:
+
+#### Frontend
 
 ```
 cd frontend/
-npm run lint
+npm run lint && npm run prettier
 ```
 
 To automatically fix detected errors run:
 
 ```
-npm run lint -- --fix
+npm run lint:fix && npm run prettier:fix
 ```
 
 #### Backend
