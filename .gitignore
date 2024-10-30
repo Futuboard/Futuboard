@@ -36,3 +36,6 @@ env
 
 # Database local data
 db/
+
+# Ruff
+/.ruff_cache
