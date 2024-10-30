@@ -3,7 +3,6 @@ Views to import and export CSV files of board data
 """
 from django.http import HttpResponse
 from ..csv_parser import write_csv_header, write_board_data, verify_csv_header, read_board_data
-from ..models import Board, Column, Swimlanecolumn, Ticket, User, Usergroup, UsergroupUser
 import csv
 import io
 from rest_framework.decorators import api_view

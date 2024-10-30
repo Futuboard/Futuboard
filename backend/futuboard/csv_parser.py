@@ -1,8 +1,6 @@
-import csv
 import uuid
 from futuboard.models import Board, Column, Ticket, User, Usergroup, UsergroupUser, Swimlanecolumn, Action
 from django.utils import timezone
-import itertools
 """
 This file is used to export and import board data to and from a csv file.
 

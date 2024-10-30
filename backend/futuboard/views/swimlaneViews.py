@@ -1,7 +1,7 @@
 from django.http import Http404
 from rest_framework.decorators import api_view
 from django.utils import timezone
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 
 from ..models import Board, Column, Swimlanecolumn, Action, Ticket, Usergroup, User, UsergroupUser
 from ..serializers import SwimlaneColumnSerializer, ActionSerializer, UserSerializer

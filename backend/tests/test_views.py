@@ -2,7 +2,6 @@ import pytest
 import futuboard.models as md
 from rest_framework.test import APIClient
 import uuid
-from django.utils import timezone
 from django.urls import reverse
 import json
 

@@ -1,9 +1,6 @@
 from argon2 import PasswordHasher
-import psycopg2
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
-from rest_framework.authtoken.models import Token
-import django.contrib.auth.hashers as hashers
 import rest_framework.request
 
 def logUserIn(request: rest_framework.request.Request):

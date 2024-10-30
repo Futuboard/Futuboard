@@ -1,6 +1,5 @@
 # This migration file is used by test_settings.py to create a test database for the application.
 
-import django.db.models.deletion
 import uuid
 from django.db import migrations, models
 
