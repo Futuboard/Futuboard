@@ -1,60 +1,57 @@
-import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import React from "react";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button"
+import Divider from "@mui/material/Divider"
+import Grid from "@mui/material/Grid"
+import TextField from "@mui/material/TextField"
+import Typography from "@mui/material/Typography"
+import React from "react"
+import { useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 
-import { useLoginMutation } from "@/state/apiSlice";
+import { useLoginMutation } from "@/state/apiSlice"
 
 interface AccessBoardFormProps {
-  id: string;
-  login: (_: boolean) => void;
+  id: string
+  login: (_: boolean) => void
 }
 
 interface FormData {
-  password: string;
+  password: string
 }
 
-const AccessBoardForm: React.FC<AccessBoardFormProps> = ({
-  id,
-  login,
-}) => {
+const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id, login }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<FormData>({
     defaultValues: {
-      password: "",
-    },
-  });
-  const navigate = useNavigate();
-  const [tryLogin] = useLoginMutation();
+      password: ""
+    }
+  })
+  const navigate = useNavigate()
+  const [tryLogin] = useLoginMutation()
   const onSubmit = async (data: FormData) => {
-    const loginResponse = await tryLogin({ boardId: id, password: data.password });
+    const loginResponse = await tryLogin({ boardId: id, password: data.password })
     if ("error" in loginResponse) {
-      alert("Hmm we got an error");
-      return;
+      alert("Hmm we got an error")
+      return
     }
 
-    const success = loginResponse.data.success;
+    const success = loginResponse.data.success
     if (success) {
-      login(true);
+      login(true)
     } else {
-      alert("Wrong password");
+      alert("Wrong password")
     }
-  };
+  }
   const onCancel = () => {
-    navigate("/");
-  };
+    navigate("/")
+  }
 
   const handleFormSubmit = (data: FormData) => {
     // Perform password validation or authentication here
-    onSubmit(data);
-  };
+    onSubmit(data)
+  }
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -82,7 +79,7 @@ const AccessBoardForm: React.FC<AccessBoardFormProps> = ({
         </Grid>
       </Grid>
     </form>
-  );
-};
+  )
+}
 
-export default AccessBoardForm;
+export default AccessBoardForm

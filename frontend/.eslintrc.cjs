@@ -11,10 +11,7 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   plugins: ["react-refresh", "unicorn", "import", "react"],
   rules: {
-    "react-refresh/only-export-components": [
-      "warn",
-      { allowConstantExport: true },
-    ],
+    "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     "react/jsx-props-no-spreading": "off", // Allow props spreading in JSX
     // File Naming and Folder Structure
     "unicorn/filename-case": [
@@ -22,9 +19,9 @@ module.exports = {
       {
         cases: {
           camelCase: true,
-          pascalCase: true,
-        },
-      },
+          pascalCase: true
+        }
+      }
     ],
     // General
     "no-console": ["error", { allow: ["warn", "error"] }],
@@ -33,27 +30,27 @@ module.exports = {
     "import/order": [
       "error",
       {
-        "groups": [
+        groups: [
           "builtin", // Node.js built-in modules
           "external", // External modules
           "internal", // Internal/project modules
           "parent", // Parent directories
           "sibling", // Sibling files
           "index", // Index file
-          "object", // Object members
+          "object" // Object members
         ],
-        "pathGroups": [
+        pathGroups: [
           // Customize the order as needed
           {
-            "pattern": "@/**", // Styles or other custom paths
-            "group": "internal",
-            "position": "after",
-          },
+            pattern: "@/**", // Styles or other custom paths
+            group: "internal",
+            position: "after"
+          }
         ],
-        "pathGroupsExcludedImportTypes": ["builtin"], // Exclude built-in modules from path groups
+        pathGroupsExcludedImportTypes: ["builtin"], // Exclude built-in modules from path groups
         "newlines-between": "always", // Ensure newlines between different import groups
-        "alphabetize": { order: "asc", caseInsensitive: true }, // Alphabetical order within groups
-      },
-    ],
-  },
-};
+        alphabetize: { order: "asc", caseInsensitive: true } // Alphabetical order within groups
+      }
+    ]
+  }
+}

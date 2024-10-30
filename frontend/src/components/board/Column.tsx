@@ -1,33 +1,38 @@
-import { Draggable, Droppable, DroppableProvided, DroppableStateSnapshot } from "@hello-pangea/dnd";
-import { Edit } from "@mui/icons-material";
-import AddIcon from "@mui/icons-material/Add";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { Box, Dialog, DialogContent, Divider, IconButton, List, Popover, Tooltip, Typography } from "@mui/material";
-import Paper from "@mui/material/Paper";
-import { useMemo, useState, useContext } from "react";
-import { useSelector } from "react-redux";
-import { useParams } from "react-router";
+import { Draggable, Droppable, DroppableProvided, DroppableStateSnapshot } from "@hello-pangea/dnd"
+import { Edit } from "@mui/icons-material"
+import AddIcon from "@mui/icons-material/Add"
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
+import { Box, Dialog, DialogContent, Divider, IconButton, List, Popover, Tooltip, Typography } from "@mui/material"
+import Paper from "@mui/material/Paper"
+import { useContext, useMemo, useState } from "react"
+import { useSelector } from "react-redux"
+import { useParams } from "react-router"
 
-import { WebsocketContext } from "@/pages/BoardContainer";
-import { RootState } from "@/state/store";
+import { WebsocketContext } from "@/pages/BoardContainer"
+import { RootState } from "@/state/store"
 
-import { getId } from "../../services/Utils";
-import { boardsApi, useAddTaskMutation, useGetTaskListByColumnIdQuery, useUpdateColumnMutation } from "../../state/apiSlice";
-import { Column, Task as TaskType, User } from "../../types";
+import { getId } from "../../services/Utils"
+import {
+  boardsApi,
+  useAddTaskMutation,
+  useGetTaskListByColumnIdQuery,
+  useUpdateColumnMutation
+} from "../../state/apiSlice"
+import { Column, Task as TaskType, User } from "../../types"
 
-import ColumnEditForm from "./ColumnEditForm";
-import SwimlaneContainer from "./SwimlaneContainer";
-import Task from "./Task";
-import TaskCreationForm from "./TaskCreationForm";
+import ColumnEditForm from "./ColumnEditForm"
+import SwimlaneContainer from "./SwimlaneContainer"
+import Task from "./Task"
+import TaskCreationForm from "./TaskCreationForm"
 
 interface FormData {
-  taskTitle: string,
-  size?: number,
-  corners?: User[],
-  description?: string,
-  cornerNote?: string,
-  color?: string,
+  taskTitle: string
+  size?: number
+  corners?: User[]
+  description?: string
+  cornerNote?: string
+  color?: string
 }
 
 interface CreateTaskButtonProps {
@@ -35,23 +40,23 @@ interface CreateTaskButtonProps {
 }
 
 const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
-  const { id = "default-id" } = useParams();
+  const { id = "default-id" } = useParams()
 
-  const [defaultValues, setDefaultValues] = useState<FormData | null>(null);
+  const [defaultValues, setDefaultValues] = useState<FormData | null>(null)
 
   //function for sending a websocket message
-  const sendMessage = useContext(WebsocketContext);
+  const sendMessage = useContext(WebsocketContext)
 
-  const [addTask] = useAddTaskMutation();
+  const [addTask] = useAddTaskMutation()
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
   const handleOpenDialog = () => {
-    setOpen(true);
-  };
+    setOpen(true)
+  }
   const handleCloseDialog = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
   const handleSubmit = (data: FormData) => {
     //task object cant be give type Task yet- problem with caretaker types
     //the object creation should be refactored to the TaskCreationForm component
@@ -65,21 +70,23 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
       boardid: id,
       color: data.color,
       cornernote: data.cornerNote
-    };
+    }
 
-    const add$ = addTask({ boardId: id, columnId: columnid, task: taskObject });
-    add$.unwrap().then(() => {
-      setOpen(false);
-      if (sendMessage !== null) {
-        sendMessage("Task added");
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
-    setOpen(false);
-    setDefaultValues(null);
-
-  };
+    const add$ = addTask({ boardId: id, columnId: columnid, task: taskObject })
+    add$
+      .unwrap()
+      .then(() => {
+        setOpen(false)
+        if (sendMessage !== null) {
+          sendMessage("Task added")
+        }
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+    setOpen(false)
+    setDefaultValues(null)
+  }
   return (
     <Box>
       <Tooltip title="Add Card">
@@ -87,40 +94,50 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
           <AddIcon />
         </IconButton>
       </Tooltip>
-      <Dialog disableRestoreFocus open={open} onClose={handleCloseDialog} PaperProps={{
-        style: {
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-        },
-      }}
+      <Dialog
+        disableRestoreFocus
+        open={open}
+        onClose={handleCloseDialog}
+        PaperProps={{
+          style: {
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)"
+          }
+        }}
       >
         <DialogContent>
-          <TaskCreationForm onSubmit={handleSubmit} onCancel={handleCloseDialog} defaultValues={defaultValues} setDefaultValues={setDefaultValues} />
+          <TaskCreationForm
+            onSubmit={handleSubmit}
+            onCancel={handleCloseDialog}
+            defaultValues={defaultValues}
+            setDefaultValues={setDefaultValues}
+          />
         </DialogContent>
       </Dialog>
     </Box>
-
-  );
-};
+  )
+}
 
 interface TaskListProps {
-  column: Column;
+  column: Column
 }
 
 const TaskList: React.FC<TaskListProps> = ({ column }) => {
-
   //get task list from server
-  const { data: taskList, isLoading } = useGetTaskListByColumnIdQuery({ boardId: column.boardid, columnId: column.columnid });
+  const { data: taskList, isLoading } = useGetTaskListByColumnIdQuery({
+    boardId: column.boardid,
+    columnId: column.columnid
+  })
 
-  const tasks = taskList;
+  const tasks = taskList
   if (isLoading) {
     return (
       <Typography variant={"body2"} gutterBottom>
         Loading cards...
       </Typography>
-    );
+    )
   }
 
   return (
@@ -132,7 +149,7 @@ const TaskList: React.FC<TaskListProps> = ({ column }) => {
             style={{
               backgroundColor: snapshot.isDraggingOver ? "rgba(22, 95, 199, 0.1)" : "transparent",
               minHeight: "74vh",
-              height: "auto",
+              height: "auto"
             }}
             {...provided.droppableProps}
           >
@@ -141,55 +158,47 @@ const TaskList: React.FC<TaskListProps> = ({ column }) => {
                 <Draggable key={task.ticketid} draggableId={task.ticketid} index={index}>
                   {(provided) => {
                     return (
-                      <List
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-
-                      >
-                        <Task
-                          key={task.ticketid}
-                          task={task}
-                          index={index}
-                        />
+                      <List ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                        <Task key={task.ticketid} task={task} index={index} />
                       </List>
-                    );
+                    )
                   }}
                 </Draggable>
               ))
             ) : (
-              <Typography variant={"body2"} gutterBottom style={{ textAlign: "center", paddingTop: "30px", color: "#2D3748" }}>
+              <Typography
+                variant={"body2"}
+                gutterBottom
+                style={{ textAlign: "center", paddingTop: "30px", color: "#2D3748" }}
+              >
                 No cards yet
               </Typography>
             )}
             {provided.placeholder}
           </div>
-        );
-      }
-
-      }
+        )
+      }}
     </Droppable>
-  );
-};
+  )
+}
 
 interface ColumnFormData {
-  columnTitle: string,
-  columnWipLimit: number | null,
-  columnWipLimitStory: number | null,
+  columnTitle: string
+  columnWipLimit: number | null
+  columnWipLimitStory: number | null
 }
 
 const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
-
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [updateColumn] = useUpdateColumnMutation();
-  const sendMessage = useContext(WebsocketContext);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+  const [updateColumn] = useUpdateColumnMutation()
+  const sendMessage = useContext(WebsocketContext)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+  }
 
   const handleClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
 
   const handleOnSubmit = async (data: ColumnFormData) => {
     const columnObject = {
@@ -197,18 +206,18 @@ const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
       title: data.columnTitle,
       boardid: column.boardid,
       wip_limit: data.columnWipLimit,
-      wip_limit_story: data.columnWipLimitStory,
-    };
-
-    await updateColumn({ column: columnObject });
-    if (sendMessage !== null) {
-      sendMessage("Column updated");
+      wip_limit_story: data.columnWipLimitStory
     }
-    setAnchorEl(null);
-  };
 
-  const open = Boolean(anchorEl);
-  const popOverid = open ? "popover" : undefined;
+    await updateColumn({ column: columnObject })
+    if (sendMessage !== null) {
+      sendMessage("Column updated")
+    }
+    setAnchorEl(null)
+  }
+
+  const open = Boolean(anchorEl)
+  const popOverid = open ? "popover" : undefined
 
   return (
     <div>
@@ -225,11 +234,11 @@ const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
         onClose={handleClose}
         anchorOrigin={{
           vertical: "center",
-          horizontal: "right",
+          horizontal: "right"
         }}
         transformOrigin={{
           vertical: 50,
-          horizontal: -20,
+          horizontal: -20
         }}
       >
         <Paper sx={{ height: "fit-content", padding: "20px", width: "200px" }}>
@@ -237,47 +246,63 @@ const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
         </Paper>
       </Popover>
     </div>
-  );
-};
-
-interface ColumnProps {
-  column: Column;
-  index: number;
+  )
 }
 
-const defaultTasks: TaskType[] = [];
+interface ColumnProps {
+  column: Column
+  index: number
+}
+
+const defaultTasks: TaskType[] = []
 
 const Column: React.FC<ColumnProps> = ({ column, index }) => {
-  const [showSwimlanes, setShowSwimlanes] = useState(false);
+  const [showSwimlanes, setShowSwimlanes] = useState(false)
 
-  const isSwimlaneColumn = column.swimlane || false; // change this to column.swimlane boolean
-  const { id = "default-id" } = useParams();
+  const isSwimlaneColumn = column.swimlane || false // change this to column.swimlane boolean
+  const { id = "default-id" } = useParams()
 
-  const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select;
+  const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
 
-  const tasks = useSelector((state: RootState) => selectTasksByColumnId({ boardId: id, columnId: column.columnid })(state).data || defaultTasks);
+  const tasks = useSelector(
+    (state: RootState) => selectTasksByColumnId({ boardId: id, columnId: column.columnid })(state).data || defaultTasks
+  )
 
-  const sizeSum = useMemo(() => tasks.reduce((sum, task) => sum + Number(task.size), 0), [tasks]);
+  const sizeSum = useMemo(() => tasks.reduce((sum, task) => sum + Number(task.size), 0), [tasks])
 
-  const taskNum = useMemo(() => tasks.length, [tasks]);
+  const taskNum = useMemo(() => tasks.length, [tasks])
 
-  let bgColor = "#E5DBD9";
+  let bgColor = "#E5DBD9"
 
   // change border color when task or size limit is exceeded
-  if ((column.wip_limit && taskNum > column.wip_limit) || (column.wip_limit_story && sizeSum > column.wip_limit_story)) {
-    bgColor = "#FF4747";
+  if (
+    (column.wip_limit && taskNum > column.wip_limit) ||
+    (column.wip_limit_story && sizeSum > column.wip_limit_story)
+  ) {
+    bgColor = "#FF4747"
   }
   return (
     <Draggable draggableId={column.columnid} index={index}>
       {(provided) => (
-        <Box
-          {...provided.draggableProps}
-          ref={provided.innerRef}
-          sx={{ display: "flex", flexDirection: "row" }}
-        >
-          <Paper elevation={4} sx={{ margin: "25px 20px", width: "250px", minHeight: "74vh", height: "fit-content", backgroundColor: bgColor, padding: "4px", border: "2px solid #000", borderBottom: "5px solid #000", borderColor: "rgba(0, 0, 0, 0.12)" }}>
+        <Box {...provided.draggableProps} ref={provided.innerRef} sx={{ display: "flex", flexDirection: "row" }}>
+          <Paper
+            elevation={4}
+            sx={{
+              margin: "25px 20px",
+              width: "250px",
+              minHeight: "74vh",
+              height: "fit-content",
+              backgroundColor: bgColor,
+              padding: "4px",
+              border: "2px solid #000",
+              borderBottom: "5px solid #000",
+              borderColor: "rgba(0, 0, 0, 0.12)"
+            }}
+          >
             <div {...provided.dragHandleProps} style={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant={"h5"} noWrap gutterBottom sx={{ paddingLeft: "3px", color: "#2D3748" }}>{column.title}</Typography>
+              <Typography variant={"h5"} noWrap gutterBottom sx={{ paddingLeft: "3px", color: "#2D3748" }}>
+                {column.title}
+              </Typography>
               <EditColumnButton column={column} />
               {isSwimlaneColumn && (
                 <IconButton
@@ -290,25 +315,38 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
               )}
             </div>
             <Divider />
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingRight: "13px", paddingBottom: "4px", paddingTop: "4px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingRight: "13px",
+                paddingBottom: "4px",
+                paddingTop: "4px"
+              }}
+            >
               <CreateTaskButton columnid={column.columnid} />
-              <Typography title={"Number of tasks"} sx={{ fontSize: "17px", color: "#2D3748" }} >{column.wip_limit ? `${taskNum} / ${column.wip_limit}` : taskNum}</Typography>
-              <Typography title={"Total size of tasks"} sx={{ fontSize: "17px", color: "#2D3748" }} >{column.wip_limit_story ? `${sizeSum} / ${column.wip_limit_story}` : sizeSum}</Typography>
+              <Typography title={"Number of tasks"} sx={{ fontSize: "17px", color: "#2D3748" }}>
+                {column.wip_limit ? `${taskNum} / ${column.wip_limit}` : taskNum}
+              </Typography>
+              <Typography title={"Total size of tasks"} sx={{ fontSize: "17px", color: "#2D3748" }}>
+                {column.wip_limit_story ? `${sizeSum} / ${column.wip_limit_story}` : sizeSum}
+              </Typography>
             </div>
             <Divider />
             <div>
               <TaskList column={column} />
             </div>
           </Paper>
-          <Box sx={{ overflowX:"hidden", height:"fit-content" }}>
-              <Box sx={{ width: showSwimlanes ? "820px" : "0px", transition: "width 300ms" }}>
-                {showSwimlanes && <SwimlaneContainer column={column} />}
-              </Box>
+          <Box sx={{ overflowX: "hidden", height: "fit-content" }}>
+            <Box sx={{ width: showSwimlanes ? "820px" : "0px", transition: "width 300ms" }}>
+              {showSwimlanes && <SwimlaneContainer column={column} />}
+            </Box>
           </Box>
         </Box>
       )}
     </Draggable>
-  );
-};
+  )
+}
 
-export default Column;
+export default Column
