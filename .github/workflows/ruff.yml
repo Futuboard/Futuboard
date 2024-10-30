@@ -1,4 +1,4 @@
-name: Python application test with pytest
+name: Python lint and style check with Ruff
 
 on:
   push:
