@@ -13,6 +13,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 ###################################### BOARD IMPORT/EXPORT TESTS ###########################################
 ############################################################################################################
 
+
 @pytest.mark.django_db
 def test_import_export():
     """
@@ -29,7 +30,15 @@ def test_import_export():
     n = 10
     boards = []
     for i in range(n):
-        board = md.Board.objects.create(boardid=uuid.uuid4(), title=f"Test Board{i}", creator=f"Test User{i}", creation_date=timezone.now(), description='', passwordhash="test", salt="test")
+        board = md.Board.objects.create(
+            boardid=uuid.uuid4(),
+            title=f"Test Board{i}",
+            creator=f"Test User{i}",
+            creation_date=timezone.now(),
+            description="",
+            passwordhash="test",
+            salt="test",
+        )
         boards.append(board)
     num = 0
     # Fill boards with random data
@@ -40,52 +49,71 @@ def test_import_export():
         for i in range(n_users):
             users.append(md.User.objects.create(userid=uuid.uuid4(), name=f"user{i}", color="red"))
         # Create Usergroup for the board
-        usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(),boardid=board,type="board")
+        usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), boardid=board, type="board")
         # Usergroupusers
         for user in users:
-            usergroupuser = md.UsergroupUser.objects.create(usergroupid=usergroup, userid=user)
+            md.UsergroupUser.objects.create(usergroupid=usergroup, userid=user)
         # Create n columns for the board
         n_columns = random.randint(1, 10)
-        for i in range(n_columns-1):
-            column = md.Column.objects.create(columnid=uuid.uuid4(), boardid=board, title=f"column{i}", ordernum=i, swimlane=False)
+        for i in range(n_columns - 1):
+            column = md.Column.objects.create(
+                columnid=uuid.uuid4(), boardid=board, title=f"column{i}", ordernum=i, swimlane=False
+            )
             n_tickets = random.randint(1, 10)
             for j in range(n_tickets):
-                ticket = md.Ticket.objects.create(ticketid=uuid.uuid4(), columnid=column, title=f"ticket{j}", description="test", order=j)
+                ticket = md.Ticket.objects.create(
+                    ticketid=uuid.uuid4(), columnid=column, title=f"ticket{j}", description="test", order=j
+                )
                 # Usergroup, users, and usergroupusers
                 usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), ticketid=ticket, type="ticket")
                 n_users = random.randint(1, 10)
                 random.shuffle(users)
-                for l in range(n_users):
-                    usergroupuser = md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[l])
+                for k in range(n_users):
+                    md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[k])
         # One column that is a swimlane
-        column = md.Column.objects.create(columnid=uuid.uuid4(), boardid=board, title=f"column{n_columns-1}", ordernum=n_columns-1, swimlane=True)
+        column = md.Column.objects.create(
+            columnid=uuid.uuid4(), boardid=board, title=f"column{n_columns-1}", ordernum=n_columns - 1, swimlane=True
+        )
         n_swimlanecolumns = random.randint(1, 10)
         for i in range(n_swimlanecolumns):
-            swimlanecolumn = md.Swimlanecolumn.objects.create(swimlanecolumnid=uuid.uuid4(), columnid=column, title=f"swimlanecolumn{i}", color="red", ordernum=i)
+            swimlanecolumn = md.Swimlanecolumn.objects.create(
+                swimlanecolumnid=uuid.uuid4(), columnid=column, title=f"swimlanecolumn{i}", color="red", ordernum=i
+            )
         # Tickets for the swimlane column
         n_tickets = random.randint(1, 10)
         tickets = []
         for j in range(n_tickets):
-            tickets.append(md.Ticket.objects.create(ticketid=uuid.uuid4(), columnid=column, title=f"ticket{j}", description="test", order=j))
+            tickets.append(
+                md.Ticket.objects.create(
+                    ticketid=uuid.uuid4(), columnid=column, title=f"ticket{j}", description="test", order=j
+                )
+            )
             # Usergroup, users, and usergroupusers
             usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), ticketid=tickets[j], type="ticket")
             n_users = random.randint(1, 10)
             random.shuffle(users)
-            for l in range(n_users):
-                usergroupuser = md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[l])
+            for k in range(n_users):
+                md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[k])
         # Actions for the ticket
         for swimlanecolumn in md.Swimlanecolumn.objects.filter(columnid=column):
             n_actions = random.randint(1, 10)
             for k in range(n_actions):
-                action = md.Action.objects.create(actionid=uuid.uuid4(), ticketid=tickets[k%n_tickets], swimlanecolumnid=swimlanecolumn, title=f"action{k}", color="red", order=k)
+                action = md.Action.objects.create(
+                    actionid=uuid.uuid4(),
+                    ticketid=tickets[k % n_tickets],
+                    swimlanecolumnid=swimlanecolumn,
+                    title=f"action{k}",
+                    color="red",
+                    order=k,
+                )
                 # Usergroup, users, and usergroupusers
                 usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), actionid=action, type="action")
                 n_users = random.randint(1, 10)
                 random.shuffle(users)
-                for l in range(n_users):
-                    usergroupuser = md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[l])
+                for ii in range(n_users):
+                    md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[ii])
         # Export the board
-        response = client.get(reverse('export_board_data', args=[boards[num].boardid, "test.csv"]))
+        response = client.get(reverse("export_board_data", args=[boards[num].boardid, "test.csv"]))
         data = response.content
         # Create a file from the data
         file = SimpleUploadedFile("test.csv", data, content_type="text/csv")
@@ -96,7 +124,7 @@ def test_import_export():
         new_boardid = uuid.uuid4()
         board_data = {"title": "Test Board", "password": "abc"}
         board_data = json.dumps(board_data)
-        response = client.post(reverse('import_board_data', args=[new_boardid]), {'board': board_data, 'file': file})
+        response = client.post(reverse("import_board_data", args=[new_boardid]), {"board": board_data, "file": file})
         assert response.status_code == 200
         # Check that the imported board is the same as the exported board
         imported_board = md.Board.objects.get(boardid=new_boardid)
@@ -165,4 +193,4 @@ def test_import_export():
     md.Swimlanecolumn.objects.all().delete()
     md.Column.objects.all().delete()
     md.Board.objects.all().delete()
-    md.User.objects.all().delete()        
+    md.User.objects.all().delete()

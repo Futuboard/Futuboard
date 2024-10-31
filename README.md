@@ -207,6 +207,31 @@ To automatically fix detected errors run:
 npm run lint -- --fix
 ```
 
+#### Backend
+
+The easiest way to lint and format backend code is to install [Ruff VS Code extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) and edit your VSCode settings to include
+
+```
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+```
+
+Alternatively, you can use the following commands:  
+To check for lint/style errors run:
+
+```
+cd backend/
+ruff check && ruff format --check
+```
+
+To automatically fix detected errors run:
+
+```
+ruff check --fix && ruff format
+```
+
 ## Instructions for future developers
 
 # Technologies
