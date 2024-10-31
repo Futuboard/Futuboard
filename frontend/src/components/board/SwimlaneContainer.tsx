@@ -63,7 +63,7 @@ const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }>
             onKeyDown={handleKeyDown}
             onChange={handleChange}
             onBlur={handleBlur}
-            style={{ width: "100%", fontSize: "1.5rem", backgroundColor: "transparent" }}
+            style={{ width: "100%", fontSize: "1.5rem", backgroundColor: "transparent", color: "black" }}
           />
         </Box>
       ) : (
