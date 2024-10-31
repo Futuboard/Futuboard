@@ -127,11 +127,11 @@ class Usergroup(models.Model):
 
 
 class UsergroupUser(models.Model):
-    usergroupid = models.OneToOneField(
-        Usergroup, models.DO_NOTHING, db_column="usergroupID", default=uuid.uuid4, primary_key=True
-    )  # Field name made lowercase. The composite primary key (usergroupID, userID) found, that is not supported. The first column is selected.
-    userid = models.ForeignKey(User, models.DO_NOTHING, db_column="userID")  # Field name made lowercase.
+    usergroupuserid = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    usergroupid = models.ForeignKey(Usergroup, models.DO_NOTHING, db_column='usergroupID')  # Field name made lowercase. The composite primary key (usergroupID, userID) found, that is not supported. The first column is selected.
+    userid = models.ForeignKey(User, models.DO_NOTHING, db_column='userID')  # Field name made lowercase.
 
     class Meta:
-        db_table = "UserGroup_User"
-        unique_together = (("usergroupid", "userid"),)
+        db_table = 'UserGroup_User'
+        unique_together = (('usergroupid', 'userid'))
+        
