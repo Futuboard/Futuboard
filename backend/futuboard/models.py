@@ -83,8 +83,8 @@ class Swimlanecolumn(models.Model):
 
 
 class Ticket(models.Model):
-    ticketid = models.UUIDField(db_column="ticketID", primary_key=True)  # Field name made lowercase.
-    columnid = models.ForeignKey(Column, models.DO_NOTHING, db_column="columnID")  # Field name made lowercase.
+    ticketid = models.UUIDField(db_column='ticketID', primary_key=True)  # Field name made lowercase.
+    columnid = models.ForeignKey(Column, models.CASCADE, db_column='columnID')  # Field name made lowercase.
     title = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
@@ -108,18 +108,10 @@ class User(models.Model):
 
 
 class Usergroup(models.Model):
-    usergroupid = models.UUIDField(
-        db_column="usergroupID", default=uuid.uuid4, primary_key=True
-    )  # Field name made lowercase.
-    boardid = models.ForeignKey(
-        Board, models.DO_NOTHING, db_column="boardID", blank=True, null=True
-    )  # Field name made lowercase.
-    ticketid = models.ForeignKey(
-        Ticket, models.DO_NOTHING, db_column="ticketID", blank=True, null=True
-    )  # Field name made lowercase.
-    actionid = models.ForeignKey(
-        Action, models.DO_NOTHING, db_column="actionID", blank=True, null=True
-    )  # Field name made lowercase.
+    usergroupid = models.UUIDField(db_column='usergroupID', default=uuid.uuid4, primary_key=True)  # Field name made lowercase.
+    boardid = models.ForeignKey(Board, models.CASCADE, db_column='boardID', blank=True, null=True)  # Field name made lowercase.
+    ticketid = models.ForeignKey(Ticket, models.CASCADE, db_column='ticketID', blank=True, null=True)  # Field name made lowercase.
+    actionid = models.ForeignKey(Action, models.CASCADE, db_column='actionID', blank=True, null=True)  # Field name made lowercase.
     type = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -128,8 +120,8 @@ class Usergroup(models.Model):
 
 class UsergroupUser(models.Model):
     usergroupuserid = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    usergroupid = models.ForeignKey(Usergroup, models.DO_NOTHING, db_column='usergroupID')  # Field name made lowercase. The composite primary key (usergroupID, userID) found, that is not supported. The first column is selected.
-    userid = models.ForeignKey(User, models.DO_NOTHING, db_column='userID')  # Field name made lowercase.
+    usergroupid = models.ForeignKey(Usergroup, models.CASCADE, db_column='usergroupID')  # Field name made lowercase. The composite primary key (usergroupID, userID) found, that is not supported. The first column is selected.
+    userid = models.ForeignKey(User, models.CASCADE, db_column='userID')  # Field name made lowercase.
 
     class Meta:
         db_table = 'UserGroup_User'
