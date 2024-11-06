@@ -2,9 +2,17 @@ name: Cypress E2E Tests
 
 on:
   push:
-    branches: [ main, development ]
+    branches: [main, development]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "cypress/**"
   pull_request:
-    branches: [ main, development ]
+    branches: [main, development]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "cypress/**"
 
 jobs:
   cypress-run:
@@ -18,7 +26,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: "14"
 
       - name: Install dependencies
         run: npm ci
