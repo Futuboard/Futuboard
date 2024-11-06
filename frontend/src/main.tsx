@@ -6,10 +6,12 @@ import App from "./App.tsx";
 import "./index.css";
 import { store } from "./state/store.ts";
 
+// Test
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
       <App />
     </Provider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
