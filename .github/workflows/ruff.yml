@@ -3,8 +3,12 @@ name: Python lint and style check with Ruff
 on:
   push:
     branches: [main, development]
+    paths:
+      - "backend/**"
   pull_request:
     branches: [main, development]
+    paths:
+      - "backend/**"
 
 jobs:
   build:
