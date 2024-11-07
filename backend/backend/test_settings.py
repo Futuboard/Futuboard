@@ -107,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 MIGRATION_MODULES = {
-    "futuboard": "tests.test_migrations",
+    "futuboard": "futuboard.migrations",
 }
 
 # Internationalization
