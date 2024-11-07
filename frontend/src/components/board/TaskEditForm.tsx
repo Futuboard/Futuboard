@@ -197,8 +197,8 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
                   message: "Size must be at least 0"
                 },
                 max: {
-                  value: 99,
-                  message: "Size must be smaller than 100"
+                  value: 9999,
+                  message: "Size can not exceed 9999"
                 }
               })}
             />
