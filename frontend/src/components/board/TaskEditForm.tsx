@@ -220,7 +220,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
           <Grid item xs={12}>
             <FormControl component="fieldset">
               <Typography variant="subtitle1">Color</Typography>
-              <RadioGroup row aria-label="color" value={selectedColor} onChange={handleColorChange} style ={{backgroundColor: "#c7c7c7", borderRadius: "1000px", paddingLeft: "24px"}}>
+              <RadioGroup row aria-label="color" value={selectedColor} onChange={handleColorChange} sx={{ bgcolor: '#c7c7c7', borderRadius: 1000, paddingLeft: 3}}> 
                 <FormControlLabel value="#ffffff" control={<Radio style={{ color: "#ffffff" }} />} label={null} />
                 <FormControlLabel value="#ffeb3b" control={<Radio style={{ color: "#ffeb3b" }} />} label={null} />
                 <FormControlLabel value="#8bc34a" control={<Radio style={{ color: "#8bc34a" }} />} label={null} />

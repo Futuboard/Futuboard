@@ -154,7 +154,7 @@ const TaskCreationForm: React.FC<TaskCreationFormProps> = (props) => {
           <Grid item xs={12}>
             <FormControl component="fieldset">
               <Typography variant="subtitle1">Color</Typography>
-              <RadioGroup row aria-label="color" value={selectedColor} onChange={handleColorChange} style ={{backgroundColor: "#c7c7c7", borderRadius: "1000px", paddingLeft: "24px"}}>
+              <RadioGroup row aria-label="color" value={selectedColor} onChange={handleColorChange} sx={{ bgcolor: '#c7c7c7', borderRadius: 1000, paddingLeft: 3}}> 
                 <FormControlLabel
                   value="#ffffff"
                   control={<Radio style={{ color: "#ffffff" }} />}
