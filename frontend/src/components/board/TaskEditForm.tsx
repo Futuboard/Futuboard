@@ -132,7 +132,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
   }
 
   return (
-    <ClickAwayListener onClickAway={closeModule}>
+    <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={closeModule}>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
