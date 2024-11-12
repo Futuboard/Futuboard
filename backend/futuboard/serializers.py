@@ -5,7 +5,7 @@ from rest_framework import serializers
 class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
-        fields = ["boardid", "description", "title", "creator", "creation_date", "passwordhash", "salt"]
+        fields = ["boardid", "description", "title", "creator", "creation_date"]
 
 
 class ColumnSerializer(serializers.ModelSerializer):
