@@ -15,15 +15,7 @@
             "python -m venv .venv",
             "source .venv/bin/activate",
             "python manage.py migrate",
-            "python manage.py runserver 0.0.0.0:8000"
-          ]
-        },
-        {
-          "name": "websocket",
-          "commands": [
-            "cd backend",
-            "source .venv/bin/activate",
-            "daphne -b 0.0.0.0 -p 5555 backend.asgi:application"
+            "daphne -b 0.0.0.0 -p 8000 backend.asgi:application"
           ]
         },
         {
