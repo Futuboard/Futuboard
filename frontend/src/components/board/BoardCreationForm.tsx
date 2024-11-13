@@ -56,7 +56,7 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
           />
         </Grid>
         <Grid item xs={12}>
-          <TextField label="Password" {...register("password")} />
+          <TextField label="Password" type="password" {...register("password")} />
         </Grid>
         <Grid item xs={12}>
           <Button type="submit" color="primary" variant="contained">

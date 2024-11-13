@@ -78,7 +78,7 @@ const BoardImportForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCanc
           />
         </Grid>
         <Grid item xs={12}>
-          <TextField label="Password" {...register("password")} />
+          <TextField label="Password" type="password" {...register("password")} />
         </Grid>
         <Grid item xs={12}>
           <Button
