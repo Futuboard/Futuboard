@@ -13,15 +13,8 @@
           "commands": [
             ".venv/Scripts/activate",
             "cd backend",
-            "python manage.py runserver 0.0.0.0:8000"
-          ]
-        },
-        {
-          "name": "websocket",
-          "commands": [
-            ".venv/Scripts/activate",
-            "cd backend",
-            "daphne -b 0.0.0.0 -p 5555 backend.asgi:application"
+            "python manage.py migrate",
+            "daphne -b 0.0.0.0 -p 8000 backend.asgi:application"
           ]
         },
         {

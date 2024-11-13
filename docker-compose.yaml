@@ -36,13 +36,12 @@ services:
 
   backend:
     build: ./backend
-    command: sh -c "python manage.py migrate & python manage.py runserver 0.0.0.0:8000 & daphne -b 0.0.0.0 -p 5555 backend.asgi:application"
+    command: sh -c "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 backend.asgi:application"
     restart: "no"
     env_file:
       - .env
       - .env.docker
     ports:
-      - "5555:5555"
       - "8000:8000"
     develop:
       watch:
