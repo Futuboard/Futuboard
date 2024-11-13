@@ -87,7 +87,7 @@ const TaskCreationForm: React.FC<TaskCreationFormProps> = (props) => {
     onCancel()
   }
   return (
-    <ClickAwayListener onClickAway={onModuleClose}>
+    <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={onModuleClose}>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
