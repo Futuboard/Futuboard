@@ -5,30 +5,49 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('futuboard', '0005_alter_ticket_columnid_alter_usergroup_actionid_and_more'),
+        ("futuboard", "0005_alter_ticket_columnid_alter_usergroup_actionid_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='action',
-            name='swimlanecolumnid',
-            field=models.ForeignKey(blank=True, db_column='swimlaneColumnID', null=True, on_delete=django.db.models.deletion.CASCADE, to='futuboard.swimlanecolumn'),
+            model_name="action",
+            name="swimlanecolumnid",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="swimlaneColumnID",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="futuboard.swimlanecolumn",
+            ),
         ),
         migrations.AlterField(
-            model_name='action',
-            name='ticketid',
-            field=models.ForeignKey(blank=True, db_column='ticketID', null=True, on_delete=django.db.models.deletion.CASCADE, to='futuboard.ticket'),
+            model_name="action",
+            name="ticketid",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="ticketID",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="futuboard.ticket",
+            ),
         ),
         migrations.AlterField(
-            model_name='column',
-            name='boardid',
-            field=models.ForeignKey(db_column='boardID', on_delete=django.db.models.deletion.CASCADE, to='futuboard.board'),
+            model_name="column",
+            name="boardid",
+            field=models.ForeignKey(
+                db_column="boardID", on_delete=django.db.models.deletion.CASCADE, to="futuboard.board"
+            ),
         ),
         migrations.AlterField(
-            model_name='swimlanecolumn',
-            name='columnid',
-            field=models.ForeignKey(blank=True, db_column='columnID', null=True, on_delete=django.db.models.deletion.CASCADE, to='futuboard.column'),
+            model_name="swimlanecolumn",
+            name="columnid",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="columnID",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="futuboard.column",
+            ),
         ),
     ]
