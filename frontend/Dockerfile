@@ -1,7 +1,9 @@
 FROM node:20
+RUN useradd -ms /bin/sh -u 1001 app
+USER app
 
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY --chown=app:app package.json package-lock.json ./
 
 RUN npm install
 
