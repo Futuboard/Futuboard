@@ -92,7 +92,7 @@ const Home: React.FC = () => {
               </Link>
             </Grid>
             <Grid item>
-              <ModalFrameCv cvFileName="Team_Tenacity_CV.png"/>
+              <ModalFrameCv cvFileName="Team_Tenacity_CV.png" />
             </Grid>
           </Grid>
         </Grid>
@@ -109,7 +109,7 @@ const Home: React.FC = () => {
               </Link>
             </Grid>
             <Grid item>
-              <ModalFrameCv cvFileName="Team_Kasipallot_CV.png"/>
+              <ModalFrameCv cvFileName="Team_Kasipallot_CV.png" />
             </Grid>
           </Grid>
         </Grid>
