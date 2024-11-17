@@ -7,26 +7,26 @@ on:
       - "backend/**"
       - "frontend/**"
       - "cypress/**"
+env:
+  RETRY_COUNT: 3
 
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
-    container:
-      image: cypress/browsers:node-20.9.0-chrome-118.0.5993.88-1-ff-118.0.2-edge-118.0.2088.46-1
-
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14"
+      - name: Make backend .env file
+        run: cp .env.example .env
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Make frontend .env file
+        run: cp frontend/.env.example frontend/.env
 
-      - name: Start the server
-        run: npm start &
+      - name: Start containers
+        run: docker compose up -d --wait
 
       - name: Run Cypress tests
         run: npx cypress run --browser chrome
+
+      - name: Stop containers
+        run: docker compose down

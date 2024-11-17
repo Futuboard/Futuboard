@@ -10,5 +10,5 @@ module.exports = {
     },
   },
 
-  retries: process.env.RETRY_COUNT || 0,
+  retries: process.env.RETRY_COUNT ? Number(process.env.RETRY_COUNT) : 0,
 };
