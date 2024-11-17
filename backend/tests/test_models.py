@@ -164,9 +164,6 @@ def test_usergroup():
     # Clean up boards, tickets, actions and columns
     for i in range(n):
         md.Board.objects.get(boardid=boardids[i]).delete()
-        md.Ticket.objects.get(ticketid=ticketids[i]).delete()
-        # md.Action.objects.get(actionid=actionids[i]).delete()
-        md.Column.objects.get(columnid=columnids[i]).delete()
 
 
 """

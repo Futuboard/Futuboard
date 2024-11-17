@@ -11,9 +11,9 @@ import uuid
 
 class Action(models.Model):
     actionid = models.UUIDField(db_column="actionID", primary_key=True)
-    ticketid = models.ForeignKey("Ticket", models.DO_NOTHING, db_column="ticketID", blank=True, null=True)
+    ticketid = models.ForeignKey("Ticket", models.CASCADE, db_column="ticketID", blank=True, null=True)
     swimlanecolumnid = models.ForeignKey(
-        "Swimlanecolumn", models.DO_NOTHING, db_column="swimlaneColumnID", blank=True, null=True
+        "Swimlanecolumn", models.CASCADE, db_column="swimlaneColumnID", blank=True, null=True
     )
     title = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
@@ -39,7 +39,7 @@ class Board(models.Model):
 
 class Column(models.Model):
     columnid = models.UUIDField(db_column="columnID", primary_key=True)
-    boardid = models.ForeignKey(Board, models.DO_NOTHING, db_column="boardID")
+    boardid = models.ForeignKey(Board, models.CASCADE, db_column="boardID")
     wip_limit = models.IntegerField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -67,7 +67,7 @@ class Event(models.Model):
 
 class Swimlanecolumn(models.Model):
     swimlanecolumnid = models.UUIDField(db_column="swimlaneColumnID", default=uuid.uuid4, primary_key=True)
-    columnid = models.ForeignKey(Column, models.DO_NOTHING, db_column="columnID", blank=True, null=True)
+    columnid = models.ForeignKey(Column, models.CASCADE, db_column="columnID", blank=True, null=True)
     color = models.TextField(blank=True, null=True)
     title = models.TextField(blank=True, null=True)
     ordernum = models.IntegerField(db_column="orderNum")
