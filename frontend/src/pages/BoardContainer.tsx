@@ -18,7 +18,6 @@ import {
   boardsApi,
   useDeleteUserMutation,
   useGetBoardQuery,
-  useLoginMutation,
   usePostUserToActionMutation,
   usePostUserToTicketMutation,
   useUpdateActionListMutation,
@@ -34,7 +33,7 @@ const clientId = getId()
 
 const BoardContainer: React.FC = () => {
   const dispatch = useDispatch()
-  const [islogged, setLogin] = useState(false)
+  const [isLoggedIn, setLogin] = useState(false)
   const { id = "default-id" } = useParams()
   const [deleteUser] = useDeleteUserMutation()
   // websocket object
@@ -78,8 +77,6 @@ const BoardContainer: React.FC = () => {
   const [updateTaskUsers] = useUpdateUserListByTicketIdMutation()
   const [updateActionUsers] = useUpdateUserListByActionIdMutation()
   const [updateActions] = useUpdateActionListMutation()
-  const [tryLogin] = useLoginMutation()
-  const [defaultLoginCompleted, setDefaultLoginCompleted] = useState(false)
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
   const selectUsersByBoardId = boardsApi.endpoints.getUsersByBoardId.select
@@ -325,19 +322,15 @@ const BoardContainer: React.FC = () => {
     }
   }
 
-  const { data: board, isLoading: loading, status } = useGetBoardQuery(id, { skip: !islogged })
+  const { data: board, isLoading, isSuccess } = useGetBoardQuery(id)
 
   useEffect(() => {
-    const defaultLogin = tryLogin({ boardId: id, password: "" })
-    defaultLogin.then((res) => {
-      setDefaultLoginCompleted(true)
-      if ("data" in res && res.data.success) {
-        setLogin(true)
-      }
-    })
-  }, [id, tryLogin])
+    if (isSuccess) {
+      setLogin(true)
+    }
+  }, [isSuccess])
 
-  if (status === "fulfilled" || islogged) {
+  if (isLoggedIn) {
     return (
       <WebsocketContext.Provider value={updatedSendMessage}>
         <>
@@ -361,7 +354,7 @@ const BoardContainer: React.FC = () => {
           height: "100vh"
         }}
       >
-        {loading || !defaultLoginCompleted ? <CircularProgress /> : <AccessBoardForm id={id} login={setLogin} />}
+        {isLoading ? <CircularProgress /> : <AccessBoardForm id={id} />}
       </Box>
     </>
   )

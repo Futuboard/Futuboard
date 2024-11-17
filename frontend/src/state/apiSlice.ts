@@ -3,7 +3,7 @@ import { TagDescription, createApi, fetchBaseQuery } from "@reduxjs/toolkit/quer
 
 import { Action, Board, Column, SwimlaneColumn, Task, User } from "../types"
 
-import { getAuth } from "./auth"
+import { getAuth, setToken } from "./auth"
 import { RootState } from "./store"
 
 //TODO: refactor
@@ -203,7 +203,15 @@ export const boardsApi = createApi({
       query: ({ boardId, password }) => ({
         url: `boards/${boardId}/`,
         method: "POST",
-        body: { boardId, password }
+        body: { boardId, password },
+        responseHandler: async (response) => {
+          const data = await response.json()
+          const { token, success } = data
+          if (success && token) {
+            setToken({ token, boardId })
+          }
+          return data
+        }
       }),
       invalidatesTags: ["Boards"]
     }),
