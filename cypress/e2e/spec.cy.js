@@ -94,7 +94,7 @@ describe("In a board", () => {
     cy.contains("Alex")
   })
 
-  it("can export and import coard", () => {
+  it("can export and import board", () => {
     cy.createColumn(defaultColumn)
     cy.createTask(defaultTask)
     cy.createTask(otherTask)
