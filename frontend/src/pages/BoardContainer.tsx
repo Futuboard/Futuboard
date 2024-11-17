@@ -18,6 +18,7 @@ import {
   boardsApi,
   useDeleteUserMutation,
   useGetBoardQuery,
+  useLoginMutation,
   usePostUserToActionMutation,
   usePostUserToTicketMutation,
   useUpdateActionListMutation,
@@ -77,6 +78,7 @@ const BoardContainer: React.FC = () => {
   const [updateTaskUsers] = useUpdateUserListByTicketIdMutation()
   const [updateActionUsers] = useUpdateUserListByActionIdMutation()
   const [updateActions] = useUpdateActionListMutation()
+  const [tryLogin] = useLoginMutation()
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
   const selectUsersByBoardId = boardsApi.endpoints.getUsersByBoardId.select
@@ -323,6 +325,10 @@ const BoardContainer: React.FC = () => {
   }
 
   const { data: board, isLoading, isSuccess } = useGetBoardQuery(id)
+
+  useEffect(() => {
+    tryLogin({ boardId: id, password: "" })
+  }, [id, tryLogin])
 
   useEffect(() => {
     if (isSuccess) {
