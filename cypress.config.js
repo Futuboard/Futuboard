@@ -9,4 +9,6 @@ module.exports = {
       // implement node event listeners here
     },
   },
+
+  retries: 2,
 };
