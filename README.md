@@ -251,7 +251,7 @@ Currently no unit-tests
 
 ### Backend
 
-Pytest can be run with the commands:
+Pytest unit tests can be run with the commands:
 
 ```
 cd backend/
