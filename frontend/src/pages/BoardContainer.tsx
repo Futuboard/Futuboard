@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom"
 import useWebSocket, { SendMessage } from "react-use-websocket"
 
 import { getId } from "@/services/Utils"
+import { setBoardId } from "@/state/auth"
 import { store } from "@/state/store"
 import { Action, Task } from "@/types"
 
@@ -60,6 +61,10 @@ const BoardContainer: React.FC = () => {
     },
     share: true
   })
+
+  useEffect(() => {
+    dispatch(setBoardId(id))
+  }, [id, dispatch])
 
   //wrap the original sendMessage function to include the clientId with every message, so that client can ignore its own messages
   const updatedSendMessage = () => {

@@ -11,7 +11,7 @@ from ..verification import decode_token, encode_token, get_token_from_request, n
 
 # Create your views here.
 @api_view(["GET", "POST"])
-def get_all_boards(request: rest_framework.request.Request, format=None):
+def all_boards(request: rest_framework.request.Request, format=None):
     if request.method == "POST":
         try:
             new_board = Board(
@@ -39,7 +39,7 @@ def get_all_boards(request: rest_framework.request.Request, format=None):
 
 
 @api_view(["GET", "POST", "DELETE"])
-def get_board_by_id(request, board_id):
+def board_by_id(request, board_id):
     if request.method == "POST":
         # Get password from request
         password = request.data["password"]

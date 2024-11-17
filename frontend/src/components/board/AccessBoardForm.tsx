@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
 import { useLoginMutation } from "@/state/apiSlice"
+import { setToken } from "@/state/auth"
 
 interface AccessBoardFormProps {
   id: string
@@ -37,8 +38,9 @@ const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id, login }) => {
       return
     }
 
-    const success = loginResponse.data.success
-    if (success) {
+    const { success, token } = loginResponse.data
+    if (success && token) {
+      setToken({ token, boardId: id })
       login(true)
     } else {
       alert("Wrong password")
