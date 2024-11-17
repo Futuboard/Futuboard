@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 export const getToken = (boardId: string) => {
-  const token = localStorage.getItem(`${boardId}-token`)
+  const token = localStorage.getItem(`board-${boardId}-token`)
   return token
 }
 
 export const setToken = ({ token, boardId }: { token: string; boardId: string }) => {
-  localStorage.setItem(`${boardId}-token`, token)
+  localStorage.setItem(`board-${boardId}-token`, token)
 }
 
 export const getAuth = (boardId: string) => {
