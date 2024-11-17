@@ -5,7 +5,7 @@ on:
     branches: [main, development]
 
 jobs:
-  cypress-run:
+  eslint-lint-check:
     runs-on: ubuntu-latest
     defaults:
       run:

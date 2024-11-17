@@ -11,7 +11,7 @@ env:
   RETRY_COUNT: 3
 
 jobs:
-  cypress-run:
+  cypress-e2e-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
