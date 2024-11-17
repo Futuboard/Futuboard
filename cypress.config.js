@@ -1,7 +1,7 @@
 module.exports = {
   devDependencies: {
     "@types/jest": "^29.5.12",
-    cypress: "^10.0.0",
+    cypress: "^13.0.0",
   },
 
   e2e: {
@@ -10,5 +10,5 @@ module.exports = {
     },
   },
 
-  retries: 2,
+  retries: process.env.RETRY_COUNT || 0,
 };
