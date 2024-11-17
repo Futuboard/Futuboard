@@ -137,7 +137,7 @@ You can either run the frontend and backend separately or use the fully dockeriz
 Simply run:
 
 ```
-docker compose up --watch
+docker compose up --watch --build
 ```
 
 The frontend will be available at `localhost:5173` and the backend at `localhost:8000`.
