@@ -137,7 +137,7 @@ You can either run the frontend and backend separately or use the fully dockeriz
 Simply run:
 
 ```
-docker compose up --watch
+docker compose up --watch --build
 ```
 
 The frontend will be available at `localhost:5173` and the backend at `localhost:8000`.
@@ -192,9 +192,9 @@ cd frontend/
 npm run dev
 ```
 
-### Linting and code style
+## Linting and code style
 
-#### Frontend
+### Frontend
 
 The easiest way to lint and format frontend code is to install the [Prettier VS Code extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) and edit your VSCode settings to include
 
@@ -218,7 +218,7 @@ To automatically fix detected errors run:
 npm run lint:fix && npm run prettier:fix
 ```
 
-#### Backend
+### Backend
 
 The easiest way to lint and format backend code is to install [Ruff VS Code extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) and edit your VSCode settings to include
 
@@ -241,6 +241,47 @@ To automatically fix detected errors run:
 
 ```
 ruff check --fix && ruff format
+```
+
+## Testing
+
+### Frontend
+
+Currently no unit-tests
+
+### Backend
+
+Pytest can be run with the commands:
+
+```
+cd backend/
+pytest
+```
+
+Running one test:
+
+```
+pytest PATH_TO_TEST_FILE::TEST_NAME
+```
+
+Running all tests in a file:
+
+```
+pytest PATH_TO_TEST_FILE
+```
+
+### E2E tests
+
+To run all E2E tests with cypress:
+
+```
+npx cypress@13 run --browser chrome
+```
+
+To open Cypress with an interactive GUI:
+
+```
+npx cypress@13 open
 ```
 
 ## Instructions for future developers
@@ -284,10 +325,6 @@ We decided to use a ready-made component library to avoid unnecessary time wasta
 React beautiful dnd makes it easy to move elements in lists, which should be well-suited for this project. It provides neat animations and extensive documentation.
 
 [React-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd)
-
-### Frontend testing
-
-We currently do not have any frontend unit tests, but we run end-to-end testing using cypress.
 
 ### ESLint
 
@@ -374,8 +411,6 @@ And then to apply made migrations run:
 python manage.py migrate
 
 ```
-
-If you want django to run the migrations, switch "managed" to "true" in the created migration file, otherwise keep as it is.
 
 To setup the database in Azure, follow this guide:
 
