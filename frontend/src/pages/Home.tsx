@@ -82,12 +82,34 @@ const Home: React.FC = () => {
         <Grid item xs={12} marginTop={"20px"}>
           <Grid container spacing={3} justifyContent="center" alignItems="center">
             <Grid item>
+              <Typography variant="h6" color={"black"} fontWeight="bold">
+                Version 2.0
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Link href="https://github.com/Futuboard/Futuboard" underline="hover" display="inline" color="black">
+                <GitHubIcon />
+              </Link>
+            </Grid>
+            <Grid item>
+              <ModalFrameCv cvFileName="Team_Tenacity_CV.png"/>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={12} marginTop={"20px"}>
+          <Grid container spacing={3} justifyContent="center" alignItems="center">
+            <Grid item>
+              <Typography variant="h6" color={"black"} fontWeight="bold">
+                Version 1.0
+              </Typography>
+            </Grid>
+            <Grid item>
               <Link href="https://github.com/Kasipallot/Futuboard" underline="hover" display="inline" color="black">
                 <GitHubIcon />
               </Link>
             </Grid>
             <Grid item>
-              <ModalFrameCv />
+              <ModalFrameCv cvFileName="Team_Kasipallot_CV.png"/>
             </Grid>
           </Grid>
         </Grid>

@@ -2,7 +2,11 @@ import CloseIcon from "@mui/icons-material/Close"
 import GroupsIcon from "@mui/icons-material/Groups"
 import { CSSProperties, useState } from "react"
 
-const ModalFrameCv = () => {
+interface ModalFrameCvProps {
+  cvFileName: string
+}
+
+const ModalFrameCv: React.FC<ModalFrameCvProps> = ({ cvFileName }) => {
   const [show, setShow] = useState(false)
   const display = show ? "block" : "none"
   const inlineStyles: Record<string, CSSProperties> = {
@@ -74,7 +78,7 @@ const ModalFrameCv = () => {
             }
           }}
         />
-        <img style={inlineStyles.CVImage} id="CV-image" alt="a picture of our cv" src="/Team_Kasipallot_CV.png" />
+        <img style={inlineStyles.CVImage} id="CV-image" alt="a picture of our cv" src={`/${cvFileName}`} />
       </div>
     </>
   )
