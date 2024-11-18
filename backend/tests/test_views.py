@@ -90,6 +90,20 @@ def test_get_board_by_id():
 
 
 @pytest.mark.django_db
+def test_getting_board_requires_auth():
+    api_client = APIClient()
+    boardId = uuid.uuid4()
+
+    creation_response = api_client.post(
+        reverse("get_all_boards"), {"id": boardId, "title": "board", "password": "password"}
+    )
+    assert creation_response.status_code == 200
+
+    get_response_unauthenticated = api_client.get(reverse("get_board_by_id", args=[boardId]))
+    assert get_response_unauthenticated.status_code == 401
+
+
+@pytest.mark.django_db
 def test_get_columns_from_board():
     """
     Test the get_columns_from_board function in backend/futuboard/views/views.py
