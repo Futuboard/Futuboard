@@ -5,6 +5,7 @@ import Grid from "@mui/material/Grid"
 import Link from "@mui/material/Link"
 import Typography from "@mui/material/Typography"
 import { getId } from "@services/Utils"
+import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 import ImportBoardButton from "@/components/home/ImportBoardButton"
@@ -31,6 +32,10 @@ const Home: React.FC = () => {
     //redirect to created board page
     navigate(`/board/${id}`)
   }
+
+  useEffect(() => {
+    document.title="Futuboard";
+  })
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" height="100vh" width="100%" bgcolor="white">

@@ -239,6 +239,10 @@ const BoardContainer: React.FC = () => {
     return null
   }
 
+  useEffect(() => {
+    document.title=board?.title || "Futuboard";
+  })
+
   if (isLoggedIn) {
     return (
       <DragDropContext onDragEnd={handleOnDragEnd}>
