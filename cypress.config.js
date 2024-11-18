@@ -1,7 +1,7 @@
 module.exports = {
   devDependencies: {
     "@types/jest": "^29.5.12",
-    cypress: "^10.0.0",
+    cypress: "^13.0.0",
   },
 
   e2e: {
@@ -9,4 +9,6 @@ module.exports = {
       // implement node event listeners here
     },
   },
+
+  retries: process.env.RETRY_COUNT ? Number(process.env.RETRY_COUNT) : 0,
 };

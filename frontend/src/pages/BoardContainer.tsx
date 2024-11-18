@@ -1,6 +1,6 @@
 import ToolBar from "@components/board/Toolbar"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
-import { Box, CircularProgress } from "@mui/material"
+import { Box } from "@mui/material"
 import { produce } from "immer"
 import { createContext, useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
@@ -34,7 +34,6 @@ const clientId = getId()
 
 const BoardContainer: React.FC = () => {
   const dispatch = useDispatch()
-  const [isLoggedIn, setLogin] = useState(false)
   const { id = "default-id" } = useParams()
   const [deleteUser] = useDeleteUserMutation()
   // websocket object
@@ -79,6 +78,7 @@ const BoardContainer: React.FC = () => {
   const [updateActionUsers] = useUpdateUserListByActionIdMutation()
   const [updateActions] = useUpdateActionListMutation()
   const [tryLogin] = useLoginMutation()
+  const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
   const selectUsersByBoardId = boardsApi.endpoints.getUsersByBoardId.select
@@ -324,17 +324,19 @@ const BoardContainer: React.FC = () => {
     }
   }
 
-  const { data: board, isLoading, isSuccess } = useGetBoardQuery(id)
+  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id)
 
   useEffect(() => {
-    tryLogin({ boardId: id, password: "" })
+    const inner = async () => {
+      await tryLogin({ boardId: id, password: "" })
+      setHasTriedEmptyPasswordLogin(true)
+    }
+    inner()
   }, [id, tryLogin])
 
-  useEffect(() => {
-    if (isSuccess) {
-      setLogin(true)
-    }
-  }, [isSuccess])
+  if (isLoading || !hasTriedEmptyPasswordLogin) {
+    return null
+  }
 
   if (isLoggedIn) {
     return (
@@ -360,7 +362,7 @@ const BoardContainer: React.FC = () => {
           height: "100vh"
         }}
       >
-        {isLoading ? <CircularProgress /> : <AccessBoardForm id={id} />}
+        <AccessBoardForm id={id} />
       </Box>
     </>
   )
