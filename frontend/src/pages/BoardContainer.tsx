@@ -1,6 +1,6 @@
 import ToolBar from "@components/board/Toolbar"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
-import { Box, CircularProgress } from "@mui/material"
+import { Box } from "@mui/material"
 import { produce } from "immer"
 import { createContext, useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
@@ -324,7 +324,7 @@ const BoardContainer: React.FC = () => {
     }
   }
 
-  const { data: board, isLoading, isSuccess } = useGetBoardQuery(id)
+  const { data: board, isSuccess } = useGetBoardQuery(id)
 
   useEffect(() => {
     tryLogin({ boardId: id, password: "" })
@@ -360,7 +360,7 @@ const BoardContainer: React.FC = () => {
           height: "100vh"
         }}
       >
-        {isLoading ? <CircularProgress /> : <AccessBoardForm id={id} />}
+        <AccessBoardForm id={id} />
       </Box>
     </>
   )
