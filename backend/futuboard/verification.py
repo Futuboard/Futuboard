@@ -1,37 +1,12 @@
+import os
+from uuid import UUID
 from argon2 import PasswordHasher
-from django.contrib.auth import authenticate, login
-from django.http import JsonResponse
-import rest_framework.request
+from django.utils import timezone
+import jwt
 
 
-def logUserIn(request: rest_framework.request.Request):
-    if request.method == "POST":
-        board_id = request.POST["id"]
-        password = request.POST["password"]
-        # Verify password
-        if verify_password(password, board_id):
-            # Give access to board
-            user = authenticate(request, username=board_id, password=password)
-        else:
-            return JsonResponse({"error": "Invalid login credentials"})
-        if user is not None:
-            login(request, user)
-            # Generate and return an auth token
-            """
-            For later:
-                token = Token.objects.create(user=user)
-                return JsonResponse({'token': token.key})
-            """
-        else:
-            # Return an 'invalid login' error message
-            return JsonResponse({"error": "Invalid login credentials"})
-    else:
-        return JsonResponse({"error": "Invalid request method"})
-
-
-def verify_password(password, id, hash: str):
+def verify_password(password: str, hash: str):
     ph = PasswordHasher()
-    # Get hash from database for board id
     try:
         ph.verify(hash, password)
         return True
@@ -45,7 +20,25 @@ def new_password(password):
     return hash
 
 
-# Planning to use argon2 for hashing passwords with django hashers
-# hashers.make_password('password', hasher='argon2')
+def get_token_from_request(request):
+    try:
+        token = request.headers["Authorization"]
+        token = token.split(" ")[1]
+        return str(token)
+    except KeyError:
+        return None
 
-# hashers.Argon2PasswordHasher.verify('password', encoded)
+
+JWT_SECRET = os.environ["JWT_SECRET"]
+
+
+def encode_token(board_id: UUID):
+    return jwt.encode(
+        {"board_id": str(board_id), "exp": timezone.now() + timezone.timedelta(weeks=50)},
+        JWT_SECRET,
+        algorithm="HS256",
+    )
+
+
+def decode_token(token: str):
+    return jwt.decode(token, JWT_SECRET, algorithms="HS256")

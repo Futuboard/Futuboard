@@ -11,14 +11,13 @@ import { useLoginMutation } from "@/state/apiSlice"
 
 interface AccessBoardFormProps {
   id: string
-  login: (_: boolean) => void
 }
 
 interface FormData {
   password: string
 }
 
-const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id, login }) => {
+const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id }) => {
   const {
     register,
     handleSubmit,
@@ -37,10 +36,10 @@ const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id, login }) => {
       return
     }
 
-    const success = loginResponse.data.success
-    if (success) {
-      login(true)
-    } else {
+    const { success } = loginResponse.data
+
+    // Succesful login in handles in apiSlice.ts
+    if (!success) {
       alert("Wrong password")
     }
   }
