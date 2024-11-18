@@ -58,12 +58,15 @@ def test_get_board_by_id():
             reverse("get_all_boards"), {"id": boardids[i], "title": "board" + str(i), "password": "password" + str(i)}
         )
         assert response.status_code == 200
+    tokens = []
     # Post board by id (Password verification)
     for i in range(5):
         response = api_client.post(reverse("get_board_by_id", args=[boardids[i]]), {"password": "password" + str(i)})
         data = response.json()
         print(data)
         assert data["success"] is True
+        assert data["token"] is not None
+        tokens.append(data["token"])
         assert response.status_code == 200
     # Test getting board by id with wrong password
     response = api_client.post(reverse("get_board_by_id", args=[boardids[0]]), {"password": "wrongpassword"})
@@ -73,7 +76,10 @@ def test_get_board_by_id():
     assert response.status_code == 200
     # Get board by id for all boards
     for i in range(5):
-        response = api_client.get(reverse("get_board_by_id", args=[boardids[i]]))
+        response = api_client.get(
+            reverse("get_board_by_id", args=[boardids[i]]), headers={"Authorization": f"Bearer {tokens[i]}"}
+        )
+        assert response.status_code == 200
         data = response.json()
         assert data["boardid"] == str(boardids[i])
         assert data["title"] == "board" + str(i)

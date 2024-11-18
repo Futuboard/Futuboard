@@ -62,7 +62,7 @@ def test_board():
         assert board.description == f"Test board{i}"
         assert board.title == f"Board{i}"
         assert board.creator == f"John{i}"
-        assert ver.verify_password(f"password{i}", board, board.passwordhash)
+        assert ver.verify_password(f"password{i}", board.passwordhash)
         i += 1
         board.delete()
     assert md.Board.objects.count() == 0
