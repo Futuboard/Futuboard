@@ -1,3 +1,4 @@
+import os
 from uuid import UUID
 from argon2 import PasswordHasher
 from django.utils import timezone
@@ -28,7 +29,7 @@ def get_token_from_request(request):
         return None
 
 
-JWT_SECRET = "secret"
+JWT_SECRET = os.environ["JWT_SECRET"]
 
 
 def encode_token(board_id: UUID):
