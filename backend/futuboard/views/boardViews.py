@@ -15,12 +15,12 @@ def all_boards(request: rest_framework.request.Request, format=None):
     if request.method == "POST":
         try:
             new_board = Board(
-                boardid=request.data["id"],  # type: ignore
+                boardid=request.data["id"],
                 description="",
-                title=request.data["title"],  # type: ignore
+                title=request.data["title"],
                 creator="",
                 creation_date=timezone.now(),
-                passwordhash=new_password(request.data["password"]),  # type: ignore
+                passwordhash=new_password(request.data["password"]),
                 salt="",
             )
             new_board.save()
