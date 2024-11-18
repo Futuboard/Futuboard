@@ -5,6 +5,10 @@ on:
     branches: [main, development]
     paths:
       - "backend/**"
+
+env:
+  JWT_SECRET: secret
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,7 +25,5 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Copy .env file
-        run: cp .env.example .env
       - name: Test with pytest
         run: pytest
