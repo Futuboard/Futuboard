@@ -1,25 +1,44 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+Cypress.Commands.add("createBoard", () => {
+  cy.get("button").contains("Create board").click()
+  cy.get(".MuiDialog-root").should("be.visible")
+  cy.get(".MuiDialog-root").find("label").contains("Name").parent().find("input").type("Project Alpha")
+  cy.get(".MuiDialog-root").find("label").contains("Password").parent().find("input").type("alpha123")
+  cy.get(".MuiDialog-root").contains("button", "Submit").click()
+})
+
+Cypress.Commands.add("loginToBoard", (password) => {
+  cy.get(".MuiTypography-root", { timeout: 10000 }).should("contain", "Enter Board Password")
+  cy.get('input[name="password"]').type(password)
+  cy.get("form").submit()
+})
+
+Cypress.Commands.add("createColumn", ({ title }) => {
+  cy.get('button[aria-label="add column"]').click()
+  // FInd input with name columnTitle
+  cy.get(".MuiDialog-root").find('input[name="columnTitle"]').type(title)
+  cy.get(".MuiDialog-root").contains("button", "Submit").click()
+})
+
+Cypress.Commands.add("createTask", ({ title, size, description, cornerNote }) => {
+  cy.get('button[aria-label="add task"]').click()
+  cy.get('textarea[name="taskTitle"]').type(title)
+  cy.get('input[name="size"]').type(size)
+  cy.get('textarea[name="description"]').type(description)
+  cy.get('input[name="cornerNote"]').type(cornerNote)
+  cy.get("button").contains("Submit").click()
+})
+
+Cypress.Commands.add("editTask", ({ title, size, description, cornerNote }) => {
+  cy.get('[data-testid="EditNoteIcon"]').click()
+  cy.get('textarea[name="taskTitle"]').clear().type(title)
+  cy.get('input[name="size"]').clear().type(size)
+  cy.get('textarea[name="description"]').clear().type(description)
+  cy.get('input[name="cornerNote"]').clear().type(cornerNote)
+  cy.get("button").contains("Save Changes").click()
+})
+
+Cypress.Commands.add("createUser", ({ name, buttoIndex }) => {
+  cy.get('button[aria-label="Add User"]').eq(buttoIndex).click()
+  cy.get('input[name="name"]').clear().type(name)
+  cy.get("button").contains("Submit").click()
+})

@@ -1,6 +1,6 @@
 import ToolBar from "@components/board/Toolbar"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
-import { Box, CircularProgress } from "@mui/material"
+import { Box } from "@mui/material"
 import { produce } from "immer"
 import { createContext, useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom"
 import useWebSocket, { SendMessage } from "react-use-websocket"
 
 import { getId } from "@/services/Utils"
+import { setBoardId } from "@/state/auth"
 import { store } from "@/state/store"
 import { Action, Task } from "@/types"
 
@@ -33,7 +34,6 @@ const clientId = getId()
 
 const BoardContainer: React.FC = () => {
   const dispatch = useDispatch()
-  const [islogged, setLogin] = useState(false)
   const { id = "default-id" } = useParams()
   const [deleteUser] = useDeleteUserMutation()
   // websocket object
@@ -61,6 +61,10 @@ const BoardContainer: React.FC = () => {
     share: true
   })
 
+  useEffect(() => {
+    dispatch(setBoardId(id))
+  }, [id, dispatch])
+
   //wrap the original sendMessage function to include the clientId with every message, so that client can ignore its own messages
   const updatedSendMessage = () => {
     originalSendMessage(clientId)
@@ -74,7 +78,7 @@ const BoardContainer: React.FC = () => {
   const [updateActionUsers] = useUpdateUserListByActionIdMutation()
   const [updateActions] = useUpdateActionListMutation()
   const [tryLogin] = useLoginMutation()
-  const [defaultLoginCompleted, setDefaultLoginCompleted] = useState(false)
+  const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
   const selectUsersByBoardId = boardsApi.endpoints.getUsersByBoardId.select
@@ -320,19 +324,21 @@ const BoardContainer: React.FC = () => {
     }
   }
 
-  const { data: board, isLoading: loading, status } = useGetBoardQuery(id, { skip: !islogged })
+  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id)
 
   useEffect(() => {
-    const defaultLogin = tryLogin({ boardId: id, password: "" })
-    defaultLogin.then((res) => {
-      setDefaultLoginCompleted(true)
-      if ("data" in res && res.data.success) {
-        setLogin(true)
-      }
-    })
+    const inner = async () => {
+      await tryLogin({ boardId: id, password: "" })
+      setHasTriedEmptyPasswordLogin(true)
+    }
+    inner()
   }, [id, tryLogin])
 
-  if (status === "fulfilled" || islogged) {
+  if (isLoading || !hasTriedEmptyPasswordLogin) {
+    return null
+  }
+
+  if (isLoggedIn) {
     return (
       <WebsocketContext.Provider value={updatedSendMessage}>
         <>
@@ -356,7 +362,7 @@ const BoardContainer: React.FC = () => {
           height: "100vh"
         }}
       >
-        {loading || !defaultLoginCompleted ? <CircularProgress /> : <AccessBoardForm id={id} login={setLogin} />}
+        <AccessBoardForm id={id} />
       </Box>
     </>
   )

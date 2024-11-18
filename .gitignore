@@ -39,3 +39,7 @@ db/
 
 # Ruff
 /.ruff_cache
+
+# Cypress
+cypress/screenshots
+cypress/downloads

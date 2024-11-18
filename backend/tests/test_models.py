@@ -1,7 +1,5 @@
 import pytest
 import futuboard.models as md
-from django.db import connection
-from django.conf import settings
 import uuid
 from django.utils import timezone
 import futuboard.verification as ver
@@ -62,7 +60,7 @@ def test_board():
         assert board.description == f"Test board{i}"
         assert board.title == f"Board{i}"
         assert board.creator == f"John{i}"
-        assert ver.verify_password(f"password{i}", board, board.passwordhash)
+        assert ver.verify_password(f"password{i}", board.passwordhash)
         i += 1
         board.delete()
     assert md.Board.objects.count() == 0
@@ -420,20 +418,3 @@ def test_ticket():
     for i in range(n):
         md.Column.objects.get(columnid=columnids[i]).delete()
         md.Board.objects.get(boardid=boardids[i]).delete()
-
-
-# Test that the tables are created properly when migrations are run for testing
-@pytest.mark.django_db
-@pytest.mark.skip(reason="Use when migration problems occur")
-def test_print_tables():
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = cursor.fetchall()
-    print("Tables:")
-    print(tables)
-    print("Length of tables:")
-    print(len(tables))
-    # Get the default database configuration
-    default_db = settings.DATABASES["default"]
-    print("Default database:")
-    print(default_db)

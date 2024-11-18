@@ -3,11 +3,29 @@ import { TagDescription, createApi, fetchBaseQuery } from "@reduxjs/toolkit/quer
 
 import { Action, Board, Column, SwimlaneColumn, Task, User } from "../types"
 
+import { getAuth, setToken } from "./auth"
+import { RootState } from "./store"
+
 //TODO: refactor
 export const boardsApi = createApi({
   reducerPath: "boardsApi",
-  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_DB_ADDRESS }), //https://futuboardbackend.azurewebsites.net
+  baseQuery: fetchBaseQuery({
+    baseUrl: import.meta.env.VITE_DB_ADDRESS,
+
+    prepareHeaders: (headers, { getState }) => {
+      const boardId = (getState() as RootState).auth.boardId
+      if (boardId) {
+        const auth = getAuth(boardId)
+        if (auth) {
+          headers.set("Authorization", auth)
+        }
+      }
+      return headers
+    }
+  }),
+
   tagTypes: ["Boards", "Columns", "Ticket", "Users", "Action", "ActionList", "SwimlaneColumn"],
+
   endpoints: (builder) => ({
     getBoard: builder.query<Board, string>({
       query: (boardId) => `boards/${boardId}/`,
@@ -181,11 +199,19 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: [{ type: "Users", id: "USERLIST" }]
     }),
-    login: builder.mutation<{ success: boolean }, { boardId: string; password: string }>({
+    login: builder.mutation<{ success: boolean; token: string }, { boardId: string; password: string }>({
       query: ({ boardId, password }) => ({
         url: `boards/${boardId}/`,
         method: "POST",
-        body: { boardId, password }
+        body: { boardId, password },
+        responseHandler: async (response) => {
+          const data = await response.json()
+          const { token, success } = data
+          if (success && token) {
+            setToken({ token, boardId })
+          }
+          return data
+        }
       }),
       invalidatesTags: ["Boards"]
     }),

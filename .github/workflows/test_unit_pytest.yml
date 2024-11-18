@@ -1,12 +1,16 @@
-name: Python application test with pytest
+name: Python unit tests with pytest
 
 on:
   pull_request:
     branches: [main, development]
     paths:
       - "backend/**"
+
+env:
+  JWT_SECRET: secret
+
 jobs:
-  build:
+  pytest-unit-tests:
     runs-on: ubuntu-latest
     defaults:
       run:

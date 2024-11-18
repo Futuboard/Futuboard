@@ -1,0 +1,32 @@
+name: Cypress E2E Tests
+
+on:
+  pull_request:
+    branches: [main, development]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "cypress/**"
+env:
+  RETRY_COUNT: 3
+
+jobs:
+  cypress-e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Make backend .env file
+        run: cp .env.example .env
+
+      - name: Make frontend .env file
+        run: cp frontend/.env.example frontend/.env
+
+      - name: Start containers
+        run: docker compose up -d --wait
+
+      - name: Run Cypress tests
+        run: npx cypress run --browser chrome
+
+      - name: Stop containers
+        run: docker compose down

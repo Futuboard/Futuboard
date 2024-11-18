@@ -7,7 +7,7 @@ on:
       - "frontend/**"
 
 jobs:
-  cypress-run:
+  prettier-style-check:
     runs-on: ubuntu-latest
     defaults:
       run:

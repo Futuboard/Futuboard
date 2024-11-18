@@ -1,16 +1,17 @@
 from django.http import Http404
+import jwt
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from ..models import Board, Column, Ticket, Usergroup, UsergroupUser, Swimlanecolumn, Action
 from ..serializers import BoardSerializer
 import rest_framework.request
 from django.utils import timezone
-from ..verification import new_password, verify_password
+from ..verification import decode_token, encode_token, get_token_from_request, new_password, verify_password
 
 
 # Create your views here.
 @api_view(["GET", "POST"])
-def get_all_boards(request: rest_framework.request.Request, format=None):
+def all_boards(request: rest_framework.request.Request, format=None):
     if request.method == "POST":
         try:
             new_board = Board(
@@ -38,37 +39,44 @@ def get_all_boards(request: rest_framework.request.Request, format=None):
 
 
 @api_view(["GET", "POST", "DELETE"])
-def get_board_by_id(request, board_id):
+def board_by_id(request, board_id):
     if request.method == "POST":
         # Get password from request
         password = request.data["password"]
+
         # Get board from database
         try:
             board = Board.objects.get(pk=board_id)
         except Board.DoesNotExist:
             raise Http404("Board does not exist")
         # verify password
-        if verify_password(password, board_id, board.passwordhash):
-            return JsonResponse({"success": True})
+        if verify_password(password, board.passwordhash):
+            token = encode_token(board.boardid)
+            return JsonResponse({"success": True, "token": token})
         else:
             return JsonResponse({"success": False})
     if request.method == "GET":
         try:
+            token = get_token_from_request(request)
+            if token is None:
+                return JsonResponse({"message": "Access token missing"}, status=401)
+
+            decoded_token = decode_token(token)
+
+            if decoded_token["board_id"] != str(board_id):
+                return JsonResponse({"message": "Access token to wrong board"}, status=405)
+
             board = Board.objects.get(pk=board_id)
             serializer = BoardSerializer(board)
             return JsonResponse(serializer.data, safe=False)
 
-            # TODO: only return the board if the user is authorized
-            # (password is empty of the user has entered the password previously)
-
-            # if verify_password("", board_id, board.passwordhash):
-            #     serializer = BoardSerializer(board)
-            #     return JsonResponse(serializer.data, safe=False)
-            # else:
-            #     # return a 401 if the user does not have access to the board
-            #     return HttpResponse(status=401)
         except Board.DoesNotExist:
             raise Http404("Board does not exist")
+        except jwt.ExpiredSignatureError:
+            return JsonResponse({"message": "Access token expired"}, status=401)
+        except jwt.InvalidTokenError:
+            return JsonResponse({"message": "Access token invalid"}, status=401)
+
     if request.method == "DELETE":
         try:
             board = Board.objects.get(pk=board_id)
