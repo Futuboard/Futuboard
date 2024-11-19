@@ -20,12 +20,12 @@ const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSn
   }
 }
 
-const ActionUserList: React.FC<{ users: User[] }> = ({ users }) => {
+const ActionUserList: React.FC<{ users: User[]; actionid: string }> = ({ users, actionid }) => {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end", overflow: "hidden" }}>
       {users &&
         users.map((user, index) => (
-          <Draggable key={user.userid} draggableId={user.userid} index={index}>
+          <Draggable key={user.userid} draggableId={user.userid + "/" + actionid} index={index}>
             {(provided, snapshot) => {
               return (
                 <div
@@ -142,7 +142,7 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
                       >
                         {currentTitle}
                       </Typography>
-                      {users && users.length > 0 && <ActionUserList users={users} />}
+                      {users && users.length > 0 && <ActionUserList users={users} actionid={action.actionid} />}
                     </Box>
                     {provided.placeholder}
                   </Box>

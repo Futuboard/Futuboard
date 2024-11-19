@@ -2,7 +2,7 @@ from django.http import Http404
 import jwt
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
-from ..models import Board, Column, Ticket, Usergroup, UsergroupUser, Swimlanecolumn, Action
+from ..models import Board
 from ..serializers import BoardSerializer
 import rest_framework.request
 from django.utils import timezone
@@ -13,25 +13,20 @@ from ..verification import decode_token, encode_token, get_token_from_request, n
 @api_view(["GET", "POST"])
 def all_boards(request: rest_framework.request.Request, format=None):
     if request.method == "POST":
-        try:
-            new_board = Board(
-                boardid=request.data["id"],
-                description="",
-                title=request.data["title"],
-                creator="",
-                creation_date=timezone.now(),
-                passwordhash=new_password(request.data["password"]),
-                salt="",
-            )
-            new_board.save()
+        new_board = Board(
+            boardid=request.data["id"],
+            description="",
+            title=request.data["title"],
+            creator="",
+            creation_date=timezone.now(),
+            passwordhash=new_password(request.data["password"]),
+            salt="",
+        )
+        new_board.save()
 
-            new_usergroup = Usergroup(boardid=new_board, type="board")
-            new_usergroup.save()
+        serializer = BoardSerializer(new_board)
+        return JsonResponse(serializer.data, safe=False)
 
-            serializer = BoardSerializer(new_board)
-            return JsonResponse(serializer.data, safe=False)
-        except:  # noqa: E722
-            raise Http404("Cannot create Board")
     if request.method == "GET":
         query_set = Board.objects.all()
         serializer = BoardSerializer(query_set, many=True)
@@ -49,6 +44,7 @@ def board_by_id(request, board_id):
             board = Board.objects.get(pk=board_id)
         except Board.DoesNotExist:
             raise Http404("Board does not exist")
+
         # verify password
         if verify_password(password, board.passwordhash):
             token = encode_token(board.boardid)
@@ -80,34 +76,6 @@ def board_by_id(request, board_id):
     if request.method == "DELETE":
         try:
             board = Board.objects.get(pk=board_id)
-            # delete users in the board.
-            usergroup = Usergroup.objects.get(boardid=board.boardid)
-            usergroupuser = UsergroupUser.objects.filter(usergroupid=usergroup.usergroupid)
-            users = [group.userid for group in usergroupuser]
-            for user in users:
-                user.delete()
-
-            # delete magnets in tickets and actions.
-            columns = Column.objects.filter(boardid=board)
-            for column in columns:
-                swimlanecolumns = Swimlanecolumn.objects.filter(columnid=column)
-                for swimlanecolumn in swimlanecolumns:
-                    actions = Action.objects.filter(swimlanecolumnid=swimlanecolumn.swimlanecolumnid)
-                    for action in actions:
-                        usergroup = Usergroup.objects.get(actionid=action.actionid)
-                        usergroupuser = UsergroupUser.objects.filter(usergroupid=usergroup)
-                        users = [group.userid for group in usergroupuser]
-                        for user in users:
-                            user.delete()
-
-                tickets = Ticket.objects.filter(columnid=column)
-                for ticket in tickets:
-                    usergroup = Usergroup.objects.get(ticketid=ticket.ticketid)
-                    usergroupuser = UsergroupUser.objects.filter(usergroupid=usergroup)
-                    users = [group.userid for group in usergroupuser]
-                    for user in users:
-                        user.delete()
-
             board.delete()
             return JsonResponse({"message": "Board deleted successfully"}, status=200)
         except:  # noqa: E722

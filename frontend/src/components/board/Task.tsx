@@ -41,11 +41,11 @@ const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSn
   }
 }
 
-const UserMagnetList: React.FC<{ users: User[] }> = ({ users }) => {
+const TaskUserList: React.FC<{ users: User[]; taskid: string }> = ({ users, taskid }) => {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
       {users.map((user, index) => (
-        <Draggable key={user.userid + "/ticket"} draggableId={user.userid} index={index}>
+        <Draggable key={user.userid + "/ticket"} draggableId={user.userid + "/" + taskid} index={index}>
           {(provided, snapshot) => {
             return (
               <div
@@ -275,7 +275,9 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                         <CaretakerComponent key={index} caretaker={caretaker} />
                       ))}
                   </div>
-                  <div style={{ overflow: "hidden", width: "90%" }}>{users && <UserMagnetList users={users} />}</div>
+                  <div style={{ overflow: "hidden", width: "90%" }}>
+                    {users && <TaskUserList users={users} taskid={task.ticketid} />}
+                  </div>
                   <div
                     style={{
                       display: "flex",

@@ -13,24 +13,28 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("api/boards/", boardViews.all_boards, name="get_all_boards"),
     path("api/boards/<uuid:board_id>/", boardViews.board_by_id, name="get_board_by_id"),
-    path("api/boards/<uuid:board_id>/columns/", views.get_columns_from_board, name="get_columns_from_board"),
+    path("api/boards/<uuid:board_id>/columns/", views.columns_on_board, name="get_columns_from_board"),
     path("api/boards/<uuid:board_id>/columns/<uuid:column_id>/", views.update_column, name="update_column"),
     path(
         "api/boards/<uuid:board_id>/columns/<uuid:column_id>/tickets",
-        views.get_tickets_from_column,
+        views.tickets_on_column,
         name="get_tickets_from_column",
     ),
     path("api/columns/<uuid:column_id>/tickets/<uuid:ticket_id>/", views.update_ticket, name="update_ticket"),
-    path("api/boards/<uuid:board_id>/users/", views.get_users_from_board, name="get_users_from_board"),
-    path("api/tickets/<uuid:ticket_id>/users/", views.get_users_from_ticket, name="get_users_from_ticket"),
-    path("api/users/<uuid:user_id>", views.update_user, name="update_user"),
-    path("api/users/<uuid:user_id>/delete_recursive/", views.delete_user_recursive, name="delete_user_recursive"),
-    path("api/tickets/<uuid:ticket_id>/users/", views.get_users_from_ticket, name="get_users_from_ticket"),
-    path("api/actions/<uuid:action_id>/users/", swimlaneViews.get_users_from_action, name="get_users_from_action"),
+    path("api/boards/<uuid:board_id>/users/", views.users_on_board, name="get_users_from_board"),
+    path("api/tickets/<uuid:ticket_id>/users/", views.users_on_ticket, name="get_users_from_ticket"),
+    path("api/users/<uuid:user_id>", views.delete_user, name="update_user"),
+    path("api/users/<uuid:user_id>/delete/", views.delete_user, name="delete_user"),
+    path("api/tickets/<uuid:ticket_id>/users/", views.users_on_ticket, name="get_users_from_ticket"),
+    path("api/actions/<uuid:action_id>/users/", swimlaneViews.users_on_action, name="get_users_from_action"),
     path(
-        "api/columns/<uuid:column_id>/swimlanecolumns/", swimlaneViews.swimlanecolumn_view, name="swimlanecolumn_view"
+        "api/columns/<uuid:column_id>/swimlanecolumns/",
+        swimlaneViews.swimlanecolumns_on_column,
+        name="swimlanecolumn_view",
     ),
-    path("api/<uuid:swimlanecolumn_id>/<uuid:ticket_id>/actions/", swimlaneViews.action_view, name="action_view"),
+    path(
+        "api/<uuid:swimlanecolumn_id>/<uuid:ticket_id>/actions/", swimlaneViews.action_on_swimlane, name="action_view"
+    ),
     path("api/actions/<uuid:action_id>/", swimlaneViews.update_action, name="update_action"),
     path(
         "api/swimlanecolumns/<uuid:swimlanecolumn_id>/",

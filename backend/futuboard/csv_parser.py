@@ -1,5 +1,5 @@
 import uuid
-from futuboard.models import Board, Column, Ticket, User, Usergroup, UsergroupUser, Swimlanecolumn, Action
+from futuboard.models import Board, Column, Ticket, User, Swimlanecolumn, Action
 from django.utils import timezone
 
 """
@@ -31,13 +31,9 @@ def write_board_data(writer, boardid):
     # Write board data to the csv file
     board = Board.objects.get(boardid=boardid)
     writer.writerow(["Board", board.creator, board.description])
-    # Get board usergroups
-    usergroup = Usergroup.objects.get(boardid=boardid)
-    # Get userids of usergroupuser with usergroupid
-    usergroupusers = UsergroupUser.objects.filter(usergroupid=usergroup.usergroupid)
+    users = User.objects.filter(boardid=boardid)
     # Get userids
-    for usergroupuser in usergroupusers:
-        user = usergroupuser.userid
+    for user in users:
         writer.writerow(["User", user.name, user.color])
     writer.writerow([])
     # Get all the columns for the board
@@ -83,29 +79,19 @@ def write_board_data(writer, boardid):
                     ticket.cornernote,
                 ]
             )
-            # Get usergroups with ticketid and boardid
-            usergroups = Usergroup.objects.filter(ticketid=ticket.ticketid)
-            # Get userids of usergroupuser with usergroupid
-            for usergroup in usergroups:
-                usergroupusers = UsergroupUser.objects.filter(usergroupid=usergroup.usergroupid)
-                # Get userids
-                for usergroupuser in usergroupusers:
-                    user = usergroupuser.userid
-                    writer.writerow(["User", user.name, user.color])
+            # Get users with ticketid
+            users = User.objects.filter(tickets__ticketid=ticket.ticketid)
+            for user in users:
+                writer.writerow(["User", user.name, user.color])
             # Get all the actions for the swimlanecolumn
             actions = Action.objects.filter(ticketid=ticket.ticketid)
             # Write all the actions in the swimlanecolumn to the csv file
             for action in actions:
                 writer.writerow(["Action", action.title, action.color, action.order, action.swimlanecolumnid.ordernum])
-                # Get usergroups with actionid and boardid
-                usergroups = Usergroup.objects.filter(actionid=action.actionid)
-                # Get userids of usergroupuser with usergroupid
-                for usergroup in usergroups:
-                    usergroupusers = UsergroupUser.objects.filter(usergroupid=usergroup.usergroupid)
-                    # Get userids
-                    for usergroupuser in usergroupusers:
-                        user = usergroupuser.userid
-                        writer.writerow(["User", user.name, user.color])
+                # Get users with actionid
+                users = User.objects.filter(actions__actionid=action.actionid)
+                for user in users:
+                    writer.writerow(["User", user.name, user.color])
         # Split the columns in the csv file with an empty line
         writer.writerow([])
     return writer
@@ -130,8 +116,6 @@ def read_board_data(reader, boardid, board_title, password_hash):
         creation_date=timezone.now(),
     )
     # Read the board users from the csv file
-    # Create board usergroup
-    usergroup = Usergroup.objects.create(usergroupid=uuid.uuid4(), boardid=board, type="board")
     for row in reader:
         # Replace empty strings with None
         for i in range(len(row)):
@@ -139,8 +123,7 @@ def read_board_data(reader, boardid, board_title, password_hash):
                 row[i] = None
         # Read users until the next object type is found
         if len(row) > 0 and row[0] == "User":
-            user = User.objects.create(userid=uuid.uuid4(), name=row[1], color=row[2])
-            UsergroupUser.objects.create(usergroupid=usergroup, userid=user)
+            user = User.objects.create(userid=uuid.uuid4(), name=row[1], color=row[2], boardid=board)
         else:
             break
     # Read the columns from the csv file
@@ -197,14 +180,13 @@ def read_board_data(reader, boardid, board_title, password_hash):
                     cornernote=row[8],
                 )
                 # Read the ticket users from the csv file
-                usergroup = Usergroup.objects.create(usergroupid=uuid.uuid4(), ticketid=ticket, type="ticket")
                 row = next(reader, None)
                 while len(row) > 0 and row[0] == "User":
                     for i in range(len(row)):
                         if row[i] == "":
                             row[i] = None
-                    user = User.objects.create(userid=uuid.uuid4(), name=row[1], color=row[2])
-                    UsergroupUser.objects.create(usergroupid=usergroup, userid=user)
+                    user = User.objects.get(name=row[1], boardid=board)
+                    user.tickets.add(ticket)
                     row = next(reader, None)
                 # Read the actions from the csv file
                 while len(row) > 0 and row[0] == "Action":
@@ -221,13 +203,12 @@ def read_board_data(reader, boardid, board_title, password_hash):
                     )
                     # Read the action users from the csv file
                     row = next(reader, None)
-                    usergroup = Usergroup.objects.create(usergroupid=uuid.uuid4(), actionid=action, type="action")
                     while len(row) > 0 and row[0] == "User":
                         for i in range(len(row)):
                             if row[i] == "":
                                 row[i] = None
-                        user = User.objects.create(userid=uuid.uuid4(), name=row[1], color=row[2])
-                        UsergroupUser.objects.create(usergroupid=usergroup, userid=user)
+                        user = User.objects.get(name=row[1], boardid=board)
+                        user.actions.add(action)
                         row = next(reader, None)
         else:
             row = next(reader, None)

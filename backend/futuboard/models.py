@@ -53,18 +53,6 @@ class Column(models.Model):
         db_table = "Column"
 
 
-class Event(models.Model):
-    eventid = models.UUIDField(db_column="eventID", primary_key=True)
-    boardid = models.ForeignKey(Board, models.DO_NOTHING, db_column="boardID")
-    timestamp = models.DateTimeField()
-    objecttype = models.TextField(db_column="objectType")
-    objectid = models.UUIDField(db_column="objectID")
-    action = models.TextField()
-
-    class Meta:
-        db_table = "Event"
-
-
 class Swimlanecolumn(models.Model):
     swimlanecolumnid = models.UUIDField(db_column="swimlaneColumnID", default=uuid.uuid4, primary_key=True)
     columnid = models.ForeignKey(Column, models.CASCADE, db_column="columnID", blank=True, null=True)
@@ -96,27 +84,9 @@ class User(models.Model):
     userid = models.UUIDField(db_column="userID", default=uuid.uuid4, primary_key=True)
     name = models.TextField(blank=True, null=True)
     color = models.TextField(blank=True, null=True)
+    boardid = models.ForeignKey(Board, models.CASCADE, db_column="boardID")
+    tickets = models.ManyToManyField(Ticket)
+    actions = models.ManyToManyField(Action)
 
     class Meta:
         db_table = "User"
-
-
-class Usergroup(models.Model):
-    usergroupid = models.UUIDField(db_column="usergroupID", default=uuid.uuid4, primary_key=True)
-    boardid = models.ForeignKey(Board, models.CASCADE, db_column="boardID", blank=True, null=True)
-    ticketid = models.ForeignKey(Ticket, models.CASCADE, db_column="ticketID", blank=True, null=True)
-    actionid = models.ForeignKey(Action, models.CASCADE, db_column="actionID", blank=True, null=True)
-    type = models.TextField(blank=True, null=True)
-
-    class Meta:
-        db_table = "UserGroup"
-
-
-class UsergroupUser(models.Model):
-    usergroupuserid = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    usergroupid = models.ForeignKey(Usergroup, models.CASCADE, db_column="usergroupID")
-    userid = models.ForeignKey(User, models.CASCADE, db_column="userID")
-
-    class Meta:
-        db_table = "UserGroup_User"
-        unique_together = ("usergroupid", "userid")

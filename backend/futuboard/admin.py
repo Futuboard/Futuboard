@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Board, Column, Ticket, User, Usergroup, UsergroupUser, Action, Swimlanecolumn
+from .models import Board, Column, Ticket, User, Action, Swimlanecolumn
 
 
 class BoardAdmin(admin.ModelAdmin):
@@ -60,36 +60,14 @@ class UserAdmin(admin.ModelAdmin):
         (None, {"fields": ["userid"]}),
         (None, {"fields": ["name"]}),
         (None, {"fields": ["color"]}),
+        (None, {"fields": ["boardid"]}),
+        (None, {"fields": ["columnid"]}),
+        (None, {"fields": ["actionid"]}),
     ]
     list_display = ("name",)
 
 
 admin.site.register(User, UserAdmin)
-
-
-class UsergroupAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {"fields": ["usergroupid"]}),
-        (None, {"fields": ["boardid"]}),
-        (None, {"fields": ["ticketid"]}),
-        (None, {"fields": ["actionid"]}),
-        (None, {"fields": ["type"]}),
-    ]
-    list_display = ("usergroupid",)
-
-
-admin.site.register(Usergroup, UsergroupAdmin)
-
-
-class UsergroupUserAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {"fields": ["usergroupid"]}),
-        (None, {"fields": ["userid"]}),
-    ]
-    list_display = ("usergroupid",)
-
-
-admin.site.register(UsergroupUser, UsergroupUserAdmin)
 
 
 class ActionAdmin(admin.ModelAdmin):
