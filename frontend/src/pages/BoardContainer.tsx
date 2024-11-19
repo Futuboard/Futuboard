@@ -79,7 +79,6 @@ const BoardContainer: React.FC = () => {
   const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
-  const selectUsersByBoardId = boardsApi.endpoints.getUsersByBoardId.select
   const selectUsersByTaskId = boardsApi.endpoints.getUsersByTicketId.select
   const selectUsersByActionId = boardsApi.endpoints.getUsersByActionId.select
   const selectActions = boardsApi.endpoints.getActionListByTaskIdAndSwimlaneColumnId.select
@@ -92,8 +91,6 @@ const BoardContainer: React.FC = () => {
     if (destination.droppableId === source.droppableId && destination.index === source.index) return
 
     const state = store.getState()
-
-    const userList = selectUsersByBoardId(id)(state).data || []
 
     //task logic:
 
@@ -162,11 +159,16 @@ const BoardContainer: React.FC = () => {
       const draggableIdParts = draggableId.split("/")
       const draggedUserId = draggableIdParts[0]
 
-      if (destinationTaskUsers.length >= 3 && destinationId != "user-list") {
+      if (sourceId === destinationId) {
+        return
+      }
+
+      if (destinationTaskUsers.length >= 3) {
         alert("Destination task already has 3 or more user magnets. Move not allowed.")
         return
       }
-      if (destinationActionUsers.length >= 2 && destinationId != "user-list") {
+
+      if (destinationActionUsers.length >= 2) {
         alert("Destination action already has 2 or more user magnets. Move not allowed.")
         return
       }
@@ -174,10 +176,6 @@ const BoardContainer: React.FC = () => {
       const isUnique =
         !destinationActionUsers.some((user) => user.userid === draggedUserId) &&
         !destinationTaskUsers.some((user) => user.userid === draggedUserId)
-
-      if (sourceId === destinationId) {
-        return
-      }
 
       if (!isUnique && destinationId !== "user-list") {
         alert("This member is already on the card. Move not allowed.")
