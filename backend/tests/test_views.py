@@ -3,7 +3,65 @@ import futuboard.models as md
 from rest_framework.test import APIClient
 import uuid
 from django.urls import reverse
+from django.utils import timezone
+import django.apps
 import json
+
+# Utility functions
+
+
+def addBoard(boardId):
+    new_board = md.Board(
+        boardid=boardId,
+        description="",
+        title="title",
+        creation_date=timezone.now(),
+        passwordhash="",
+        salt="",
+    )
+    new_board.save()
+    return new_board
+
+
+def addColumn(boardId, columnId, title="", swimlane=False):
+    length = len(md.Column.objects.filter(boardid=boardId))
+
+    new_column = md.Column(
+        columnid=columnId,
+        boardid=md.Board.objects.get(pk=boardId),
+        description="",
+        title=title,
+        ordernum=length,
+        creation_date=timezone.now(),
+        swimlane=swimlane,
+    )
+    new_column.save()
+    return new_column
+
+
+def addTicket(columnId, ticketId, title="", description="", color="", size=0, cornernote=""):
+    length = len(md.Ticket.objects.filter(columnid=columnId))
+
+    new_ticket = md.Ticket(
+        ticketid=ticketId,
+        columnid=md.Column.objects.get(pk=columnId),
+        title=title,
+        description=description,
+        color=color,
+        storypoints=8,
+        size=size,
+        order=length,
+        creation_date=timezone.now(),
+        cornernote=cornernote,
+    )
+    new_ticket.save()
+    return new_ticket
+
+
+def resetDB():
+    for model in django.apps.apps.get_models():
+        model.objects.all().delete()
+
 
 ############################################################################################################
 ############################################# VIEW TESTS ###################################################
@@ -240,8 +298,9 @@ def test_tickets_on_column():
 def test_update_ticket():
     """
     Test the update_ticket function in backend/futuboard/views/views.py
-    Has one method: PUT
+    Has one method: PUT and DELETE
         PUT: Updates a ticket
+        DELETE: Deletes a ticket
     """
     api_client = APIClient()
     # Create a board and a column and add a ticket to it
@@ -254,6 +313,7 @@ def test_update_ticket():
         reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
+
     # Add a ticket to column
     ticketid = uuid.uuid4()
     data = {
@@ -269,6 +329,7 @@ def test_update_ticket():
         content_type="application/json",
     )
     assert response.status_code == 200
+
     # Test PUT request to update ticket
     data = {
         "ticketid": str(ticketid),
@@ -281,6 +342,7 @@ def test_update_ticket():
         reverse("update_ticket", args=[columnid, ticketid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
+
     # Get ticket by id
     response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
     data = response.json()
@@ -298,10 +360,12 @@ def test_update_ticket():
 def test_update_column():
     """
     Test the update_column function in backend/futuboard/views/views.py
-    Has one method: PUT
+    Has two methods: PUT and DELETE
         PUT: Updates a column
+        DELETE: Deletes column
     """
     api_client = APIClient()
+
     # Create a board and a column
     boardid = uuid.uuid4()
     columnid = uuid.uuid4()
@@ -312,12 +376,14 @@ def test_update_column():
         reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
+
     # Test PUT request to update column
     data = {"columnid": str(columnid), "title": "updatedcolumn", "position": 0, "swimlane": False}
     response = api_client.put(
         reverse("update_column", args=[boardid, columnid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
+
     # Get column by id
     response = api_client.get(reverse("columns_on_board", args=[boardid]))
     data = response.json()
@@ -464,3 +530,66 @@ def test_update_user():
     assert md.User.objects.count() == 0
 
     md.Board.objects.all().delete()
+
+
+@pytest.mark.django_db
+def test_deleting_board():
+    """
+    Test deleting a board by id
+    Test that the right board is deleted.
+    """
+
+    api_client = APIClient()
+    boardid1 = addBoard(uuid.uuid4()).boardid
+    boardid2 = addBoard(uuid.uuid4()).boardid
+
+    # Test Delete by id
+    response = api_client.delete(reverse("board_by_id", args=[boardid1]))
+    assert response.status_code == 200
+
+    # Test That the second board isn't deleted
+    assert md.Board.objects.all()[0].boardid == boardid2
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_deleting_column():
+    """
+    Test deleting a column by id
+    Test that the right column is deleted.
+    """
+    api_client = APIClient()
+
+    boardid = addBoard(uuid.uuid4()).boardid
+    columnid = addColumn(boardid, uuid.uuid4()).columnid
+    columnid2 = addColumn(boardid, uuid.uuid4()).columnid
+
+    response = api_client.delete(reverse("update_column", args=[boardid, columnid]))
+
+    assert response.status_code == 200
+    assert md.Column.objects.all()[0].columnid == columnid2
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_deleting_ticket():
+    """
+    Test deleting a ticket by id
+    Test that the right ticket is deleted.
+    """
+
+    api_client = APIClient()
+
+    boardid = addBoard(uuid.uuid4()).boardid
+    columnid = addColumn(boardid, uuid.uuid4()).columnid
+    ticketid = addTicket(columnid, uuid.uuid4()).ticketid
+    ticketid2 = addTicket(columnid, uuid.uuid4()).ticketid
+
+    response = api_client.delete(reverse("update_ticket", args=[columnid, ticketid]))
+
+    assert response.status_code == 200
+    assert md.Ticket.objects.all()[0].ticketid == ticketid2
+
+    resetDB()
