@@ -245,8 +245,9 @@ def test_get_tickets_from_column():
 def test_update_ticket():
     """
     Test the update_ticket function in backend/futuboard/views/views.py
-    Has one method: PUT
+    Has one method: PUT and DELETE
         PUT: Updates a ticket
+        DELETE: Deletes a ticket
     """
     api_client = APIClient()
     # Create a board and a column and add a ticket to it
@@ -259,6 +260,7 @@ def test_update_ticket():
         reverse("get_columns_from_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
+
     # Add a ticket to column
     ticketid = uuid.uuid4()
     data = {
@@ -274,6 +276,7 @@ def test_update_ticket():
         content_type="application/json",
     )
     assert response.status_code == 200
+
     # Test PUT request to update ticket
     data = {
         "ticketid": str(ticketid),
@@ -286,6 +289,7 @@ def test_update_ticket():
         reverse("update_ticket", args=[columnid, ticketid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
+
     # Get ticket by id
     response = api_client.get(reverse("get_tickets_from_column", args=[boardid, columnid]))
     data = response.json()
@@ -293,8 +297,15 @@ def test_update_ticket():
     assert data[0]["title"] == "updatedticket"
     assert data[0]["description"] == "This is an updated description"
     assert response.status_code == 200
+
     # Delete ticket
+    response = api_client.delete(reverse("update_ticket", args=[columnid, ticketid]))
+    assert response.status_code == 200
+    assert md.Ticket.objects.count() == 0
+
+    # Delete incase ticket isn't properly deleted
     md.Ticket.objects.all().delete()
+
     # Delete all columns, boards and usergroups
     md.Column.objects.all().delete()
     md.Board.objects.all().delete()
@@ -305,10 +316,12 @@ def test_update_ticket():
 def test_update_column():
     """
     Test the update_column function in backend/futuboard/views/views.py
-    Has one method: PUT
+    Has two methods: PUT and DELETE
         PUT: Updates a column
+        DELETE: Deletes column
     """
     api_client = APIClient()
+
     # Create a board and a column
     boardid = uuid.uuid4()
     columnid = uuid.uuid4()
@@ -319,19 +332,28 @@ def test_update_column():
         reverse("get_columns_from_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
+
     # Test PUT request to update column
     data = {"columnid": str(columnid), "title": "updatedcolumn", "position": 0, "swimlane": False}
     response = api_client.put(
         reverse("update_column", args=[boardid, columnid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
+
     # Get column by id
     response = api_client.get(reverse("get_columns_from_board", args=[boardid]))
     data = response.json()
     assert data[0]["title"] == "updatedcolumn"
     assert response.status_code == 200
+
     # Delete column
+    response = api_client.delete(reverse("update_column", args=[boardid, columnid]))
+    assert response.status_code == 200
+    assert md.Column.objects.count() == 0
+
+    # Delete incase column isn't properly deleted
     md.Column.objects.all().delete()
+
     # Delete all boards and usergroups
     md.Board.objects.all().delete()
     md.Usergroup.objects.all().delete()
