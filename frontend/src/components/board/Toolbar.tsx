@@ -19,6 +19,7 @@ import { WebsocketContext } from "@/pages/BoardContainer"
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation } from "@/state/apiSlice"
 
 import BoardDeletionComponent from "./BoardDeletionComponent"
+import BoardPasswordForm from "./BoardPasswordForm"
 import BoardTitleForm from "./BoardTitleForm"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
@@ -195,6 +196,7 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
             }}
           >
             <BoardTitleForm title={title} />
+            <BoardPasswordForm />
             <MenuItem onClick={handleExportAndClose} sx={{ py: 1 }}>
               <Download sx={{ fontSize: "1rem", mr: 1 }} />
               <Typography variant="body2">Download Board CSV</Typography>

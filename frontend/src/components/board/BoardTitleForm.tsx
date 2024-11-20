@@ -10,7 +10,7 @@ interface BoardTitleFormProps {
   title: string
 }
 
-interface FormData {
+interface BoardTitleFormData {
   title: string
 }
 
@@ -25,7 +25,7 @@ const BoardTitleForm: React.FC<BoardTitleFormProps> = (props) => {
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm<FormData>({
+  } = useForm<BoardTitleFormData>({
     defaultValues: {
       title: title
     }
@@ -39,7 +39,7 @@ const BoardTitleForm: React.FC<BoardTitleFormProps> = (props) => {
     setOpen(false)
   }
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: BoardTitleFormData) => {
     try {
       await updateBoardName({ boardId: id, newName: data.title }).unwrap()
       handleCloseModal()

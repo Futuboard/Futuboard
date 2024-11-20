@@ -1,7 +1,7 @@
 import { PatchCollection } from "@reduxjs/toolkit/dist/query/core/buildThunks"
 import { TagDescription, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 
-import { Action, Board, Column, SwimlaneColumn, Task, User } from "../types"
+import { Action, Board, Column, NewBoardPassword, SwimlaneColumn, Task, User } from "../types"
 
 import { getAuth, setToken } from "./auth"
 import { RootState } from "./store"
@@ -53,6 +53,14 @@ export const boardsApi = createApi({
         url: `boards/${boardId}/title/`,
         method: "PUT",
         body: { title: newName }
+      }),
+      invalidatesTags: ["Boards"]
+    }),
+    updateBoardPassword: builder.mutation<Board, { boardId: string; newPassword: NewBoardPassword }>({
+      query: ({ boardId, newPassword }) => ({
+        url: `boards/${boardId}/password/`,
+        method: "PUT",
+        body: newPassword
       }),
       invalidatesTags: ["Boards"]
     }),
@@ -495,6 +503,7 @@ export const {
   useAddBoardMutation,
   useDeleteBoardMutation,
   useUpdateBoardTitleMutation,
+  useUpdateBoardPasswordMutation,
   useGetColumnsByBoardIdQuery,
   useGetTaskListByColumnIdQuery,
   useAddColumnMutation,

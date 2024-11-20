@@ -48,6 +48,12 @@ export type NewBoardFormImport = {
   file: FileList
 }
 
+export type NewBoardPassword = {
+  old_password: string
+  new_password: string
+  confirm_password: string
+}
+
 export type Action = {
   actionid: string
   ticketid?: string
