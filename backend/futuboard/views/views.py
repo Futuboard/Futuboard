@@ -22,7 +22,6 @@ def columns_on_board(request, board_id):
         new_column = Column(
             columnid=request.data["columnid"],
             boardid=Board.objects.get(pk=board_id),
-            color="",
             description="",
             title=request.data["title"],
             ordernum=length,
@@ -35,7 +34,6 @@ def columns_on_board(request, board_id):
             for name in defaultSwimlaneNames:
                 swimlanecolumn = Swimlanecolumn(
                     columnid=Column.objects.get(pk=request.data["columnid"]),
-                    color="white",
                     title=name,
                     ordernum=defaultSwimlaneNames.index(name),
                 )

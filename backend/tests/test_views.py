@@ -345,7 +345,7 @@ def test_users_on_board():
     for i in range(5):
         response = api_client.post(
             reverse("users_on_board", args=[boardid]),
-            {"userid": str(userids[i]), "name": "user" + str(i), "color": "color" + str(i)},
+            {"userid": str(userids[i]), "name": "user" + str(i)},
         )
         assert response.status_code == 200
 
@@ -451,7 +451,7 @@ def test_update_user():
     boardid = uuid.uuid4()
     response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
     assert response.status_code == 200
-    response = api_client.post(reverse("users_on_board", args=[boardid]), {"name": "user", "color": "color"})
+    response = api_client.post(reverse("users_on_board", args=[boardid]), {"name": "user"})
     data = response.json()
     # get user id from response
     print(data)

@@ -7,7 +7,6 @@ class BoardAdmin(admin.ModelAdmin):
         (None, {"fields": ["boardid"]}),
         (None, {"fields": ["description"]}),
         (None, {"fields": ["title"]}),
-        (None, {"fields": ["creator"]}),
         (None, {"fields": ["creation_date"]}),
         (None, {"fields": ["passwordhash"]}),
         (None, {"fields": ["salt"]}),
@@ -23,7 +22,6 @@ class ColumnAdmin(admin.ModelAdmin):
         (None, {"fields": ["columnid"]}),
         (None, {"fields": ["boardid"]}),
         (None, {"fields": ["wip_limit"]}),
-        (None, {"fields": ["color"]}),
         (None, {"fields": ["description"]}),
         (None, {"fields": ["title"]}),
         (None, {"fields": ["ordernum"]}),
@@ -59,10 +57,9 @@ class UserAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {"fields": ["userid"]}),
         (None, {"fields": ["name"]}),
-        (None, {"fields": ["color"]}),
         (None, {"fields": ["boardid"]}),
-        (None, {"fields": ["columnid"]}),
-        (None, {"fields": ["actionid"]}),
+        (None, {"fields": ["columns"]}),
+        (None, {"fields": ["actions"]}),
     ]
     list_display = ("name",)
 
@@ -76,7 +73,6 @@ class ActionAdmin(admin.ModelAdmin):
         (None, {"fields": ["ticketid"]}),
         (None, {"fields": ["swimlanecolumnid"]}),
         (None, {"fields": ["title"]}),
-        (None, {"fields": ["color"]}),
         (None, {"fields": ["order"]}),
         (None, {"fields": ["creation_date"]}),
     ]
@@ -90,7 +86,6 @@ class SwimlanecolumnAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {"fields": ["swimlanecolumnid"]}),
         (None, {"fields": ["columnid"]}),
-        (None, {"fields": ["color"]}),
         (None, {"fields": ["title"]}),
         (None, {"fields": ["ordernum"]}),
     ]

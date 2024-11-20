@@ -23,7 +23,6 @@ def test_swimlanecolumns_on_column():
     board = md.Board.objects.create(
         boardid=uuid.uuid4(),
         title="Test Board",
-        creator="Test User",
         creation_date=timezone.now(),
         passwordhash="test",
         salt="test",
@@ -45,7 +44,6 @@ def test_swimlanecolumns_on_column():
     data = {
         "swimlanecolumnid": str(uuid.uuid4()),
         "columnid": str(columnid),
-        "color": "red",
         "title": "new swimlanecolumn",
     }
     response = client.post(
@@ -81,7 +79,6 @@ def test_action_on_swimlane():
     board = md.Board.objects.create(
         boardid=uuid.uuid4(),
         title="Test Board",
-        creator="Test User",
         creation_date=timezone.now(),
         passwordhash="test",
         salt="test",
@@ -112,7 +109,6 @@ def test_action_on_swimlane():
     data = {
         "swimlanecolumnid": str(swimlanecolumnid),
         "columnid": str(columnid),
-        "color": "red",
         "title": "new swimlanecolumn",
     }
     response = client.post(
@@ -127,7 +123,6 @@ def test_action_on_swimlane():
             "swimlanecolumnid": str(swimlanecolumnid),
             "title": "action" + str(i),
             "description": "action description" + str(i),
-            "color": "red",
         }
         response = client.post(
             reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]),
@@ -145,7 +140,6 @@ def test_action_on_swimlane():
     data = {
         "swimlanecolumnid": str(swimlanecolumnid2),
         "columnid": str(columnid),
-        "color": "red",
         "title": "new swimlanecolumn",
     }
     response = client.post(

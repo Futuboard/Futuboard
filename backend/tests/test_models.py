@@ -25,19 +25,17 @@ def test_user():
         boardid=uuid.uuid4(),
         description="Test board",
         title="Board",
-        creator="John",
         creation_date=timezone.now(),
         passwordhash=ver.new_password("password"),
         salt="",
     )
     for i in range(n):
-        md.User.objects.create(name=f"user{i}", color=f"color{i}", boardid=board)
+        md.User.objects.create(name=f"user{i}", boardid=board)
     assert md.User.objects.count() == n
     print(board)
     for i in range(n):
         user = md.User.objects.get(name=f"user{i}")
         assert user.name == f"user{i}"
-        assert user.color == f"color{i}"
         user.delete()
     assert md.User.objects.count() == 0
 
@@ -57,7 +55,6 @@ def test_board():
             boardid=boardids[i],
             description=f"Test board{i}",
             title=f"Board{i}",
-            creator=f"John{i}",
             creation_date=timezone.now(),
             passwordhash=ver.new_password(f"password{i}"),
             salt="",
@@ -69,7 +66,6 @@ def test_board():
         assert board.boardid in boardids
         assert board.description == f"Test board{i}"
         assert board.title == f"Board{i}"
-        assert board.creator == f"John{i}"
         assert ver.verify_password(f"password{i}", board.passwordhash)
         i += 1
         board.delete()
@@ -91,7 +87,6 @@ def test_column():
             boardid=boardids[i],
             description=f"Test board{i}",
             title=f"Board{i}",
-            creator=f"John{i}",
             creation_date=timezone.now(),
             passwordhash=ver.new_password(f"password{i}"),
             salt="",
@@ -100,7 +95,6 @@ def test_column():
             columnid=columnids[i],
             boardid=md.Board.objects.get(pk=boardids[i]),
             wip_limit=5,
-            color=f"color{i}",
             description=f"description{i}",
             title=f"title{i}",
             ordernum=i,
@@ -113,7 +107,6 @@ def test_column():
         column = md.Column.objects.get(columnid=columnid)
         assert column.columnid in columnids
         assert column.wip_limit == 5
-        assert column.color == f"color{i}"
         assert column.description == f"description{i}"
         assert column.title == f"title{i}"
         assert column.ordernum == i
@@ -144,13 +137,11 @@ def test_swimlanecolumn():
                 boardid=boardids[i],
                 description=f"Test board{i}",
                 title=f"Board{i}",
-                creator=f"John{i}",
                 creation_date=timezone.now(),
                 passwordhash=ver.new_password(f"password{i}"),
                 salt="",
             ),
             wip_limit=5,
-            color=f"color{i}",
             description=f"description{i}",
             title=f"title{i}",
             ordernum=i,
@@ -160,7 +151,6 @@ def test_swimlanecolumn():
         md.Swimlanecolumn.objects.create(
             swimlanecolumnid=swimlanecolumnids[i],
             columnid=md.Column.objects.get(columnid=columnids[i]),
-            color=f"color{i}",
             title=f"title{i}",
             ordernum=i,
         )
@@ -170,7 +160,6 @@ def test_swimlanecolumn():
         swimlanecolumn = md.Swimlanecolumn.objects.get(swimlanecolumnid=swimlanecolumnid)
         assert swimlanecolumn.swimlanecolumnid in swimlanecolumnids
         assert swimlanecolumn.columnid.columnid in columnids
-        assert swimlanecolumn.color == f"color{i}"
         assert swimlanecolumn.title == f"title{i}"
         assert swimlanecolumn.ordernum == i
         i += 1
@@ -198,20 +187,17 @@ def test_action():
                     boardid=boardids[i],
                     description=f"Test board{i}",
                     title=f"Board{i}",
-                    creator=f"John{i}",
                     creation_date=timezone.now(),
                     passwordhash=ver.new_password(f"password{i}"),
                     salt="",
                 ),
                 wip_limit=5,
-                color=f"color{i}",
                 description=f"description{i}",
                 title=f"title{i}",
                 ordernum=i,
                 creation_date=timezone.now(),
                 swimlane=True,
             ),
-            color=f"color{i}",
             title=f"title{i}",
             ordernum=i,
         )
@@ -219,7 +205,6 @@ def test_action():
             actionid=actionids[i],
             swimlanecolumnid=md.Swimlanecolumn.objects.get(swimlanecolumnid=swimlanecolumnids[i]),
             title=f"title{i}",
-            color=f"color{i}",
             order=i,
             creation_date=timezone.now(),
         )
@@ -230,7 +215,6 @@ def test_action():
         assert action.actionid in actionids
         assert action.swimlanecolumnid.swimlanecolumnid in swimlanecolumnids
         assert action.title == f"title{i}"
-        assert action.color == f"color{i}"
         assert action.order == i
         i += 1
         action.delete()
@@ -260,13 +244,11 @@ def test_ticket():
                 boardid=boardids[i],
                 description=f"Test board{i}",
                 title=f"Board{i}",
-                creator=f"John{i}",
                 creation_date=timezone.now(),
                 passwordhash=ver.new_password(f"password{i}"),
                 salt="",
             ),
             wip_limit=5,
-            color=f"color{i}",
             description=f"description{i}",
             title=f"title{i}",
             ordernum=i,

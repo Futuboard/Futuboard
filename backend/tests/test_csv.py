@@ -33,7 +33,6 @@ def test_import_export():
         board = md.Board.objects.create(
             boardid=uuid.uuid4(),
             title=f"Test Board{i}",
-            creator=f"Test User{i}",
             creation_date=timezone.now(),
             description="",
             passwordhash="test",
@@ -47,7 +46,7 @@ def test_import_export():
         n_users = 10
         users = []
         for i in range(n_users):
-            users.append(md.User.objects.create(userid=uuid.uuid4(), name=f"user{i}", color="red", boardid=board))
+            users.append(md.User.objects.create(userid=uuid.uuid4(), name=f"user{i}", boardid=board))
         # Create n columns for the board
         n_columns = random.randint(1, 10)
         for i in range(n_columns - 1):
@@ -71,7 +70,7 @@ def test_import_export():
         n_swimlanecolumns = random.randint(1, 10)
         for i in range(n_swimlanecolumns):
             swimlanecolumn = md.Swimlanecolumn.objects.create(
-                swimlanecolumnid=uuid.uuid4(), columnid=column, title=f"swimlanecolumn{i}", color="red", ordernum=i
+                swimlanecolumnid=uuid.uuid4(), columnid=column, title=f"swimlanecolumn{i}", ordernum=i
             )
         # Tickets for the swimlane column
         n_tickets = random.randint(1, 10)
@@ -95,7 +94,6 @@ def test_import_export():
                     ticketid=tickets[k % n_tickets],
                     swimlanecolumnid=swimlanecolumn,
                     title=f"action{k}",
-                    color="red",
                     order=k,
                 )
                 n_users = random.randint(1, 10)
@@ -118,8 +116,7 @@ def test_import_export():
         assert response.status_code == 200
         # Check that the imported board is the same as the exported board
         imported_board = md.Board.objects.get(boardid=new_boardid)
-        # Creator and description should be the same, other fields can be different
-        assert imported_board.creator == board.creator
+        # Description should be the same, other fields can be different
         assert imported_board.description == board.description
 
         # Check that the columns are the same
@@ -133,7 +130,6 @@ def test_import_export():
 
         assert len(imported_users) == len(users)
         assert imported_users[0].name == users[0].name
-        assert imported_users[0].color == users[0].color
 
         # TODO: Should test that the users have the same tickets and actions
 
@@ -176,7 +172,6 @@ def test_import_export():
                         imported_action = imported_actions[k]
                         action = actions[k]
                         assert imported_action.title == action.title
-                        assert imported_action.color == action.color
                         assert imported_action.order == action.order
         num += 1
     # Clean up everything

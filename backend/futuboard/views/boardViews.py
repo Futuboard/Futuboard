@@ -17,7 +17,6 @@ def all_boards(request: rest_framework.request.Request, format=None):
             boardid=request.data["id"],
             description="",
             title=request.data["title"],
-            creator="",
             creation_date=timezone.now(),
             passwordhash=new_password(request.data["password"]),
             salt="",

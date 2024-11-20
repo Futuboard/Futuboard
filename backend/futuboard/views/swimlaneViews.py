@@ -23,7 +23,6 @@ def swimlanecolumns_on_column(request, column_id):
         new_swimlanecolumn = Swimlanecolumn(
             swimlanecolumnid=request.data["swimlanecolumnid"],
             columnid=Column.objects.get(pk=column_id),
-            color=request.data["color"],
             title=request.data["title"],
             ordernum=length,
         )
@@ -69,7 +68,6 @@ def action_on_swimlane(request, swimlanecolumn_id, ticket_id):
             ticketid=Ticket.objects.get(pk=ticket_id),
             swimlanecolumnid=Swimlanecolumn.objects.get(pk=swimlanecolumn_id),
             title=request.data["title"],
-            color=request.data["color"],
             order=length,
             creation_date=timezone.now(),
         )
@@ -103,7 +101,6 @@ def update_action(request, action_id):
             raise Http404("Action not found")
 
         action.title = request.data.get("title", action.title)
-        action.color = request.data.get("color", action.color)
         action.save()
 
         serializer = ActionSerializer(action)
