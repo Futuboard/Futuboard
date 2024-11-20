@@ -21,27 +21,21 @@ class Migration(migrations.Migration):
 
         for board in Board.objects.all():
             users = {}
-            for userGroup in UserGroup.objects.filter(boardid=board):
-                for userGroupUser in UserGroupUser.objects.filter(usergroupid=userGroup):
-                    user = User.objects.get(pk=userGroupUser.userid.userid)
-
-                    if user.name in users:
-                        users[user.name].append(userGroupUser.usergroupid.usergroupid)
-
-                    else:
-                        users[user.name] = [userGroupUser.usergroupid.usergroupid]
-
             for column in Column.objects.filter(boardid=board):
                 for ticket in Ticket.objects.filter(columnid=column):
                     for userGroup in UserGroup.objects.filter(ticketid=ticket.ticketid):
                         for userGroupUser in UserGroupUser.objects.filter(usergroupid=userGroup):
                             user = User.objects.get(pk=userGroupUser.userid.userid)
+                            if user.name not in users:
+                                users[user.name] = []
                             users[user.name].append(userGroupUser.usergroupid.usergroupid)
 
                     for action in Action.objects.filter(ticketid=ticket.ticketid):
                         for userGroup in UserGroup.objects.filter(actionid=action.actionid):
                             for userGroupUser in UserGroupUser.objects.filter(usergroupid=userGroup):
                                 user = User.objects.get(pk=userGroupUser.userid.userid)
+                                if user.name not in users:
+                                    users[user.name] = []
                                 users[user.name].append(userGroupUser.usergroupid.usergroupid)
 
             for username, userGroupIds in users.items():
