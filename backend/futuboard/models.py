@@ -16,7 +16,6 @@ class Action(models.Model):
         "Swimlanecolumn", models.CASCADE, db_column="swimlaneColumnID", blank=True, null=True
     )
     title = models.TextField(blank=True, null=True)
-    color = models.TextField(blank=True, null=True)
     order = models.IntegerField()
     creation_date = models.DateTimeField(blank=True, null=True)
 
@@ -28,7 +27,6 @@ class Board(models.Model):
     boardid = models.UUIDField(db_column="boardID", primary_key=True)
     description = models.TextField(blank=True, null=True)
     title = models.TextField()
-    creator = models.TextField()
     creation_date = models.DateTimeField()
     passwordhash = models.TextField(db_column="passwordHash")
     salt = models.TextField()
@@ -41,7 +39,6 @@ class Column(models.Model):
     columnid = models.UUIDField(db_column="columnID", primary_key=True)
     boardid = models.ForeignKey(Board, models.CASCADE, db_column="boardID")
     wip_limit = models.IntegerField(blank=True, null=True)
-    color = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     title = models.TextField(blank=True, null=True)
     ordernum = models.IntegerField(db_column="orderNum")
@@ -56,7 +53,6 @@ class Column(models.Model):
 class Swimlanecolumn(models.Model):
     swimlanecolumnid = models.UUIDField(db_column="swimlaneColumnID", default=uuid.uuid4, primary_key=True)
     columnid = models.ForeignKey(Column, models.CASCADE, db_column="columnID", blank=True, null=True)
-    color = models.TextField(blank=True, null=True)
     title = models.TextField(blank=True, null=True)
     ordernum = models.IntegerField(db_column="orderNum")
 
@@ -83,7 +79,6 @@ class Ticket(models.Model):
 class User(models.Model):
     userid = models.UUIDField(db_column="userID", default=uuid.uuid4, primary_key=True)
     name = models.TextField(blank=True, null=True)
-    color = models.TextField(blank=True, null=True)
     boardid = models.ForeignKey(Board, models.CASCADE, db_column="boardID")
     tickets = models.ManyToManyField(Ticket)
     actions = models.ManyToManyField(Action)
