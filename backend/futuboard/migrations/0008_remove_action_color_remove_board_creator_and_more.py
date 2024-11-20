@@ -4,30 +4,29 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('futuboard', '0007_remove_usergroup_actionid_remove_usergroup_boardid_and_more'),
+        ("futuboard", "0007_remove_usergroup_actionid_remove_usergroup_boardid_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='action',
-            name='color',
+            model_name="action",
+            name="color",
         ),
         migrations.RemoveField(
-            model_name='board',
-            name='creator',
+            model_name="board",
+            name="creator",
         ),
         migrations.RemoveField(
-            model_name='column',
-            name='color',
+            model_name="column",
+            name="color",
         ),
         migrations.RemoveField(
-            model_name='swimlanecolumn',
-            name='color',
+            model_name="swimlanecolumn",
+            name="color",
         ),
         migrations.RemoveField(
-            model_name='user',
-            name='color',
+            model_name="user",
+            name="color",
         ),
     ]
