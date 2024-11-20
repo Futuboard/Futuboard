@@ -48,7 +48,14 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: ["Boards"]
     }),
-
+    updateBoardName: builder.mutation<Board, { boardId: string; newName: string }>({
+      query: ({ boardId, newName }) => ({
+        url: `boards/${boardId}/title/`,
+        method: "PUT",
+        body: { title: newName }
+      }),
+      invalidatesTags: ["Boards"]
+    }),
     getColumnsByBoardId: builder.query<Column[], string>({
       query: (boardid) => `boards/${boardid}/columns/`,
       providesTags: [{ type: "Columns", id: "LIST" }]
@@ -487,6 +494,7 @@ export const {
   useGetBoardQuery,
   useAddBoardMutation,
   useDeleteBoardMutation,
+  useUpdateBoardNameMutation,
   useGetColumnsByBoardIdQuery,
   useGetTaskListByColumnIdQuery,
   useAddColumnMutation,

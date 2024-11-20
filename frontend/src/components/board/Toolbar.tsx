@@ -19,6 +19,7 @@ import { WebsocketContext } from "@/pages/BoardContainer"
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation } from "@/state/apiSlice"
 
 import BoardDeletionComponent from "./BoardDeletionComponent"
+import BoardNameEdit from "./BoardNameEdit"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
 import HomeButton from "./HomeButton"
@@ -193,6 +194,7 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
               "aria-labelledby": "basic-button"
             }}
           >
+            <BoardNameEdit />
             <MenuItem onClick={handleExportAndClose} sx={{ py: 1 }}>
               <Download sx={{ fontSize: "1rem", mr: 1 }} />
               <Typography variant="body2">Download Board CSV</Typography>
