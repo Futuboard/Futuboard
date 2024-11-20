@@ -1,5 +1,16 @@
 import { EnhancedEncryption } from "@mui/icons-material"
-import { Box, Button, Dialog, DialogContent, DialogTitle, MenuItem, Stack, TextField, Typography } from "@mui/material"
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  MenuItem,
+  Stack,
+  TextField,
+  Typography,
+  Grid
+} from "@mui/material"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { useParams } from "react-router-dom"
@@ -51,32 +62,40 @@ const BoardPasswordForm = () => {
           <DialogTitle>Enter new password</DialogTitle>
           <DialogContent>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <Stack spacing={2}>
-                <TextField
-                  label="Old Password"
-                  size="small"
-                  helperText={errors.old_password?.message}
-                  error={Boolean(errors.old_password)}
-                  {...register("old_password")}
-                />
-                <TextField
-                  label="New Password"
-                  size="small"
-                  helperText={errors.new_password?.message}
-                  error={Boolean(errors.new_password)}
-                  {...register("new_password")}
-                />
-                <TextField
-                  label="Confirm Password"
-                  size="small"
-                  helperText={errors.confirm_password?.message}
-                  error={Boolean(errors.confirm_password)}
-                  {...register("confirm_password")}
-                />
-                <Button variant="contained" type="submit">
-                  Submit
-                </Button>
-              </Stack>
+              <Grid container spacing={1} textAlign="center" height="285px" width="250px">
+                <Grid item xs={12}>
+                  <TextField
+                    label="Old Password"
+                    size="small"
+                    helperText={errors.old_password?.message}
+                    error={Boolean(errors.old_password)}
+                    {...register("old_password")}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="New Password"
+                    size="small"
+                    helperText={errors.new_password?.message}
+                    error={Boolean(errors.new_password)}
+                    {...register("new_password")}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Confirm Password"
+                    size="small"
+                    helperText={errors.confirm_password?.message}
+                    error={Boolean(errors.confirm_password)}
+                    {...register("confirm_password")}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Button variant="contained" type="submit">
+                    Submit
+                  </Button>
+                </Grid>
+              </Grid>
             </form>
           </DialogContent>
         </Box>
