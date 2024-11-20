@@ -1,3 +1,4 @@
+import { Edit } from "@mui/icons-material"
 import { Box, Button, Dialog, DialogContent, DialogTitle, MenuItem, Stack, TextField, Typography } from "@mui/material"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -50,6 +51,7 @@ const BoardTitleForm: React.FC<BoardTitleFormProps> = (props) => {
   return (
     <Box>
       <MenuItem onClick={handleOpenModal} sx={{ py: 1 }}>
+        <Edit sx={{ fontSize: "1rem", mr: 1 }} />
         <Typography variant="body2">Edit Board Name</Typography>
       </MenuItem>
       <Dialog open={open} onClose={handleCloseModal}>
