@@ -12,9 +12,9 @@ import json
 
 
 @pytest.mark.django_db
-def test_swimlanecolumn_view():
+def test_swimlanecolumns_on_column():
     """
-    Test the swimlanecolumn_view function in backend/futuboard/views/swimlaneViews.py
+    Test the swimlanecolumns_on_column function in backend/futuboard/views/swimlaneViews.py
     Has two methods: GET and POST
     GET: Returns all swimlanecolumns for a given column
     POST: Creates a new swimlanecolumn for a given column
@@ -31,13 +31,13 @@ def test_swimlanecolumn_view():
     columnid = uuid.uuid4()
     data = {"columnid": str(columnid), "title": "column4", "position": 4, "swimlane": True}
     response = client.post(
-        reverse("get_columns_from_board", args=[board.boardid]), data=json.dumps(data), content_type="application/json"
+        reverse("columns_on_board", args=[board.boardid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
     # Check that the 4 default swimlanecolumns are created
     assert len(md.Swimlanecolumn.objects.filter(columnid=columnid)) == 4
     # Get the swimlanecolumns for the column
-    response = client.get(reverse("swimlanecolumn_view", args=[columnid]))
+    response = client.get(reverse("swimlanecolumns_on_column", args=[columnid]))
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 4
@@ -49,13 +49,13 @@ def test_swimlanecolumn_view():
         "title": "new swimlanecolumn",
     }
     response = client.post(
-        reverse("swimlanecolumn_view", args=[columnid]), data=json.dumps(data), content_type="application/json"
+        reverse("swimlanecolumns_on_column", args=[columnid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
     # Check that the new swimlanecolumn is created
     assert len(md.Swimlanecolumn.objects.filter(columnid=columnid)) == 5
     # Get the swimlanecolumns for the column
-    response = client.get(reverse("swimlanecolumn_view", args=[columnid]))
+    response = client.get(reverse("swimlanecolumns_on_column", args=[columnid]))
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 5
@@ -67,9 +67,9 @@ def test_swimlanecolumn_view():
 
 
 @pytest.mark.django_db
-def test_action_view():
+def test_action_on_swimlane():
     """
-    Test the action_view function in backend/futuboard/views/swimlaneViews.py
+    Test the action_on_swimlane function in backend/futuboard/views/swimlaneViews.py
     Has three methods: GET, POST, and PUT
 
         GET: Returns all actions for a given swimlanecolumn and ticket
@@ -90,7 +90,7 @@ def test_action_view():
     columnid = uuid.uuid4()
     data = {"columnid": str(columnid), "title": "column4", "position": 4, "swimlane": True}
     response = client.post(
-        reverse("get_columns_from_board", args=[board.boardid]), data=json.dumps(data), content_type="application/json"
+        reverse("columns_on_board", args=[board.boardid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
     # Create a new ticket
@@ -117,7 +117,7 @@ def test_action_view():
         "title": "new swimlanecolumn",
     }
     response = client.post(
-        reverse("swimlanecolumn_view", args=[columnid]), data=json.dumps(data), content_type="application/json"
+        reverse("swimlanecolumns_on_column", args=[columnid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
     # Create 3 new actions
@@ -131,13 +131,13 @@ def test_action_view():
             "color": "red",
         }
         response = client.post(
-            reverse("action_view", args=[swimlanecolumnid, ticketid]),
+            reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]),
             data=json.dumps(data),
             content_type="application/json",
         )
         assert response.status_code == 200
     # Get the actions for the swimlanecolumn and ticket
-    response = client.get(reverse("action_view", args=[swimlanecolumnid, ticketid]))
+    response = client.get(reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]))
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 3
@@ -150,7 +150,7 @@ def test_action_view():
         "title": "new swimlanecolumn",
     }
     response = client.post(
-        reverse("swimlanecolumn_view", args=[columnid]), data=json.dumps(data), content_type="application/json"
+        reverse("swimlanecolumns_on_column", args=[columnid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
     data = [
@@ -166,13 +166,13 @@ def test_action_view():
     ]
     # Move the actions to the new swimlanecolumn
     response = client.put(
-        reverse("action_view", args=[swimlanecolumnid2, ticketid]),
+        reverse("action_on_swimlane", args=[swimlanecolumnid2, ticketid]),
         data=json.dumps(data),
         content_type="application/json",
     )
     assert response.status_code == 200
     # Get the actions for the new swimlanecolumn and ticket
-    response = client.get(reverse("action_view", args=[swimlanecolumnid2, ticketid]))
+    response = client.get(reverse("action_on_swimlane", args=[swimlanecolumnid2, ticketid]))
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 3
@@ -181,7 +181,7 @@ def test_action_view():
     assert data[1]["order"] == 1
     assert data[2]["order"] == 2
     # Check that the actions have been removed from the old swimlanecolumn
-    response = client.get(reverse("action_view", args=[swimlanecolumnid, ticketid]))
+    response = client.get(reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]))
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 0

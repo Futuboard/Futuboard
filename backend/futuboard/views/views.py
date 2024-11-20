@@ -182,7 +182,7 @@ def users_on_ticket(request, ticket_id):
 
 
 @api_view(["DELETE"])
-def delete_user(request, user_id):
+def update_user(request, user_id):
     if request.method == "DELETE":
         user = User.objects.get(pk=user_id)
         response = "Successfully deleted user: {}".format(user_id)
