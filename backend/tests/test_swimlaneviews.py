@@ -63,7 +63,6 @@ def test_swimlanecolumns_on_column():
     md.Board.objects.all().delete()
     md.Column.objects.all().delete()
     md.Swimlanecolumn.objects.all().delete()
-    md.Usergroup.objects.all().delete()
 
 
 @pytest.mark.django_db
@@ -103,7 +102,7 @@ def test_action_on_swimlane():
         "size": 10,
     }
     response = client.post(
-        reverse("get_tickets_from_column", args=[board.boardid, columnid]),
+        reverse("tickets_on_column", args=[board.boardid, columnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
@@ -191,4 +190,3 @@ def test_action_on_swimlane():
     md.Swimlanecolumn.objects.all().delete()
     md.Ticket.objects.all().delete()
     md.Action.objects.all().delete()
-    md.Usergroup.objects.all().delete()

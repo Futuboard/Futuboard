@@ -38,8 +38,6 @@ def test_all_boards():
     data = response.json()
     assert len(data) == 0
     assert md.Board.objects.count() == 0
-    # Clean up usergroups
-    md.Usergroup.objects.all().delete()
 
 
 @pytest.mark.django_db
@@ -84,9 +82,8 @@ def test_board_by_id():
         assert data["boardid"] == str(boardids[i])
         assert data["title"] == "board" + str(i)
         assert response.status_code == 200
-    # Delete all boards and usergroups
+    # Delete all boards
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
 
 
 @pytest.mark.django_db
@@ -149,16 +146,15 @@ def test_columns_on_board():
     data = response.json()
     assert len(data) == 0
     assert response.status_code == 200
-    # Delete all boards, swimlanecolumns and usergroups
+    # Delete all boards and swimlanecolumns
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
     md.Swimlanecolumn.objects.all().delete()
 
 
 @pytest.mark.django_db
-def test_get_tickets_from_column():
+def test_tickets_on_column():
     """
-    Test the get_tickets_from_column function in backend/futuboard/views/views.py
+    Test the tickets_on_column function in backend/futuboard/views/views.py
     Has three methods: GET, POST and PUT
         GET: Returns all tickets from a column
         POST: Creates a new ticket in a column
@@ -186,13 +182,13 @@ def test_get_tickets_from_column():
             "size": 5,
         }
         response = api_client.post(
-            reverse("get_tickets_from_column", args=[boardid, columnid]),
+            reverse("tickets_on_column", args=[boardid, columnid]),
             data=json.dumps(data),
             content_type="application/json",
         )
         assert response.status_code == 200
     # Get tickets from column
-    response = api_client.get(reverse("get_tickets_from_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
     data = response.json()
     assert len(data) == 5
     assert response.status_code == 200
@@ -219,25 +215,24 @@ def test_get_tickets_from_column():
     ]
 
     response = api_client.put(
-        reverse("get_tickets_from_column", args=[boardid, newcolumnid]),
+        reverse("tickets_on_column", args=[boardid, newcolumnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
     assert response.status_code == 200
     # Get tickets from new column
-    response = api_client.get(reverse("get_tickets_from_column", args=[boardid, newcolumnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[boardid, newcolumnid]))
     data = response.json()
     assert len(data) == 2
     assert response.status_code == 200
     # Get tickets from old column
-    response = api_client.get(reverse("get_tickets_from_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
     data = response.json()
     assert len(data) == 3
     assert response.status_code == 200
-    # Delete all columns, boards, tickets and usergroups
+
     md.Column.objects.all().delete()
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
     md.Ticket.objects.all().delete()
 
 
@@ -269,7 +264,7 @@ def test_update_ticket():
         "size": 5,
     }
     response = api_client.post(
-        reverse("get_tickets_from_column", args=[boardid, columnid]),
+        reverse("tickets_on_column", args=[boardid, columnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
@@ -287,18 +282,16 @@ def test_update_ticket():
     )
     assert response.status_code == 200
     # Get ticket by id
-    response = api_client.get(reverse("get_tickets_from_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
     data = response.json()
     print(data)
     assert data[0]["title"] == "updatedticket"
     assert data[0]["description"] == "This is an updated description"
     assert response.status_code == 200
-    # Delete ticket
+
     md.Ticket.objects.all().delete()
-    # Delete all columns, boards and usergroups
     md.Column.objects.all().delete()
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
 
 
 @pytest.mark.django_db
@@ -330,11 +323,9 @@ def test_update_column():
     data = response.json()
     assert data[0]["title"] == "updatedcolumn"
     assert response.status_code == 200
-    # Delete column
+
     md.Column.objects.all().delete()
-    # Delete all boards and usergroups
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
 
 
 @pytest.mark.django_db
@@ -357,79 +348,95 @@ def test_users_on_board():
             {"userid": str(userids[i]), "name": "user" + str(i), "color": "color" + str(i)},
         )
         assert response.status_code == 200
-    # Get users from board
+
     response = api_client.get(reverse("users_on_board", args=[boardid]))
     data = response.json()
     assert len(data) == 5
     assert response.status_code == 200
-    # Delete all usergroupusers
-    md.UsergroupUser.objects.all().delete()
-    # Get users from board
+
+    md.User.objects.all().delete()
+
     response = api_client.get(reverse("users_on_board", args=[boardid]))
     data = response.json()
     assert len(data) == 0
     assert response.status_code == 200
-    # Delete all boards usergroups and users
-    md.Board.objects.all().delete()
-    md.User.objects.all().delete()
-    md.Usergroup.objects.all().delete()
 
-    # Why is users_on_ticket defined twice in views.py? Test fails because of this, put test also not implemented due to this
-    # @pytest.mark.django_db
-    # def test_users_on_ticket():
+    md.Board.objects.all().delete()
+
+
+@pytest.mark.django_db
+def test_users_on_ticket():
     """
     Test the users_on_ticket function in backend/futuboard/views/views.py
     Has three methods: GET, POST and PUT
         GET: Returns all users from a ticket
         POST: Adds a user to a ticket
-        PUT: Changes the position of a user to a new ticket
+        DELETE: Removes a user from a ticket
     """
 
+    api_client = APIClient()
+    # Create a board, a column, a ticket and add 5 users to it
+    boardid = uuid.uuid4()
+    columnid = uuid.uuid4()
+    ticketid = uuid.uuid4()
+    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    assert response.status_code == 200
+    data = {"columnid": str(columnid), "title": "column", "position": 0, "swimlane": False}
+    response = api_client.post(
+        reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
+    )
+    assert response.status_code == 200
+    data = {
+        "ticketid": str(ticketid),
+        "title": "ticket",
+        "description": "description",
+        "position": 0,
+        "size": 5,
+    }
+    response = api_client.post(
+        reverse("tickets_on_column", args=[boardid, columnid]),
+        data=json.dumps(data),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+    userids = []
+    for i in range(5):
+        response = api_client.post(
+            reverse("users_on_board", args=[boardid]),
+            {"name": "user" + str(i)},
+        )
+        assert response.status_code == 200
+        userids.append(response.json()["userid"])
 
-#     api_client = APIClient()
-#     # Create a board, a column, a ticket and add 5 users to it
-#     boardid = uuid.uuid4()
-#     columnid = uuid.uuid4()
-#     ticketid = uuid.uuid4()
-#     response = api_client.post(reverse('all_boards'), {'id': boardid, 'title': 'board', 'password': 'password'})
-#     assert response.status_code == 200
-#     data = {
-#         'columnid': str(columnid),
-#         'title': 'column',
-#         'position': 0,
-#         'swimlane': False
-#     }
-#     response = api_client.post(reverse('columns_on_board', args=[boardid]), data=json.dumps(data), content_type='application/json')
-#     assert response.status_code == 200
-#     data = {
-#         'ticketid': str(ticketid),
-#         'title': 'ticket',
-#         'description': 'description',
-#         'position': 0,
-#         'size': 5,
-#     }
-#     response = api_client.post(reverse('get_tickets_from_column', args=[boardid, columnid]), data=json.dumps(data), content_type='application/json')
-#     assert response.status_code == 200
-#     userids = [uuid.uuid4() for i in range(5)]
-#     for i in range(5):
-#         response = api_client.post(reverse('users_on_ticket', args=[boardid, columnid, ticketid]), {'userid': str(userids[i]), 'name': 'user' + str(i), 'color': 'color' + str(i)})
-#         assert response.status_code == 200
-#     # Get users from ticket
-#     response = api_client.get(reverse('users_on_ticket', args=[boardid, columnid, ticketid]))
-#     data = response.json()
-#     assert len(data) == 5
-#     assert response.status_code == 200
-#     # Delete all usergroupusers
-#     md.UsergroupUser.objects.all().delete()
-#     # Get users from ticket
-#     response = api_client.get(reverse('users_on_ticket', args=[boardid, columnid, ticketid]))
-#     data = response.json()
-#     assert len(data) == 0
-#     assert response.status_code == 200
-#     # Delete all columns, boards, usergroups and users
-#     md.Column.objects.all().delete()
-#     md.Board.objects.all().delete()
-#     md.User.objects.all().delete()
+    for i in range(5):
+        response = api_client.post(
+            reverse("users_on_ticket", args=[ticketid]),
+            {"userid": userids[i]},
+        )
+        assert response.status_code == 200
+
+    # Get users from ticket
+    response = api_client.get(reverse("users_on_ticket", args=[ticketid]))
+    data = response.json()
+    assert len(data) == 5
+    assert response.status_code == 200
+
+    for i in range(5):
+        response = api_client.delete(
+            reverse("users_on_ticket", args=[ticketid]),
+            {"userid": userids[i]},
+        )
+        assert response.status_code == 200
+
+    # Get users from ticket
+    response = api_client.get(reverse("users_on_ticket", args=[ticketid]))
+    data = response.json()
+    assert len(data) == 0
+    assert response.status_code == 200
+
+    md.Column.objects.all().delete()
+    md.Board.objects.all().delete()
+    md.User.objects.all().delete()
 
 
 @pytest.mark.django_db
@@ -455,7 +462,5 @@ def test_update_user():
     assert response.status_code == 200
     # Check that amount of users is 0
     assert md.User.objects.count() == 0
-    # Delete all boards and usergroups
+
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
-    md.UsergroupUser.objects.all().delete()
