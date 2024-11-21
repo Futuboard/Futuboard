@@ -275,7 +275,7 @@ export const boardsApi = createApi({
     }),
     deleteUser: builder.mutation<User, { userId: string }>({
       query: ({ userId }) => ({
-        url: `users/${userId}/delete/`,
+        url: `users/${userId}`,
         method: "DELETE"
       }),
       invalidatesTags: ["Users"]
