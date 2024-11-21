@@ -25,13 +25,15 @@ const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlan
   return (
     <>
       {isLoading ? (
-        <Skeleton width ="100%" variant="rectangular">
-          <Box sx={{
-                display: "flex",
-                padding: "2px",
-                height: "118px",
-                overflowX: "hidden",
-                }}/>
+        <Skeleton width="100%" variant="rectangular">
+          <Box
+            sx={{
+              display: "flex",
+              padding: "2px",
+              height: "118px",
+              overflowX: "hidden"
+            }}
+          />
         </Skeleton>
       ) : (
         <Droppable droppableId={swimlanecolumnid + "/" + taskId} type={"SWIMLANE" + "/" + taskId}>
@@ -62,14 +64,14 @@ const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlan
                 "&::-webkit-scrollbar-thumb:hover": {
                   background: "#555"
                 }
-            }}
-          >
-            {actionList &&
-              actionList.map((action, index) => <Action key={action.actionid} action={action} index={index} />)}
-            {provided.placeholder}
-          </Box>
-        )}
-      </Droppable>
+              }}
+            >
+              {actionList &&
+                actionList.map((action, index) => <Action key={action.actionid} action={action} index={index} />)}
+              {provided.placeholder}
+            </Box>
+          )}
+        </Droppable>
       )}
     </>
   )

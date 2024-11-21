@@ -3,10 +3,7 @@ import Paper from "@mui/material/Paper"
 import { useContext, useEffect, useState } from "react"
 
 import { WebsocketContext } from "@/pages/BoardContainer"
-import {
-  useGetSwimlaneColumnsByColumnIdQuery,
-  useUpdateSwimlaneColumnMutation
-} from "@/state/apiSlice"
+import { useGetSwimlaneColumnsByColumnIdQuery, useUpdateSwimlaneColumnMutation } from "@/state/apiSlice"
 import type { Column, Task, SwimlaneColumn } from "@/types"
 
 import Swimlane from "./Swimlane"
@@ -81,7 +78,6 @@ interface SwimlaneContainerProps {
 
 const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column, tasks }) => {
   const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(column.columnid)
-
 
   return (
     <Paper
