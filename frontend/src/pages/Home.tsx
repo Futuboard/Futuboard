@@ -34,7 +34,7 @@ const Home: React.FC = () => {
   }
 
   useEffect(() => {
-    document.title="Futuboard";
+    document.title = "Futuboard"
   })
 
   return (
