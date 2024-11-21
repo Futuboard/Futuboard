@@ -1,7 +1,17 @@
 import { PatchCollection } from "@reduxjs/toolkit/dist/query/core/buildThunks"
 import { TagDescription, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 
-import { Action, Board, Column, NewAction, NewTask, SwimlaneColumn, Task, User } from "@/types"
+import {
+  Action,
+  Board,
+  Column,
+  NewAction,
+  NewTask,
+  SwimlaneColumn,
+  Task,
+  User,
+  UserWithoutTicketsOrActions
+} from "@/types"
 
 import { getAuth, setToken } from "./auth"
 import { RootState } from "./store"
@@ -209,7 +219,7 @@ export const boardsApi = createApi({
       providesTags: [{ type: "Users", id: "ALL_USERS" }]
     }),
 
-    postUserToBoard: builder.mutation<User, { boardId: string; user: Omit<User, "userid"> }>({
+    postUserToBoard: builder.mutation<User, { boardId: string; user: Omit<UserWithoutTicketsOrActions, "userid"> }>({
       query: ({ boardId, user }) => ({
         url: `boards/${boardId}/users/`,
         method: "POST",
