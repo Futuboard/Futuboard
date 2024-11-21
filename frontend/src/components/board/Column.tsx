@@ -19,7 +19,7 @@ import {
   useGetTaskListByColumnIdQuery,
   useUpdateColumnMutation
 } from "../../state/apiSlice"
-import { Column, Task as TaskType, User } from "../../types"
+import type { Column, Task as TaskType, User } from "../../types"
 
 import ColumnEditForm from "./ColumnEditForm"
 import SwimlaneContainer from "./SwimlaneContainer"
@@ -340,7 +340,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
           </Paper>
           <Box sx={{ overflowX: "hidden", height: "fit-content" }}>
             <Box sx={{ width: showSwimlanes ? "820px" : "0px", transition: "width 300ms" }}>
-              {showSwimlanes && <SwimlaneContainer column={column} />}
+              {showSwimlanes && <SwimlaneContainer column={column} tasks = {tasks} />}
             </Box>
           </Box>
         </Box>

@@ -5,10 +5,9 @@ import { useContext, useEffect, useState } from "react"
 import { WebsocketContext } from "@/pages/BoardContainer"
 import {
   useGetSwimlaneColumnsByColumnIdQuery,
-  useGetTaskListByColumnIdQuery,
   useUpdateSwimlaneColumnMutation
 } from "@/state/apiSlice"
-import { Column, SwimlaneColumn } from "@/types"
+import type { Column, Task, SwimlaneColumn } from "@/types"
 
 import Swimlane from "./Swimlane"
 
@@ -77,13 +76,12 @@ const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }>
 
 interface SwimlaneContainerProps {
   column: Column
+  tasks: Task[]
 }
 
-const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
-  const { data: taskList } = useGetTaskListByColumnIdQuery({ boardId: column.boardid, columnId: column.columnid })
+const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column, tasks }) => {
   const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(column.columnid)
 
-  const tasks = taskList
 
   return (
     <Paper

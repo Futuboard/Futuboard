@@ -1,6 +1,6 @@
 import { Droppable } from "@hello-pangea/dnd"
 import { Add } from "@mui/icons-material"
-import { Box, IconButton, Paper, Popover, Typography } from "@mui/material"
+import { Box, IconButton, Paper, Popover, Skeleton, Typography } from "@mui/material"
 import { useContext, useState } from "react"
 
 import { WebsocketContext } from "@/pages/BoardContainer"
@@ -24,43 +24,53 @@ const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlan
 
   return (
     <>
-      <Droppable droppableId={swimlanecolumnid + "/" + taskId} type={"SWIMLANE" + "/" + taskId}>
-        {(provided, snapshot) => (
-          <Box
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              flex: "1",
-              padding: "2px",
-              alignContent: "center",
-              border: snapshot.isDraggingOver ? "1px solid rgba(22, 95, 199)" : "1px solid rgba(0, 0, 0, 0.12)",
-              backgroundColor: snapshot.isDraggingOver ? "rgba(22, 95, 199, 0.1)" : "#E5DB0",
-              height: "118px",
-              overflowX: "hidden",
-              //custom scrollbar has issues with react-beautiful-dnd, remove if it's causing problems
-              "&::-webkit-scrollbar": {
-                width: "5px"
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "#f1f1f1"
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: "#888"
-              },
-              "&::-webkit-scrollbar-thumb:hover": {
-                background: "#555"
-              }
+      {isLoading ? (
+        <Skeleton width ="100%" variant="rectangular">
+          <Box sx={{
+                display: "flex",
+                padding: "2px",
+                height: "118px",
+                overflowX: "hidden",
+                }}/>
+        </Skeleton>
+      ) : (
+        <Droppable droppableId={swimlanecolumnid + "/" + taskId} type={"SWIMLANE" + "/" + taskId}>
+          {(provided, snapshot) => (
+            <Box
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                flex: "1",
+                padding: "2px",
+                alignContent: "center",
+                border: snapshot.isDraggingOver ? "1px solid rgba(22, 95, 199)" : "1px solid rgba(0, 0, 0, 0.12)",
+                backgroundColor: snapshot.isDraggingOver ? "rgba(22, 95, 199, 0.1)" : "#E5DB0",
+                height: "118px",
+                overflowX: "hidden",
+                //custom scrollbar has issues with react-beautiful-dnd, remove if it's causing problems
+                "&::-webkit-scrollbar": {
+                  width: "5px"
+                },
+                "&::-webkit-scrollbar-track": {
+                  background: "#f1f1f1"
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "#888"
+                },
+                "&::-webkit-scrollbar-thumb:hover": {
+                  background: "#555"
+                }
             }}
           >
-            {isLoading && <Typography>Loading actions...</Typography>}
             {actionList &&
               actionList.map((action, index) => <Action key={action.actionid} action={action} index={index} />)}
             {provided.placeholder}
           </Box>
         )}
       </Droppable>
+      )}
     </>
   )
 }
