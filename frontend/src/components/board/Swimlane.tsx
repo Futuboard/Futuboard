@@ -1,6 +1,6 @@
 import { Droppable } from "@hello-pangea/dnd"
 import { Add } from "@mui/icons-material"
-import { Box, IconButton, Paper, Popover, Skeleton, Typography } from "@mui/material"
+import { Box, IconButton, Paper, Popover, Skeleton } from "@mui/material"
 import { useContext, useState } from "react"
 
 import { WebsocketContext } from "@/pages/BoardContainer"
