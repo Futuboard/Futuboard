@@ -11,6 +11,7 @@ import { useParams } from "react-router"
 
 import { WebsocketContext } from "@/pages/BoardContainer"
 import { RootState } from "@/state/store"
+import type { Column, Task as TaskType, User } from "@/types"
 
 import { getId } from "../../services/Utils"
 import {
@@ -19,7 +20,6 @@ import {
   useGetTaskListByColumnIdQuery,
   useUpdateColumnMutation
 } from "../../state/apiSlice"
-import type { Column, Task as TaskType, User } from "../../types"
 
 import ColumnEditForm from "./ColumnEditForm"
 import SwimlaneContainer from "./SwimlaneContainer"

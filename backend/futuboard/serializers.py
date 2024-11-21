@@ -24,7 +24,21 @@ class ColumnSerializer(serializers.ModelSerializer):
         ]
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["userid", "name", "actions", "tickets"]
+
+
+class UserSerializerWithoutActionsOrTickets(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["userid", "name"]
+
+
 class TicketSerializer(serializers.ModelSerializer):
+    users = UserSerializerWithoutActionsOrTickets(many=True, read_only=True, source="user_set")
+
     class Meta:
         model = Ticket
         fields = [
@@ -38,13 +52,8 @@ class TicketSerializer(serializers.ModelSerializer):
             "order",
             "creation_date",
             "cornernote",
+            "users",
         ]
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["userid", "name", "boardid"]
 
 
 class SwimlaneColumnSerializer(serializers.ModelSerializer):
@@ -54,6 +63,8 @@ class SwimlaneColumnSerializer(serializers.ModelSerializer):
 
 
 class ActionSerializer(serializers.ModelSerializer):
+    users = UserSerializerWithoutActionsOrTickets(many=True, read_only=True, source="user_set")
+
     class Meta:
         model = Action
-        fields = ["actionid", "ticketid", "swimlanecolumnid", "title", "order", "creation_date"]
+        fields = ["actionid", "ticketid", "swimlanecolumnid", "title", "order", "creation_date", "users"]

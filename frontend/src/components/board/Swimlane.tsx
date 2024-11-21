@@ -6,7 +6,7 @@ import { useContext, useState } from "react"
 import { WebsocketContext } from "@/pages/BoardContainer"
 import { getId } from "@/services/Utils"
 import { usePostActionMutation } from "@/state/apiSlice"
-import { Action as ActionType, SwimlaneColumn, Task } from "@/types"
+import { Action as ActionType, NewAction, SwimlaneColumn, Task } from "@/types"
 
 import Action from "./Action"
 import ActionCreationForm from "./ActionCreationForm"
@@ -77,10 +77,9 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }>
   }
 
   const handleOnSubmit = async (data: { actionTitle: string; resetActionTitle: () => void }) => {
-    const actionObject: ActionType = {
+    const actionObject: NewAction = {
       title: data.actionTitle,
-      actionid: getId(),
-      color: "white"
+      actionid: getId()
     }
 
     await createAction({ taskId, swimlaneColumnId: swimlanecolumnid, action: actionObject })

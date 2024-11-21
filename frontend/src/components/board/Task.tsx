@@ -12,22 +12,12 @@ import ClickAwayListener from "@mui/material/ClickAwayListener"
 import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from "react"
 
 import { WebsocketContext } from "@/pages/BoardContainer"
+import { Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
 
-import { useGetUsersByTicketIdQuery, useUpdateTaskMutation } from "../../state/apiSlice"
-import { Task as TaskType, User } from "../../types"
+import { useUpdateTaskMutation } from "../../state/apiSlice"
 
 import TaskEditForm from "./TaskEditForm"
 import UserMagnet from "./UserMagnet"
-
-const CaretakerComponent: React.FC<{ caretaker: User }> = ({ caretaker }) => {
-  return (
-    <div>
-      <Paper variant="outlined" sx={{ backgroundColor: caretaker.color || "lightgrey", padding: "0px 12px" }}>
-        <Typography>{caretaker.name}</Typography>
-      </Paper>
-    </div>
-  )
-}
 
 const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSnapshot) => {
   if (!snapshot.isDropAnimating) {
@@ -41,7 +31,7 @@ const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSn
   }
 }
 
-const TaskUserList: React.FC<{ users: User[]; taskid: string }> = ({ users, taskid }) => {
+const TaskUserList: React.FC<{ users: UserWithoutTicketsOrActions[]; taskid: string }> = ({ users, taskid }) => {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end" }}>
       {users.map((user, index) => (
@@ -67,7 +57,6 @@ const TaskUserList: React.FC<{ users: User[]; taskid: string }> = ({ users, task
 interface FormData {
   taskTitle: string
   size?: number
-  corners?: User[]
   cornerNote?: string
   description?: string
   color?: string
@@ -98,7 +87,6 @@ const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetSt
       title: data.taskTitle,
       description: data.description,
       cornernote: data.cornerNote,
-      caretakers: data.corners,
       size: data.size,
       color: data.color,
       columnid: task.columnid
@@ -145,8 +133,6 @@ interface TaskProps {
 }
 
 const Task: React.FC<TaskProps> = ({ task }) => {
-  const { data: users } = useGetUsersByTicketIdQuery(task.ticketid)
-
   const [updateTask] = useUpdateTaskMutation()
   const sendMessage = useContext(WebsocketContext)
   const [selected, setSelected] = useState(false)
@@ -269,14 +255,8 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                   </div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <div style={{ overflow: "hidden" }}>
-                    {task.caretakers &&
-                      task.caretakers.map((caretaker, index) => (
-                        <CaretakerComponent key={index} caretaker={caretaker} />
-                      ))}
-                  </div>
                   <div style={{ overflow: "hidden", width: "90%" }}>
-                    {users && <TaskUserList users={users} taskid={task.ticketid} />}
+                    <TaskUserList users={task.users} taskid={task.ticketid} />
                   </div>
                   <div
                     style={{

@@ -1,7 +1,7 @@
 import { PatchCollection } from "@reduxjs/toolkit/dist/query/core/buildThunks"
 import { TagDescription, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 
-import { Action, Board, Column, SwimlaneColumn, Task, User } from "../types"
+import { Action, Board, Column, NewAction, NewTask, SwimlaneColumn, Task, User } from "@/types"
 
 import { getAuth, setToken } from "./auth"
 import { RootState } from "./store"
@@ -31,6 +31,7 @@ export const boardsApi = createApi({
       query: (boardId) => `boards/${boardId}/`,
       providesTags: ["Boards"]
     }),
+
     addBoard: builder.mutation<Board, Board>({
       query: (board) => {
         return {
@@ -41,6 +42,7 @@ export const boardsApi = createApi({
       },
       invalidatesTags: ["Boards"]
     }),
+
     deleteBoard: builder.mutation<Board, string>({
       query: (boardId) => ({
         url: `boards/${boardId}/`,
@@ -53,16 +55,26 @@ export const boardsApi = createApi({
       query: (boardid) => `boards/${boardid}/columns/`,
       providesTags: [{ type: "Columns", id: "LIST" }]
     }),
+
     getTaskListByColumnId: builder.query<Task[], { boardId: string; columnId: string }>({
       query: ({ boardId, columnId }) => {
         return `boards/${boardId}/columns/${columnId}/tickets`
       },
       providesTags: (result, _error, args) => {
-        const tags: TagDescription<"Ticket">[] = []
+        const tags: TagDescription<"Ticket" | "Users">[] = []
         if (result) {
           const tasks: Task[] = result
+          const taggedUsers: string[] = []
           tasks.forEach((task) => {
             tags.push({ type: "Ticket", id: task.ticketid })
+            tags.push({ type: "Users", id: task.ticketid })
+            task.users.forEach((user) => {
+              if (!taggedUsers.includes(user.userid)) {
+                tags.push({ type: "Users", id: user.userid })
+
+                taggedUsers.push(user.userid)
+              }
+            })
           })
         }
         return [{ type: "Columns", id: args.columnId }, ...tags]
@@ -78,7 +90,7 @@ export const boardsApi = createApi({
       invalidatesTags: ["Columns"]
     }),
 
-    addTask: builder.mutation<Task, { boardId: string; columnId: string; task: Task }>({
+    addTask: builder.mutation<Task, { boardId: string; columnId: string; task: NewTask }>({
       query: ({ boardId, columnId, task }) => ({
         url: `boards/${boardId}/columns/${columnId}/tickets`,
         method: "POST",
@@ -87,7 +99,7 @@ export const boardsApi = createApi({
       invalidatesTags: (_result, _error, { columnId }) => [{ type: "Columns", id: columnId }]
     }),
 
-    updateTask: builder.mutation<Task, { task: Task }>({
+    updateTask: builder.mutation<Task, { task: NewTask }>({
       query: ({ task }) => ({
         url: `columns/${task.columnid}/tickets/${task.ticketid}/`,
         method: "PUT",
@@ -95,6 +107,7 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: (_result, _error, { task }) => [{ type: "Ticket", id: task.ticketid }]
     }),
+
     deleteTask: builder.mutation<Task, { task: Task }>({
       query: ({ task }) => ({
         url: `columns/${task.columnid}/tickets/${task.ticketid}/`,
@@ -111,6 +124,7 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: ["Columns"]
     }),
+
     //optimistclly updates column order
     updateColumnOrder: builder.mutation<Column[], { boardId: string; columns: Column[] }>({
       query: ({ boardId, columns }) => ({
@@ -142,6 +156,7 @@ export const boardsApi = createApi({
         }
       }
     }),
+
     deleteColumn: builder.mutation<Column, { column: Column }>({
       query: ({ column }) => ({
         url: `boards/${column.boardid}/columns/${column.columnid}/`,
@@ -149,6 +164,7 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: ["Columns"]
     }),
+
     //optimistclly updates task list
     updateTaskListByColumnId: builder.mutation<Task[], { boardId: string; columnId: string; tasks: Task[] }>({
       query: ({ boardId, columnId, tasks }) => ({
@@ -187,18 +203,21 @@ export const boardsApi = createApi({
         }
       }
     }),
+
     getUsersByBoardId: builder.query<User[], string>({
       query: (boardId) => `boards/${boardId}/users/`,
-      providesTags: [{ type: "Users", id: "USERLIST" }]
+      providesTags: [{ type: "Users", id: "ALL_USERS" }]
     }),
+
     postUserToBoard: builder.mutation<User, { boardId: string; user: Omit<User, "userid"> }>({
       query: ({ boardId, user }) => ({
         url: `boards/${boardId}/users/`,
         method: "POST",
         body: user
       }),
-      invalidatesTags: [{ type: "Users", id: "USERLIST" }]
+      invalidatesTags: [{ type: "Users", id: "ALL_USERS" }]
     }),
+
     login: builder.mutation<{ success: boolean; token: string }, { boardId: string; password: string }>({
       query: ({ boardId, password }) => ({
         url: `boards/${boardId}/`,
@@ -215,64 +234,59 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: ["Boards"]
     }),
-    getUsersByTicketId: builder.query<User[], string>({
-      query: (ticketId) => `tickets/${ticketId}/users/`,
-      providesTags: (result, _error, args) => {
-        const tags: TagDescription<"Users">[] = []
-        if (result) {
-          const users: User[] = result
-          users.forEach((user) => {
-            tags.push({ type: "Users", id: user.userid })
-          })
-        }
-        return [{ type: "Users", id: args }, ...tags]
-      }
-    }),
-    getUsersByActionId: builder.query<User[], string>({
-      query: (actionId) => `actions/${actionId}/users/`,
-      providesTags: (result, _error, args) => {
-        const tags: TagDescription<"Users">[] = []
-        if (result) {
-          const users: User[] = result
-          users.forEach((user) => {
-            tags.push({ type: "Users", id: user.userid })
-          })
-        }
-        return [{ type: "Users", id: args }, ...tags]
-      }
-    }),
+
     postUserToTicket: builder.mutation<User, { ticketId: string; userid: string }>({
       query: ({ ticketId, userid }) => ({
         url: `tickets/${ticketId}/users/`,
         method: "POST",
         body: { userid }
       }),
-      invalidatesTags: (_result, _error, { ticketId }) => [{ type: "Users", id: ticketId }]
+      invalidatesTags: (_result, _error, { ticketId, userid }) => [
+        { type: "Users", id: ticketId },
+        { type: "Users", id: userid },
+        { type: "Users", id: "ALL_USERS" }
+      ]
     }),
+
     deleteUserFromTicket: builder.mutation<User, { ticketId: string; userid: string }>({
       query: ({ ticketId, userid }) => ({
         url: `tickets/${ticketId}/users/`,
         method: "DELETE",
         body: { userid }
       }),
-      invalidatesTags: (_result, _error, { ticketId }) => [{ type: "Users", id: ticketId }]
+      invalidatesTags: (_result, _error, { ticketId, userid }) => [
+        { type: "Users", id: ticketId },
+        { type: "Users", id: userid },
+        { type: "Users", id: "ALL_USERS" }
+      ]
     }),
+
     postUserToAction: builder.mutation<User, { actionId: string; userid: string }>({
       query: ({ actionId, userid }) => ({
         url: `actions/${actionId}/users/`,
         method: "POST",
         body: { userid }
       }),
-      invalidatesTags: (_result, _error, { actionId }) => [{ type: "Users", id: actionId }]
+      invalidatesTags: (_result, _error, { actionId, userid }) => [
+        { type: "Users", id: actionId },
+        { type: "Users", id: userid },
+        { type: "Users", id: "ALL_USERS" }
+      ]
     }),
+
     deleteUserFromAction: builder.mutation<User, { actionId: string; userid: string }>({
       query: ({ actionId, userid }) => ({
         url: `actions/${actionId}/users/`,
         method: "DELETE",
         body: { userid }
       }),
-      invalidatesTags: (_result, _error, { actionId }) => [{ type: "Users", id: actionId }]
+      invalidatesTags: (_result, _error, { actionId, userid }) => [
+        { type: "Users", id: actionId },
+        { type: "Users", id: userid },
+        { type: "Users", id: "ALL_USERS" }
+      ]
     }),
+
     deleteUser: builder.mutation<User, { userId: string }>({
       query: ({ userId }) => ({
         url: `users/${userId}`,
@@ -280,10 +294,12 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: ["Users"]
     }),
+
     getSwimlaneColumnsByColumnId: builder.query<SwimlaneColumn[], string>({
       query: (columnId) => `columns/${columnId}/swimlanecolumns/`,
       providesTags: [{ type: "SwimlaneColumn", id: "LIST" }]
     }),
+
     updateSwimlaneColumn: builder.mutation<SwimlaneColumn, { swimlaneColumn: SwimlaneColumn }>({
       query: ({ swimlaneColumn }) => ({
         url: `swimlanecolumns/${swimlaneColumn.swimlanecolumnid}/`,
@@ -296,11 +312,19 @@ export const boardsApi = createApi({
     getActionListByTaskIdAndSwimlaneColumnId: builder.query<Action[], { taskId: string; swimlaneColumnId: string }>({
       query: ({ taskId, swimlaneColumnId }) => `${swimlaneColumnId}/${taskId}/actions/`,
       providesTags: (result, _error, args) => {
-        const tags: TagDescription<"Action">[] = []
+        const tags: TagDescription<"Action" | "Users">[] = []
         if (result) {
           const actions: Action[] = result
+          const taggedUsers: string[] = []
           actions.forEach((action) => {
             tags.push({ type: "Action", id: action.actionid })
+            tags.push({ type: "Users", id: action.actionid })
+            action.users.forEach((user) => {
+              if (!taggedUsers.includes(user.userid)) {
+                tags.push({ type: "Users", id: user.userid })
+                taggedUsers.push(user.userid)
+              }
+            })
           })
         }
         return [
@@ -323,7 +347,7 @@ export const boardsApi = createApi({
         return [{ type: "ActionList", id: args }, { type: "Action", id: "LIST" }, ...tags]
       }
     }),
-    postAction: builder.mutation<Action, { taskId: string; swimlaneColumnId: string; action: Action }>({
+    postAction: builder.mutation<Action, { taskId: string; swimlaneColumnId: string; action: NewAction }>({
       query: ({ taskId, swimlaneColumnId, action }) => ({
         url: `${swimlaneColumnId}/${taskId}/actions/`,
         method: "POST",
@@ -331,8 +355,9 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: [{ type: "Action", id: "LIST" }]
     }),
+
     //update single action
-    updateAction: builder.mutation<Action, { action: Action }>({
+    updateAction: builder.mutation<Action, { action: NewAction }>({
       query: ({ action }) => ({
         url: `actions/${action.actionid}/`,
         method: "PUT",
@@ -340,6 +365,7 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: (_result, _error, { action }) => [{ type: "Action", id: action.actionid }]
     }),
+
     //optimistclly updates swimlane action list
     updateActionList: builder.mutation<
       Action[],
@@ -394,7 +420,6 @@ export const {
   useLoginMutation,
   useUpdateTaskListByColumnIdMutation,
   usePostUserToBoardMutation,
-  useGetUsersByTicketIdQuery,
   usePostUserToTicketMutation,
   useDeleteUserMutation,
   useGetSwimlaneColumnsByColumnIdQuery,
@@ -404,7 +429,6 @@ export const {
   usePostActionMutation,
   useUpdateActionMutation,
   useUpdateActionListMutation,
-  useGetUsersByActionIdQuery,
   usePostUserToActionMutation,
   useDeleteUserFromActionMutation,
   useDeleteUserFromTicketMutation

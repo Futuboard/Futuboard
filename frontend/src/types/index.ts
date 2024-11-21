@@ -29,13 +29,19 @@ export type Task = {
   caretakers?: User[]
   size?: number
   columnid: string
+  users: UserWithoutTicketsOrActions[]
 }
+
+export type NewTask = Omit<Task, "users">
 
 export type User = {
   userid: string
   name: string
-  color?: string
+  tickets: string[]
+  actions: string[]
 }
+
+export type UserWithoutTicketsOrActions = Omit<User, "tickets" | "actions">
 
 export type NewBoardFormData = {
   title: string
@@ -53,10 +59,12 @@ export type Action = {
   ticketid?: string
   swimlanecolumnid?: string
   title: string
-  color?: string
   order?: number
   creation_date?: string
+  users: UserWithoutTicketsOrActions[]
 }
+
+export type NewAction = Omit<Action, "users">
 
 export type SwimlaneColumn = {
   swimlanecolumnid: string

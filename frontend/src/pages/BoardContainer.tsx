@@ -10,7 +10,7 @@ import useWebSocket, { SendMessage } from "react-use-websocket"
 import { getId } from "@/services/Utils"
 import { setBoardId } from "@/state/auth"
 import { store } from "@/state/store"
-import { Action, Task } from "@/types"
+import { Action, Task, User } from "@/types"
 
 import AccessBoardForm from "../components/board/AccessBoardForm"
 import Board from "../components/board/Board"
@@ -79,8 +79,6 @@ const BoardContainer: React.FC = () => {
   const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
-  const selectUsersByTaskId = boardsApi.endpoints.getUsersByTicketId.select
-  const selectUsersByActionId = boardsApi.endpoints.getUsersByActionId.select
   const selectActions = boardsApi.endpoints.getActionsByColumnId.select
   const selectColumns = boardsApi.endpoints.getColumnsByBoardId.select(id)
 
@@ -92,39 +90,13 @@ const BoardContainer: React.FC = () => {
 
     const state = store.getState()
 
-    //task logic:
-
-    const selectDestinationTasks = selectTasksByColumnId({ boardId: id, columnId: destination.droppableId })
-    const destinationTasks = selectDestinationTasks(state).data || []
-
-    const selectSourceTasks = selectTasksByColumnId({ boardId: id, columnId: source.droppableId })
-    const sourceTasks = selectSourceTasks(state).data || []
-
-    //action logic:
-
-    const [destSwimLaneColumnId, destTicketId, destColumnId] = destination.droppableId.split("/")
-
-    const selectDestionationActions = selectActions(destColumnId)
-
-    const destinationColumnActions = selectDestionationActions(state).data
-
-    const destinationActions =
-      selectDestionationActions(state).data?.filter(
-        (a) => a.ticketid == destTicketId && a.swimlanecolumnid == destSwimLaneColumnId
-      ) || []
-
-    const [sourceSwimlaneColumnId, sourceTicketId, sourceColumnId] = source.droppableId.split("/")
-
-    const selectSourceActions = selectActions(sourceColumnId)
-
-    const sourceColumnActions = selectSourceActions(state).data
-
-    const sourceActions =
-      selectSourceActions(state).data?.filter(
-        (a) => a.ticketid == sourceTicketId && a.swimlanecolumnid == sourceSwimlaneColumnId
-      ) || []
-
     if (type === "task") {
+      const selectDestinationTasks = selectTasksByColumnId({ boardId: id, columnId: destination.droppableId })
+      const destinationTasks = selectDestinationTasks(state).data || []
+
+      const selectSourceTasks = selectTasksByColumnId({ boardId: id, columnId: source.droppableId })
+      const sourceTasks = selectSourceTasks(state).data || []
+
       //dragging tasks in the same column
       if (destination.droppableId === source.droppableId) {
         const dataCopy = [...(destinationTasks ?? [])]
@@ -160,12 +132,6 @@ const BoardContainer: React.FC = () => {
       const destinationId = destination.droppableId.split("/")[0]
       const sourceId = source.droppableId.split("/")[0]
 
-      const selectDestinationTaskUsers = selectUsersByTaskId(destinationId)
-      const destinationTaskUsers = selectDestinationTaskUsers(state).data || []
-
-      const selectDestinationActionUsers = selectUsersByActionId(destinationId)
-      const destinationActionUsers = selectDestinationActionUsers(state).data || []
-
       const draggableIdParts = draggableId.split("/")
       const draggedUserId = draggableIdParts[0]
 
@@ -173,19 +139,27 @@ const BoardContainer: React.FC = () => {
         return
       }
 
-      if (destinationTaskUsers.length >= 3) {
-        alert("Destination task already has 3 or more user magnets. Move not allowed.")
-        return
+      let destinationUsers: User[] = []
+
+      const allUsers = boardsApi.endpoints.getUsersByBoardId.select(id)(state).data || []
+
+      if (destinationType === "ticket") {
+        destinationUsers = allUsers.filter((user) => user.tickets.includes(destinationId))
+        if (destinationUsers.length >= 3) {
+          alert("Destination task already has 3 or more user magnets. Move not allowed.")
+          return
+        }
       }
 
-      if (destinationActionUsers.length >= 2) {
-        alert("Destination action already has 2 or more user magnets. Move not allowed.")
-        return
+      if (destinationType === "action") {
+        destinationUsers = allUsers.filter((user) => user.actions.includes(destinationId))
+        if (destinationUsers.length >= 2) {
+          alert("Destination action already has 2 or more user magnets. Move not allowed.")
+          return
+        }
       }
 
-      const isUnique =
-        !destinationActionUsers.some((user) => user.userid === draggedUserId) &&
-        !destinationTaskUsers.some((user) => user.userid === draggedUserId)
+      const isUnique = !destinationUsers.some((user) => user.userid === draggedUserId)
 
       if (!isUnique && destinationId !== "user-list") {
         alert("This member is already on the card. Move not allowed.")
@@ -215,6 +189,28 @@ const BoardContainer: React.FC = () => {
       updatedSendMessage()
     }
     if (type.split("/")[0] === "SWIMLANE") {
+      const [destSwimLaneColumnId, destTicketId, destColumnId] = destination.droppableId.split("/")
+
+      const selectDestionationActions = selectActions(destColumnId)
+
+      const destinationColumnActions = selectDestionationActions(state).data
+
+      const destinationActions =
+        selectDestionationActions(state).data?.filter(
+          (a) => a.ticketid == destTicketId && a.swimlanecolumnid == destSwimLaneColumnId
+        ) || []
+
+      const [sourceSwimlaneColumnId, sourceTicketId, sourceColumnId] = source.droppableId.split("/")
+
+      const selectSourceActions = selectActions(sourceColumnId)
+
+      const sourceColumnActions = selectSourceActions(state).data
+
+      const sourceActions =
+        selectSourceActions(state).data?.filter(
+          (a) => a.ticketid == sourceTicketId && a.swimlanecolumnid == sourceSwimlaneColumnId
+        ) || []
+
       if (destination.droppableId === source.droppableId && destination.index === source.index) return
       if (destination.droppableId === source.droppableId) {
         const dataCopy = [...(destinationActions ?? [])]

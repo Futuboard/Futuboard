@@ -4,10 +4,10 @@ import { useContext } from "react"
 
 import { WebsocketContext } from "@/pages/BoardContainer"
 import { useDeleteUserMutation } from "@/state/apiSlice"
-import { User } from "@/types"
+import { UserWithoutTicketsOrActions } from "@/types"
 
 interface UserMagnetProps {
-  user: User
+  user: UserWithoutTicketsOrActions
   editable: boolean
 }
 
@@ -26,7 +26,7 @@ const UserMagnet: React.FC<UserMagnetProps> = ({ user, editable }) => {
       sx={{
         display: "flex",
         justifyContent: "center",
-        backgroundColor: editable ? "rgb(230,170,170)" : user.color || "rgb(230,247,206)",
+        backgroundColor: editable ? "rgb(230,170,170)" : "rgb(230,247,206)",
         alignItems: "center",
         margin: "4px",
         border: "solid 1px",

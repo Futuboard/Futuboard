@@ -3,8 +3,8 @@ import { Box, ClickAwayListener, Typography } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 
 import { WebsocketContext } from "@/pages/BoardContainer"
-import { useGetUsersByActionIdQuery, useUpdateActionMutation } from "@/state/apiSlice"
-import { Action as ActionType, User } from "@/types"
+import { useUpdateActionMutation } from "@/state/apiSlice"
+import { Action as ActionType, UserWithoutTicketsOrActions } from "@/types"
 
 import UserMagnet from "./UserMagnet"
 
@@ -20,7 +20,7 @@ const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSn
   }
 }
 
-const ActionUserList: React.FC<{ users: User[]; actionid: string }> = ({ users, actionid }) => {
+const ActionUserList: React.FC<{ users: UserWithoutTicketsOrActions[]; actionid: string }> = ({ users, actionid }) => {
   return (
     <div style={{ display: "flex", justifyContent: "flex-end", overflow: "hidden" }}>
       {users &&
@@ -47,7 +47,6 @@ const ActionUserList: React.FC<{ users: User[]; actionid: string }> = ({ users, 
 
 const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index }) => {
   const sendMessage = useContext(WebsocketContext)
-  const { data: users } = useGetUsersByActionIdQuery(action.actionid)
   const [isEditing, setIsEditing] = useState(false)
   const [currentTitle, setCurrentTitle] = useState(action.title)
 
@@ -135,14 +134,14 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
                       <Typography
                         variant={"body1"}
                         noWrap={
-                          users &&
-                          users.length > 0 /*if action has users, limit the text into a single row to save space*/
+                          action.users.length >
+                          0 /*if action has users, limit the text into a single row to save space*/
                         }
                         fontSize={12}
                       >
                         {currentTitle}
                       </Typography>
-                      {users && users.length > 0 && <ActionUserList users={users} actionid={action.actionid} />}
+                      {action.users.length > 0 && <ActionUserList users={action.users} actionid={action.actionid} />}
                     </Box>
                     {provided.placeholder}
                   </Box>
