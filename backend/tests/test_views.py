@@ -11,9 +11,9 @@ import json
 
 
 @pytest.mark.django_db
-def test_get_all_boards():
+def test_all_boards():
     """
-    Test the get_all_boards function in backend/futuboard/views/views.py
+    Test the all_boards function in backend/futuboard/views/views.py
     Has two methods: GET and POST
         GET: Returns all boards
         POST: Creates a new board
@@ -22,11 +22,11 @@ def test_get_all_boards():
     # Post 5 boards
     for i in range(5):
         response = api_client.post(
-            reverse("get_all_boards"), {"id": uuid.uuid4(), "title": "board" + str(i), "password": "password" + str(i)}
+            reverse("all_boards"), {"id": uuid.uuid4(), "title": "board" + str(i), "password": "password" + str(i)}
         )
         assert response.status_code == 200
     # Get all boards
-    response = api_client.get(reverse("get_all_boards"))
+    response = api_client.get(reverse("all_boards"))
     data = response.json()
     assert len(data) == 5
     assert response.status_code == 200
@@ -34,18 +34,16 @@ def test_get_all_boards():
     # Delete all boards
     md.Board.objects.all().delete()
     # Get all boards
-    response = api_client.get(reverse("get_all_boards"))
+    response = api_client.get(reverse("all_boards"))
     data = response.json()
     assert len(data) == 0
     assert md.Board.objects.count() == 0
-    # Clean up usergroups
-    md.Usergroup.objects.all().delete()
 
 
 @pytest.mark.django_db
-def test_get_board_by_id():
+def test_board_by_id():
     """
-    Test the get_board_by_id function in backend/futuboard/views/views.py
+    Test the board_by_id function in backend/futuboard/views/views.py
     Has two methods: GET and POST
         GET: Returns a board by id
         POST: Returns a success message if the password is correct
@@ -55,13 +53,13 @@ def test_get_board_by_id():
     boardids = [uuid.uuid4() for i in range(5)]
     for i in range(5):
         response = api_client.post(
-            reverse("get_all_boards"), {"id": boardids[i], "title": "board" + str(i), "password": "password" + str(i)}
+            reverse("all_boards"), {"id": boardids[i], "title": "board" + str(i), "password": "password" + str(i)}
         )
         assert response.status_code == 200
     tokens = []
     # Post board by id (Password verification)
     for i in range(5):
-        response = api_client.post(reverse("get_board_by_id", args=[boardids[i]]), {"password": "password" + str(i)})
+        response = api_client.post(reverse("board_by_id", args=[boardids[i]]), {"password": "password" + str(i)})
         data = response.json()
         print(data)
         assert data["success"] is True
@@ -69,7 +67,7 @@ def test_get_board_by_id():
         tokens.append(data["token"])
         assert response.status_code == 200
     # Test getting board by id with wrong password
-    response = api_client.post(reverse("get_board_by_id", args=[boardids[0]]), {"password": "wrongpassword"})
+    response = api_client.post(reverse("board_by_id", args=[boardids[0]]), {"password": "wrongpassword"})
     data = response.json()
     print(data)
     assert data["success"] is False
@@ -77,16 +75,15 @@ def test_get_board_by_id():
     # Get board by id for all boards
     for i in range(5):
         response = api_client.get(
-            reverse("get_board_by_id", args=[boardids[i]]), headers={"Authorization": f"Bearer {tokens[i]}"}
+            reverse("board_by_id", args=[boardids[i]]), headers={"Authorization": f"Bearer {tokens[i]}"}
         )
         assert response.status_code == 200
         data = response.json()
         assert data["boardid"] == str(boardids[i])
         assert data["title"] == "board" + str(i)
         assert response.status_code == 200
-    # Delete all boards and usergroups
+    # Delete all boards
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
 
 
 @pytest.mark.django_db
@@ -95,18 +92,18 @@ def test_getting_board_requires_auth():
     boardId = uuid.uuid4()
 
     creation_response = api_client.post(
-        reverse("get_all_boards"), {"id": boardId, "title": "board", "password": "password"}
+        reverse("all_boards"), {"id": boardId, "title": "board", "password": "password"}
     )
     assert creation_response.status_code == 200
 
-    get_response_unauthenticated = api_client.get(reverse("get_board_by_id", args=[boardId]))
+    get_response_unauthenticated = api_client.get(reverse("board_by_id", args=[boardId]))
     assert get_response_unauthenticated.status_code == 401
 
 
 @pytest.mark.django_db
-def test_get_columns_from_board():
+def test_columns_on_board():
     """
-    Test the get_columns_from_board function in backend/futuboard/views/views.py
+    Test the columns_on_board function in backend/futuboard/views/views.py
     Has two methods: GET and POST
         GET: Returns all columns from a board
         POST: Creates a new column in a board
@@ -115,25 +112,25 @@ def test_get_columns_from_board():
     # Create a board and add 5 columns to it, of which 1 is a swimlane column
     boardid = uuid.uuid4()
     columnids = [uuid.uuid4() for i in range(5)]
-    response = api_client.post(reverse("get_all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
     assert response.status_code == 200
     # Non-swimlane columns
     for i in range(4):
         # Using json.dumps assures swimlane is a boolean not a string
         data = {"columnid": str(columnids[i]), "title": "column" + str(i), "position": i, "swimlane": False}
         response = api_client.post(
-            reverse("get_columns_from_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
+            reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
         )
         assert response.status_code == 200
 
     # Swimlane column
     data = {"columnid": str(columnids[4]), "title": "column4", "position": 4, "swimlane": True}
     response = api_client.post(
-        reverse("get_columns_from_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
+        reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
     # Get columns from board
-    response = api_client.get(reverse("get_columns_from_board", args=[boardid]))
+    response = api_client.get(reverse("columns_on_board", args=[boardid]))
     data = response.json()
     assert len(data) == 5
     # Make sure there are 4 non-swimlane columns and 1 swimlane column
@@ -145,20 +142,19 @@ def test_get_columns_from_board():
     # Delete all columns
     md.Column.objects.all().delete()
     # Get columns from board
-    response = api_client.get(reverse("get_columns_from_board", args=[boardid]))
+    response = api_client.get(reverse("columns_on_board", args=[boardid]))
     data = response.json()
     assert len(data) == 0
     assert response.status_code == 200
-    # Delete all boards, swimlanecolumns and usergroups
+    # Delete all boards and swimlanecolumns
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
     md.Swimlanecolumn.objects.all().delete()
 
 
 @pytest.mark.django_db
-def test_get_tickets_from_column():
+def test_tickets_on_column():
     """
-    Test the get_tickets_from_column function in backend/futuboard/views/views.py
+    Test the tickets_on_column function in backend/futuboard/views/views.py
     Has three methods: GET, POST and PUT
         GET: Returns all tickets from a column
         POST: Creates a new ticket in a column
@@ -168,11 +164,11 @@ def test_get_tickets_from_column():
     # Create a board and a column and add 5 tickets to it
     boardid = uuid.uuid4()
     columnid = uuid.uuid4()
-    response = api_client.post(reverse("get_all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
     assert response.status_code == 200
     data = {"columnid": str(columnid), "title": "column", "position": 0, "swimlane": False}
     response = api_client.post(
-        reverse("get_columns_from_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
+        reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
     # Add 5 tickets to column
@@ -186,13 +182,13 @@ def test_get_tickets_from_column():
             "size": 5,
         }
         response = api_client.post(
-            reverse("get_tickets_from_column", args=[boardid, columnid]),
+            reverse("tickets_on_column", args=[boardid, columnid]),
             data=json.dumps(data),
             content_type="application/json",
         )
         assert response.status_code == 200
     # Get tickets from column
-    response = api_client.get(reverse("get_tickets_from_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
     data = response.json()
     assert len(data) == 5
     assert response.status_code == 200
@@ -206,7 +202,7 @@ def test_get_tickets_from_column():
         "swimlane": False,
     }
     response = api_client.post(
-        reverse("get_columns_from_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
+        reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
     )
     # List of ticketids to move to new column, move 1st and 4th ticket
     data = [
@@ -219,25 +215,24 @@ def test_get_tickets_from_column():
     ]
 
     response = api_client.put(
-        reverse("get_tickets_from_column", args=[boardid, newcolumnid]),
+        reverse("tickets_on_column", args=[boardid, newcolumnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
     assert response.status_code == 200
     # Get tickets from new column
-    response = api_client.get(reverse("get_tickets_from_column", args=[boardid, newcolumnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[boardid, newcolumnid]))
     data = response.json()
     assert len(data) == 2
     assert response.status_code == 200
     # Get tickets from old column
-    response = api_client.get(reverse("get_tickets_from_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
     data = response.json()
     assert len(data) == 3
     assert response.status_code == 200
-    # Delete all columns, boards, tickets and usergroups
+
     md.Column.objects.all().delete()
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
     md.Ticket.objects.all().delete()
 
 
@@ -252,11 +247,11 @@ def test_update_ticket():
     # Create a board and a column and add a ticket to it
     boardid = uuid.uuid4()
     columnid = uuid.uuid4()
-    response = api_client.post(reverse("get_all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
     assert response.status_code == 200
     data = {"columnid": str(columnid), "title": "column", "position": 0, "swimlane": False}
     response = api_client.post(
-        reverse("get_columns_from_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
+        reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
     # Add a ticket to column
@@ -269,7 +264,7 @@ def test_update_ticket():
         "size": 5,
     }
     response = api_client.post(
-        reverse("get_tickets_from_column", args=[boardid, columnid]),
+        reverse("tickets_on_column", args=[boardid, columnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
@@ -287,18 +282,16 @@ def test_update_ticket():
     )
     assert response.status_code == 200
     # Get ticket by id
-    response = api_client.get(reverse("get_tickets_from_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
     data = response.json()
     print(data)
     assert data[0]["title"] == "updatedticket"
     assert data[0]["description"] == "This is an updated description"
     assert response.status_code == 200
-    # Delete ticket
+
     md.Ticket.objects.all().delete()
-    # Delete all columns, boards and usergroups
     md.Column.objects.all().delete()
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
 
 
 @pytest.mark.django_db
@@ -312,11 +305,11 @@ def test_update_column():
     # Create a board and a column
     boardid = uuid.uuid4()
     columnid = uuid.uuid4()
-    response = api_client.post(reverse("get_all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
     assert response.status_code == 200
     data = {"columnid": str(columnid), "title": "column", "position": 0, "swimlane": False}
     response = api_client.post(
-        reverse("get_columns_from_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
+        reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
     # Test PUT request to update column
@@ -326,21 +319,19 @@ def test_update_column():
     )
     assert response.status_code == 200
     # Get column by id
-    response = api_client.get(reverse("get_columns_from_board", args=[boardid]))
+    response = api_client.get(reverse("columns_on_board", args=[boardid]))
     data = response.json()
     assert data[0]["title"] == "updatedcolumn"
     assert response.status_code == 200
-    # Delete column
+
     md.Column.objects.all().delete()
-    # Delete all boards and usergroups
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
 
 
 @pytest.mark.django_db
-def test_get_users_from_board():
+def test_users_on_board():
     """
-    Test the get_users_from_board function in backend/futuboard/views/views.py
+    Test the users_on_board function in backend/futuboard/views/views.py
     Has two methods: GET and POST
         GET: Returns all users from a board
         POST: Adds a user to a board
@@ -348,88 +339,104 @@ def test_get_users_from_board():
     api_client = APIClient()
     # Create a board and add 5 users to it
     boardid = uuid.uuid4()
-    response = api_client.post(reverse("get_all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
     assert response.status_code == 200
     userids = [uuid.uuid4() for i in range(5)]
     for i in range(5):
         response = api_client.post(
-            reverse("get_users_from_board", args=[boardid]),
-            {"userid": str(userids[i]), "name": "user" + str(i), "color": "color" + str(i)},
+            reverse("users_on_board", args=[boardid]),
+            {"userid": str(userids[i]), "name": "user" + str(i)},
         )
         assert response.status_code == 200
-    # Get users from board
-    response = api_client.get(reverse("get_users_from_board", args=[boardid]))
+
+    response = api_client.get(reverse("users_on_board", args=[boardid]))
     data = response.json()
     assert len(data) == 5
     assert response.status_code == 200
-    # Delete all usergroupusers
-    md.UsergroupUser.objects.all().delete()
-    # Get users from board
-    response = api_client.get(reverse("get_users_from_board", args=[boardid]))
+
+    md.User.objects.all().delete()
+
+    response = api_client.get(reverse("users_on_board", args=[boardid]))
     data = response.json()
     assert len(data) == 0
     assert response.status_code == 200
-    # Delete all boards usergroups and users
-    md.Board.objects.all().delete()
-    md.User.objects.all().delete()
-    md.Usergroup.objects.all().delete()
 
-    # Why is get_users_from_ticket defined twice in views.py? Test fails because of this, put test also not implemented due to this
-    # @pytest.mark.django_db
-    # def test_get_users_from_ticket():
+    md.Board.objects.all().delete()
+
+
+@pytest.mark.django_db
+def test_users_on_ticket():
     """
-    Test the get_users_from_ticket function in backend/futuboard/views/views.py
+    Test the users_on_ticket function in backend/futuboard/views/views.py
     Has three methods: GET, POST and PUT
         GET: Returns all users from a ticket
         POST: Adds a user to a ticket
-        PUT: Changes the position of a user to a new ticket
+        DELETE: Removes a user from a ticket
     """
 
+    api_client = APIClient()
+    # Create a board, a column, a ticket and add 5 users to it
+    boardid = uuid.uuid4()
+    columnid = uuid.uuid4()
+    ticketid = uuid.uuid4()
+    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    assert response.status_code == 200
+    data = {"columnid": str(columnid), "title": "column", "position": 0, "swimlane": False}
+    response = api_client.post(
+        reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
+    )
+    assert response.status_code == 200
+    data = {
+        "ticketid": str(ticketid),
+        "title": "ticket",
+        "description": "description",
+        "position": 0,
+        "size": 5,
+    }
+    response = api_client.post(
+        reverse("tickets_on_column", args=[boardid, columnid]),
+        data=json.dumps(data),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+    userids = []
+    for i in range(5):
+        response = api_client.post(
+            reverse("users_on_board", args=[boardid]),
+            {"name": "user" + str(i)},
+        )
+        assert response.status_code == 200
+        userids.append(response.json()["userid"])
 
-#     api_client = APIClient()
-#     # Create a board, a column, a ticket and add 5 users to it
-#     boardid = uuid.uuid4()
-#     columnid = uuid.uuid4()
-#     ticketid = uuid.uuid4()
-#     response = api_client.post(reverse('get_all_boards'), {'id': boardid, 'title': 'board', 'password': 'password'})
-#     assert response.status_code == 200
-#     data = {
-#         'columnid': str(columnid),
-#         'title': 'column',
-#         'position': 0,
-#         'swimlane': False
-#     }
-#     response = api_client.post(reverse('get_columns_from_board', args=[boardid]), data=json.dumps(data), content_type='application/json')
-#     assert response.status_code == 200
-#     data = {
-#         'ticketid': str(ticketid),
-#         'title': 'ticket',
-#         'description': 'description',
-#         'position': 0,
-#         'size': 5,
-#     }
-#     response = api_client.post(reverse('get_tickets_from_column', args=[boardid, columnid]), data=json.dumps(data), content_type='application/json')
-#     assert response.status_code == 200
-#     userids = [uuid.uuid4() for i in range(5)]
-#     for i in range(5):
-#         response = api_client.post(reverse('get_users_from_ticket', args=[boardid, columnid, ticketid]), {'userid': str(userids[i]), 'name': 'user' + str(i), 'color': 'color' + str(i)})
-#         assert response.status_code == 200
-#     # Get users from ticket
-#     response = api_client.get(reverse('get_users_from_ticket', args=[boardid, columnid, ticketid]))
-#     data = response.json()
-#     assert len(data) == 5
-#     assert response.status_code == 200
-#     # Delete all usergroupusers
-#     md.UsergroupUser.objects.all().delete()
-#     # Get users from ticket
-#     response = api_client.get(reverse('get_users_from_ticket', args=[boardid, columnid, ticketid]))
-#     data = response.json()
-#     assert len(data) == 0
-#     assert response.status_code == 200
-#     # Delete all columns, boards, usergroups and users
-#     md.Column.objects.all().delete()
-#     md.Board.objects.all().delete()
-#     md.User.objects.all().delete()
+    for i in range(5):
+        response = api_client.post(
+            reverse("users_on_ticket", args=[ticketid]),
+            {"userid": userids[i]},
+        )
+        assert response.status_code == 200
+
+    # Get users from ticket
+    response = api_client.get(reverse("users_on_ticket", args=[ticketid]))
+    data = response.json()
+    assert len(data) == 5
+    assert response.status_code == 200
+
+    for i in range(5):
+        response = api_client.delete(
+            reverse("users_on_ticket", args=[ticketid]),
+            {"userid": userids[i]},
+        )
+        assert response.status_code == 200
+
+    # Get users from ticket
+    response = api_client.get(reverse("users_on_ticket", args=[ticketid]))
+    data = response.json()
+    assert len(data) == 0
+    assert response.status_code == 200
+
+    md.Column.objects.all().delete()
+    md.Board.objects.all().delete()
+    md.User.objects.all().delete()
 
 
 @pytest.mark.django_db
@@ -442,9 +449,9 @@ def test_update_user():
     api_client = APIClient()
     # Create a board and a user
     boardid = uuid.uuid4()
-    response = api_client.post(reverse("get_all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
     assert response.status_code == 200
-    response = api_client.post(reverse("get_users_from_board", args=[boardid]), {"name": "user", "color": "color"})
+    response = api_client.post(reverse("users_on_board", args=[boardid]), {"name": "user"})
     data = response.json()
     # get user id from response
     print(data)
@@ -455,7 +462,5 @@ def test_update_user():
     assert response.status_code == 200
     # Check that amount of users is 0
     assert md.User.objects.count() == 0
-    # Delete all boards and usergroups
+
     md.Board.objects.all().delete()
-    md.Usergroup.objects.all().delete()
-    md.UsergroupUser.objects.all().delete()

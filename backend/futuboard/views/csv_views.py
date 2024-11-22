@@ -7,7 +7,6 @@ from ..csv_parser import write_csv_header, write_board_data, verify_csv_header, 
 import csv
 import io
 from rest_framework.decorators import api_view
-from django.http import Http404
 from ..verification import new_password
 from django.http import JsonResponse
 import json
@@ -19,17 +18,13 @@ def export_board_data(request, board_id, filename):
     Export board data to a csv file
     """
     if request.method == "GET":
-        try:
-            response = HttpResponse(content_type="text/csv")
-            response["Content-Disposition"] = 'attachment; filename="' + filename + '.csv"'
-            writer = csv.writer(response)
-            write_csv_header(writer)
-            write_board_data(writer, board_id)
-            print("Board data exported")
-            return response
-        except Exception as e:
-            print(e)
-            raise Http404("Error exporting board data")
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="' + filename + '.csv"'
+        writer = csv.writer(response)
+        write_csv_header(writer)
+        write_board_data(writer, board_id)
+        print("Board data exported")
+        return response
     return HttpResponse("Invalid request")
 
 
@@ -53,4 +48,5 @@ def import_board_data(request, board_id):
         board = json.loads(board)
         read_board_data(reader, board_id, board["title"], new_password(board["password"]))
         return JsonResponse({"success": True})
+
     return JsonResponse({"success": False})

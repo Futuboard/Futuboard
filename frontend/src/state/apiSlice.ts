@@ -241,73 +241,36 @@ export const boardsApi = createApi({
         return [{ type: "Users", id: args }, ...tags]
       }
     }),
-    postUserToTicket: builder.mutation<User, { ticketId: string; user: User }>({
-      query: ({ ticketId, user }) => ({
+    postUserToTicket: builder.mutation<User, { ticketId: string; userid: string }>({
+      query: ({ ticketId, userid }) => ({
         url: `tickets/${ticketId}/users/`,
         method: "POST",
-        body: user
+        body: { userid }
       }),
-      invalidatesTags: (_result, _error, { ticketId }) => [{ type: "Users", id: ticketId }],
-      async onQueryStarted(patchArgs: { ticketId: string; user: User }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "Users", id: patchArgs.ticketId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getUsersByTicketId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getUsersByTicketId", cache.originalArgs, (oldData) => {
-                return [...oldData, { userid: "temp", name: patchArgs.user.name, color: patchArgs.user.color }]
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
-
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Users", id: patchArgs.ticketId }]))
-        }
-      }
+      invalidatesTags: (_result, _error, { ticketId }) => [{ type: "Users", id: ticketId }]
     }),
-    postUserToAction: builder.mutation<User, { actionId: string; user: User }>({
-      query: ({ actionId, user }) => ({
+    deleteUserFromTicket: builder.mutation<User, { ticketId: string; userid: string }>({
+      query: ({ ticketId, userid }) => ({
+        url: `tickets/${ticketId}/users/`,
+        method: "DELETE",
+        body: { userid }
+      }),
+      invalidatesTags: (_result, _error, { ticketId }) => [{ type: "Users", id: ticketId }]
+    }),
+    postUserToAction: builder.mutation<User, { actionId: string; userid: string }>({
+      query: ({ actionId, userid }) => ({
         url: `actions/${actionId}/users/`,
         method: "POST",
-        body: user
+        body: { userid }
       }),
-      //optimistically updates the user list, however since the new instance of the user gets its id from the server, the optimistically
-      //updated user will have a temporary id, which will be replaced by the server id when the query is fulfilled
-      //this can lead to problems if one tries to drag the user before the query is fulfilled
-      async onQueryStarted(patchArgs: { actionId: string; user: User }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "Users", id: patchArgs.actionId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getUsersByActionId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getUsersByActionId", cache.originalArgs, (oldData) => {
-                return [...oldData, { userid: "temp", name: patchArgs.user.name, color: patchArgs.user.color }]
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
-
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Users", id: patchArgs.actionId }]))
-        }
-      },
+      invalidatesTags: (_result, _error, { actionId }) => [{ type: "Users", id: actionId }]
+    }),
+    deleteUserFromAction: builder.mutation<User, { actionId: string; userid: string }>({
+      query: ({ actionId, userid }) => ({
+        url: `actions/${actionId}/users/`,
+        method: "DELETE",
+        body: { userid }
+      }),
       invalidatesTags: (_result, _error, { actionId }) => [{ type: "Users", id: actionId }]
     }),
     deleteUser: builder.mutation<User, { userId: string }>({
@@ -315,84 +278,7 @@ export const boardsApi = createApi({
         url: `users/${userId}`,
         method: "DELETE"
       }),
-      invalidatesTags: [{ type: "Users", id: "USERLIST" }]
-    }),
-    deleteUserRecursive: builder.mutation<User, { userId: string }>({
-      query: ({ userId }) => ({
-        url: `users/${userId}/delete_recursive/`,
-        method: "DELETE"
-      }),
       invalidatesTags: ["Users"]
-    }),
-    updateUserListByTicketId: builder.mutation<User[], { ticketId: string; users: User[] }>({
-      query: ({ ticketId, users }) => ({
-        url: `tickets/${ticketId}/users/`,
-        method: "PUT",
-        body: users
-      }),
-      async onQueryStarted(patchArgs: { ticketId: string; users: User[] }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "Users", id: patchArgs.ticketId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getUsersByTicketId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getUsersByTicketId", cache.originalArgs, () => {
-                const updatedUsers = patchArgs.users.map((user) => ({
-                  ...user
-                }))
-                return updatedUsers
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
-
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Users", id: patchArgs.ticketId }]))
-        }
-      }
-    }),
-    updateUserListByActionId: builder.mutation<User[], { actionId: string; users: User[] }>({
-      query: ({ actionId, users }) => ({
-        url: `actions/${actionId}/users/`,
-        method: "PUT",
-        body: users
-      }),
-      async onQueryStarted(patchArgs: { actionId: string; users: User[] }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "Users", id: patchArgs.actionId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getUsersByActionId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getUsersByActionId", cache.originalArgs, () => {
-                const updatedUsers = patchArgs.users.map((user) => ({
-                  ...user
-                }))
-                return updatedUsers
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
-
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Users", id: patchArgs.actionId }]))
-        }
-      }
     }),
     getSwimlaneColumnsByColumnId: builder.query<SwimlaneColumn[], string>({
       query: (columnId) => `columns/${columnId}/swimlanecolumns/`,
@@ -514,9 +400,7 @@ export const {
   usePostUserToBoardMutation,
   useGetUsersByTicketIdQuery,
   usePostUserToTicketMutation,
-  useUpdateUserListByTicketIdMutation,
   useDeleteUserMutation,
-  useDeleteUserRecursiveMutation,
   useGetSwimlaneColumnsByColumnIdQuery,
   useUpdateSwimlaneColumnMutation,
   useGetActionListByTaskIdAndSwimlaneColumnIdQuery,
@@ -526,5 +410,6 @@ export const {
   useUpdateActionListMutation,
   useGetUsersByActionIdQuery,
   usePostUserToActionMutation,
-  useUpdateUserListByActionIdMutation
+  useDeleteUserFromActionMutation,
+  useDeleteUserFromTicketMutation
 } = boardsApi
