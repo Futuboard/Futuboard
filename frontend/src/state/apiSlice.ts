@@ -424,6 +424,19 @@ export const boardsApi = createApi({
         ]
       }
     }),
+    getActionsByColumnId: builder.query<Action[], string>({
+      query: (columnId) => `/columns/${columnId}/actions/`,
+      providesTags: (result, _error, args) => {
+        const tags: TagDescription<"Action">[] = []
+        if (result) {
+          const actions: Action[] = result
+          actions.forEach((action) => {
+            tags.push({ type: "Action", id: action.actionid })
+          })
+        }
+        return [{ type: "ActionList", id: args }, { type: "Action", id: "LIST" }, ...tags]
+      }
+    }),
     postAction: builder.mutation<Action, { taskId: string; swimlaneColumnId: string; action: Action }>({
       query: ({ taskId, swimlaneColumnId, action }) => ({
         url: `${swimlaneColumnId}/${taskId}/actions/`,
@@ -507,6 +520,7 @@ export const {
   useGetSwimlaneColumnsByColumnIdQuery,
   useUpdateSwimlaneColumnMutation,
   useGetActionListByTaskIdAndSwimlaneColumnIdQuery,
+  useGetActionsByColumnIdQuery,
   usePostActionMutation,
   useUpdateActionMutation,
   useUpdateActionListMutation,

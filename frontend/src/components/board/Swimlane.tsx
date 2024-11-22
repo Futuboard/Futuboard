@@ -14,65 +14,48 @@ import ActionCreationForm from "./ActionCreationForm"
 interface SwimlaneActionListProps {
   taskId: string
   swimlanecolumnid: string
+  actionList: ActionType[]
 }
 
-const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlanecolumnid }) => {
-  const { data: actionList, isLoading } = useGetActionListByTaskIdAndSwimlaneColumnIdQuery({
-    taskId,
-    swimlaneColumnId: swimlanecolumnid
-  })
-
+const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlanecolumnid, actionList }) => {
   return (
     <>
-      {isLoading ? (
-        <Skeleton width="100%" variant="rectangular">
+      <Droppable droppableId={swimlanecolumnid + "/" + taskId} type={"SWIMLANE" + "/" + taskId}>
+        {(provided, snapshot) => (
           <Box
+            ref={provided.innerRef}
+            {...provided.droppableProps}
             sx={{
               display: "flex",
+              flexDirection: "column",
+              flex: "1",
               padding: "2px",
+              alignContent: "center",
+              border: snapshot.isDraggingOver ? "1px solid rgba(22, 95, 199)" : "1px solid rgba(0, 0, 0, 0.12)",
+              backgroundColor: snapshot.isDraggingOver ? "rgba(22, 95, 199, 0.1)" : "#E5DB0",
               height: "118px",
-              overflowX: "hidden"
+              overflowX: "hidden",
+              //custom scrollbar has issues with react-beautiful-dnd, remove if it's causing problems
+              "&::-webkit-scrollbar": {
+                width: "5px"
+              },
+              "&::-webkit-scrollbar-track": {
+                background: "#f1f1f1"
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: "#888"
+              },
+              "&::-webkit-scrollbar-thumb:hover": {
+                background: "#555"
+              }
             }}
-          />
-        </Skeleton>
-      ) : (
-        <Droppable droppableId={swimlanecolumnid + "/" + taskId} type={"SWIMLANE" + "/" + taskId}>
-          {(provided, snapshot) => (
-            <Box
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                flex: "1",
-                padding: "2px",
-                alignContent: "center",
-                border: snapshot.isDraggingOver ? "1px solid rgba(22, 95, 199)" : "1px solid rgba(0, 0, 0, 0.12)",
-                backgroundColor: snapshot.isDraggingOver ? "rgba(22, 95, 199, 0.1)" : "#E5DB0",
-                height: "118px",
-                overflowX: "hidden",
-                //custom scrollbar has issues with react-beautiful-dnd, remove if it's causing problems
-                "&::-webkit-scrollbar": {
-                  width: "5px"
-                },
-                "&::-webkit-scrollbar-track": {
-                  background: "#f1f1f1"
-                },
-                "&::-webkit-scrollbar-thumb": {
-                  background: "#888"
-                },
-                "&::-webkit-scrollbar-thumb:hover": {
-                  background: "#555"
-                }
-              }}
-            >
-              {actionList &&
-                actionList.map((action, index) => <Action key={action.actionid} action={action} index={index} />)}
-              {provided.placeholder}
-            </Box>
-          )}
-        </Droppable>
-      )}
+          >
+            {actionList &&
+              actionList.map((action, index) => <Action key={action.actionid} action={action} index={index} />)}
+            {provided.placeholder}
+          </Box>
+        )}
+      </Droppable>
     </>
   )
 }
@@ -139,9 +122,10 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }>
 interface SwimlaneProps {
   task: Task
   swimlaneColumns: SwimlaneColumn[]
+  actions: ActionType[]
 }
 
-const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns }) => {
+const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns, actions }) => {
   return (
     <div style={{ display: "flex" }}>
       {swimlaneColumns && (
@@ -162,6 +146,10 @@ const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns }) => {
                 key={index}
                 taskId={task.ticketid}
                 swimlanecolumnid={swimlaneColumn.swimlanecolumnid}
+                actionList={actions.filter(
+                  (action) =>
+                    action.ticketid == task.ticketid && action.swimlanecolumnid == swimlaneColumn.swimlanecolumnid
+                )}
               />
             ))}
         </Box>

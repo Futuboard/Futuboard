@@ -34,6 +34,18 @@ def swimlanecolumn_view(request, column_id):
             raise Http404("Cannot create swinlane column")
 
 
+@api_view(["GET"])
+def get_actions_by_columnId(request, column_id):
+    if request.method == "GET":
+        try:
+            ticketIds_query_set = Ticket.objects.filter(columnid=column_id)
+            query_set = Action.objects.filter(ticketid__in=ticketIds_query_set)
+            serializer = ActionSerializer(query_set, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        except:  # noqa: E722
+            raise Http404("Column actions not found")
+
+
 @api_view(["GET", "POST", "PUT"])
 def action_view(request, swimlanecolumn_id, ticket_id):
     if request.method == "PUT":
