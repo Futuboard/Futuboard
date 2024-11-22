@@ -1,14 +1,14 @@
 from django.http import Http404
 from rest_framework.decorators import api_view
 from django.http import HttpResponse, JsonResponse
-from ..models import Board, Column, Ticket, Usergroup, User, UsergroupUser, Swimlanecolumn, Action
+from ..models import Board, Column, Ticket, User, Swimlanecolumn
 from ..serializers import ColumnSerializer, TicketSerializer, UserSerializer
 from django.utils import timezone
 
 
 # Create your views here.
 @api_view(["GET", "POST", "PUT"])
-def get_columns_from_board(request, board_id):
+def columns_on_board(request, board_id):
     if request.method == "GET":
         try:
             query_set = Column.objects.filter(boardid=board_id).order_by("ordernum")
@@ -16,49 +16,43 @@ def get_columns_from_board(request, board_id):
             raise Http404("Column does not exist")
         serializer = ColumnSerializer(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
+
     if request.method == "POST":
-        try:
-            length = len(Column.objects.filter(boardid=board_id))
-            new_column = Column(
-                columnid=request.data["columnid"],
-                boardid=Board.objects.get(pk=board_id),
-                color="",
-                description="",
-                title=request.data["title"],
-                ordernum=length,
-                creation_date=timezone.now(),
-                swimlane=request.data["swimlane"],
-            )
-            new_column.save()
-            if request.data["swimlane"]:
-                defaultSwimlaneNames = ["To Do", "Doing", "Verify", "Done"]
-                for name in defaultSwimlaneNames:
-                    swimlanecolumn = Swimlanecolumn(
-                        columnid=Column.objects.get(pk=request.data["columnid"]),
-                        color="white",
-                        title=name,
-                        ordernum=defaultSwimlaneNames.index(name),
-                    )
-                    print("SWIM: " + str(swimlanecolumn.swimlanecolumnid))
-                    swimlanecolumn.save()
-            serializer = ColumnSerializer(new_column)
-            return JsonResponse(serializer.data, safe=False)
-        except:  # noqa: E722
-            raise Http404("Column creation failed")
+        length = len(Column.objects.filter(boardid=board_id))
+        new_column = Column(
+            columnid=request.data["columnid"],
+            boardid=Board.objects.get(pk=board_id),
+            description="",
+            title=request.data["title"],
+            ordernum=length,
+            creation_date=timezone.now(),
+            swimlane=request.data["swimlane"],
+        )
+        new_column.save()
+        if request.data["swimlane"]:
+            defaultSwimlaneNames = ["To Do", "Doing", "Verify", "Done"]
+            for name in defaultSwimlaneNames:
+                swimlanecolumn = Swimlanecolumn(
+                    columnid=Column.objects.get(pk=request.data["columnid"]),
+                    title=name,
+                    ordernum=defaultSwimlaneNames.index(name),
+                )
+                print("SWIM: " + str(swimlanecolumn.swimlanecolumnid))
+                swimlanecolumn.save()
+        serializer = ColumnSerializer(new_column)
+        return JsonResponse(serializer.data, safe=False)
+
     if request.method == "PUT":
-        try:
-            columns_data = request.data
-            for index, column_data in enumerate(columns_data):
-                column = Column.objects.get(columnid=column_data["columnid"])
-                column.ordernum = index
-                column.save()
-            return JsonResponse({"message": "Columns order updated successfully"}, status=200)
-        except:  # noqa: E722
-            raise Http404("Error updating columns order.")
+        columns_data = request.data
+        for index, column_data in enumerate(columns_data):
+            column = Column.objects.get(columnid=column_data["columnid"])
+            column.ordernum = index
+            column.save()
+        return JsonResponse({"message": "Columns order updated successfully"}, status=200)
 
 
 @api_view(["GET", "POST", "PUT"])
-def get_tickets_from_column(request, board_id, column_id):
+def tickets_on_column(request, board_id, column_id):
     if request.method == "PUT":
         try:
             tickets_data = request.data
@@ -77,42 +71,32 @@ def get_tickets_from_column(request, board_id, column_id):
                 task.save()
 
             return JsonResponse({"message": "Tasks order updated successfully"}, status=200)
+
         except Ticket.DoesNotExist:
             raise Http404("Task does not exist")
-        except:  # noqa: E722
-            raise Http404("Error updating tasks order.")
+
     if request.method == "POST":
-        try:
-            length = len(Ticket.objects.filter(columnid=column_id))
-            new_ticket = Ticket(
-                ticketid=request.data["ticketid"],
-                columnid=Column.objects.get(pk=column_id),
-                title=request.data["title"],
-                description=request.data["description"],
-                color=request.data["color"] if "color" in request.data else "white",
-                storypoints=8,
-                size=int(request.data["size"]) if request.data["size"] else 0,
-                order=length,
-                creation_date=timezone.now(),
-                cornernote=request.data["cornernote"] if "cornernote" in request.data else "",
-            )
+        length = len(Ticket.objects.filter(columnid=column_id))
+        new_ticket = Ticket(
+            ticketid=request.data["ticketid"],
+            columnid=Column.objects.get(pk=column_id),
+            title=request.data["title"],
+            description=request.data["description"],
+            color=request.data["color"] if "color" in request.data else "white",
+            storypoints=8,
+            size=int(request.data["size"]) if request.data["size"] else 0,
+            order=length,
+            creation_date=timezone.now(),
+            cornernote=request.data["cornernote"] if "cornernote" in request.data else "",
+        )
+        new_ticket.save()
+        serializer = TicketSerializer(new_ticket)
+        return JsonResponse(serializer.data, safe=False)
 
-            new_ticket.save()
-
-            new_usergroup = Usergroup(ticketid=new_ticket, type="ticket")
-            new_usergroup.save()
-
-            serializer = TicketSerializer(new_ticket)
-            return JsonResponse(serializer.data, safe=False)
-        except:  # noqa: E722
-            raise Http404("Cannot create Ticket")
     if request.method == "GET":
-        try:
-            query_set = Ticket.objects.filter(columnid=column_id).order_by("order")
-            serializer = TicketSerializer(query_set, many=True)
-            return JsonResponse(serializer.data, safe=False)
-        except:  # noqa: E722
-            raise Http404("Error getting tickets.")
+        query_set = Ticket.objects.filter(columnid=column_id).order_by("order")
+        serializer = TicketSerializer(query_set, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
 
 @api_view(["PUT", "DELETE"])
@@ -121,43 +105,22 @@ def update_ticket(request, column_id, ticket_id):
         ticket = Ticket.objects.get(pk=ticket_id, columnid=column_id)
     except Ticket.DoesNotExist:
         raise Http404("Ticket not found")
+
     if request.method == "DELETE":
-        try:
-            # Delete users on the ticket
-            usergroup = Usergroup.objects.get(ticketid=ticket_id)
-            usergroupuser = UsergroupUser.objects.filter(usergroupid=usergroup)
-            users = [group.userid for group in usergroupuser]
-            for user in users:
-                user.delete()
-
-            # Delete users from actions that are on the ticket's swimlane
-            actions = Action.objects.filter(ticketid=ticket_id)
-            for action in actions:
-                usergroup = Usergroup.objects.get(actionid=action.actionid)
-                usergroupuser = UsergroupUser.objects.filter(usergroupid=usergroup)
-                users = [group.userid for group in usergroupuser]
-                for user in users:
-                    user.delete()
-
-            ticket.delete()
-            return JsonResponse({"message": "Ticket deleted successfully"}, status=200)
-        except:  # noqa: E722
-            raise Http404("Cannot delete Ticket")
+        ticket.delete()
+        return JsonResponse({"message": "Ticket deleted successfully"}, status=200)
 
     if request.method == "PUT":
-        try:
-            ticket.title = request.data.get("title", ticket.title)
-            ticket.description = request.data.get("description", ticket.description)
-            ticket.color = request.data.get("color", ticket.color)
-            ticket.storypoints = request.data.get("storypoints", ticket.storypoints)
-            ticket.size = request.data.get("size", ticket.size)
-            ticket.cornernote = request.data.get("cornernote", ticket.cornernote)
-            ticket.save()
+        ticket.title = request.data.get("title", ticket.title)
+        ticket.description = request.data.get("description", ticket.description)
+        ticket.color = request.data.get("color", ticket.color)
+        ticket.storypoints = request.data.get("storypoints", ticket.storypoints)
+        ticket.size = request.data.get("size", ticket.size)
+        ticket.cornernote = request.data.get("cornernote", ticket.cornernote)
+        ticket.save()
 
-            serializer = TicketSerializer(ticket)
-            return JsonResponse(serializer.data, safe=False)
-        except:  # noqa: E722
-            raise Http404("Cannot update Ticket")
+        serializer = TicketSerializer(ticket)
+        return JsonResponse(serializer.data, safe=False)
 
 
 @api_view(["PUT", "DELETE"])
@@ -166,164 +129,60 @@ def update_column(request, board_id, column_id):
         column = Column.objects.get(pk=column_id, boardid=board_id)
     except Column.DoesNotExist:
         raise Http404("Column not found")
-    if request.method == "DELETE":
-        try:
-            # Delete users in tickets
-            tickets = Ticket.objects.filter(columnid=column_id)
-            for ticket in tickets:
-                usergroup = Usergroup.objects.get(ticketid=ticket.ticketid)
-                usergroupuser = UsergroupUser.objects.filter(usergroupid=usergroup)
-                users = [group.userid for group in usergroupuser]
-                for user in users:
-                    user.delete()
 
-            # Delete users from actions that are on the ticket's swimlane
-            swimlanecolumns = Swimlanecolumn.objects.filter(columnid=column_id)
-            for swimlanecolumn in swimlanecolumns:
-                actions = Action.objects.filter(swimlanecolumnid=swimlanecolumn.swimlanecolumnid)
-                for action in actions:
-                    usergroup = Usergroup.objects.get(actionid=action.actionid)
-                    usergroupuser = UsergroupUser.objects.filter(usergroupid=usergroup)
-                    users = [group.userid for group in usergroupuser]
-                    for user in users:
-                        user.delete()
-            column.delete()
-            return JsonResponse({"message": "Column deleted successfully"}, status=200)
-        except:  # noqa: E722
-            raise Http404("Cannot delete Column")
+    if request.method == "DELETE":
+        column.delete()
+        return JsonResponse({"message": "Column deleted successfully"}, status=200)
 
     if request.method == "PUT":
-        try:
-            column.title = request.data.get("title", column.title)
-            column.wip_limit = request.data.get("wip_limit", column.wip_limit)
-            column.wip_limit_story = request.data.get("wip_limit_story", column.wip_limit_story)
-            column.save()
+        column.title = request.data.get("title", column.title)
+        column.wip_limit = request.data.get("wip_limit", column.wip_limit)
+        column.wip_limit_story = request.data.get("wip_limit_story", column.wip_limit_story)
+        column.save()
 
-            serializer = ColumnSerializer(column)
-            return JsonResponse(serializer.data, safe=False)
-        except:  # noqa: E722
-            raise Http404("Cannot update Column")
+        serializer = ColumnSerializer(column)
+        return JsonResponse(serializer.data, safe=False)
 
 
 @api_view(["GET", "POST"])
-def get_users_from_board(request, board_id):
+def users_on_board(request, board_id):
     if request.method == "GET":
-        try:
-            query_set = Usergroup.objects.get(boardid=board_id)
-            query_set2 = UsergroupUser.objects.filter(usergroupid=query_set.usergroupid)
-            users = [user.userid for user in query_set2]
-            serializer = UserSerializer(users, many=True)
-        except Board.DoesNotExist:
-            raise Http404("Error getting users")
+        users = User.objects.filter(boardid=board_id)
+        serializer = UserSerializer(users, many=True)
         return JsonResponse(serializer.data, safe=False)
+
     if request.method == "POST":
-        try:
-            usergroup = Usergroup.objects.get(boardid=board_id)
-            new_user = User(
-                name=request.data["name"],
-            )
-            new_user.save()
-
-            new_UsergroupUser = UsergroupUser(usergroupid=usergroup, userid=new_user)
-            new_UsergroupUser.save()
-
-            serializer = UserSerializer(new_user)
-            return JsonResponse(serializer.data, safe=False)
-        except:  # noqa: E722
-            raise Http404("User creation failed")
+        board = Board.objects.get(pk=board_id)
+        new_user = User(name=request.data["name"], boardid=board)
+        new_user.save()
+        serializer = UserSerializer(new_user)
+        return JsonResponse(serializer.data, safe=False)
 
 
-@api_view(["GET", "POST", "PUT"])
-def get_users_from_ticket(request, ticket_id):
+@api_view(["GET", "POST", "DELETE"])
+def users_on_ticket(request, ticket_id):
     if request.method == "GET":
-        try:
-            query_set = Usergroup.objects.get(ticketid=ticket_id)
-            query_set2 = UsergroupUser.objects.filter(usergroupid=query_set.usergroupid)
-            users = [user.userid for user in query_set2]
-            serializer = UserSerializer(users, many=True)
-        except Board.DoesNotExist:
-            raise Http404("Error getting users")
+        users = User.objects.filter(tickets__ticketid=ticket_id)
+        serializer = UserSerializer(users, many=True)
         return JsonResponse(serializer.data, safe=False)
-    if request.method == "PUT":
-        try:
-            usergroup = Usergroup.objects.get(ticketid=ticket_id)
-            query_set2 = UsergroupUser.objects.filter(usergroupid=usergroup)
-            users = [user.userid for user in query_set2]  # list of users in the new ticket
-            if request.data == []:
-                query_set2.delete()
-            else:
-                old_usergroup = UsergroupUser(
-                    usergroupid=usergroup, userid=User.objects.get(pk=request.data[0]["userid"])
-                )
-                old_usergroup.delete()
-                for user in request.data:
-                    new_usergroup = UsergroupUser(usergroupid=usergroup, userid=User.objects.get(pk=user["userid"]))
-                    new_usergroup.save()
 
-        except:  # noqa: E722
-            raise Http404("User update failed")
-        # TODO: implement
-        print("TO BE IMPLEMENTED")
-        return JsonResponse({"message": "Users updated successfully"}, status=200)
     if request.method == "POST":
-        # when a user is dragged to a ticket for the first time, just create a new one with a new userid but same other fields, makes it easier to delete etc
-        try:
-            usergroup = Usergroup.objects.get(ticketid=ticket_id)
-            new_user = User(name=request.data["name"])
-            new_user.save()
+        userid = request.data["userid"]
+        user = User.objects.get(pk=userid)
+        user.tickets.add(ticket_id)
+        return JsonResponse({"message": "User added to ticket successfully"}, status=200)
 
-            new_UsergroupUser = UsergroupUser(usergroupid=usergroup, userid=new_user)
-            new_UsergroupUser.save()
-
-            serializer = UserSerializer(new_user)
-            return JsonResponse(serializer.data, safe=False)
-        except:  # noqa: E722
-            raise Http404("User creation failed")
+    if request.method == "DELETE":
+        userid = request.data["userid"]
+        user = User.objects.get(pk=userid)
+        user.tickets.remove(ticket_id)
+        return JsonResponse({"message": "Removed user from ticket succesfully"}, status=200)
 
 
 @api_view(["DELETE"])
 def update_user(request, user_id):
     if request.method == "DELETE":
-        try:
-            user = User.objects.get(pk=user_id)
-            response = "Successfully deleted user: {}".format(user_id)
-            user.delete()
-            return HttpResponse(response)
-        except:  # noqa: E722
-            raise Http404("User deletion failed")
-
-
-@api_view(["DELETE"])
-def delete_user_recursive(request, user_id):
-    if request.method == "DELETE":
-        try:
-            original_user = User.objects.get(pk=user_id)
-            usergroupUser = UsergroupUser.objects.get(userid=original_user)
-            if usergroupUser.usergroupid.type == "board":
-                boardid = usergroupUser.usergroupid.boardid
-                columns = Column.objects.filter(boardid=boardid)
-                for column in columns:
-                    Swimlanecolumns = Swimlanecolumn.objects.filter(columnid=column)
-                    for swimlanecolumn in Swimlanecolumns:
-                        actions = Action.objects.filter(swimlanecolumnid=swimlanecolumn)
-                        for action in actions:
-                            usergroup = Usergroup.objects.get(actionid=action.actionid)
-                            usergroupuser = UsergroupUser.objects.filter(usergroupid=usergroup)
-                            users = [group.userid for group in usergroupuser]
-                            for user in users:
-                                if original_user.name == user.name:
-                                    user.delete()
-                    tickets = Ticket.objects.filter(columnid=column)
-                    for ticket in tickets:
-                        usergroup = Usergroup.objects.get(ticketid=ticket.ticketid)
-                        usergroupuser = UsergroupUser.objects.filter(usergroupid=usergroup)
-                        users = [group.userid for group in usergroupuser]
-                        for user in users:
-                            if original_user.name == user.name:
-                                user.delete()
-            response = "Successfully deleted user: {}".format(user_id)
-            original_user.delete()
-            return HttpResponse(response)
-        except Exception as e:
-            print(e)
-            raise Http404("User deletion failed")
+        user = User.objects.get(pk=user_id)
+        response = "Successfully deleted user: {}".format(user_id)
+        user.delete()
+        return HttpResponse(response)

@@ -33,7 +33,6 @@ def test_import_export():
         board = md.Board.objects.create(
             boardid=uuid.uuid4(),
             title=f"Test Board{i}",
-            creator=f"Test User{i}",
             creation_date=timezone.now(),
             description="",
             passwordhash="test",
@@ -47,12 +46,7 @@ def test_import_export():
         n_users = 10
         users = []
         for i in range(n_users):
-            users.append(md.User.objects.create(userid=uuid.uuid4(), name=f"user{i}", color="red"))
-        # Create Usergroup for the board
-        usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), boardid=board, type="board")
-        # Usergroupusers
-        for user in users:
-            md.UsergroupUser.objects.create(usergroupid=usergroup, userid=user)
+            users.append(md.User.objects.create(userid=uuid.uuid4(), name=f"user{i}", boardid=board))
         # Create n columns for the board
         n_columns = random.randint(1, 10)
         for i in range(n_columns - 1):
@@ -64,12 +58,11 @@ def test_import_export():
                 ticket = md.Ticket.objects.create(
                     ticketid=uuid.uuid4(), columnid=column, title=f"ticket{j}", description="test", order=j
                 )
-                # Usergroup, users, and usergroupusers
-                usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), ticketid=ticket, type="ticket")
+
                 n_users = random.randint(1, 10)
                 random.shuffle(users)
                 for k in range(n_users):
-                    md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[k])
+                    users[k].tickets.add(md.Ticket.objects.get(ticketid=ticket.ticketid))
         # One column that is a swimlane
         column = md.Column.objects.create(
             columnid=uuid.uuid4(), boardid=board, title=f"column{n_columns-1}", ordernum=n_columns - 1, swimlane=True
@@ -77,7 +70,7 @@ def test_import_export():
         n_swimlanecolumns = random.randint(1, 10)
         for i in range(n_swimlanecolumns):
             swimlanecolumn = md.Swimlanecolumn.objects.create(
-                swimlanecolumnid=uuid.uuid4(), columnid=column, title=f"swimlanecolumn{i}", color="red", ordernum=i
+                swimlanecolumnid=uuid.uuid4(), columnid=column, title=f"swimlanecolumn{i}", ordernum=i
             )
         # Tickets for the swimlane column
         n_tickets = random.randint(1, 10)
@@ -88,12 +81,10 @@ def test_import_export():
                     ticketid=uuid.uuid4(), columnid=column, title=f"ticket{j}", description="test", order=j
                 )
             )
-            # Usergroup, users, and usergroupusers
-            usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), ticketid=tickets[j], type="ticket")
             n_users = random.randint(1, 10)
             random.shuffle(users)
             for k in range(n_users):
-                md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[k])
+                users[k].tickets.add(md.Ticket.objects.get(ticketid=ticket.ticketid))
         # Actions for the ticket
         for swimlanecolumn in md.Swimlanecolumn.objects.filter(columnid=column):
             n_actions = random.randint(1, 10)
@@ -103,15 +94,12 @@ def test_import_export():
                     ticketid=tickets[k % n_tickets],
                     swimlanecolumnid=swimlanecolumn,
                     title=f"action{k}",
-                    color="red",
                     order=k,
                 )
-                # Usergroup, users, and usergroupusers
-                usergroup = md.Usergroup.objects.create(usergroupid=uuid.uuid4(), actionid=action, type="action")
                 n_users = random.randint(1, 10)
                 random.shuffle(users)
                 for ii in range(n_users):
-                    md.UsergroupUser.objects.create(usergroupid=usergroup, userid=users[ii])
+                    users[k].actions.add(md.Action.objects.get(actionid=action.actionid))
         # Export the board
         response = client.get(reverse("export_board_data", args=[boards[num].boardid, "test.csv"]))
         data = response.content
@@ -128,13 +116,23 @@ def test_import_export():
         assert response.status_code == 200
         # Check that the imported board is the same as the exported board
         imported_board = md.Board.objects.get(boardid=new_boardid)
-        # Creator and description should be the same, other fields can be different
-        assert imported_board.creator == board.creator
+        # Description should be the same, other fields can be different
         assert imported_board.description == board.description
+
         # Check that the columns are the same
         imported_columns = md.Column.objects.filter(boardid=imported_board)
         columns = md.Column.objects.filter(boardid=board)
         assert len(imported_columns) == len(columns)
+
+        # Check that users are the same
+        imported_users = md.User.objects.filter(boardid=imported_board)
+        users = md.User.objects.filter(boardid=board)
+
+        assert len(imported_users) == len(users)
+        assert imported_users[0].name == users[0].name
+
+        # TODO: Should test that the users have the same tickets and actions
+
         # Check that the tickets are the same
         # Sort both column lists by ordernum
         imported_columns = list(imported_columns)
@@ -161,10 +159,6 @@ def test_import_export():
                 assert imported_ticket.order == ticket.order
                 assert imported_ticket.creation_date == ticket.creation_date
                 assert imported_ticket.cornernote == ticket.cornernote
-                # Check that the usergroups are the same
-                imported_usergroups = md.Usergroup.objects.filter(ticketid=imported_ticket)
-                usergroups = md.Usergroup.objects.filter(ticketid=ticket)
-                assert len(imported_usergroups) == len(usergroups)
                 if columns[j].swimlane:
                     # Check that the actions are the same
                     imported_actions = md.Action.objects.filter(ticketid=imported_ticket)
@@ -178,17 +172,10 @@ def test_import_export():
                         imported_action = imported_actions[k]
                         action = actions[k]
                         assert imported_action.title == action.title
-                        assert imported_action.color == action.color
                         assert imported_action.order == action.order
-                        # Check that the usergroups are the same
-                        imported_usergroups = md.Usergroup.objects.filter(actionid=imported_action)
-                        usergroups = md.Usergroup.objects.filter(actionid=action)
-                        assert len(imported_usergroups) == len(usergroups)
         num += 1
     # Clean up everything
     md.Action.objects.all().delete()
-    md.UsergroupUser.objects.all().delete()
-    md.Usergroup.objects.all().delete()
     md.Ticket.objects.all().delete()
     md.Swimlanecolumn.objects.all().delete()
     md.Column.objects.all().delete()
