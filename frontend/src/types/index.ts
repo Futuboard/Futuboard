@@ -72,3 +72,12 @@ export type SwimlaneColumn = {
   columnid: string
   order: number
 }
+
+type Tag = "Boards" | "Columns" | "Ticket" | "Users" | "Action" | "ActionList" | "SwimlaneColumn"
+
+export type CacheInvalidationTag =
+  | {
+      type: Tag
+      id?: string
+    }
+  | Tag

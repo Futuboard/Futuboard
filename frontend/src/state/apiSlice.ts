@@ -4,6 +4,7 @@ import { TagDescription, createApi, fetchBaseQuery } from "@reduxjs/toolkit/quer
 import {
   Action,
   Board,
+  CacheInvalidationTag,
   Column,
   NewAction,
   NewTask,
@@ -15,6 +16,12 @@ import {
 
 import { getAuth, setToken } from "./auth"
 import { RootState } from "./store"
+import { webSocketContainer } from "./websocket"
+
+const invalidateLocalAndRemoteCache = (tags: CacheInvalidationTag[]) => {
+  webSocketContainer.invalidateCacheOfOtherUsers(tags)
+  return tags
+}
 
 //TODO: refactor
 export const boardsApi = createApi({
@@ -50,7 +57,7 @@ export const boardsApi = createApi({
           body: board
         }
       },
-      invalidatesTags: ["Boards"]
+      invalidatesTags: () => invalidateLocalAndRemoteCache(["Boards"])
     }),
 
     deleteBoard: builder.mutation<Board, string>({
@@ -58,7 +65,7 @@ export const boardsApi = createApi({
         url: `boards/${boardId}/`,
         method: "DELETE"
       }),
-      invalidatesTags: ["Boards"]
+      invalidatesTags: () => invalidateLocalAndRemoteCache(["Boards"])
     }),
 
     getColumnsByBoardId: builder.query<Column[], string>({
@@ -97,7 +104,7 @@ export const boardsApi = createApi({
         method: "POST",
         body: column
       }),
-      invalidatesTags: ["Columns"]
+      invalidatesTags: () => invalidateLocalAndRemoteCache(["Columns"])
     }),
 
     addTask: builder.mutation<Task, { boardId: string; columnId: string; task: NewTask }>({
@@ -106,7 +113,8 @@ export const boardsApi = createApi({
         method: "POST",
         body: task
       }),
-      invalidatesTags: (_result, _error, { columnId }) => [{ type: "Columns", id: columnId }]
+      invalidatesTags: (_result, _error, { columnId }) =>
+        invalidateLocalAndRemoteCache([{ type: "Columns", id: columnId }])
     }),
 
     updateTask: builder.mutation<Task, { task: NewTask }>({
@@ -115,7 +123,8 @@ export const boardsApi = createApi({
         method: "PUT",
         body: task
       }),
-      invalidatesTags: (_result, _error, { task }) => [{ type: "Ticket", id: task.ticketid }]
+      invalidatesTags: (_result, _error, { task }) =>
+        invalidateLocalAndRemoteCache([{ type: "Ticket", id: task.ticketid }])
     }),
 
     deleteTask: builder.mutation<Task, { task: Task }>({
@@ -123,7 +132,8 @@ export const boardsApi = createApi({
         url: `columns/${task.columnid}/tickets/${task.ticketid}/`,
         method: "DELETE"
       }),
-      invalidatesTags: (_result, _error, { task }) => [{ type: "Ticket", id: task.ticketid }]
+      invalidatesTags: (_result, _error, { task }) =>
+        invalidateLocalAndRemoteCache([{ type: "Ticket", id: task.ticketid }])
     }),
 
     updateColumn: builder.mutation<Column, { column: Column; ticketIds?: string[] }>({
@@ -132,7 +142,7 @@ export const boardsApi = createApi({
         method: "PUT",
         body: { ...column, ticket_ids: ticketIds }
       }),
-      invalidatesTags: ["Columns"]
+      invalidatesTags: () => invalidateLocalAndRemoteCache(["Columns"])
     }),
 
     //optimistclly updates column order
@@ -162,9 +172,9 @@ export const boardsApi = createApi({
           patchResults.forEach((patchResult) => {
             patchResult.undo()
           })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Columns", id: "LIST" }]))
         }
-      }
+      },
+      invalidatesTags: () => invalidateLocalAndRemoteCache([{ type: "Columns", id: "LIST" }])
     }),
 
     deleteColumn: builder.mutation<Column, { column: Column }>({
@@ -172,7 +182,7 @@ export const boardsApi = createApi({
         url: `boards/${column.boardid}/columns/${column.columnid}/`,
         method: "DELETE"
       }),
-      invalidatesTags: ["Columns"]
+      invalidatesTags: () => invalidateLocalAndRemoteCache(["Columns"])
     }),
 
     //optimistclly updates task list
@@ -209,9 +219,10 @@ export const boardsApi = createApi({
           patchResults.forEach((patchResult) => {
             patchResult.undo()
           })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Columns", id: patchArgs.columnId }]))
         }
-      }
+      },
+      invalidatesTags: (_result, _error, { columnId }) =>
+        invalidateLocalAndRemoteCache([{ type: "Columns", id: columnId }])
     }),
 
     getUsersByBoardId: builder.query<User[], string>({
@@ -225,7 +236,7 @@ export const boardsApi = createApi({
         method: "POST",
         body: user
       }),
-      invalidatesTags: [{ type: "Users", id: "ALL_USERS" }]
+      invalidatesTags: () => invalidateLocalAndRemoteCache([{ type: "Users", id: "ALL_USERS" }])
     }),
 
     login: builder.mutation<{ success: boolean; token: string }, { boardId: string; password: string }>({
@@ -251,11 +262,12 @@ export const boardsApi = createApi({
         method: "POST",
         body: { userid }
       }),
-      invalidatesTags: (_result, _error, { ticketId, userid }) => [
-        { type: "Users", id: ticketId },
-        { type: "Users", id: userid },
-        { type: "Users", id: "ALL_USERS" }
-      ]
+      invalidatesTags: (_result, _error, { ticketId, userid }) =>
+        invalidateLocalAndRemoteCache([
+          { type: "Users", id: ticketId },
+          { type: "Users", id: userid },
+          { type: "Users", id: "ALL_USERS" }
+        ])
     }),
 
     deleteUserFromTicket: builder.mutation<User, { ticketId: string; userid: string }>({
@@ -264,11 +276,12 @@ export const boardsApi = createApi({
         method: "DELETE",
         body: { userid }
       }),
-      invalidatesTags: (_result, _error, { ticketId, userid }) => [
-        { type: "Users", id: ticketId },
-        { type: "Users", id: userid },
-        { type: "Users", id: "ALL_USERS" }
-      ]
+      invalidatesTags: (_result, _error, { ticketId, userid }) =>
+        invalidateLocalAndRemoteCache([
+          { type: "Users", id: ticketId },
+          { type: "Users", id: userid },
+          { type: "Users", id: "ALL_USERS" }
+        ])
     }),
 
     postUserToAction: builder.mutation<User, { actionId: string; userid: string }>({
@@ -277,11 +290,12 @@ export const boardsApi = createApi({
         method: "POST",
         body: { userid }
       }),
-      invalidatesTags: (_result, _error, { actionId, userid }) => [
-        { type: "Users", id: actionId },
-        { type: "Users", id: userid },
-        { type: "Users", id: "ALL_USERS" }
-      ]
+      invalidatesTags: (_result, _error, { actionId, userid }) =>
+        invalidateLocalAndRemoteCache([
+          { type: "Users", id: actionId },
+          { type: "Users", id: userid },
+          { type: "Users", id: "ALL_USERS" }
+        ])
     }),
 
     deleteUserFromAction: builder.mutation<User, { actionId: string; userid: string }>({
@@ -290,11 +304,12 @@ export const boardsApi = createApi({
         method: "DELETE",
         body: { userid }
       }),
-      invalidatesTags: (_result, _error, { actionId, userid }) => [
-        { type: "Users", id: actionId },
-        { type: "Users", id: userid },
-        { type: "Users", id: "ALL_USERS" }
-      ]
+      invalidatesTags: (_result, _error, { actionId, userid }) =>
+        invalidateLocalAndRemoteCache([
+          { type: "Users", id: actionId },
+          { type: "Users", id: userid },
+          { type: "Users", id: "ALL_USERS" }
+        ])
     }),
 
     deleteUser: builder.mutation<User, { userId: string }>({
@@ -302,7 +317,7 @@ export const boardsApi = createApi({
         url: `users/${userId}`,
         method: "DELETE"
       }),
-      invalidatesTags: ["Users"]
+      invalidatesTags: () => invalidateLocalAndRemoteCache(["Users"])
     }),
 
     getSwimlaneColumnsByColumnId: builder.query<SwimlaneColumn[], string>({
@@ -316,7 +331,7 @@ export const boardsApi = createApi({
         method: "PUT",
         body: swimlaneColumn
       }),
-      invalidatesTags: [{ type: "SwimlaneColumn", id: "LIST" }]
+      invalidatesTags: () => invalidateLocalAndRemoteCache([{ type: "SwimlaneColumn", id: "LIST" }])
     }),
 
     getActionListByTaskIdAndSwimlaneColumnId: builder.query<Action[], { taskId: string; swimlaneColumnId: string }>({
@@ -363,7 +378,7 @@ export const boardsApi = createApi({
         method: "POST",
         body: action
       }),
-      invalidatesTags: [{ type: "Action", id: "LIST" }]
+      invalidatesTags: () => invalidateLocalAndRemoteCache([{ type: "Action", id: "LIST" }])
     }),
 
     //update single action
@@ -373,7 +388,8 @@ export const boardsApi = createApi({
         method: "PUT",
         body: action
       }),
-      invalidatesTags: (_result, _error, { action }) => [{ type: "Action", id: action.actionid }]
+      invalidatesTags: (_result, _error, { action }) =>
+        invalidateLocalAndRemoteCache([{ type: "Action", id: action.actionid }])
     }),
 
     //optimistclly updates swimlane action list

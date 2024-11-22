@@ -10,6 +10,7 @@ import useWebSocket, { SendMessage } from "react-use-websocket"
 import { getId } from "@/services/Utils"
 import { setBoardId } from "@/state/auth"
 import { store } from "@/state/store"
+import { webSocketContainer } from "@/state/websocket"
 import { Action, Task, User } from "@/types"
 
 import AccessBoardForm from "../components/board/AccessBoardForm"
@@ -29,43 +30,20 @@ import {
 
 export const WebsocketContext = createContext<SendMessage | null>(null)
 
-const clientId = getId()
-
 const BoardContainer: React.FC = () => {
   const dispatch = useDispatch()
   const { id = "default-id" } = useParams()
-  // websocket object
-  const { sendMessage: originalSendMessage } = useWebSocket(import.meta.env.VITE_WEBSOCKET_ADDRESS + id, {
-    //`wss://futuboardbackend.azurewebsites.net/board/${id}`
-    onOpen: () => {},
-    //Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: () => true,
-    onMessage: (event) => {
-      const data = JSON.parse(event.data)
-      if (data.message !== clientId) {
-        dispatch(
-          boardsApi.util.invalidateTags([
-            "Boards",
-            "Columns",
-            "Ticket",
-            "Users",
-            "Action",
-            "ActionList",
-            "SwimlaneColumn"
-          ])
-        )
-      }
-    },
-    share: true
-  })
 
   useEffect(() => {
     dispatch(setBoardId(id))
+    webSocketContainer.connectToBoard(id)
+    webSocketContainer.onMessage((tags) => {
+      dispatch(boardsApi.util.invalidateTags(tags))
+    })
   }, [id, dispatch])
 
-  //wrap the original sendMessage function to include the clientId with every message, so that client can ignore its own messages
-  const updatedSendMessage = () => {
-    originalSendMessage(clientId)
+  const invalidateCacheOfOtherUsers = () => {
+    //originalSendMessage(clientId)
   }
 
   const [updateTaskList] = useUpdateTaskListByColumnIdMutation()
@@ -102,7 +80,7 @@ const BoardContainer: React.FC = () => {
         const dataCopy = [...(destinationTasks ?? [])]
         const newOrdered = reorder<Task>(dataCopy, source.index, destination.index)
         await updateTaskList({ boardId: id, columnId: source.droppableId, tasks: newOrdered })
-        updatedSendMessage()
+        invalidateCacheOfOtherUsers()
       }
       //dragging tasks to different columns
       if (destination.droppableId !== source.droppableId) {
@@ -121,7 +99,7 @@ const BoardContainer: React.FC = () => {
           updateTaskList({ boardId: id, columnId: destination.droppableId, tasks: nextDestinationTasks ?? [] }),
           updateTaskList({ boardId: id, columnId: source.droppableId, tasks: nextSourceTasks ?? [] })
         ])
-        updatedSendMessage()
+        invalidateCacheOfOtherUsers()
       }
     }
 
@@ -185,8 +163,6 @@ const BoardContainer: React.FC = () => {
       if (destinationType === "action") {
         postUserToAction({ actionId: destinationId, userid: draggedUserId })
       }
-
-      updatedSendMessage()
     }
     if (type.split("/")[0] === "SWIMLANE") {
       const [destSwimLaneColumnId, destTicketId, destColumnId] = destination.droppableId.split("/")
@@ -222,7 +198,7 @@ const BoardContainer: React.FC = () => {
           actions: newOrdered,
           originalActions: destinationColumnActions ?? []
         })
-        updatedSendMessage()
+        invalidateCacheOfOtherUsers()
       }
       if (destination.droppableId !== source.droppableId) {
         const nextSourceActions = produce(sourceActions, (draft) => {
@@ -248,7 +224,7 @@ const BoardContainer: React.FC = () => {
             originalActions: sourceColumnActions ?? []
           })
         ])
-        updatedSendMessage()
+        invalidateCacheOfOtherUsers()
       }
     }
     //reordering columns
@@ -259,7 +235,7 @@ const BoardContainer: React.FC = () => {
       const dataCopy = [...columns]
       const newOrdered = reorder(dataCopy, source.index, destination.index) //reorder column list
       await updateColumns({ boardId: id, columns: newOrdered })
-      updatedSendMessage()
+      invalidateCacheOfOtherUsers()
     }
   }
 
@@ -279,7 +255,7 @@ const BoardContainer: React.FC = () => {
 
   if (isLoggedIn) {
     return (
-      <WebsocketContext.Provider value={updatedSendMessage}>
+      <WebsocketContext.Provider value={invalidateCacheOfOtherUsers}>
         <>
           <DragDropContext onDragEnd={handleOnDragEnd}>
             <ToolBar boardId={id} title={board?.title || ""} />
