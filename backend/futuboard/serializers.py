@@ -5,7 +5,7 @@ from rest_framework import serializers
 class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
-        fields = ["boardid", "description", "title", "creator", "creation_date"]
+        fields = ["boardid", "description", "title", "creation_date"]
 
 
 class ColumnSerializer(serializers.ModelSerializer):
@@ -15,7 +15,6 @@ class ColumnSerializer(serializers.ModelSerializer):
             "columnid",
             "boardid",
             "wip_limit",
-            "color",
             "description",
             "title",
             "ordernum",
@@ -45,16 +44,16 @@ class TicketSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["userid", "name"]
+        fields = ["userid", "name", "boardid"]
 
 
 class SwimlaneColumnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Swimlanecolumn
-        fields = ["swimlanecolumnid", "columnid", "color", "title", "ordernum"]
+        fields = ["swimlanecolumnid", "columnid", "title", "ordernum"]
 
 
 class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
-        fields = ["actionid", "ticketid", "swimlanecolumnid", "title", "color", "order", "creation_date"]
+        fields = ["actionid", "ticketid", "swimlanecolumnid", "title", "order", "creation_date"]
