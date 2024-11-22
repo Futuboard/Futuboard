@@ -1,11 +1,11 @@
 import { Droppable } from "@hello-pangea/dnd"
 import { Add } from "@mui/icons-material"
-import { Box, IconButton, Paper, Popover, Typography } from "@mui/material"
+import { Box, IconButton, Paper, Popover } from "@mui/material"
 import { useContext, useState } from "react"
 
 import { WebsocketContext } from "@/pages/BoardContainer"
 import { getId } from "@/services/Utils"
-import { useGetActionListByTaskIdAndSwimlaneColumnIdQuery, usePostActionMutation } from "@/state/apiSlice"
+import { usePostActionMutation } from "@/state/apiSlice"
 import { Action as ActionType, SwimlaneColumn, Task } from "@/types"
 
 import Action from "./Action"
