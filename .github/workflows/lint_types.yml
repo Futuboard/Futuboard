@@ -1,4 +1,4 @@
-name: Eslint lint check
+name: Typescript type check
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - "frontend/**"
 
 jobs:
-  eslint-lint-check:
+  typescript-type-check:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -23,5 +23,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Eslint
-        run: npm run lint
+      - name: Run tsc
+        run: npm run typecheck

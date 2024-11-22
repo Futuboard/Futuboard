@@ -12,7 +12,8 @@
     "test": "jest",
     "server": "json-server -p3001 --watch db.json",
     "prettier": "npx prettier . --check",
-    "prettier:fix": "npx prettier . --write"
+    "prettier:fix": "npx prettier . --write",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
