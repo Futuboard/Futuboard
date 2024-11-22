@@ -5,11 +5,10 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 import { Box, Dialog, DialogContent, Divider, IconButton, List, Popover, Tooltip, Typography } from "@mui/material"
 import Paper from "@mui/material/Paper"
-import { useContext, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useSelector } from "react-redux"
 import { useParams } from "react-router"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
 import { RootState } from "@/state/store"
 import type { Column, Task as TaskType, User } from "@/types"
 
@@ -44,9 +43,6 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
 
   const [defaultValues, setDefaultValues] = useState<FormData | null>(null)
 
-  //function for sending a websocket message
-  const sendMessage = useContext(WebsocketContext)
-
   const [addTask] = useAddTaskMutation()
 
   const [open, setOpen] = useState(false)
@@ -77,9 +73,6 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
       .unwrap()
       .then(() => {
         setOpen(false)
-        if (sendMessage !== null) {
-          sendMessage("Task added")
-        }
       })
       .catch((error) => {
         console.error(error)
@@ -191,7 +184,6 @@ interface ColumnFormData {
 const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [updateColumn] = useUpdateColumnMutation()
-  const sendMessage = useContext(WebsocketContext)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -210,9 +202,6 @@ const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
     }
 
     await updateColumn({ column: columnObject })
-    if (sendMessage !== null) {
-      sendMessage("Column updated")
-    }
     setAnchorEl(null)
   }
 

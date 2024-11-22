@@ -2,12 +2,10 @@ import ToolBar from "@components/board/Toolbar"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 import { Box } from "@mui/material"
 import { produce } from "immer"
-import { createContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useParams } from "react-router-dom"
-import useWebSocket, { SendMessage } from "react-use-websocket"
 
-import { getId } from "@/services/Utils"
 import { setBoardId } from "@/state/auth"
 import { store } from "@/state/store"
 import { webSocketContainer } from "@/state/websocket"
@@ -28,8 +26,6 @@ import {
   useUpdateTaskListByColumnIdMutation
 } from "../state/apiSlice"
 
-export const WebsocketContext = createContext<SendMessage | null>(null)
-
 const BoardContainer: React.FC = () => {
   const dispatch = useDispatch()
   const { id = "default-id" } = useParams()
@@ -41,10 +37,6 @@ const BoardContainer: React.FC = () => {
       dispatch(boardsApi.util.invalidateTags(tags))
     })
   }, [id, dispatch])
-
-  const invalidateCacheOfOtherUsers = () => {
-    //originalSendMessage(clientId)
-  }
 
   const [updateTaskList] = useUpdateTaskListByColumnIdMutation()
   const [updateColumns] = useUpdateColumnOrderMutation()
@@ -80,7 +72,6 @@ const BoardContainer: React.FC = () => {
         const dataCopy = [...(destinationTasks ?? [])]
         const newOrdered = reorder<Task>(dataCopy, source.index, destination.index)
         await updateTaskList({ boardId: id, columnId: source.droppableId, tasks: newOrdered })
-        invalidateCacheOfOtherUsers()
       }
       //dragging tasks to different columns
       if (destination.droppableId !== source.droppableId) {
@@ -99,7 +90,6 @@ const BoardContainer: React.FC = () => {
           updateTaskList({ boardId: id, columnId: destination.droppableId, tasks: nextDestinationTasks ?? [] }),
           updateTaskList({ boardId: id, columnId: source.droppableId, tasks: nextSourceTasks ?? [] })
         ])
-        invalidateCacheOfOtherUsers()
       }
     }
 
@@ -198,7 +188,6 @@ const BoardContainer: React.FC = () => {
           actions: newOrdered,
           originalActions: destinationColumnActions ?? []
         })
-        invalidateCacheOfOtherUsers()
       }
       if (destination.droppableId !== source.droppableId) {
         const nextSourceActions = produce(sourceActions, (draft) => {
@@ -224,7 +213,6 @@ const BoardContainer: React.FC = () => {
             originalActions: sourceColumnActions ?? []
           })
         ])
-        invalidateCacheOfOtherUsers()
       }
     }
     //reordering columns
@@ -235,7 +223,6 @@ const BoardContainer: React.FC = () => {
       const dataCopy = [...columns]
       const newOrdered = reorder(dataCopy, source.index, destination.index) //reorder column list
       await updateColumns({ boardId: id, columns: newOrdered })
-      invalidateCacheOfOtherUsers()
     }
   }
 
@@ -255,14 +242,10 @@ const BoardContainer: React.FC = () => {
 
   if (isLoggedIn) {
     return (
-      <WebsocketContext.Provider value={invalidateCacheOfOtherUsers}>
-        <>
-          <DragDropContext onDragEnd={handleOnDragEnd}>
-            <ToolBar boardId={id} title={board?.title || ""} />
-            <Board />
-          </DragDropContext>
-        </>
-      </WebsocketContext.Provider>
+      <DragDropContext onDragEnd={handleOnDragEnd}>
+        <ToolBar boardId={id} title={board?.title || ""} />
+        <Board />
+      </DragDropContext>
     )
   }
 

@@ -1,8 +1,6 @@
 import { Delete } from "@mui/icons-material"
 import { Card, IconButton, Typography } from "@mui/material"
-import { useContext } from "react"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
 import { useDeleteUserMutation } from "@/state/apiSlice"
 import { UserWithoutTicketsOrActions } from "@/types"
 
@@ -13,12 +11,9 @@ interface UserMagnetProps {
 
 const UserMagnet: React.FC<UserMagnetProps> = ({ user, editable }) => {
   const [deleteUser] = useDeleteUserMutation()
-  const sendMessage = useContext(WebsocketContext)
+
   const handleDelete = async () => {
     await deleteUser({ userId: user.userid })
-    if (sendMessage !== null) {
-      sendMessage("User deleted")
-    }
   }
 
   return (

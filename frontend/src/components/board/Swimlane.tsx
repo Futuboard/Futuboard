@@ -1,9 +1,8 @@
 import { Droppable } from "@hello-pangea/dnd"
 import { Add } from "@mui/icons-material"
 import { Box, IconButton, Paper, Popover } from "@mui/material"
-import { useContext, useState } from "react"
+import { useState } from "react"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
 import { getId } from "@/services/Utils"
 import { usePostActionMutation } from "@/state/apiSlice"
 import { Action as ActionType, NewAction, SwimlaneColumn, Task } from "@/types"
@@ -67,7 +66,6 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }>
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [createAction] = usePostActionMutation()
 
-  const sendMessage = useContext(WebsocketContext)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -84,9 +82,6 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }>
 
     await createAction({ taskId, swimlaneColumnId: swimlanecolumnid, action: actionObject })
 
-    if (sendMessage !== null) {
-      sendMessage("Action created")
-    }
     data.resetActionTitle()
   }
 

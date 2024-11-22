@@ -1,8 +1,7 @@
 import { Box, Skeleton, Typography } from "@mui/material"
 import Paper from "@mui/material/Paper"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
 import {
   useGetSwimlaneColumnsByColumnIdQuery,
   useUpdateSwimlaneColumnMutation,
@@ -15,7 +14,6 @@ import Swimlane from "./Swimlane"
 
 const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }> = ({ swimlanecolumn }) => {
   const [updateSwimlaneColumn] = useUpdateSwimlaneColumnMutation()
-  const sendMessage = useContext(WebsocketContext)
 
   const [isEditing, setIsEditing] = useState(false)
   const [currentTitle, setCurrentTitle] = useState(swimlanecolumn.title)
@@ -35,9 +33,6 @@ const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }>
     }
     const updatedSwimlaneColumn = { ...swimlanecolumn, title: currentTitle }
     await updateSwimlaneColumn({ swimlaneColumn: updatedSwimlaneColumn })
-    if (sendMessage !== null) {
-      sendMessage("Swimlane column updated")
-    }
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -9,9 +9,8 @@ import {
 import { EditNote } from "@mui/icons-material"
 import { IconButton, Paper, Popover, Tooltip, Typography } from "@mui/material"
 import ClickAwayListener from "@mui/material/ClickAwayListener"
-import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from "react"
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
 import { Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
 
 import { useUpdateTaskMutation } from "../../state/apiSlice"
@@ -68,7 +67,7 @@ const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetSt
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
   const [updateTask] = useUpdateTaskMutation()
-  const sendMessage = useContext(WebsocketContext)
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setTaskSelected(true)
     setAnchorEl(event.currentTarget)
@@ -92,9 +91,6 @@ const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetSt
       columnid: task.columnid
     }
     await updateTask({ task: taskObject })
-    if (sendMessage !== null) {
-      sendMessage("Task updated")
-    }
   }
   const open = Boolean(anchorEl)
   const popOverid = open ? "popover" : undefined
@@ -134,7 +130,7 @@ interface TaskProps {
 
 const Task: React.FC<TaskProps> = ({ task }) => {
   const [updateTask] = useUpdateTaskMutation()
-  const sendMessage = useContext(WebsocketContext)
+
   const [selected, setSelected] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [cornernote, setCornernote] = useState(task.cornernote)
@@ -155,9 +151,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
     setIsEditing(false)
     if (cornernote === task.cornernote) return
     await updateTask({ task: updatedTaskObject })
-    if (sendMessage !== null) {
-      sendMessage("cornernote updated")
-    }
+
     //todo: send message to websocket
   }
 

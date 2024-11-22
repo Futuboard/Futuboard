@@ -1,8 +1,7 @@
 import { Draggable, DraggableStateSnapshot, DraggableStyle, Droppable } from "@hello-pangea/dnd"
 import { Box, ClickAwayListener, Typography } from "@mui/material"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
 import { useUpdateActionMutation } from "@/state/apiSlice"
 import { Action as ActionType, UserWithoutTicketsOrActions } from "@/types"
 
@@ -46,7 +45,6 @@ const ActionUserList: React.FC<{ users: UserWithoutTicketsOrActions[]; actionid:
 }
 
 const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index }) => {
-  const sendMessage = useContext(WebsocketContext)
   const [isEditing, setIsEditing] = useState(false)
   const [currentTitle, setCurrentTitle] = useState(action.title)
 
@@ -69,9 +67,6 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
 
     const updatedAction = { ...action, title: currentTitle }
     await updateAction({ action: updatedAction })
-    if (sendMessage !== null) {
-      sendMessage("Action updated")
-    }
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
