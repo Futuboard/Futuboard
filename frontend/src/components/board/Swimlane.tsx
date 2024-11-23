@@ -30,26 +30,11 @@ const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlan
             sx={{
               display: "flex",
               flexDirection: "column",
-              flex: "1",
               padding: "2px",
               alignContent: "center",
               border: snapshot.isDraggingOver ? "1px solid rgba(22, 95, 199)" : "1px solid rgba(0, 0, 0, 0.12)",
               backgroundColor: snapshot.isDraggingOver ? "rgba(22, 95, 199, 0.1)" : "#E5DB0",
-              height: "118px",
-              overflowX: "hidden",
-              //custom scrollbar has issues with react-beautiful-dnd, remove if it's causing problems
-              "&::-webkit-scrollbar": {
-                width: "5px"
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "#f1f1f1"
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: "#888"
-              },
-              "&::-webkit-scrollbar-thumb:hover": {
-                background: "#555"
-              }
+              overflowX: "hidden"
             }}
           >
             {actionList &&
@@ -93,7 +78,7 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }>
 
   return (
     <div>
-      <IconButton size={"small"} onClick={handleClick}>
+      <IconButton sx={{ marginTop: "10px" }} size={"small"} onClick={handleClick}>
         <Add sx={{ fontSize: "15px" }} />
       </IconButton>
       <Popover
@@ -127,31 +112,31 @@ interface SwimlaneProps {
 
 const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns, actions }) => {
   return (
-    <div style={{ display: "flex" }}>
+    <Box sx={{ display: "flex" }}>
       {swimlaneColumns && (
         <CreateActionButton taskId={task.ticketid} swimlanecolumnid={swimlaneColumns[0].swimlanecolumnid} />
       )}
       <Box
         sx={{
-          height: "129px",
-          /*might later need to change swimlane height to show all actions*/ width: "100%",
-          backgroundColor: "#E5DB0",
-          paddingBottom: "10px"
+          height: "120px",
+          paddingBottom: "9px",
+          paddingTop: "9px",
+          paddingRight: "25px",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr 1fr"
         }}
       >
-        <Box sx={{ display: "flex" }}>
-          {swimlaneColumns &&
-            swimlaneColumns.map((swimlaneColumn, index) => (
-              <SwimlaneActionList
-                key={index}
-                taskId={task.ticketid}
-                swimlanecolumn={swimlaneColumn}
-                actionList={actions.filter((action) => action.swimlanecolumnid == swimlaneColumn.swimlanecolumnid)}
-              />
-            ))}
-        </Box>
+        {swimlaneColumns &&
+          swimlaneColumns.map((swimlaneColumn, index) => (
+            <SwimlaneActionList
+              key={index}
+              taskId={task.ticketid}
+              swimlanecolumn={swimlaneColumn}
+              actionList={actions.filter((action) => action.swimlanecolumnid == swimlaneColumn.swimlanecolumnid)}
+            />
+          ))}
       </Box>
-    </div>
+    </Box>
   )
 }
 

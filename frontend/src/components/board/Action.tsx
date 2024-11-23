@@ -125,19 +125,17 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
                       padding: "2px"
                     }}
                   >
-                    <Box>
-                      <Typography
-                        variant={"body1"}
-                        noWrap={
-                          action.users.length >
-                          0 /*if action has users, limit the text into a single row to save space*/
-                        }
-                        fontSize={12}
-                      >
-                        {currentTitle}
-                      </Typography>
-                      {action.users.length > 0 && <ActionUserList users={action.users} actionid={action.actionid} />}
-                    </Box>
+                    <Typography
+                      variant={"body1"}
+                      noWrap={
+                        action.users.length > 0 /*if action has users, limit the text into a single row to save space*/
+                      }
+                      fontSize={12}
+                    >
+                      {currentTitle}
+                    </Typography>
+                    {action.users.length > 0 && <ActionUserList users={action.users} actionid={action.actionid} />}
+
                     {provided.placeholder}
                   </Box>
                 )}

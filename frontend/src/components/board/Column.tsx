@@ -328,7 +328,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
             </div>
           </Paper>
           <Box sx={{ overflowX: "hidden", height: "fit-content" }}>
-            <Box sx={{ width: showSwimlanes ? "820px" : "0px", transition: "width 300ms" }}>
+            <Box sx={{ width: showSwimlanes ? "900px" : "0px", transition: "width 300ms" }}>
               {showSwimlanes && <SwimlaneContainer column={column} />}
             </Box>
           </Box>
