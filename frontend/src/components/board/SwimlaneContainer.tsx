@@ -9,7 +9,7 @@ import {
   useGetActionsByColumnIdQuery,
   useGetTaskListByColumnIdQuery
 } from "@/state/apiSlice"
-import type { Column, SwimlaneColumn, Action } from "@/types"
+import type { Column, SwimlaneColumn } from "@/types"
 
 import Swimlane from "./Swimlane"
 
