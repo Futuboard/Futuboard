@@ -1,3 +1,4 @@
+import CreateBoardButton from "@components/home/CreateBoardButton"
 import GitHubIcon from "@mui/icons-material/GitHub"
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
@@ -6,7 +7,6 @@ import Typography from "@mui/material/Typography"
 import { getId } from "@services/Utils"
 import { useNavigate } from "react-router-dom"
 
-import CreateBoardButton from "@components/home/CreateBoardButton"
 import ImportBoardButton from "@/components/home/ImportBoardButton"
 import ModalFrameCv from "@/components/home/ModalFrameCv"
 import { useAddBoardMutation } from "@/state/apiSlice"

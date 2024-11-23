@@ -171,7 +171,7 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
             {isSuccess && users.length > 0 && <UserList users={users} />}
           </Box>
           <div style={{ marginLeft: "10px" }}>
-           <AddUserButton />
+            <AddUserButton />
           </div>
           <CopyToClipboardButton />
           <CreateColumnButton boardId={boardId} />
