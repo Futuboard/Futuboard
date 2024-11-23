@@ -152,13 +152,13 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
       position="fixed"
       sx={{ background: "white", height: "65px", boxShadow: "none", borderBottom: "2px solid #D1D5DB" }}
     >
-      <Toolbar sx={{ justifyContent: "center" }}>
+      <Toolbar disableGutters sx={{ justifyContent: "center", marginLeft: "10px", marginRight: "10px" }}>
         <Box display="flex" alignContent="center" sx={{ flexGrow: 1 }}>
           <HomeButton />
           <Divider
             orientation="vertical"
             flexItem
-            sx={{ margin: "0 10px", borderRightWidth: "2px", height: "35px", marginTop: "5px", borderColor: "#D1D5DB" }}
+            sx={{ margin: "0 10px", marginTop: "5px", borderRightWidth: "2px", height: "35px", borderColor: "#D1D5DB" }}
           />
           <Typography
             variant="h6"
@@ -167,11 +167,11 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
           >
             {title}
           </Typography>
-          <Box sx={{ flexGrow: 1 }} style={{ marginTop: "3px" }}>
+          <Box sx={{ flexGrow: 1 }} style={{ marginTop: "0px" }}>
             {isSuccess && users.length > 0 && <UserList users={users} />}
           </Box>
           <div style={{ marginLeft: "10px" }}>
-            <AddUserButton />
+           <AddUserButton />
           </div>
           <CopyToClipboardButton />
           <CreateColumnButton boardId={boardId} />
@@ -180,7 +180,7 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
             aria-controls="long-menu"
             aria-haspopup="true"
             onClick={handleMenu}
-            sx={{ padding: "5px" }}
+            sx={{ padding: "5px", color: "#2D3748" }}
           >
             <MoreVert />
           </IconButton>
