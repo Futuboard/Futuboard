@@ -8,17 +8,24 @@ type CacheInvalidationMessage = {
 class WebSocketContainer {
   private socket: WebSocket | null
   private clientId: string
+  private lastBoardId: string
 
   constructor() {
     this.clientId = getId()
     this.socket = null
+    this.lastBoardId = ""
   }
 
   public connectToBoard(boardId: string) {
-    if (this.socket) {
-      this.socket.close()
+    const isDifferentBoard = this.lastBoardId !== boardId
+
+    if (isDifferentBoard) {
+      if (this.socket) {
+        this.socket.close()
+      }
+      this.socket = new WebSocket(import.meta.env.VITE_WEBSOCKET_ADDRESS + boardId)
+      this.lastBoardId = boardId
     }
-    this.socket = new WebSocket(import.meta.env.VITE_WEBSOCKET_ADDRESS + boardId)
   }
 
   public close() {
