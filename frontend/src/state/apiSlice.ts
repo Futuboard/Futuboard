@@ -350,6 +350,7 @@ export const boardsApi = createApi({
         method: "PUT",
         body: actions
       }),
+      invalidatesTags: (_result, _error, { columnId }) => [{ type: "ActionList", id: columnId }], //burgerfix for getting right order, proper fix later
       async onQueryStarted(
         { swimlaneColumnId, taskId, columnId, actions, originalActions },
         { dispatch, queryFulfilled }

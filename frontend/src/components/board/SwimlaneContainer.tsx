@@ -84,7 +84,7 @@ const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
   const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(column.columnid)
   const { data: taskList } = useGetTaskListByColumnIdQuery({ boardId: column.boardid, columnId: column.columnid })
   const tasks = taskList
-  const { data: actionList } = useGetActionsByColumnIdQuery(column.columnid)
+  const { data: actions } = useGetActionsByColumnIdQuery(column.columnid)
 
   return (
     <>
@@ -135,13 +135,13 @@ const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
         </Box>
 
         {tasks && tasks.length ? (
-          isSuccess && actionList ? (
+          isSuccess && actions ? (
             tasks.map((task) => (
               <Swimlane
                 key={task.ticketid}
                 task={task}
                 swimlaneColumns={swimlaneColumns}
-                actions={actionList.filter((a) => a.ticketid == task.ticketid)}
+                actions={actions.filter((a) => a.ticketid == task.ticketid)}
               />
             ))
           ) : (

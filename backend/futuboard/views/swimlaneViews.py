@@ -40,8 +40,8 @@ def get_actions_by_columnId(request, column_id):
             query_set = Action.objects.filter(ticketid__in=ticketIds_query_set)
             serializer = ActionSerializer(query_set, many=True)
             return JsonResponse(serializer.data, safe=False)
-        except:  # noqa: E722
-            raise Http404("Column actions not found")
+        except Ticket.DoesNotExist:
+            raise Http404("Tickets not found")
 
 
 @api_view(["GET", "POST", "PUT"])
