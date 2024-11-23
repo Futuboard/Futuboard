@@ -81,7 +81,7 @@ const BoardContainer: React.FC = () => {
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
   const selectUsersByTaskId = boardsApi.endpoints.getUsersByTicketId.select
   const selectUsersByActionId = boardsApi.endpoints.getUsersByActionId.select
-  const selectActions = boardsApi.endpoints.getActionListByTaskIdAndSwimlaneColumnId.select
+  const selectActions = boardsApi.endpoints.getActionsByColumnId.select
   const selectColumns = boardsApi.endpoints.getColumnsByBoardId.select(id)
 
   const handleOnDragEnd = async (result: DropResult) => {
@@ -102,17 +102,27 @@ const BoardContainer: React.FC = () => {
 
     //action logic:
 
-    const selectDestionationActions = selectActions({
-      taskId: destination.droppableId.split("/")[1],
-      swimlaneColumnId: destination.droppableId.split("/")[0]
-    })
-    const destinationActions = selectDestionationActions(state).data || []
+    const [destSwimLaneColumnId, destTicketId, destColumnId] = destination.droppableId.split("/")
 
-    const selectSourceActions = selectActions({
-      taskId: source.droppableId.split("/")[1],
-      swimlaneColumnId: source.droppableId.split("/")[0]
-    })
-    const sourceActions = selectSourceActions(state).data || []
+    const selectDestionationActions = selectActions(destColumnId)
+
+    const destinationColumnActions = selectDestionationActions(state).data
+
+    const destinationActions =
+      selectDestionationActions(state).data?.filter(
+        (a) => a.ticketid == destTicketId && a.swimlanecolumnid == destSwimLaneColumnId
+      ) || []
+
+    const [sourceSwimlaneColumnId, sourceTicketId, sourceColumnId] = source.droppableId.split("/")
+
+    const selectSourceActions = selectActions(sourceColumnId)
+
+    const sourceColumnActions = selectSourceActions(state).data
+
+    const sourceActions =
+      selectSourceActions(state).data?.filter(
+        (a) => a.ticketid == sourceTicketId && a.swimlanecolumnid == sourceSwimlaneColumnId
+      ) || []
 
     if (type === "task") {
       //dragging tasks in the same column
@@ -210,9 +220,11 @@ const BoardContainer: React.FC = () => {
         const dataCopy = [...(destinationActions ?? [])]
         const newOrdered = reorder<Action>(dataCopy, source.index, destination.index)
         await updateActions({
-          taskId: destination.droppableId.split("/")[1],
-          swimlaneColumnId: destination.droppableId.split("/")[0],
-          actions: newOrdered
+          taskId: destTicketId,
+          swimlaneColumnId: destSwimLaneColumnId,
+          columnId: destColumnId,
+          actions: newOrdered,
+          originalActions: destinationColumnActions ?? []
         })
         updatedSendMessage()
       }
@@ -226,14 +238,18 @@ const BoardContainer: React.FC = () => {
         })
         await Promise.all([
           updateActions({
-            taskId: destination.droppableId.split("/")[1],
-            swimlaneColumnId: destination.droppableId.split("/")[0],
-            actions: nextDestinationActions ?? []
+            taskId: destTicketId,
+            swimlaneColumnId: destSwimLaneColumnId,
+            columnId: destColumnId,
+            actions: nextDestinationActions ?? [],
+            originalActions: destinationColumnActions ?? []
           }),
           updateActions({
-            taskId: source.droppableId.split("/")[1],
-            swimlaneColumnId: source.droppableId.split("/")[0],
-            actions: nextSourceActions ?? []
+            taskId: sourceTicketId,
+            swimlaneColumnId: sourceSwimlaneColumnId,
+            columnId: sourceColumnId,
+            actions: nextSourceActions ?? [],
+            originalActions: sourceColumnActions ?? []
           })
         ])
         updatedSendMessage()

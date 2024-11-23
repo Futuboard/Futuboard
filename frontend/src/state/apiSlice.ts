@@ -310,6 +310,19 @@ export const boardsApi = createApi({
         ]
       }
     }),
+    getActionsByColumnId: builder.query<Action[], string>({
+      query: (columnId) => `/columns/${columnId}/actions/`,
+      providesTags: (result, _error, args) => {
+        const tags: TagDescription<"Action">[] = []
+        if (result) {
+          const actions: Action[] = result
+          actions.forEach((action) => {
+            tags.push({ type: "Action", id: action.actionid })
+          })
+        }
+        return [{ type: "ActionList", id: args }, { type: "Action", id: "LIST" }, ...tags]
+      }
+    }),
     postAction: builder.mutation<Action, { taskId: string; swimlaneColumnId: string; action: Action }>({
       query: ({ taskId, swimlaneColumnId, action }) => ({
         url: `${swimlaneColumnId}/${taskId}/actions/`,
@@ -328,40 +341,36 @@ export const boardsApi = createApi({
       invalidatesTags: (_result, _error, { action }) => [{ type: "Action", id: action.actionid }]
     }),
     //optimistclly updates swimlane action list
-    updateActionList: builder.mutation<Action[], { taskId: string; swimlaneColumnId: string; actions: Action[] }>({
+    updateActionList: builder.mutation<
+      Action[],
+      { taskId: string; swimlaneColumnId: string; columnId: string; actions: Action[]; originalActions: Action[] }
+    >({
       query: ({ taskId, swimlaneColumnId, actions }) => ({
         url: `${swimlaneColumnId}/${taskId}/actions/`,
         method: "PUT",
         body: actions
       }),
-      async onQueryStarted(patchArgs: { taskId: string; swimlaneColumnId: string; actions: Action[] }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "ActionList", id: patchArgs.swimlaneColumnId + patchArgs.taskId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getActionListByTaskIdAndSwimlaneColumnId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getActionListByTaskIdAndSwimlaneColumnId", cache.originalArgs, () => {
-                const updatedActions = patchArgs.actions.map((action) => ({
-                  ...action,
-                  swimlanecolumnid: patchArgs.swimlaneColumnId,
-                  ticketid: patchArgs.taskId
-                }))
-                return updatedActions
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
-
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
+      invalidatesTags: (_result, _error, { columnId }) => [{ type: "ActionList", id: columnId }], //burgerfix for getting right order, proper fix later
+      async onQueryStarted(
+        { swimlaneColumnId, taskId, columnId, actions, originalActions },
+        { dispatch, queryFulfilled }
+      ) {
+        const patchResult = dispatch(
+          boardsApi.util.updateQueryData("getActionsByColumnId", columnId, (draft) => {
+            actions.forEach((action) => {
+              const index = originalActions.findIndex((a) => a.actionid == action.actionid)
+              if (index >= 0) {
+                draft[index] = { ...action, swimlanecolumnid: swimlaneColumnId, ticketid: taskId }
+              } else {
+                draft.push(action)
+              }
+            })
           })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Action", id: "LIST" }]))
+        )
+        try {
+          await queryFulfilled
+        } catch {
+          patchResult.undo()
         }
       }
     })
@@ -391,6 +400,7 @@ export const {
   useGetSwimlaneColumnsByColumnIdQuery,
   useUpdateSwimlaneColumnMutation,
   useGetActionListByTaskIdAndSwimlaneColumnIdQuery,
+  useGetActionsByColumnIdQuery,
   usePostActionMutation,
   useUpdateActionMutation,
   useUpdateActionListMutation,

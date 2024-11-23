@@ -32,6 +32,18 @@ def swimlanecolumns_on_column(request, column_id):
         return JsonResponse(serializer.data, safe=False)
 
 
+@api_view(["GET"])
+def get_actions_by_columnId(request, column_id):
+    if request.method == "GET":
+        try:
+            ticketIds_query_set = Ticket.objects.filter(columnid=column_id)
+            query_set = Action.objects.filter(ticketid__in=ticketIds_query_set)
+            serializer = ActionSerializer(query_set, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        except Ticket.DoesNotExist:
+            raise Http404("Tickets not found")
+
+
 @api_view(["GET", "POST", "PUT"])
 def action_on_swimlane(request, swimlanecolumn_id, ticket_id):
     if request.method == "PUT":

@@ -1,11 +1,11 @@
 import { Droppable } from "@hello-pangea/dnd"
 import { Add } from "@mui/icons-material"
-import { Box, IconButton, Paper, Popover, Typography } from "@mui/material"
+import { Box, IconButton, Paper, Popover } from "@mui/material"
 import { useContext, useState } from "react"
 
 import { WebsocketContext } from "@/pages/BoardContainer"
 import { getId } from "@/services/Utils"
-import { useGetActionListByTaskIdAndSwimlaneColumnIdQuery, usePostActionMutation } from "@/state/apiSlice"
+import { usePostActionMutation } from "@/state/apiSlice"
 import { Action as ActionType, SwimlaneColumn, Task } from "@/types"
 
 import Action from "./Action"
@@ -13,18 +13,17 @@ import ActionCreationForm from "./ActionCreationForm"
 
 interface SwimlaneActionListProps {
   taskId: string
-  swimlanecolumnid: string
+  swimlanecolumn: SwimlaneColumn
+  actionList: ActionType[]
 }
 
-const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlanecolumnid }) => {
-  const { data: actionList, isLoading } = useGetActionListByTaskIdAndSwimlaneColumnIdQuery({
-    taskId,
-    swimlaneColumnId: swimlanecolumnid
-  })
-
+const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlanecolumn, actionList }) => {
   return (
     <>
-      <Droppable droppableId={swimlanecolumnid + "/" + taskId} type={"SWIMLANE" + "/" + taskId}>
+      <Droppable
+        droppableId={swimlanecolumn.swimlanecolumnid + "/" + taskId + "/" + swimlanecolumn.columnid}
+        type={"SWIMLANE" + "/" + taskId}
+      >
         {(provided, snapshot) => (
           <Box
             ref={provided.innerRef}
@@ -54,7 +53,6 @@ const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlan
               }
             }}
           >
-            {isLoading && <Typography>Loading actions...</Typography>}
             {actionList &&
               actionList.map((action, index) => <Action key={action.actionid} action={action} index={index} />)}
             {provided.placeholder}
@@ -127,9 +125,10 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }>
 interface SwimlaneProps {
   task: Task
   swimlaneColumns: SwimlaneColumn[]
+  actions: ActionType[]
 }
 
-const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns }) => {
+const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns, actions }) => {
   return (
     <div style={{ display: "flex" }}>
       {swimlaneColumns && (
@@ -149,7 +148,8 @@ const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns }) => {
               <SwimlaneActionList
                 key={index}
                 taskId={task.ticketid}
-                swimlanecolumnid={swimlaneColumn.swimlanecolumnid}
+                swimlanecolumn={swimlaneColumn}
+                actionList={actions.filter((action) => action.swimlanecolumnid == swimlaneColumn.swimlanecolumnid)}
               />
             ))}
         </Box>

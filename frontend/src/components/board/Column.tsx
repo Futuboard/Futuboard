@@ -19,7 +19,7 @@ import {
   useGetTaskListByColumnIdQuery,
   useUpdateColumnMutation
 } from "../../state/apiSlice"
-import { Column, Task as TaskType, User } from "../../types"
+import type { Column, Task as TaskType, User } from "../../types"
 
 import ColumnEditForm from "./ColumnEditForm"
 import SwimlaneContainer from "./SwimlaneContainer"
