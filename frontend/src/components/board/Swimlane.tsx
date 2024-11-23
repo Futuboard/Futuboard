@@ -123,7 +123,8 @@ const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns, actions }) =
           paddingTop: "9px",
           paddingRight: "25px",
           display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr 1fr"
+          gridTemplateColumns: "1fr 1fr 1fr 1fr",
+          width: "100%"
         }}
       >
         {swimlaneColumns &&
