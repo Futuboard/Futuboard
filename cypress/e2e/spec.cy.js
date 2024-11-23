@@ -26,7 +26,7 @@ const otherTask = {
 
 describe("At the Futuboard home page", () => {
   it("has the correct title", () => {
-    cy.get(".MuiTypography-root").should("contain", "FutuBoard")
+    cy.get(".MuiTypography-root").should("contain", "Futuboard")
   })
 
   it("can create board and log in ", () => {
@@ -140,7 +140,7 @@ describe("In a board", () => {
     cy.get(".MuiDialog-root").contains("button", "Submit").click()
     cy.get("button").contains("Confirm Deletion").click()
 
-    cy.contains("FutuBoard")
+    cy.contains("Futuboard")
     cy.contains("Antonio").should("not.exist")
     cy.contains("Create board")
   })
