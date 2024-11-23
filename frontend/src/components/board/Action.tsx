@@ -111,7 +111,7 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
               />
             </ClickAwayListener>
           ) : (
-            <div>
+            <div title={currentTitle}>
               <Droppable droppableId={action.actionid + "/action"} type="user">
                 {(provided, snapshot) => (
                   <Box
