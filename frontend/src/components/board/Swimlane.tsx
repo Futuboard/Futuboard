@@ -13,14 +13,17 @@ import ActionCreationForm from "./ActionCreationForm"
 
 interface SwimlaneActionListProps {
   taskId: string
-  swimlanecolumnid: string
+  swimlanecolumn: SwimlaneColumn
   actionList: ActionType[]
 }
 
-const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlanecolumnid, actionList }) => {
+const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlanecolumn, actionList }) => {
   return (
     <>
-      <Droppable droppableId={swimlanecolumnid + "/" + taskId} type={"SWIMLANE" + "/" + taskId}>
+      <Droppable
+        droppableId={swimlanecolumn.swimlanecolumnid + "/" + taskId + "/" + swimlanecolumn.columnid}
+        type={"SWIMLANE" + "/" + taskId}
+      >
         {(provided, snapshot) => (
           <Box
             ref={provided.innerRef}
@@ -145,11 +148,8 @@ const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns, actions }) =
               <SwimlaneActionList
                 key={index}
                 taskId={task.ticketid}
-                swimlanecolumnid={swimlaneColumn.swimlanecolumnid}
-                actionList={actions.filter(
-                  (action) =>
-                    action.ticketid == task.ticketid && action.swimlanecolumnid == swimlaneColumn.swimlanecolumnid
-                )}
+                swimlanecolumn={swimlaneColumn}
+                actionList={actions.filter((action) => action.swimlanecolumnid == swimlaneColumn.swimlanecolumnid)}
               />
             ))}
         </Box>

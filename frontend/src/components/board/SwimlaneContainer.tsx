@@ -9,7 +9,7 @@ import {
   useGetActionsByColumnIdQuery,
   useGetTaskListByColumnIdQuery
 } from "@/state/apiSlice"
-import type { Column, SwimlaneColumn } from "@/types"
+import type { Column, SwimlaneColumn, Action } from "@/types"
 
 import Swimlane from "./Swimlane"
 
@@ -84,7 +84,8 @@ const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
   const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(column.columnid)
   const { data: taskList } = useGetTaskListByColumnIdQuery({ boardId: column.boardid, columnId: column.columnid })
   const tasks = taskList
-  const response = useGetActionsByColumnIdQuery(column.columnid)
+  const { data: actionList } = useGetActionsByColumnIdQuery(column.columnid)
+
   return (
     <>
       <Paper
@@ -134,9 +135,14 @@ const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
         </Box>
 
         {tasks && tasks.length ? (
-          isSuccess && response.isSuccess ? (
+          isSuccess && actionList ? (
             tasks.map((task) => (
-              <Swimlane key={task.ticketid} task={task} swimlaneColumns={swimlaneColumns} actions={response.data} />
+              <Swimlane
+                key={task.ticketid}
+                task={task}
+                swimlaneColumns={swimlaneColumns}
+                actions={actionList.filter((a) => a.ticketid == task.ticketid)}
+              />
             ))
           ) : (
             <Skeleton variant="rectangular" width="100%" height={tasks.length * 129} />
