@@ -195,7 +195,8 @@ const BoardContainer: React.FC = () => {
         await updateActions({
           taskId: destTicketId,
           swimlaneColumnId: destSwimLaneColumnId,
-          actions: newOrdered
+          actions: newOrdered,
+          columnid: destColumnId
         })
       }
       if (destination.droppableId !== source.droppableId) {
@@ -211,12 +212,14 @@ const BoardContainer: React.FC = () => {
           updateActions({
             taskId: destTicketId,
             swimlaneColumnId: destSwimLaneColumnId,
-            actions: nextDestinationActions ?? []
+            actions: nextDestinationActions ?? [],
+            columnid: destColumnId
           }),
           updateActions({
             taskId: sourceTicketId,
             swimlaneColumnId: sourceSwimlaneColumnId,
-            actions: nextSourceActions ?? []
+            actions: nextSourceActions ?? [],
+            columnid: sourceColumnId
           })
         ])
       }

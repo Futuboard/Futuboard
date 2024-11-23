@@ -119,6 +119,7 @@ const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
                 key={task.ticketid}
                 task={task}
                 swimlaneColumns={swimlaneColumns}
+                columnid={column.columnid}
                 actions={actions.filter((a) => a.ticketid == task.ticketid)}
               />
             ))

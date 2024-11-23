@@ -55,6 +55,7 @@ export type NewBoardFormImport = {
 }
 
 export type Action = {
+  columnid: string
   actionid: string
   ticketid: string
   swimlanecolumnid: string

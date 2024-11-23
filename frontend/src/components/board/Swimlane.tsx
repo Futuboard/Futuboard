@@ -47,7 +47,11 @@ const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlan
   )
 }
 
-const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }> = ({ taskId, swimlanecolumnid }) => {
+const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string; columnid: string }> = ({
+  taskId,
+  swimlanecolumnid,
+  columnid
+}) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [createAction] = usePostActionMutation()
 
@@ -62,6 +66,7 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }>
   const handleOnSubmit = async (data: { actionTitle: string; resetActionTitle: () => void }) => {
     const action: NewAction = {
       title: data.actionTitle,
+      columnid: columnid,
       actionid: getId(),
       ticketid: taskId,
       swimlanecolumnid,
@@ -108,13 +113,18 @@ interface SwimlaneProps {
   task: Task
   swimlaneColumns: SwimlaneColumn[]
   actions: ActionType[]
+  columnid: string
 }
 
-const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns, actions }) => {
+const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns, actions, columnid }) => {
   return (
     <Box sx={{ display: "flex" }}>
       {swimlaneColumns && (
-        <CreateActionButton taskId={task.ticketid} swimlanecolumnid={swimlaneColumns[0].swimlanecolumnid} />
+        <CreateActionButton
+          taskId={task.ticketid}
+          swimlanecolumnid={swimlaneColumns[0].swimlanecolumnid}
+          columnid={columnid}
+        />
       )}
       <Box
         sx={{
