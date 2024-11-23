@@ -30,7 +30,7 @@ const CreateBoardButton = () => {
     formData.append("file", data.file[0])
     formData.append("board", JSON.stringify(board))
 
-    await fetch(`${import.meta.env.VITE_DB_ADDRESS}/import/${board.id}/`, {
+    await fetch(`${import.meta.env.VITE_DB_ADDRESS}import/${board.id}/`, {
       method: "POST",
       body: formData
     })
