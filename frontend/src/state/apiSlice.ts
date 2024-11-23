@@ -1,4 +1,3 @@
-import { PatchCollection } from "@reduxjs/toolkit/dist/query/core/buildThunks"
 import { TagDescription, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 
 import {
@@ -157,36 +156,29 @@ export const boardsApi = createApi({
       invalidatesTags: () => invalidateRemoteCache(["Columns"])
     }),
 
-    //optimistclly updates column order
     updateColumnOrder: builder.mutation<Column[], { boardId: string; columns: Column[] }>({
       query: ({ boardId, columns }) => ({
         url: `boards/${boardId}/columns/`,
         method: "PUT",
         body: columns
       }),
-      async onQueryStarted(patchArgs: { boardId: string; columns: Column[] }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [{ type: "Columns", id: "LIST" }])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getColumnsByBoardId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getColumnsByBoardId", cache.originalArgs, () => {
-                return patchArgs.columns
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
+      //update optimistically
+      onQueryStarted({ columns }, apiActions) {
+        const invalidationTags: CacheInvalidationTag[] = [{ type: "Columns", id: "LIST" }]
+        updateCache(
+          "getColumnsByBoardId",
+          invalidationTags,
+          () => {
+            return columns
+          },
+          apiActions
+        )
 
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-        }
-      },
-      invalidatesTags: () => invalidateRemoteCache([{ type: "Columns", id: "LIST" }])
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(invalidationTags)
+          boardsApi.util.invalidateTags(invalidationTags)
+        })
+      }
     }),
 
     deleteColumn: builder.mutation<Column, { column: Column }>({
@@ -197,43 +189,34 @@ export const boardsApi = createApi({
       invalidatesTags: () => invalidateRemoteCache(["Columns"])
     }),
 
-    //optimistclly updates task list
     updateTaskListByColumnId: builder.mutation<Task[], { boardId: string; columnId: string; tasks: Task[] }>({
       query: ({ boardId, columnId, tasks }) => ({
         url: `boards/${boardId}/columns/${columnId}/tickets`,
         method: "PUT",
         body: tasks
       }),
+      //update optimistically
+      onQueryStarted({ columnId, tasks }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Columns", id: columnId }]
 
-      async onQueryStarted(patchArgs: { boardId: string; columnId: string; tasks: Task[] }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "Columns", id: patchArgs.columnId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getTaskListByColumnId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getTaskListByColumnId", cache.originalArgs, () => {
-                const updatedTasks = patchArgs.tasks.map((task) => ({
-                  ...task,
-                  columnid: patchArgs.columnId
-                }))
-                return updatedTasks
-              })
-            )
-            patchResults.push(patchResult)
-          }
+        updateCache(
+          "getTaskListByColumnId",
+          tagsToInvalidate,
+          () => {
+            const updatedTasks = tasks.map((task) => ({
+              ...task,
+              columnid: columnId
+            }))
+            return updatedTasks
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+          boardsApi.util.invalidateTags(tagsToInvalidate)
         })
-
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-        }
-      },
-      invalidatesTags: (_result, _error, { columnId }) => invalidateRemoteCache([{ type: "Columns", id: columnId }])
+      }
     }),
 
     getUsersByBoardId: builder.query<User[], string>({
@@ -273,6 +256,7 @@ export const boardsApi = createApi({
         method: "POST",
         body: { userid }
       }),
+      //update optimistically
       onQueryStarted({ ticketId, userid }, apiActions) {
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: ticketId },
@@ -322,6 +306,7 @@ export const boardsApi = createApi({
         method: "DELETE",
         body: { userid }
       }),
+      //update optimistically
       onQueryStarted({ ticketId, userid }, apiActions) {
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: ticketId },
@@ -368,6 +353,7 @@ export const boardsApi = createApi({
         method: "POST",
         body: { userid }
       }),
+      //update optimistically
       onQueryStarted({ actionId, userid }, apiActions) {
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: actionId },
@@ -417,6 +403,7 @@ export const boardsApi = createApi({
         method: "DELETE",
         body: { userid }
       }),
+      //update optimistically
       onQueryStarted({ actionId, userid }, apiActions) {
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: actionId },
@@ -523,7 +510,24 @@ export const boardsApi = createApi({
         method: "POST",
         body: action
       }),
-      invalidatesTags: () => invalidateRemoteCache([{ type: "Action", id: "LIST" }])
+      //update optimistically
+      onQueryStarted({ taskId, swimlaneColumnId, action }, apiActions) {
+        const invalidationTags: CacheInvalidationTag[] = [{ type: "Action", id: "LIST" }]
+        updateCache(
+          "getActionListByTaskIdAndSwimlaneColumnId",
+          [{ type: "ActionList", id: swimlaneColumnId + taskId }],
+          (draft) => {
+            const actions = draft as Action[]
+            actions.push({ ...action, swimlanecolumnid: swimlaneColumnId, ticketid: taskId, users: [] })
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(invalidationTags)
+          boardsApi.util.invalidateTags(invalidationTags)
+        })
+      }
     }),
 
     //update single action
