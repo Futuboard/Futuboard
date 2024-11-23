@@ -75,12 +75,15 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }>
   }
 
   const handleOnSubmit = async (data: { actionTitle: string; resetActionTitle: () => void }) => {
-    const actionObject: NewAction = {
+    const action: NewAction = {
       title: data.actionTitle,
-      actionid: getId()
+      actionid: getId(),
+      ticketid: taskId,
+      swimlanecolumnid,
+      order: 0
     }
 
-    await createAction({ taskId, swimlaneColumnId: swimlanecolumnid, action: actionObject })
+    await createAction({ action })
 
     data.resetActionTitle()
   }

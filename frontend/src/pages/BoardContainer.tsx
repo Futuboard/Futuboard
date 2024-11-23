@@ -174,8 +174,6 @@ const BoardContainer: React.FC = () => {
 
       const selectDestionationActions = selectActions(destColumnId)
 
-      const destinationColumnActions = selectDestionationActions(state).data
-
       const destinationActions =
         selectDestionationActions(state).data?.filter(
           (a) => a.ticketid == destTicketId && a.swimlanecolumnid == destSwimLaneColumnId
@@ -184,8 +182,6 @@ const BoardContainer: React.FC = () => {
       const [sourceSwimlaneColumnId, sourceTicketId, sourceColumnId] = source.droppableId.split("/")
 
       const selectSourceActions = selectActions(sourceColumnId)
-
-      const sourceColumnActions = selectSourceActions(state).data
 
       const sourceActions =
         selectSourceActions(state).data?.filter(
@@ -199,9 +195,7 @@ const BoardContainer: React.FC = () => {
         await updateActions({
           taskId: destTicketId,
           swimlaneColumnId: destSwimLaneColumnId,
-          columnId: destColumnId,
-          actions: newOrdered,
-          originalActions: destinationColumnActions ?? []
+          actions: newOrdered
         })
       }
       if (destination.droppableId !== source.droppableId) {
@@ -212,20 +206,17 @@ const BoardContainer: React.FC = () => {
         const nextDestinationActions = produce(destinationActions, (draft) => {
           draft?.splice(destination!.index, 0, sourceActions![source.index])
         })
+
         await Promise.all([
           updateActions({
             taskId: destTicketId,
             swimlaneColumnId: destSwimLaneColumnId,
-            columnId: destColumnId,
-            actions: nextDestinationActions ?? [],
-            originalActions: destinationColumnActions ?? []
+            actions: nextDestinationActions ?? []
           }),
           updateActions({
             taskId: sourceTicketId,
             swimlaneColumnId: sourceSwimlaneColumnId,
-            columnId: sourceColumnId,
-            actions: nextSourceActions ?? [],
-            originalActions: sourceColumnActions ?? []
+            actions: nextSourceActions ?? []
           })
         ])
       }

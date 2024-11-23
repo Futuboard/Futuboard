@@ -56,15 +56,15 @@ export type NewBoardFormImport = {
 
 export type Action = {
   actionid: string
-  ticketid?: string
-  swimlanecolumnid?: string
+  ticketid: string
+  swimlanecolumnid: string
   title: string
-  order?: number
-  creation_date?: string
+  order: number
+  creation_date: string
   users: UserWithoutTicketsOrActions[]
 }
 
-export type NewAction = Omit<Action, "users">
+export type NewAction = Omit<Action, "users" | "creation_date">
 
 export type SwimlaneColumn = {
   swimlanecolumnid: string
