@@ -503,7 +503,7 @@ export const boardsApi = createApi({
           invalidationTags,
           (draft) => {
             const actions = draft as Action[]
-            actions.push({ ...action, creation_date: new Date().toISOString(), users: [] })
+            actions.unshift({ ...action, creation_date: new Date().toISOString(), users: [] })
           },
           apiActions
         )
