@@ -28,15 +28,7 @@ import {
 
 const BoardContainer: React.FC = () => {
   const dispatch = useDispatch()
-  const { id = "default-id" } = useParams()
-
-  useEffect(() => {
-    dispatch(setBoardId(id))
-    webSocketContainer.connectToBoard(id)
-    webSocketContainer.onMessage((tags) => {
-      dispatch(boardsApi.util.invalidateTags(tags))
-    })
-  }, [id, dispatch])
+  const { id } = useParams()
 
   const [updateTaskList] = useUpdateTaskListByColumnIdMutation()
   const [updateColumns] = useUpdateColumnOrderMutation()
@@ -47,6 +39,29 @@ const BoardContainer: React.FC = () => {
   const [deleteUserFromAction] = useDeleteUserFromActionMutation()
   const [tryLogin] = useLoginMutation()
   const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
+  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "")
+
+  useEffect(() => {
+    if (!id) return
+    dispatch(setBoardId(id))
+    webSocketContainer.connectToBoard(id)
+    webSocketContainer.onMessage((tags) => {
+      dispatch(boardsApi.util.invalidateTags(tags))
+    })
+  }, [id, dispatch])
+
+  useEffect(() => {
+    if (!id) return
+    const inner = async () => {
+      await tryLogin({ boardId: id, password: "" })
+      setHasTriedEmptyPasswordLogin(true)
+    }
+    inner()
+  }, [id, tryLogin])
+
+  if (!id) {
+    return null
+  }
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
   const selectActions = boardsApi.endpoints.getActionsByColumnId.select
@@ -225,16 +240,6 @@ const BoardContainer: React.FC = () => {
       await updateColumns({ boardId: id, columns: newOrdered })
     }
   }
-
-  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id)
-
-  useEffect(() => {
-    const inner = async () => {
-      await tryLogin({ boardId: id, password: "" })
-      setHasTriedEmptyPasswordLogin(true)
-    }
-    inner()
-  }, [id, tryLogin])
 
   if (isLoading || !hasTriedEmptyPasswordLogin) {
     return null
