@@ -54,7 +54,11 @@ export type NewBoardFormImport = {
   file: FileList
 }
 
-export type NewBoardPassword = {
+export type BoardTitleChangeFormData = {
+  title: string
+}
+
+export type PasswordChangeFormData = {
   old_password: string
   new_password: string
   confirm_password: string

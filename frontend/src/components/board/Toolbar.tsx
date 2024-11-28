@@ -20,8 +20,8 @@ import { useParams } from "react-router-dom"
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation } from "@/state/apiSlice"
 
 import BoardDeletionComponent from "./BoardDeletionComponent"
-import BoardPasswordForm from "./BoardPasswordForm"
-import BoardTitleForm from "./BoardTitleForm"
+import BoardPasswordChangeForm from "./BoardPasswordChangeForm"
+import BoardTitleChangeForm from "./BoardTitleChangeForm"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
 import HomeButton from "./HomeButton"
@@ -230,12 +230,12 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
         <Box>
           <Dialog open={titleFormOpen} onClose={handleCloseTitleForm}>
             <DialogContent>
-              <BoardTitleForm title={title} onClose={handleCloseTitleForm} />
+              <BoardTitleChangeForm title={title} onClose={handleCloseTitleForm} />
             </DialogContent>
           </Dialog>
           <Dialog open={passwordFormOpen} onClose={handleClosePasswordForm}>
             <DialogContent>
-              <BoardPasswordForm onClose={handleClosePasswordForm} />
+              <BoardPasswordChangeForm onClose={handleClosePasswordForm} />
             </DialogContent>
           </Dialog>
         </Box>

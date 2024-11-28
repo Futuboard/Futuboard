@@ -7,11 +7,11 @@ import {
   Column,
   NewAction,
   NewTask,
-  NewBoardPassword,
   SwimlaneColumn,
   Task,
   User,
-  UserWithoutTicketsOrActions
+  UserWithoutTicketsOrActions,
+  PasswordChangeFormData
 } from "@/types"
 
 import { getAuth, setToken } from "./auth"
@@ -95,7 +95,7 @@ export const boardsApi = createApi({
       invalidatesTags: ["Boards"]
     }),
 
-    updateBoardPassword: builder.mutation<Board, { boardId: string; newPassword: NewBoardPassword }>({
+    updateBoardPassword: builder.mutation<Board, { boardId: string; newPassword: PasswordChangeFormData }>({
       query: ({ boardId, newPassword }) => ({
         url: `boards/${boardId}/password/`,
         method: "PUT",

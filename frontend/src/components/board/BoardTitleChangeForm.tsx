@@ -4,17 +4,14 @@ import { useForm } from "react-hook-form"
 import { useParams } from "react-router-dom"
 
 import { useUpdateBoardTitleMutation } from "@/state/apiSlice"
+import { BoardTitleChangeFormData } from "@/types"
 
-interface BoardTitleFormProps {
+interface BoardTitleChangeFormProps {
   title: string
   onClose: () => void
 }
 
-interface BoardTitleFormData {
-  title: string
-}
-
-const BoardTitleForm = ({ title, onClose }: BoardTitleFormProps) => {
+const BoardTitleChangeForm = ({ title, onClose }: BoardTitleChangeFormProps) => {
   const { id = "default-id" } = useParams()
   const [updateBoardName] = useUpdateBoardTitleMutation()
 
@@ -22,7 +19,7 @@ const BoardTitleForm = ({ title, onClose }: BoardTitleFormProps) => {
     register,
     handleSubmit,
     formState: { errors }
-  } = useForm<BoardTitleFormData>({
+  } = useForm<BoardTitleChangeFormData>({
     defaultValues: {
       title: title
     }
@@ -36,7 +33,7 @@ const BoardTitleForm = ({ title, onClose }: BoardTitleFormProps) => {
     }
   }, [])
 
-  const onSubmit = async (data: BoardTitleFormData) => {
+  const onSubmit = async (data: BoardTitleChangeFormData) => {
     try {
       await updateBoardName({ boardId: id, newName: data.title }).unwrap()
       onClose()
@@ -84,4 +81,4 @@ const BoardTitleForm = ({ title, onClose }: BoardTitleFormProps) => {
   )
 }
 
-export default BoardTitleForm
+export default BoardTitleChangeForm

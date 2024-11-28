@@ -4,18 +4,13 @@ import { useForm } from "react-hook-form"
 import { useParams } from "react-router-dom"
 
 import { useUpdateBoardPasswordMutation } from "@/state/apiSlice"
+import { PasswordChangeFormData } from "@/types"
 
-interface PasswordFormData {
-  old_password: string
-  new_password: string
-  confirm_password: string
-}
-
-interface BoardPasswordFormProps {
+interface BoardPasswordChangeFormProps {
   onClose: () => void
 }
 
-const BoardPasswordForm = ({ onClose }: BoardPasswordFormProps) => {
+const BoardPasswordChangeForm = ({ onClose }: BoardPasswordChangeFormProps) => {
   const { id = "default-id" } = useParams()
   const [updateBoardPassword] = useUpdateBoardPasswordMutation()
 
@@ -24,7 +19,7 @@ const BoardPasswordForm = ({ onClose }: BoardPasswordFormProps) => {
     handleSubmit,
     setError,
     formState: { errors }
-  } = useForm<PasswordFormData>()
+  } = useForm<PasswordChangeFormData>()
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -34,7 +29,7 @@ const BoardPasswordForm = ({ onClose }: BoardPasswordFormProps) => {
     }
   }, [])
 
-  const onSubmit = async (data: PasswordFormData) => {
+  const onSubmit = async (data: PasswordChangeFormData) => {
     if (data.new_password !== data.confirm_password) {
       setError("confirm_password", {
         type: "manual",
@@ -110,4 +105,4 @@ const BoardPasswordForm = ({ onClose }: BoardPasswordFormProps) => {
   )
 }
 
-export default BoardPasswordForm
+export default BoardPasswordChangeForm
