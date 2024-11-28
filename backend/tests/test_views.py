@@ -15,7 +15,7 @@ from .test_utils import addBoard, addColumn, addTicket, resetDB
 @pytest.mark.django_db
 def test_all_boards():
     """
-    Test the all_boards function in backend/futuboard/views/views.py
+    Test the all_boards function in backend/futuboard/views/boardViews.py
     Has two methods: GET and POST
         GET: Returns all boards
         POST: Creates a new board
@@ -45,10 +45,11 @@ def test_all_boards():
 @pytest.mark.django_db
 def test_board_by_id():
     """
-    Test the board_by_id function in backend/futuboard/views/views.py
-    Has two methods: GET and POST
+    Test the board_by_id function in backend/futuboard/views/boardViews.py
+    Has three methods: GET, POST and DELETE
         GET: Returns a board by id
         POST: Returns a success message if the password is correct
+        DELETE: Returns a success message if the board was deleted
     """
     api_client = APIClient()
     # Add 5 boards to the database
@@ -84,6 +85,22 @@ def test_board_by_id():
         assert data["boardid"] == str(boardids[i])
         assert data["title"] == "board" + str(i)
         assert response.status_code == 200
+    # Delete a board by id for all boards
+    for i in range(5):
+        response = api_client.delete(
+            reverse("board_by_id", args=[boardids[i]]), headers={"Authorization": f"Bearer {tokens[i]}"}
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["message"] == "Board deleted successfully"
+    # Verify boards are deleted
+    for i in range(5):
+        response = api_client.get(
+            reverse("board_by_id", args=[boardids[i]]), headers={"Authorization": f"Bearer {tokens[i]}"}
+        )
+        assert response.status_code == 404
+    # Ensure no boards are left in the database
+    assert md.Board.objects.count() == 0
     # Delete all boards
     md.Board.objects.all().delete()
 
@@ -242,7 +259,7 @@ def test_tickets_on_column():
 def test_update_ticket():
     """
     Test the update_ticket function in backend/futuboard/views/views.py
-    Has one method: PUT and DELETE
+    Has two methods: PUT and DELETE
         PUT: Updates a ticket
         DELETE: Deletes a ticket
     """
