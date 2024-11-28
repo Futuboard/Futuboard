@@ -82,7 +82,7 @@ def board_by_id(request, board_id):
 
 
 @api_view(["PUT"])
-def board_title(request, board_id):
+def update_board_title(request, board_id):
     try:
         token = get_token_from_request(request)
         if token is None:
@@ -111,7 +111,7 @@ def board_title(request, board_id):
 
 
 @api_view(["PUT"])
-def board_password(request, board_id):
+def update_board_password(request, board_id):
     try:
         token = get_token_from_request(request)
         if token is None:
@@ -131,7 +131,7 @@ def board_password(request, board_id):
         confirm_password = request.data["confirm_password"]
 
         if candidate_password != confirm_password:
-            return JsonResponse({"message": "Passwords do not match"}, status=403)
+            return JsonResponse({"message": "Passwords do not match"}, status=400)
 
         board.passwordhash = new_password(candidate_password)
         board.save()
