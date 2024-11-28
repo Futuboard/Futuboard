@@ -59,6 +59,10 @@ const BoardContainer: React.FC = () => {
     inner()
   }, [id, tryLogin])
 
+  useEffect(() => {
+    document.title = board?.title ? board?.title + " - Futuboard" : "Futuboard"
+  }, [board])
+
   if (!id) {
     return null
   }
