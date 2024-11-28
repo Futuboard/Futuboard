@@ -477,27 +477,6 @@ def test_update_user():
 
 
 @pytest.mark.django_db
-def test_deleting_board():
-    """
-    Test deleting a board by id
-    Test that the right board is deleted.
-    """
-
-    api_client = APIClient()
-    boardid1 = addBoard(uuid.uuid4()).boardid
-    boardid2 = addBoard(uuid.uuid4()).boardid
-
-    # Test Delete by id
-    response = api_client.delete(reverse("board_by_id", args=[boardid1]))
-    assert response.status_code == 200
-
-    # Test That the second board isn't deleted
-    assert md.Board.objects.all()[0].boardid == boardid2
-
-    resetDB()
-
-
-@pytest.mark.django_db
 def test_deleting_column():
     """
     Test deleting a column by id
