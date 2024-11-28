@@ -59,6 +59,10 @@ const BoardContainer: React.FC = () => {
     inner()
   }, [id, tryLogin])
 
+  useEffect(() => {
+    document.title=board?.title ? board?.title + ' - Futuboard' : "Futuboard";
+  }, [board])
+
   if (!id) {
     return null
   }
@@ -238,10 +242,6 @@ const BoardContainer: React.FC = () => {
   if (isLoading || !hasTriedEmptyPasswordLogin) {
     return null
   }
-
-  useEffect(() => {
-    document.title=board?.title || "Futuboard";
-  })
 
   if (isLoggedIn) {
     return (
