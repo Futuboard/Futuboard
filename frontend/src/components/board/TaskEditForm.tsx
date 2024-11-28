@@ -141,8 +141,6 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
                 {" "}
                 <b>{task.title}</b>
               </Typography>
-
-              <DeleteTaskButton task={task} />
             </Box>
             <Divider />
           </Grid>
@@ -235,11 +233,16 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
-            <Button type="submit" color="primary" variant="contained">
-              Save Changes
-            </Button>
-            <Button onClick={onCancel}>Cancel</Button>
+          <Grid item container spacing={4} xs={12}>
+            <Grid item xs={10}>
+              <Button type="submit" color="primary" variant="contained">
+                Save Changes
+              </Button>
+              <Button onClick={onCancel}>Cancel</Button>
+            </Grid>
+            <Grid item xs={1}>
+              <DeleteTaskButton task={task} />
+            </Grid>
           </Grid>
         </Grid>
       </form>
