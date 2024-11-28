@@ -43,3 +43,5 @@ db/
 # Cypress
 cypress/screenshots
 cypress/downloads
+
+tests/** 

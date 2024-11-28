@@ -12,10 +12,9 @@ import {
   Tooltip,
   Typography
 } from "@mui/material"
-import React, { useContext, useState } from "react"
+import React, { useState } from "react"
 import { useParams } from "react-router-dom"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation } from "@/state/apiSlice"
 
 import BoardDeletionComponent from "./BoardDeletionComponent"
@@ -32,7 +31,6 @@ interface FormData {
 }
 
 export const AddUserButton: React.FC = () => {
-  const sendMessage = useContext(WebsocketContext)
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const { id = "default-id" } = useParams()
   const [addUser] = usePostUserToBoardMutation()
@@ -47,9 +45,7 @@ export const AddUserButton: React.FC = () => {
 
   const handleOnSubmit = async (data: FormData) => {
     await addUser({ boardId: id, user: data })
-    if (sendMessage !== null) {
-      sendMessage("User added")
-    }
+
     setAnchorEl(null)
   }
 

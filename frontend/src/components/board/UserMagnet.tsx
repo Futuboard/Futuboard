@@ -1,24 +1,19 @@
 import { Delete } from "@mui/icons-material"
 import { Card, IconButton, Typography } from "@mui/material"
-import { useContext } from "react"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
-import { useDeleteUserRecursiveMutation } from "@/state/apiSlice"
-import { User } from "@/types"
+import { useDeleteUserMutation } from "@/state/apiSlice"
+import { UserWithoutTicketsOrActions } from "@/types"
 
 interface UserMagnetProps {
-  user: User
+  user: UserWithoutTicketsOrActions
   editable: boolean
 }
 
 const UserMagnet: React.FC<UserMagnetProps> = ({ user, editable }) => {
-  const [deleteUser] = useDeleteUserRecursiveMutation()
-  const sendMessage = useContext(WebsocketContext)
+  const [deleteUser] = useDeleteUserMutation()
+
   const handleDelete = async () => {
     await deleteUser({ userId: user.userid })
-    if (sendMessage !== null) {
-      sendMessage("User deleted")
-    }
   }
 
   return (
@@ -26,7 +21,7 @@ const UserMagnet: React.FC<UserMagnetProps> = ({ user, editable }) => {
       sx={{
         display: "flex",
         justifyContent: "center",
-        backgroundColor: editable ? "rgb(230,170,170)" : user.color || "rgb(230,247,206)",
+        backgroundColor: editable ? "rgb(230,170,170)" : "rgb(230,247,206)",
         alignItems: "center",
         margin: "4px",
         border: "solid 1px",

@@ -1,10 +1,45 @@
-import { PatchCollection } from "@reduxjs/toolkit/dist/query/core/buildThunks"
 import { TagDescription, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 
-import { Action, Board, Column, NewBoardPassword, SwimlaneColumn, Task, User } from "../types"
+import {
+  Action,
+  Board,
+  CacheInvalidationTag,
+  Column,
+  NewAction,
+  NewTask,
+  NewBoardPassword,
+  SwimlaneColumn,
+  Task,
+  User,
+  UserWithoutTicketsOrActions
+} from "@/types"
 
 import { getAuth, setToken } from "./auth"
 import { RootState } from "./store"
+import { webSocketContainer } from "./websocket"
+
+const invalidateRemoteCache = (tags: CacheInvalidationTag[]) => {
+  webSocketContainer.invalidateCacheOfOtherUsers(tags)
+  return tags
+}
+
+// TODO: type this better
+const updateCache = (
+  endpointName: Parameters<typeof boardsApi.util.updateQueryData>[0],
+  tagsToInvalidate: CacheInvalidationTag[],
+  updateFunction: Parameters<typeof boardsApi.util.updateQueryData>[2],
+  apiActions: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+  onCacheMiss?: () => void
+) => {
+  const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), tagsToInvalidate)
+  const cache = cacheList.find((cache) => cache.endpointName === endpointName)
+
+  if (cache) {
+    apiActions.dispatch(boardsApi.util.updateQueryData(endpointName, cache.originalArgs, updateFunction))
+  } else if (onCacheMiss) {
+    onCacheMiss()
+  }
+}
 
 //TODO: refactor
 export const boardsApi = createApi({
@@ -31,6 +66,7 @@ export const boardsApi = createApi({
       query: (boardId) => `boards/${boardId}/`,
       providesTags: ["Boards"]
     }),
+
     addBoard: builder.mutation<Board, Board>({
       query: (board) => {
         return {
@@ -39,15 +75,17 @@ export const boardsApi = createApi({
           body: board
         }
       },
-      invalidatesTags: ["Boards"]
+      invalidatesTags: () => invalidateRemoteCache(["Boards"])
     }),
+
     deleteBoard: builder.mutation<Board, string>({
       query: (boardId) => ({
         url: `boards/${boardId}/`,
         method: "DELETE"
       }),
-      invalidatesTags: ["Boards"]
+      invalidatesTags: () => invalidateRemoteCache(["Boards"])
     }),
+
     updateBoardTitle: builder.mutation<Board, { boardId: string; newName: string }>({
       query: ({ boardId, newName }) => ({
         url: `boards/${boardId}/title/`,
@@ -56,6 +94,7 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: ["Boards"]
     }),
+
     updateBoardPassword: builder.mutation<Board, { boardId: string; newPassword: NewBoardPassword }>({
       query: ({ boardId, newPassword }) => ({
         url: `boards/${boardId}/password/`,
@@ -64,20 +103,31 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: ["Boards"]
     }),
+
     getColumnsByBoardId: builder.query<Column[], string>({
       query: (boardid) => `boards/${boardid}/columns/`,
       providesTags: [{ type: "Columns", id: "LIST" }]
     }),
+
     getTaskListByColumnId: builder.query<Task[], { boardId: string; columnId: string }>({
       query: ({ boardId, columnId }) => {
         return `boards/${boardId}/columns/${columnId}/tickets`
       },
       providesTags: (result, _error, args) => {
-        const tags: TagDescription<"Ticket">[] = []
+        const tags: TagDescription<"Ticket" | "Users">[] = []
         if (result) {
           const tasks: Task[] = result
+          const taggedUsers: string[] = []
           tasks.forEach((task) => {
             tags.push({ type: "Ticket", id: task.ticketid })
+            tags.push({ type: "Users", id: task.ticketid })
+            task.users.forEach((user) => {
+              if (!taggedUsers.includes(user.userid)) {
+                tags.push({ type: "Users", id: user.userid })
+
+                taggedUsers.push(user.userid)
+              }
+            })
           })
         }
         return [{ type: "Columns", id: args.columnId }, ...tags]
@@ -90,32 +140,33 @@ export const boardsApi = createApi({
         method: "POST",
         body: column
       }),
-      invalidatesTags: ["Columns"]
+      invalidatesTags: () => invalidateRemoteCache(["Columns"])
     }),
 
-    addTask: builder.mutation<Task, { boardId: string; columnId: string; task: Task }>({
+    addTask: builder.mutation<Task, { boardId: string; columnId: string; task: NewTask }>({
       query: ({ boardId, columnId, task }) => ({
         url: `boards/${boardId}/columns/${columnId}/tickets`,
         method: "POST",
         body: task
       }),
-      invalidatesTags: (_result, _error, { columnId }) => [{ type: "Columns", id: columnId }]
+      invalidatesTags: (_result, _error, { columnId }) => invalidateRemoteCache([{ type: "Columns", id: columnId }])
     }),
 
-    updateTask: builder.mutation<Task, { task: Task }>({
+    updateTask: builder.mutation<Task, { task: NewTask }>({
       query: ({ task }) => ({
         url: `columns/${task.columnid}/tickets/${task.ticketid}/`,
         method: "PUT",
         body: task
       }),
-      invalidatesTags: (_result, _error, { task }) => [{ type: "Ticket", id: task.ticketid }]
+      invalidatesTags: (_result, _error, { task }) => invalidateRemoteCache([{ type: "Ticket", id: task.ticketid }])
     }),
+
     deleteTask: builder.mutation<Task, { task: Task }>({
       query: ({ task }) => ({
         url: `columns/${task.columnid}/tickets/${task.ticketid}/`,
         method: "DELETE"
       }),
-      invalidatesTags: (_result, _error, { task }) => [{ type: "Ticket", id: task.ticketid }]
+      invalidatesTags: (_result, _error, { task }) => invalidateRemoteCache([{ type: "Ticket", id: task.ticketid }])
     }),
 
     updateColumn: builder.mutation<Column, { column: Column; ticketIds?: string[] }>({
@@ -124,96 +175,86 @@ export const boardsApi = createApi({
         method: "PUT",
         body: { ...column, ticket_ids: ticketIds }
       }),
-      invalidatesTags: ["Columns"]
+      invalidatesTags: () => invalidateRemoteCache(["Columns"])
     }),
-    //optimistclly updates column order
+
     updateColumnOrder: builder.mutation<Column[], { boardId: string; columns: Column[] }>({
       query: ({ boardId, columns }) => ({
         url: `boards/${boardId}/columns/`,
         method: "PUT",
         body: columns
       }),
-      async onQueryStarted(patchArgs: { boardId: string; columns: Column[] }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [{ type: "Columns", id: "LIST" }])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getColumnsByBoardId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getColumnsByBoardId", cache.originalArgs, () => {
-                return patchArgs.columns
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
+      //update optimistically
+      onQueryStarted({ columns }, apiActions) {
+        const invalidationTags: CacheInvalidationTag[] = [{ type: "Columns", id: "LIST" }]
+        updateCache(
+          "getColumnsByBoardId",
+          invalidationTags,
+          () => {
+            return columns
+          },
+          apiActions
+        )
 
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Columns", id: "LIST" }]))
-        }
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(invalidationTags)
+          boardsApi.util.invalidateTags(invalidationTags)
+        })
       }
     }),
+
     deleteColumn: builder.mutation<Column, { column: Column }>({
       query: ({ column }) => ({
         url: `boards/${column.boardid}/columns/${column.columnid}/`,
         method: "DELETE"
       }),
-      invalidatesTags: ["Columns"]
+      invalidatesTags: () => invalidateRemoteCache(["Columns"])
     }),
-    //optimistclly updates task list
+
     updateTaskListByColumnId: builder.mutation<Task[], { boardId: string; columnId: string; tasks: Task[] }>({
       query: ({ boardId, columnId, tasks }) => ({
         url: `boards/${boardId}/columns/${columnId}/tickets`,
         method: "PUT",
         body: tasks
       }),
+      //update optimistically
+      onQueryStarted({ columnId, tasks }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Columns", id: columnId }]
 
-      async onQueryStarted(patchArgs: { boardId: string; columnId: string; tasks: Task[] }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "Columns", id: patchArgs.columnId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getTaskListByColumnId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getTaskListByColumnId", cache.originalArgs, () => {
-                const updatedTasks = patchArgs.tasks.map((task) => ({
-                  ...task,
-                  columnid: patchArgs.columnId
-                }))
-                return updatedTasks
-              })
-            )
-            patchResults.push(patchResult)
-          }
+        updateCache(
+          "getTaskListByColumnId",
+          tagsToInvalidate,
+          () => {
+            const updatedTasks = tasks.map((task) => ({
+              ...task,
+              columnid: columnId
+            }))
+            return updatedTasks
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+          boardsApi.util.invalidateTags(tagsToInvalidate)
         })
-
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Columns", id: patchArgs.columnId }]))
-        }
       }
     }),
+
     getUsersByBoardId: builder.query<User[], string>({
       query: (boardId) => `boards/${boardId}/users/`,
-      providesTags: [{ type: "Users", id: "USERLIST" }]
+      providesTags: [{ type: "Users", id: "ALL_USERS" }]
     }),
-    postUserToBoard: builder.mutation<User, { boardId: string; user: Omit<User, "userid"> }>({
+
+    postUserToBoard: builder.mutation<User, { boardId: string; user: Omit<UserWithoutTicketsOrActions, "userid"> }>({
       query: ({ boardId, user }) => ({
         url: `boards/${boardId}/users/`,
         method: "POST",
         body: user
       }),
-      invalidatesTags: [{ type: "Users", id: "USERLIST" }]
+      invalidatesTags: () => invalidateRemoteCache([{ type: "Users", id: "ALL_USERS" }])
     }),
+
     login: builder.mutation<{ success: boolean; token: string }, { boardId: string; password: string }>({
       query: ({ boardId, password }) => ({
         url: `boards/${boardId}/`,
@@ -230,268 +271,319 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: ["Boards"]
     }),
-    getUsersByTicketId: builder.query<User[], string>({
-      query: (ticketId) => `tickets/${ticketId}/users/`,
-      providesTags: (result, _error, args) => {
-        const tags: TagDescription<"Users">[] = []
-        if (result) {
-          const users: User[] = result
-          users.forEach((user) => {
-            tags.push({ type: "Users", id: user.userid })
-          })
-        }
-        return [{ type: "Users", id: args }, ...tags]
-      }
-    }),
-    getUsersByActionId: builder.query<User[], string>({
-      query: (actionId) => `actions/${actionId}/users/`,
-      providesTags: (result, _error, args) => {
-        const tags: TagDescription<"Users">[] = []
-        if (result) {
-          const users: User[] = result
-          users.forEach((user) => {
-            tags.push({ type: "Users", id: user.userid })
-          })
-        }
-        return [{ type: "Users", id: args }, ...tags]
-      }
-    }),
-    postUserToTicket: builder.mutation<User, { ticketId: string; user: User }>({
-      query: ({ ticketId, user }) => ({
+
+    postUserToTicket: builder.mutation<User, { ticketId: string; userid: string }>({
+      query: ({ ticketId, userid }) => ({
         url: `tickets/${ticketId}/users/`,
         method: "POST",
-        body: user
+        body: { userid }
       }),
-      invalidatesTags: (_result, _error, { ticketId }) => [{ type: "Users", id: ticketId }],
-      async onQueryStarted(patchArgs: { ticketId: string; user: User }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "Users", id: patchArgs.ticketId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getUsersByTicketId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getUsersByTicketId", cache.originalArgs, (oldData) => {
-                return [...oldData, { userid: "temp", name: patchArgs.user.name, color: patchArgs.user.color }]
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
+      //update optimistically
+      onQueryStarted({ ticketId, userid }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [
+          { type: "Users", id: ticketId },
+          { type: "Users", id: userid },
+          { type: "Users", id: "ALL_USERS" }
+        ]
 
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Users", id: patchArgs.ticketId }]))
-        }
+        let userName = ""
+
+        updateCache(
+          "getUsersByBoardId",
+          tagsToInvalidate,
+          (draft) => {
+            const users = draft as User[]
+            const user = users.find((user) => user.userid === userid)
+            if (user) {
+              user.tickets.push(ticketId)
+              userName = user.name
+            }
+          },
+          apiActions
+        )
+
+        updateCache(
+          "getTaskListByColumnId",
+          tagsToInvalidate,
+          (draft) => {
+            const tasks = draft as Task[]
+            const task = tasks.find((task) => task.ticketid === ticketId)
+            if (task) {
+              task.users.push({ userid, name: userName })
+            }
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+          boardsApi.util.invalidateTags(tagsToInvalidate)
+        })
       }
     }),
-    postUserToAction: builder.mutation<User, { actionId: string; user: User }>({
-      query: ({ actionId, user }) => ({
+
+    deleteUserFromTicket: builder.mutation<User, { ticketId: string; userid: string }>({
+      query: ({ ticketId, userid }) => ({
+        url: `tickets/${ticketId}/users/`,
+        method: "DELETE",
+        body: { userid }
+      }),
+      //update optimistically
+      onQueryStarted({ ticketId, userid }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [
+          { type: "Users", id: ticketId },
+          { type: "Users", id: userid },
+          { type: "Users", id: "ALL_USERS" }
+        ]
+
+        updateCache(
+          "getUsersByBoardId",
+          tagsToInvalidate,
+          (draft) => {
+            const users = draft as User[]
+            const user = users.find((user) => user.userid === userid)
+            if (user) {
+              user.tickets.splice(user.tickets.indexOf(ticketId), 1)
+            }
+          },
+          apiActions
+        )
+
+        updateCache(
+          "getTaskListByColumnId",
+          tagsToInvalidate,
+          (draft) => {
+            const tasks = draft as Task[]
+            const task = tasks.find((task) => task.ticketid === ticketId)
+            if (task) {
+              task.users = task.users.filter((user) => user.userid !== userid)
+            }
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+          boardsApi.util.invalidateTags(tagsToInvalidate)
+        })
+      }
+    }),
+
+    postUserToAction: builder.mutation<User, { actionId: string; userid: string }>({
+      query: ({ actionId, userid }) => ({
         url: `actions/${actionId}/users/`,
         method: "POST",
-        body: user
+        body: { userid }
       }),
-      //optimistically updates the user list, however since the new instance of the user gets its id from the server, the optimistically
-      //updated user will have a temporary id, which will be replaced by the server id when the query is fulfilled
-      //this can lead to problems if one tries to drag the user before the query is fulfilled
-      async onQueryStarted(patchArgs: { actionId: string; user: User }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "Users", id: patchArgs.actionId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getUsersByActionId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getUsersByActionId", cache.originalArgs, (oldData) => {
-                return [...oldData, { userid: "temp", name: patchArgs.user.name, color: patchArgs.user.color }]
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
+      //update optimistically
+      onQueryStarted({ actionId, userid }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [
+          { type: "Users", id: actionId },
+          { type: "Users", id: userid },
+          { type: "Users", id: "ALL_USERS" }
+        ]
 
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Users", id: patchArgs.actionId }]))
-        }
-      },
-      invalidatesTags: (_result, _error, { actionId }) => [{ type: "Users", id: actionId }]
+        let userName = ""
+
+        updateCache(
+          "getUsersByBoardId",
+          tagsToInvalidate,
+          (draft) => {
+            const users = draft as User[]
+            const user = users.find((user) => user.userid === userid)
+            if (user) {
+              user.actions.push(actionId)
+              userName = user.name
+            }
+          },
+          apiActions
+        )
+
+        updateCache(
+          "getActionsByColumnId",
+          tagsToInvalidate,
+          (draft) => {
+            const actions = draft as Action[]
+            const action = actions.find((action) => action.actionid === actionId)
+            if (action) {
+              action.users.push({ userid, name: userName })
+            }
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+          boardsApi.util.invalidateTags(tagsToInvalidate)
+        })
+      }
     }),
+
+    deleteUserFromAction: builder.mutation<User, { actionId: string; userid: string }>({
+      query: ({ actionId, userid }) => ({
+        url: `actions/${actionId}/users/`,
+        method: "DELETE",
+        body: { userid }
+      }),
+      //update optimistically
+      onQueryStarted({ actionId, userid }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [
+          { type: "Users", id: actionId },
+          { type: "Users", id: userid },
+          { type: "Users", id: "ALL_USERS" }
+        ]
+
+        updateCache(
+          "getUsersByBoardId",
+          tagsToInvalidate,
+          (draft) => {
+            const users = draft as User[]
+            const user = users.find((user) => user.userid === userid)
+            if (user) {
+              user.actions.splice(user.actions.indexOf(actionId), 1)
+            }
+          },
+          apiActions
+        )
+
+        updateCache(
+          "getActionsByColumnId",
+          tagsToInvalidate,
+          (draft) => {
+            const actions = draft as Action[]
+            const action = actions.find((action) => action.actionid === actionId)
+            if (action) {
+              action.users = action.users.filter((action) => action.userid !== userid)
+            }
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+          boardsApi.util.invalidateTags(tagsToInvalidate)
+        })
+      }
+    }),
+
     deleteUser: builder.mutation<User, { userId: string }>({
       query: ({ userId }) => ({
         url: `users/${userId}`,
         method: "DELETE"
       }),
-      invalidatesTags: [{ type: "Users", id: "USERLIST" }]
+      invalidatesTags: () => invalidateRemoteCache(["Users"])
     }),
-    deleteUserRecursive: builder.mutation<User, { userId: string }>({
-      query: ({ userId }) => ({
-        url: `users/${userId}/delete_recursive/`,
-        method: "DELETE"
-      }),
-      invalidatesTags: ["Users"]
-    }),
-    updateUserListByTicketId: builder.mutation<User[], { ticketId: string; users: User[] }>({
-      query: ({ ticketId, users }) => ({
-        url: `tickets/${ticketId}/users/`,
-        method: "PUT",
-        body: users
-      }),
-      async onQueryStarted(patchArgs: { ticketId: string; users: User[] }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "Users", id: patchArgs.ticketId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getUsersByTicketId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getUsersByTicketId", cache.originalArgs, () => {
-                const updatedUsers = patchArgs.users.map((user) => ({
-                  ...user
-                }))
-                return updatedUsers
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
 
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Users", id: patchArgs.ticketId }]))
-        }
-      }
-    }),
-    updateUserListByActionId: builder.mutation<User[], { actionId: string; users: User[] }>({
-      query: ({ actionId, users }) => ({
-        url: `actions/${actionId}/users/`,
-        method: "PUT",
-        body: users
-      }),
-      async onQueryStarted(patchArgs: { actionId: string; users: User[] }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "Users", id: patchArgs.actionId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getUsersByActionId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getUsersByActionId", cache.originalArgs, () => {
-                const updatedUsers = patchArgs.users.map((user) => ({
-                  ...user
-                }))
-                return updatedUsers
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
-
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Users", id: patchArgs.actionId }]))
-        }
-      }
-    }),
     getSwimlaneColumnsByColumnId: builder.query<SwimlaneColumn[], string>({
       query: (columnId) => `columns/${columnId}/swimlanecolumns/`,
       providesTags: [{ type: "SwimlaneColumn", id: "LIST" }]
     }),
+
     updateSwimlaneColumn: builder.mutation<SwimlaneColumn, { swimlaneColumn: SwimlaneColumn }>({
       query: ({ swimlaneColumn }) => ({
         url: `swimlanecolumns/${swimlaneColumn.swimlanecolumnid}/`,
         method: "PUT",
         body: swimlaneColumn
       }),
-      invalidatesTags: [{ type: "SwimlaneColumn", id: "LIST" }]
+      invalidatesTags: () => invalidateRemoteCache([{ type: "SwimlaneColumn", id: "LIST" }])
     }),
 
-    getActionListByTaskIdAndSwimlaneColumnId: builder.query<Action[], { taskId: string; swimlaneColumnId: string }>({
-      query: ({ taskId, swimlaneColumnId }) => `${swimlaneColumnId}/${taskId}/actions/`,
-      providesTags: (result, _error, args) => {
-        const tags: TagDescription<"Action">[] = []
+    getActionsByColumnId: builder.query<Action[], string>({
+      query: (columnId) => `/columns/${columnId}/actions/`,
+      providesTags: (result, _error, columnid) => {
+        const tags: CacheInvalidationTag[] = []
+        tags.push({ type: "Action", id: columnid })
         if (result) {
           const actions: Action[] = result
+          const taggedUsers: string[] = []
           actions.forEach((action) => {
             tags.push({ type: "Action", id: action.actionid })
+            tags.push({ type: "Users", id: action.actionid })
+            action.users.forEach((user) => {
+              if (!taggedUsers.includes(user.userid)) {
+                tags.push({ type: "Users", id: user.userid })
+                taggedUsers.push(user.userid)
+              }
+            })
           })
         }
-        return [
-          { type: "ActionList", id: args.swimlaneColumnId + args.taskId },
-          { type: "Action", id: "LIST" },
-          ...tags
-        ]
+        return tags
       }
     }),
-    postAction: builder.mutation<Action, { taskId: string; swimlaneColumnId: string; action: Action }>({
-      query: ({ taskId, swimlaneColumnId, action }) => ({
-        url: `${swimlaneColumnId}/${taskId}/actions/`,
+
+    postAction: builder.mutation<Action, { action: NewAction }>({
+      query: ({ action }) => ({
+        url: `${action.swimlanecolumnid}/${action.ticketid}/actions/`,
         method: "POST",
         body: action
       }),
-      invalidatesTags: [{ type: "Action", id: "LIST" }]
+      //update optimistically
+      onQueryStarted({ action }, apiActions) {
+        const invalidationTags: CacheInvalidationTag[] = [{ type: "Action", id: action.columnid }]
+        updateCache(
+          "getActionsByColumnId",
+          invalidationTags,
+          (draft) => {
+            const actions = draft as Action[]
+            actions.unshift({ ...action, creation_date: new Date().toISOString(), users: [] })
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(invalidationTags)
+          boardsApi.util.invalidateTags(invalidationTags)
+        })
+      }
     }),
+
     //update single action
-    updateAction: builder.mutation<Action, { action: Action }>({
+    updateAction: builder.mutation<Action, { action: NewAction }>({
       query: ({ action }) => ({
         url: `actions/${action.actionid}/`,
         method: "PUT",
         body: action
       }),
-      invalidatesTags: (_result, _error, { action }) => [{ type: "Action", id: action.actionid }]
+      invalidatesTags: (result) => invalidateRemoteCache([{ type: "Action", id: result?.columnid }])
     }),
-    //optimistclly updates swimlane action list
-    updateActionList: builder.mutation<Action[], { taskId: string; swimlaneColumnId: string; actions: Action[] }>({
+
+    // update action order
+    updateActionList: builder.mutation<
+      Action[],
+      { columnid: string; taskId: string; swimlaneColumnId: string; actions: Action[] }
+    >({
       query: ({ taskId, swimlaneColumnId, actions }) => ({
         url: `${swimlaneColumnId}/${taskId}/actions/`,
         method: "PUT",
         body: actions
       }),
-      async onQueryStarted(patchArgs: { taskId: string; swimlaneColumnId: string; actions: Action[] }, apiActions) {
-        const cacheList = boardsApi.util.selectInvalidatedBy(apiActions.getState(), [
-          { type: "ActionList", id: patchArgs.swimlaneColumnId + patchArgs.taskId }
-        ])
-        const patchResults: PatchCollection[] = []
-        cacheList.forEach((cache) => {
-          if (cache.endpointName === "getActionListByTaskIdAndSwimlaneColumnId") {
-            const patchResult = apiActions.dispatch(
-              boardsApi.util.updateQueryData("getActionListByTaskIdAndSwimlaneColumnId", cache.originalArgs, () => {
-                const updatedActions = patchArgs.actions.map((action) => ({
-                  ...action,
-                  swimlanecolumnid: patchArgs.swimlaneColumnId,
-                  ticketid: patchArgs.taskId
-                }))
-                return updatedActions
-              })
-            )
-            patchResults.push(patchResult)
-          }
-        })
+      //update optimistically
+      onQueryStarted({ columnid, swimlaneColumnId, actions: newActions }, apiActions) {
+        const invalidationTags: CacheInvalidationTag[] = [{ type: "Action", id: columnid }]
+        updateCache(
+          "getActionsByColumnId",
+          invalidationTags,
+          (draft) => {
+            const oldActions = draft as Action[]
 
-        try {
-          await apiActions.queryFulfilled
-        } catch {
-          patchResults.forEach((patchResult) => {
-            patchResult.undo()
-          })
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Action", id: "LIST" }]))
-        }
+            const oldActionsWithoutNewActions = oldActions.filter(
+              (oldAction) => !newActions.some((newAction) => newAction.actionid === oldAction.actionid)
+            )
+
+            const newActionsWithCorrectIds = newActions.map((newAction) => ({
+              ...newAction,
+              swimlanecolumnid: swimlaneColumnId
+            }))
+
+            return [...oldActionsWithoutNewActions, ...newActionsWithCorrectIds]
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(invalidationTags)
+          boardsApi.util.invalidateTags(invalidationTags)
+        })
       }
     })
   })
@@ -516,18 +608,15 @@ export const {
   useLoginMutation,
   useUpdateTaskListByColumnIdMutation,
   usePostUserToBoardMutation,
-  useGetUsersByTicketIdQuery,
   usePostUserToTicketMutation,
-  useUpdateUserListByTicketIdMutation,
   useDeleteUserMutation,
-  useDeleteUserRecursiveMutation,
   useGetSwimlaneColumnsByColumnIdQuery,
   useUpdateSwimlaneColumnMutation,
-  useGetActionListByTaskIdAndSwimlaneColumnIdQuery,
+  useGetActionsByColumnIdQuery,
   usePostActionMutation,
   useUpdateActionMutation,
   useUpdateActionListMutation,
-  useGetUsersByActionIdQuery,
   usePostUserToActionMutation,
-  useUpdateUserListByActionIdMutation
+  useDeleteUserFromActionMutation,
+  useDeleteUserFromTicketMutation
 } = boardsApi

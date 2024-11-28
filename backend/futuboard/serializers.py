@@ -5,7 +5,7 @@ from rest_framework import serializers
 class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
-        fields = ["boardid", "description", "title", "creator", "creation_date"]
+        fields = ["boardid", "description", "title", "creation_date"]
 
 
 class ColumnSerializer(serializers.ModelSerializer):
@@ -15,7 +15,6 @@ class ColumnSerializer(serializers.ModelSerializer):
             "columnid",
             "boardid",
             "wip_limit",
-            "color",
             "description",
             "title",
             "ordernum",
@@ -25,7 +24,21 @@ class ColumnSerializer(serializers.ModelSerializer):
         ]
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["userid", "name", "actions", "tickets"]
+
+
+class UserSerializerWithoutActionsOrTickets(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["userid", "name"]
+
+
 class TicketSerializer(serializers.ModelSerializer):
+    users = UserSerializerWithoutActionsOrTickets(many=True, read_only=True, source="user_set")
+
     class Meta:
         model = Ticket
         fields = [
@@ -39,22 +52,19 @@ class TicketSerializer(serializers.ModelSerializer):
             "order",
             "creation_date",
             "cornernote",
+            "users",
         ]
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["userid", "name"]
 
 
 class SwimlaneColumnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Swimlanecolumn
-        fields = ["swimlanecolumnid", "columnid", "color", "title", "ordernum"]
+        fields = ["swimlanecolumnid", "columnid", "title", "ordernum"]
 
 
 class ActionSerializer(serializers.ModelSerializer):
+    users = UserSerializerWithoutActionsOrTickets(many=True, read_only=True, source="user_set")
+
     class Meta:
         model = Action
-        fields = ["actionid", "ticketid", "swimlanecolumnid", "title", "color", "order", "creation_date"]
+        fields = ["actionid", "ticketid", "swimlanecolumnid", "title", "order", "creation_date", "users"]
