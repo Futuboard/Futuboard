@@ -35,7 +35,7 @@ const BoardTitleChangeForm = ({ title, onClose }: BoardTitleChangeFormProps) => 
 
   const onSubmit = async (data: BoardTitleChangeFormData) => {
     try {
-      await updateBoardName({ boardId: id, newName: data.title }).unwrap()
+      await updateBoardName({ boardId: id, newTitle: data.title }).unwrap()
       onClose()
     } catch (error) {
       console.error("Failed to change board name:", error)

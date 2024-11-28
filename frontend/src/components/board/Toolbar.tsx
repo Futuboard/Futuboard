@@ -218,7 +218,7 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
             </MenuItem>
             <MenuItem onClick={handleOpenPasswordForm} sx={{ py: 1 }}>
               <EnhancedEncryption sx={{ fontSize: "1rem", mr: 1 }} />
-              <Typography variant="body2">Edit Board Password</Typography>
+              <Typography variant="body2">Change Board Password</Typography>
             </MenuItem>
             <MenuItem onClick={handleExportAndClose} sx={{ py: 1 }}>
               <Download sx={{ fontSize: "1rem", mr: 1 }} />

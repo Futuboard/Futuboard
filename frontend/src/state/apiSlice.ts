@@ -86,11 +86,11 @@ export const boardsApi = createApi({
       invalidatesTags: () => invalidateRemoteCache(["Boards"])
     }),
 
-    updateBoardTitle: builder.mutation<Board, { boardId: string; newName: string }>({
-      query: ({ boardId, newName }) => ({
+    updateBoardTitle: builder.mutation<Board, { boardId: string; newTitle: string }>({
+      query: ({ boardId, newTitle }) => ({
         url: `boards/${boardId}/title/`,
         method: "PUT",
-        body: { title: newName }
+        body: { title: newTitle }
       }),
       invalidatesTags: ["Boards"]
     }),
