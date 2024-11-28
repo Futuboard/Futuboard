@@ -54,7 +54,7 @@ const BoardTitleForm = ({ title, onClose }: BoardTitleFormProps) => {
         <Grid item xs={12}>
           <TextField
             inputRef={inputRef}
-            size="small"
+            spellCheck={false}
             helperText={errors.title?.message}
             error={Boolean(errors.title)}
             {...register("title", {

@@ -22,6 +22,7 @@ const BoardPasswordForm = ({ onClose }: BoardPasswordFormProps) => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors }
   } = useForm<PasswordFormData>()
 
@@ -34,17 +35,39 @@ const BoardPasswordForm = ({ onClose }: BoardPasswordFormProps) => {
   }, [])
 
   const onSubmit = async (data: PasswordFormData) => {
+    if (data.new_password !== data.confirm_password) {
+      setError("confirm_password", {
+        type: "manual",
+        message: "New password and confirm password do not match"
+      })
+      return
+    }
+
     try {
       await updateBoardPassword({ boardId: id, newPassword: data }).unwrap()
       onClose()
-    } catch (error) {
-      console.error("Failed to change password:", error)
+    } catch (error: unknown) {
+      if (typeof error === "object" && error !== null && "data" in error) {
+        const apiError = error as { data?: { message?: string } }
+        const errorMessage = apiError.data?.message || "An unexpected error occurred"
+
+        if (errorMessage === "Wrong old password") {
+          setError("old_password", {
+            type: "manual",
+            message: "The old password is incorrect"
+          })
+        } else {
+          console.error("Failed to change password:", errorMessage)
+        }
+      } else {
+        console.error("Unknown error:", error)
+      }
     }
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={2} height="360px" width="250px">
+      <Grid container spacing={2} height="400px" width="250px">
         <Grid item>
           <Typography variant="h6">Enter a New Password</Typography>
         </Grid>
