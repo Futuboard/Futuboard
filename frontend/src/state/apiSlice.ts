@@ -10,7 +10,8 @@ import {
   SwimlaneColumn,
   Task,
   User,
-  UserWithoutTicketsOrActions
+  UserWithoutTicketsOrActions,
+  PasswordChangeFormData
 } from "@/types"
 
 import { getAuth, setToken } from "./auth"
@@ -83,6 +84,24 @@ export const boardsApi = createApi({
         method: "DELETE"
       }),
       invalidatesTags: () => invalidateRemoteCache(["Boards"])
+    }),
+
+    updateBoardTitle: builder.mutation<Board, { boardId: string; newTitle: string }>({
+      query: ({ boardId, newTitle }) => ({
+        url: `boards/${boardId}/title/`,
+        method: "PUT",
+        body: { title: newTitle }
+      }),
+      invalidatesTags: ["Boards"]
+    }),
+
+    updateBoardPassword: builder.mutation<Board, { boardId: string; newPassword: PasswordChangeFormData }>({
+      query: ({ boardId, newPassword }) => ({
+        url: `boards/${boardId}/password/`,
+        method: "PUT",
+        body: newPassword
+      }),
+      invalidatesTags: ["Boards"]
     }),
 
     getColumnsByBoardId: builder.query<Column[], string>({
@@ -575,6 +594,8 @@ export const {
   useGetBoardQuery,
   useAddBoardMutation,
   useDeleteBoardMutation,
+  useUpdateBoardTitleMutation,
+  useUpdateBoardPasswordMutation,
   useGetColumnsByBoardIdQuery,
   useGetTaskListByColumnIdQuery,
   useAddColumnMutation,
