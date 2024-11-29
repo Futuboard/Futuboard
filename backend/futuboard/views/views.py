@@ -89,11 +89,12 @@ def tickets_on_column(request, board_id, column_id):
             cornernote=request.data["cornernote"] if "cornernote" in request.data else "",
         )
 
-        new_ticket.save()
         same_column_tickets = Ticket.objects.filter(columnid=column_id)
         for ticket in same_column_tickets:
             ticket.order += 1
             ticket.save()
+
+        new_ticket.save()
 
         serializer = TicketSerializer(new_ticket)
         return JsonResponse(serializer.data, safe=False)
