@@ -16,7 +16,7 @@
     "puppeteer-cluster": "^0.24.0"
   },
   "devDependencies": {
-    "tsx": "^4.19.2",
+    "prettier": "^3.4.1",
     "typescript": "^5.7.2"
   }
 }

@@ -20,7 +20,7 @@ Cypress.Commands.add("createColumn", ({ title }) => {
 })
 
 Cypress.Commands.add("createTask", ({ title, size, description, cornerNote }) => {
-  cy.get('button[aria-label="add task"]').click()
+  cy.get('button[aria-label="add task"]').first().click()
   cy.get('textarea[name="taskTitle"]').type(title)
   cy.get('input[name="size"]').type(size)
   cy.get('textarea[name="description"]').type(description)

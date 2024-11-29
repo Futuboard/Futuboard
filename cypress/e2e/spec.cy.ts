@@ -1,5 +1,3 @@
-import { Cluster } from "puppeteer-cluster"
-
 beforeEach(() => {
   cy.visit("http://localhost:5173")
 })
@@ -109,7 +107,7 @@ describe("In a board", () => {
 
     const date = new Date()
     const fileName = `Project Alpha-${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}.csv`
-    const filePath = `cypress/downloads/${fileName}`
+    const filePath = `downloads/${fileName}`
 
     cy.readFile(filePath).should("exist")
 
@@ -146,20 +144,31 @@ describe("In a board", () => {
     cy.contains("Antonio").should("not.exist")
     cy.contains("Create board")
   })
-})
 
-it.only("test", () => {
-  cy.createBoard()
-  cy.loginToBoard("alpha123")
+  it("can work with multiple users at the same time", () => {
+    // Test that updates from other users are responsive
 
-  const concurrentUsers = 5
+    // Only testing with 5 concurrent users, because all browser are running on the same machine.
+    // With more users, test becomes flaky.
+    const concurrentUsers = 5
 
-  cy.url().then(url => {
-    cy.exec(`npx tsx stress-test.ts ${url} ${concurrentUsers}`).then((result) => {
+    cy.url().then((url) => {
+      cy.task("stress-test", { boardUrl: url, concurrentUsers })
     })
-  })
 
-  for(let i = 0; i < concurrentUsers; i++) {
-    cy.contains(`To Do (${i})`)
-  }
+    for (let i = 0; i < concurrentUsers; i++) {
+      cy.contains(`To Do (${i})`)
+      cy.contains(`Card (${i})`)
+      cy.contains(`Corner Note (${i})`)
+    }
+
+    // Test own updates are responsive, when board in use
+
+    cy.createColumn(otherColumn)
+    cy.contains("Something else")
+
+    cy.createTask(otherTask)
+    cy.contains("Research Competitors")
+    cy.contains("Normal")
+  })
 })
