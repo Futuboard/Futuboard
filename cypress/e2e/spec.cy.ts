@@ -1,3 +1,5 @@
+import { Cluster } from "puppeteer-cluster"
+
 beforeEach(() => {
   cy.visit("http://localhost:5173")
 })
@@ -85,9 +87,9 @@ describe("In a board", () => {
   })
 
   it("can add users", () => {
-    cy.createUser({ name: "Antonio", buttoIndex: 0 })
-    cy.createUser({ name: "Samuli", buttoIndex: 0 })
-    cy.createUser({ name: "Alex", buttoIndex: 1 })
+    cy.createUser({ name: "Antonio", buttonIndex: 0 })
+    cy.createUser({ name: "Samuli", buttonIndex: 0 })
+    cy.createUser({ name: "Alex", buttonIndex: 1 })
 
     cy.contains("Antonio")
     cy.contains("Samuli")
@@ -99,8 +101,8 @@ describe("In a board", () => {
     cy.createTask(defaultTask)
     cy.createTask(otherTask)
     cy.createColumn(otherColumn)
-    cy.createUser({ name: "Antonio", buttoIndex: 0 })
-    cy.createUser({ name: "Samuli", buttoIndex: 0 })
+    cy.createUser({ name: "Antonio", buttonIndex: 0 })
+    cy.createUser({ name: "Samuli", buttonIndex: 0 })
 
     cy.get('[data-testid="MoreVertIcon"]').click()
     cy.get('[data-testid="DownloadIcon"]').click()
@@ -131,7 +133,7 @@ describe("In a board", () => {
 
   it("can delete a board", () => {
     cy.createColumn(defaultColumn)
-    cy.createUser({ name: "Antonio", buttoIndex: 0 })
+    cy.createUser({ name: "Antonio", buttonIndex: 0 })
     cy.createTask(defaultTask)
 
     cy.get('[data-testid="MoreVertIcon"]').click()
@@ -144,4 +146,20 @@ describe("In a board", () => {
     cy.contains("Antonio").should("not.exist")
     cy.contains("Create board")
   })
+})
+
+it.only("test", () => {
+  cy.createBoard()
+  cy.loginToBoard("alpha123")
+
+  const concurrentUsers = 5
+
+  cy.url().then(url => {
+    cy.exec(`npx tsx stress-test.ts ${url} ${concurrentUsers}`).then((result) => {
+    })
+  })
+
+  for(let i = 0; i < concurrentUsers; i++) {
+    cy.contains(`To Do (${i})`)
+  }
 })

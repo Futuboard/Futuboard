@@ -37,8 +37,8 @@ Cypress.Commands.add("editTask", ({ title, size, description, cornerNote }) => {
   cy.get("button").contains("Save Changes").click()
 })
 
-Cypress.Commands.add("createUser", ({ name, buttoIndex }) => {
-  cy.get('button[aria-label="Add User"]').eq(buttoIndex).click()
+Cypress.Commands.add("createUser", ({ name, buttonIndex }) => {
+  cy.get('button[aria-label="Add User"]').eq(buttonIndex).click()
   cy.get('input[name="name"]').clear().type(name)
   cy.get("button").contains("Submit").click()
 })
