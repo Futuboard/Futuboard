@@ -101,11 +101,11 @@ const BoardDeletionComponent = () => {
           </Box>
         ) : (
           <Box>
-            <DialogTitle>Enter password</DialogTitle>
+            <DialogTitle>Enter Password</DialogTitle>
             <DialogContent>
               <Stack spacing={2}>
                 <Typography variant="body2" color="textSecondary">
-                  Please Enter board password.
+                  Please enter board password.
                 </Typography>
                 <Stack direction="row" spacing={2}>
                   <TextField

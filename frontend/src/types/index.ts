@@ -29,13 +29,19 @@ export type Task = {
   caretakers?: User[]
   size?: number
   columnid: string
+  users: UserWithoutTicketsOrActions[]
 }
+
+export type NewTask = Omit<Task, "users">
 
 export type User = {
   userid: string
   name: string
-  color?: string
+  tickets: string[]
+  actions: string[]
 }
+
+export type UserWithoutTicketsOrActions = Omit<User, "tickets" | "actions">
 
 export type NewBoardFormData = {
   title: string
@@ -48,15 +54,28 @@ export type NewBoardFormImport = {
   file: FileList
 }
 
-export type Action = {
-  actionid: string
-  ticketid?: string
-  swimlanecolumnid?: string
+export type BoardTitleChangeFormData = {
   title: string
-  color?: string
-  order?: number
-  creation_date?: string
 }
+
+export type PasswordChangeFormData = {
+  old_password: string
+  new_password: string
+  confirm_password: string
+}
+
+export type Action = {
+  columnid: string
+  actionid: string
+  ticketid: string
+  swimlanecolumnid: string
+  title: string
+  order: number
+  creation_date: string
+  users: UserWithoutTicketsOrActions[]
+}
+
+export type NewAction = Omit<Action, "users" | "creation_date">
 
 export type SwimlaneColumn = {
   swimlanecolumnid: string
@@ -64,3 +83,12 @@ export type SwimlaneColumn = {
   columnid: string
   order: number
 }
+
+type Tag = "Boards" | "Columns" | "Ticket" | "Users" | "Action" | "ActionList" | "SwimlaneColumn"
+
+export type CacheInvalidationTag =
+  | {
+      type: Tag
+      id?: string
+    }
+  | Tag

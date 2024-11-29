@@ -38,7 +38,10 @@ def get_actions_by_columnId(request, column_id):
         try:
             ticketIds_query_set = Ticket.objects.filter(columnid=column_id)
             query_set = Action.objects.filter(ticketid__in=ticketIds_query_set)
+            query_set = query_set.order_by("order")
             serializer = ActionSerializer(query_set, many=True)
+            for action in serializer.data:
+                action["columnid"] = column_id
             return JsonResponse(serializer.data, safe=False)
         except Ticket.DoesNotExist:
             raise Http404("Tickets not found")
@@ -63,27 +66,21 @@ def action_on_swimlane(request, swimlanecolumn_id, ticket_id):
             action.save()
         return JsonResponse({"message": "Action order updated successfully"}, status=200)
 
-    if request.method == "GET":
-        try:
-            query_set = Action.objects.filter(swimlanecolumnid=swimlanecolumn_id, ticketid=ticket_id).order_by("order")
-            serializer = ActionSerializer(query_set, many=True)
-            return JsonResponse(serializer.data, safe=False)
-
-        except Board.DoesNotExist:
-            raise Http404("Error getting actions")
-
     if request.method == "POST":
-        length = len(Action.objects.filter(ticketid=ticket_id))
-        print(length)
         new_action = Action(
             actionid=request.data["actionid"],
             ticketid=Ticket.objects.get(pk=ticket_id),
             swimlanecolumnid=Swimlanecolumn.objects.get(pk=swimlanecolumn_id),
             title=request.data["title"],
-            order=length,
+            order=0,
             creation_date=timezone.now(),
         )
         new_action.save()
+
+        same_swimlane_actions = Action.objects.filter(swimlanecolumnid=swimlanecolumn_id, ticketid=ticket_id)
+        for action in same_swimlane_actions:
+            action.order += 1
+            action.save()
 
         serializer = ActionSerializer(new_action)
         return JsonResponse(serializer.data, safe=False)

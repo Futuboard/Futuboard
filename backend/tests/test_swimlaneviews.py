@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.urls import reverse
 import json
 
+# TO-DO : Refactor to be like test_views.py
+
 ############################################################################################################
 ######################################### SWIMLANE VIEW TESTS ##############################################
 ############################################################################################################
@@ -131,10 +133,12 @@ def test_action_on_swimlane():
         )
         assert response.status_code == 200
     # Get the actions for the swimlanecolumn and ticket
-    response = client.get(reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]))
+    response = client.get(reverse("get_actions_by_columnId", args=[columnid]))
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 3
+    for action in data:
+        assert action["swimlanecolumnid"] == str(swimlanecolumnid)
     # Create another swimlanecolumn to be moved to
     swimlanecolumnid2 = uuid.uuid4()
     data = {
@@ -148,10 +152,10 @@ def test_action_on_swimlane():
     assert response.status_code == 200
     data = [
         {
-            "actionid": str(actionids[0]),
+            "actionid": str(actionids[1]),
         },
         {
-            "actionid": str(actionids[1]),
+            "actionid": str(actionids[0]),
         },
         {
             "actionid": str(actionids[2]),
@@ -165,19 +169,16 @@ def test_action_on_swimlane():
     )
     assert response.status_code == 200
     # Get the actions for the new swimlanecolumn and ticket
-    response = client.get(reverse("action_on_swimlane", args=[swimlanecolumnid2, ticketid]))
+    response = client.get(reverse("get_actions_by_columnId", args=[columnid]))
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 3
+    for action in data:
+        assert action["swimlanecolumnid"] == str(swimlanecolumnid2)
     # Check that the order of the actions has been updated
     assert data[0]["order"] == 0
     assert data[1]["order"] == 1
     assert data[2]["order"] == 2
-    # Check that the actions have been removed from the old swimlanecolumn
-    response = client.get(reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]))
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data) == 0
     # Clean up
     md.Board.objects.all().delete()
     md.Column.objects.all().delete()
