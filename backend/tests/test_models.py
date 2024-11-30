@@ -3,6 +3,7 @@ import futuboard.models as md
 import uuid
 from django.utils import timezone
 import futuboard.verification as ver
+from .test_utils import resetDB
 
 
 ############################################################################################################
@@ -39,6 +40,8 @@ def test_user():
         user.delete()
     assert md.User.objects.count() == 0
 
+    resetDB()
+
 
 """
 Test creating n boards and check that they are created properly. Check that board deletion also works.
@@ -70,6 +73,8 @@ def test_board():
         i += 1
         board.delete()
     assert md.Board.objects.count() == 0
+
+    resetDB()
 
 
 """
@@ -114,9 +119,8 @@ def test_column():
         i += 1
         column.delete()
     assert md.Column.objects.count() == 0
-    # Clean up boards
-    for i in range(n):
-        md.Board.objects.get(boardid=boardids[i]).delete()
+
+    resetDB()
 
 
 """
@@ -165,10 +169,8 @@ def test_swimlanecolumn():
         i += 1
         swimlanecolumn.delete()
     assert md.Swimlanecolumn.objects.count() == 0
-    # Clean up columns and boards
-    for i in range(n):
-        md.Column.objects.get(columnid=columnids[i]).delete()
-        md.Board.objects.get(boardid=boardids[i]).delete()
+
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -219,11 +221,8 @@ def test_action():
         i += 1
         action.delete()
     assert md.Action.objects.count() == 0
-    # Clean up swimlanecolumns and columns
-    for i in range(n):
-        md.Swimlanecolumn.objects.get(swimlanecolumnid=swimlanecolumnids[i]).delete()
-        md.Column.objects.get(columnid=columnids[i]).delete()
-        md.Board.objects.get(boardid=boardids[i]).delete()
+
+    resetDB()
 
 
 """
@@ -275,7 +274,5 @@ def test_ticket():
         i += 1
         ticket.delete()
     assert md.Ticket.objects.count() == 0
-    # Clean up boards and columns
-    for i in range(n):
-        md.Column.objects.get(columnid=columnids[i]).delete()
-        md.Board.objects.get(boardid=boardids[i]).delete()
+
+    resetDB()

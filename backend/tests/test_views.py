@@ -84,8 +84,8 @@ def test_board_by_id():
         assert data["boardid"] == str(boardids[i])
         assert data["title"] == "board" + str(i)
         assert response.status_code == 200
-    # Delete all boards
-    md.Board.objects.all().delete()
+
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -148,9 +148,8 @@ def test_columns_on_board():
     data = response.json()
     assert len(data) == 0
     assert response.status_code == 200
-    # Delete all boards and swimlanecolumns
-    md.Board.objects.all().delete()
-    md.Swimlanecolumn.objects.all().delete()
+
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -233,9 +232,7 @@ def test_tickets_on_column():
     assert len(data) == 3
     assert response.status_code == 200
 
-    md.Column.objects.all().delete()
-    md.Board.objects.all().delete()
-    md.Ticket.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -295,9 +292,7 @@ def test_update_ticket():
     assert data[0]["description"] == "This is an updated description"
     assert response.status_code == 200
 
-    md.Ticket.objects.all().delete()
-    md.Column.objects.all().delete()
-    md.Board.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -334,8 +329,7 @@ def test_update_column():
     assert data[0]["title"] == "updatedcolumn"
     assert response.status_code == 200
 
-    md.Column.objects.all().delete()
-    md.Board.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -371,7 +365,7 @@ def test_users_on_board():
     assert len(data) == 0
     assert response.status_code == 200
 
-    md.Board.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -444,9 +438,7 @@ def test_users_on_ticket():
     assert len(data) == 0
     assert response.status_code == 200
 
-    md.Column.objects.all().delete()
-    md.Board.objects.all().delete()
-    md.User.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -473,7 +465,7 @@ def test_update_user():
     # Check that amount of users is 0
     assert md.User.objects.count() == 0
 
-    md.Board.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
