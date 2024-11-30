@@ -7,6 +7,7 @@ from django.urls import reverse
 import json
 import random
 from django.core.files.uploadedfile import SimpleUploadedFile
+from .test_utils import resetDB
 
 
 ############################################################################################################
@@ -175,9 +176,4 @@ def test_import_export():
                         assert imported_action.order == action.order
         num += 1
     # Clean up everything
-    md.Action.objects.all().delete()
-    md.Ticket.objects.all().delete()
-    md.Swimlanecolumn.objects.all().delete()
-    md.Column.objects.all().delete()
-    md.Board.objects.all().delete()
-    md.User.objects.all().delete()
+    resetDB()
