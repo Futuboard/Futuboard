@@ -544,6 +544,10 @@ def test_updating_columns_order():
         reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
+    assert md.Column.objects.get(pk=columnid1).ordernum == 3
+    assert md.Column.objects.get(pk=columnid2).ordernum == 2
+    assert md.Column.objects.get(pk=columnid3).ordernum == 0
+    assert md.Column.objects.get(pk=columnid4).ordernum == 1
 
     response = api_client.get(reverse("columns_on_board", args=[boardid]))
     data = response.json()
