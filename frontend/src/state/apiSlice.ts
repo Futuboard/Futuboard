@@ -92,7 +92,7 @@ export const boardsApi = createApi({
         method: "PUT",
         body: { title: newTitle }
       }),
-      invalidatesTags: ["Boards"]
+      invalidatesTags: () => invalidateRemoteCache(["Boards"])
     }),
 
     updateBoardPassword: builder.mutation<Board, { boardId: string; newPassword: PasswordChangeFormData }>({
@@ -101,7 +101,7 @@ export const boardsApi = createApi({
         method: "PUT",
         body: newPassword
       }),
-      invalidatesTags: ["Boards"]
+      invalidatesTags: () => invalidateRemoteCache(["Boards"])
     }),
 
     getColumnsByBoardId: builder.query<Column[], string>({
