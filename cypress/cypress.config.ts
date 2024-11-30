@@ -7,7 +7,6 @@ const HEADLESS = true
 export default defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
-      // implement node event listeners here
       on("task", {
         "stress-test": async ({ boardUrl, concurrentUsers }: { boardUrl: string; concurrentUsers: number }) => {
           return new Promise(async (resolve, reject) => {
@@ -52,13 +51,15 @@ export default defineConfig({
                 await page.type('input[name="cornerNote"]', `Corner Note (${index})`)
                 await page.click('button[type="submit"]')
 
-                // Callind resolve() causes the Cypress test to continue.
+                // Calling resolve() causes the Cypress test to continue.
                 resolve(null)
 
                 // Add delay, so browser keeps loading updates to board
                 await delay(10_000)
               } catch (error) {
+                // Calling reject() causes the Cypress test to fail.
                 reject(error)
+
                 await cluster.close()
               }
             })
@@ -67,7 +68,9 @@ export default defineConfig({
               cluster.queue({ url: boardUrl, index: i })
             }
 
+            // Wait for all tasks to complete
             await cluster.idle()
+
             await cluster.close()
           })
         }
