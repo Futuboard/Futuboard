@@ -521,7 +521,7 @@ def test_deleting_ticket():
 @pytest.mark.django_db
 def test_updating_columns_order():
     """
-    Test updating columns order 
+    Test updating columns order
     Test that columns new order is correct
     """
 
@@ -540,9 +540,11 @@ def test_updating_columns_order():
         {"columnid": str(columnid1)},
     ]
 
-    response = api_client.put(reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json")
+    response = api_client.put(
+        reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
+    )
     assert response.status_code == 200
-    
+
     response = api_client.get(reverse("columns_on_board", args=[boardid]))
     data = response.json()
     assert data[0]["columnid"] == str(columnid3)
