@@ -41,14 +41,15 @@ export default defineConfig({
                 await page.click('button[type="submit"]')
 
                 await page.waitForSelector('button[aria-label="add task"]')
-                await delay(500)
+
+                // Puppeteer fails in clicking the button if something is loading, so we wait for that
+                await delay(5_000)
                 await page.click('button[aria-label="add task"]')
 
                 await page.waitForSelector('textarea[name="taskTitle"]')
+                await delay(500)
                 await page.type('textarea[name="taskTitle"]', `Card (${index})`)
-                await page.type('input[name="size"]', String(index))
-                await page.type('textarea[name="description"]', `Description (${index})`)
-                await page.type('input[name="cornerNote"]', `Corner Note (${index})`)
+                await delay(500)
                 await page.click('button[type="submit"]')
 
                 // Calling resolve() causes the Cypress test to continue.

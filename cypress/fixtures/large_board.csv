@@ -1,0 +1,1042 @@
+Futuboard,v1.0,Board Data
+
+Board,
+User,Inka
+User,Juuso
+User,Matias
+User,Milla
+User,Luka
+User,Otto
+User,Henna
+User,Atte
+
+Column,9,,Sprint backlog,4,True
+Swimlanecolumn,To Do,0
+Swimlanecolumn,Doing,1
+Swimlanecolumn,Verify,2
+Swimlanecolumn,Done,3
+Ticket,----ennusteraja----,,#ffeb3b,8,0,2,2024-03-19 09:10:26.444530+00:00,
+Ticket,Kukin tekee 1 UT,"Tuotteen laadusta vastaavan ominaisuudessa,
+haluan että jokainen devaaja tekee ainakin yhden yksikkötestin,
+jotta tiedän kaikkien osaavan ja kynnys tehdä niitä työn aikana madaltuu.
+
+Hyväksymiskriteerit:
+- Kukin on tehnyt testin valitsemalleen osalle koodia, joka on gitissä ja pyörii osana CITA putkea.",#ffffff,8,8,1,2024-10-21 15:21:53.446105+00:00,
+Action,Inkan action tähän,0,0
+Action,Testi salasanan vaihdolle,1,1
+User,Luka
+Action,,2,3
+Action,,3,3
+Action,Testi uudelle authentikaatiolle,1,3
+User,Otto
+Action,Testi columnien järjestyksen muuttamiselle,2,1
+User,Juuso
+Action,Testi boardin poistamiselle,0,2
+User,Milla
+Action,Testi columnien ja tickettien poistamiselle,0,3
+User,Atte
+Action,Testi actionien hakemiselle column Id:n perusteella,0,1
+User,Matias
+Action,,1,0
+Ticket,Performanssin varmistus,"Käyttäjän ominaisuudessa,
+haluan että tuote on responsiivinen myös kun yhtäaikaisia käyttäjiä on 10,
+jotta voimme suorittaa tiimin tapahtumat tehokkaasti Futuboardilla.
+
+Hyväksymiskriteerit:
+- Operaatioiden tulee antaa vaste käyttäjälle viimeistään 1,5 sekunnin päästä.
+- Käyttäjän toimien tulee näkyä muilla käyttäjillä viimeistään 4 sekunnin päästä.
+- Futuboardin tulee pääosin vaikuttaa responsiiviselta 9 hengen Sprint Planningissä.",#ffffff,8,16,3,2024-11-14 16:10:48.304125+00:00,
+Action,Huonon suorituskyvyn syiden tutkiminen,2,3
+User,Otto
+Action,Suorityskyvyn automaattinen testaus,0,2
+User,Otto
+Action,Tietokannan scheman optimointi,1,3
+User,Otto
+Action,Live-päivitysten optimointi,0,3
+User,Otto
+Action,Actioneiden päivityksen parantaminen,3,3
+User,Atte
+Action,Ylimääräisten requestien vähentäminen,4,3
+User,Otto
+Ticket,Sprint 1 Goal: Improvements for power-users,,#03a9f4,8,0,0,2024-11-27 15:43:42.157827+00:00,
+
+Column,0,,Sprint 0 voitot,13,False
+Ticket,Määritellään Definition of Done,"Tiimin työnhallinnasta vastaavan ominaisuudessa,
+haluan että tiimi määrittelee DoDin,
+jotta tiimillä ja PO:lla on yhteinen käsitys siitä mitä laatutasoa töiltä odotetaan kun ne julistetaan ""Valmiiksi"".
+
+Hyväksymiskriteerit:",#ffffff,8,0,1,2024-03-06 13:20:20.007206+00:00,
+Ticket,Valitaan Bäkkiteknologia,"Toteuttavan tiimin ominaisuudessa,
+haluan että back-end teknologia on selkeästi ja hyvin valittu,
+jotta voin edetä kehitystyön kanssa ripeästi käyttäen oikeita työkaluja.
+
+Ando, Matias, Klaus, Edris
+
+Hyväksymiskriteerit:
+Valittu ja esitelty",#ffffff,8,4,5,2024-03-06 13:20:52.915996+00:00,
+Ticket,Valitaan Fronttiteknologia,"Toteuttavan tiimin ominaisuudessa,
+haluan että frontin teknologia on selkeästi ja hyvin valittu,
+jotta voin edetä kehitystyön kanssa ripeästi käyttäen oikeita työkaluja.
+
+Tekijät: Alex, Viivi, Aarne
+
+Hyväksymiskriteerit:
+Valinta tehty
+Tiimille infottu ja esitelty
+Dokumentoitu
+Tiedetään tiimin fronttivahvat jäsenet",#ffffff,8,4,10,2024-03-06 13:21:37.890671+00:00,
+Ticket,Määritellään Definition of Ready,"Tiimin työnhallinnasta vastaavan ominaisuudessa,
+haluan että tiimi määrittelee DoRrin,
+jotta tiimillä ja PO:lla on yhteinen käsitys siitä mitä laatutasoa töiden määrittelyiltä odotetaan kun ne julistetaan ""Valmistelluiksi"".
+
+Hyväksymiskriteerit:",#ffffff,8,0,2,2024-03-06 13:20:26.987209+00:00,
+Ticket,Valitaan käytettävä DB,"Toteuttavan tiimin ominaisuudessa,
+haluan että käytettävä DB teknologia on selkeästi ja hyvin valittu,
+jotta voin edetä kehitystyön kanssa ripeästi käyttäen oikeita työkaluja.
+
+Hyväksymiskriteerit:
+Valittu ja esitelty tiimille",#ffffff,8,2,6,2024-03-06 13:21:00.337026+00:00,
+Ticket,Taulun protokuva,"Tuotteesta vastaavan ominaisuudessa,
+haluan GUIn protokuvan,
+jotta tiimillä ja PO:lla on yhteinen käsitys siitä millaista kapinetta tässä suunnilleen ollaan rakentamassa.
+
+Tekijät
+Alex, samuli, Viivi
+
+Hyväksymiskriteerit:
+PO ja tiimi hyväksyvät kuvan olevan riittävän lähellä tavoitetta jotta sillä voidaan lähteä eteenpäin tässä kohtaa
+Kuva on piirretty jollain kaikilla olevalla välineellä (Miro, Google slides..)
+",#ffffff,8,8,0,2024-03-06 13:20:13.927664+00:00,
+Ticket,Valitaan Pilviteknologia,"Toteuttavan tiimin ominaisuudessa,
+haluan että käytetty pilviteknologia on selkeästi ja hyvin valittu,
+jotta voin edetä kehitystyön kanssa ripeästi käyttäen oikeita työkaluja.
+
+Hyväksymiskriteerit:
+Kriteerit selkeyttetty
+Osaajat tunnistettu
+Valittu ja esitelty
+Varmistettu saatavuus (Aalto)
+
+Ideat:
+AWS
+Azure",#ffffff,8,8,7,2024-03-06 13:21:08.827160+00:00,
+Ticket,Valitaan sopiva open source lisenssi ,"Tulevan oman asennuksen virittelijän ominaisuudessa,
+haluan että projektin lisenssi on selvä ja sopivan vapaa,
+jotta
+voin ottaa tulokset käyttöön
+tiedän mitä saan sillä tehdä
+voin tehdä omia muutoksia
+voin osallistua projektin kehittämiseen
+
+Tekijä
+Matias
+
+Hyväksymiskriteerit:
+On selvitelty rajoittaako Aalto lisenssin valintaa
+Lisenssi on valittu ja tiedotettu tiimille + PO + Vanhanen
+Lisenssi on dokumentoitu Miro boardille
+Lisenssivalinnasta on järjestetty puhelu jossa se on hyväksytty
+Repossa lisenssi filu
+
+Riippuvuuksia:
+Pitää tarkistaa rajoittaako Aalto YO jotenkin lisenssin valintaa
+
+Toteutusideoita:
+Vapaa mutta alkup tekijät mainittava",#ffffff,8,4,9,2024-03-06 13:21:26.130412+00:00,
+Ticket,Sovitaan Sprinttien kokoukset,"Tiimin työnhallinnasta vastaavan ominaisuudessa,
+haluan että tiimi sopii oleelliset kokoukset,
+jotta tiimillä ja PO:lla on yhteinen käsitys siitä milloin teemme mitäkin, ja kaikki saapuvat paikalle.
+
+Hyväksymiskriteerit:",#ffffff,8,4,3,2024-03-06 13:20:34.728323+00:00,
+Ticket,Perustetaan versionhallinta,"Tuotteen laadusta vastaavan ominaisuudessa,
+haluan että projektilla on hyvä nykyaikainen versionhallinta,
+jotta pystymme hallitsemaan, perumaan, ja yhdistelemään muutoksia ammattimaisesti.
+
+Hyväksymiskriteerit:
+Repo on olemassa
+Koko tiimillä on access
+Polku on tiedotettu tiimille ja sidosryhmille
+Työkalu on koeponnistettu",#ffffff,8,2,4,2024-03-06 13:20:44.072703+00:00,
+Ticket,Tutkimus valmiista aihioista,"Projektin tehokkuudesta välittävän ominaisuudessa,
+haluan tiimin tutkivan onko valituilla teknologioilla jo olemassa open source raakiletta josta voimme saada merkittävää nopeushyötyä,
+jotta saatamme saavuttaa projektissa paljon enemmän samassa ajassa.
+
+Hyväksymiskriteerit:
+Ainakin kaksi tiimiläistä on etsinyt potentiaalisia aihioita
+Tiimille on raportoitu tuloksista
+Aikaa on käytetty korkeintaan 8 pisteen edestä
+
+Riippuvuudet:
+ei kummempia",#ffffff,8,8,8,2024-03-06 13:21:18.471893+00:00,
+
+Column,0,,Priorisoitu,3,False
+Ticket,Lapulle saa asettaa oletussisällön (template),"scrummarin ominaisuudessa,
+haluan että kun luon lapun, siihen ilmestyy vakiosisältö,
+jotta ei ole tarpeen aina kirjoittaa samoja juttuja ja DoDinkin saa mukaan jos haluaa.
+
+Hyväksymiskriteerit:
+-kun lapun luo mihin tahansa sarakkeeseen, sille ilmestyy oletussisältö
+-oletussisällön voi asettaa ja sitä voi muokata
+
+Toteutusidea:
+Siellä jossain settings sivulla on tekstilaatikko johon voi kirjoittaa oletussisällön. Siinä on valmiiksi perus user storyn formaatti.",white,8,8,3,2024-03-06 13:02:25.138058+00:00,
+Ticket,Ylemmän tason automaatiotestien hyväksikäyttö,"Tuotteen laadusta vastaavan ominaisuudessa,
+haluan, että tiimi implementoi ainakin neljä uutta E2E testiä,
+jotta vakuutun että nämä teknologiariskit ovat hallinnassa ja kynnys tehdä automaatiotestejä on riittävän pieni.
+
+Hyväksymiskriteerit:
+-Ainakin 4 uutta testiä on implementoitu
+-Ne pyörivät osana CI:tä
+-Niiden raportti on helposti nähtävillä",white,8,8,2,2024-03-06 13:14:05.623790+00:00,
+Ticket,Piilotettu sivutaulu johon saa laitettua näkyviin tietoa,"Scrummarin ominaisuudessa,
+haluan taululle tilan joka tulee tarvittaessa näkyviin,
+jotta voin kirjata välillä tarvittavia tietoja, kuten DoD, DoR jne.
+
+Hyväksymiskriteerit:
+-Taululla on nappula josta saa näkyviin ja piiloon sopivan alueen tekstiä.
+
+Toteutusidea:
+Piirretään yhdessä demokuva!",white,8,16,1,2024-03-06 13:01:36.211707+00:00,
+Action,RBD2:n opiskelu,0,0
+Action,Material UI:n tai jonkin custom-componentin luominen,1,0
+Action,Miten tämä kytketään bäckendiin?,2,0
+Action,Mitä bäckendissä pitää muuttaa tätä komponenttia varten?,3,0
+Ticket,"Jos tikettiin liittyy linkki, sitä voi klikata","Tiimiläisen ominaisuudessa,
+haluan voida klikata tikettiin liittyvää linkkiä,
+jotta voin helposti siirtyä sivulle, jota tiketti koskee
+
+Hyväksymiskriteerit:
+- Tiketin descriptionissa olevaa linkkiä voi klikata, ja se aukeaa uuteen ikkunaan
+- Linkki näyttää linkiltä",#ffffff,8,4,0,2024-08-30 07:44:06.666447+00:00,
+
+Column,0,,Valmisteltu,2,False
+Ticket,Sidosryhmän salasana,"Tiimiläisen ominaisuudessa,
+haluan vain salasanan tietävät henkilöt voivat käydä muuttamassa taulua ja sidosryhmäsalasanalla voi vain katsella,
+jotta voin luottaa työnohjausjärjestelmän sisältöön.
+
+Hyväksymiskriteerit:
+-Kun koesysteemin taululla menee linkillä vain salasanalla pääsee näkemään taulun
+-Vain tiimisalasanalla voi tehdä muutoksia
+-Salasanat voi asettaa taulun luonnin yhteydessä",white,8,16,4,2024-03-06 13:03:19.127643+00:00,
+Ticket,Boardin sisältöä ei saa saada haettua/muokattua pelkällä linkillä/ID:llä,"Käyttäjän ominaisuudessa,
+haluan että pelkällä boardin linkillä/ID:llä ei voi lukea tai muokata boardia,
+jotta tiedän tietojeni olevan edes jollain tavalla turvassa.
+
+Hyväksymiskriteerit:
+- Boardin datan lukeminen ja manipulointi vaativat salasanan tuntemisen.
+
+Huom: On edelleen hyväksyttävää että penetraatiomenetelmillä tuote on läpäistävissä.",#ffffff,8,16,3,2024-10-21 15:51:33.849167+00:00,
+Ticket,Saan läpimenoaikatietoa,"Agile Coachin ominaisuudessa,
+haluan saada läpimenoaikatietoa tiimin töistä,
+jotta voin arvioida tiimin työn kehitysyritysten onnistuneisuutta ja ennustaa tärkeiden töiden valmistumista.
+
+Hyväksymiskriteerit:
+-Taululla näkyy jollain hyödyllisellä tavalla läpimenoajat viikottain
+-Voin määritellä minkä tilojen välillä läpimenoaika lasketaan
+-Voin määritellä montako viikkoa näytetään (max 30)
+
+Toteutusidea:
+-Tiketeillä on historia, sieltä ilmenee millä aikaleimoilla se on mennyt mihinkin tiloihin.
+-Siellä missä näytetään läpimenoaikaraportti, voi myös säätää sitä, minkä tilojen välillä läpimenoaika lasketaan.
+-Vaikkapa kaksi drop down valikkoa taulukon vieressä
+-Taulukon voisi laskea vaikka kerran vuorokaudessa ja näyttää sen, ellei käyttäjä muuta asetuksia",white,8,16,6,2024-03-06 13:05:04.352242+00:00,
+Ticket,Saan cumulative flow diagrammin,"Agile Coachin ominaisuudessa,
+haluan saada cumulative flow diagrammin tiimin töistä,
+jotta voin arvioida tiimin työn pullonkauloja ja tunnistaa kehityskohteita.
+
+Hyväksymiskriteerit:
+-Taululla näkyy jollain hyödyllisellä CFD pyydettäessä
+-Voin määritellä aikayksikön (päivää, kuukautta, viikkoa)
+-Voin määritellä montako aikayksikköä näytetään
+-Vastaa jotakuinkin Mirossa design alueella olevaa esimerkkiä
+-Default: yksikkö on päivä, näytettävä aika on max 30 päivää
+
+Toteutusidea:
+-Tiketeillä on historia, sieltä ilmenee millä aikaleimoilla se on mennyt mihinkin tiloihin.
+-Siellä missä näytetään CFD, voi myös säätää sitä, mikä on palkki ja montako näytetään.
+-Vaikkapa kaksi drop down valikkoa taulukon vieressä
+-Taulukon voisi laskea vaikka kerran vuorokaudessa ja näyttää sen, ellei käyttäjä muuta asetuksia",white,8,16,7,2024-03-06 13:04:17.133675+00:00,
+Ticket,Lapulle saa acceptance kriteerejä (checklist),"scrummarin ominaisuudessa,
+haluan että töille voi asettaa hyväksymiskriteerejä,
+jotta voimme konkreettisesti sopia mikä työn skooppi on.
+
+Hyväksymiskriteerit:
+-muokkaustilassa on jonkinlainen checklist johon voi laittaa hyväksymiskriteereitä
+-futuboard on selvillä hyväksymiskriteerin luonteesta
+-lapusta näkee kuinka moni checkbox on kuitattu (esim. 3/7)
+-Isomman lapun hyväksymiskriteerit muuttuvat automaattisesti pikkulapuiksi (Mikäli hyväksymiskriteerit on toteutettu)
+
+Toteutusideat:
+-Voi olla erillinen tekstilaatikko
+-Voi olla listamainen objekti
+-Voi olla kuvaustekstin sovitusti formatoitu osio",white,8,8,5,2024-03-06 13:06:47.720932+00:00,
+Ticket,Mahdollisuus käyttää board templatea kun luodaan board,"Scrummarin ominaisuudessa,
+haluan voida luoda uuden boardin templatesta,
+jotta ei tarvitse joka kerta suunnitella boardin layoutia uudestaan
+
+Hyväksymiskriteerit:
+- Boardia luodessa voi valita listasta templaten, jota käytetään
+- Löytyy Scrum tiimin template englanniksi
+- Löytyy yksilön itsejohtamiseen todo-lista
+- Templatea pitää voida muokata ilman devaajaa",#ffffff,8,8,2,2024-04-23 08:45:15.093905+00:00,
+Ticket,Actionin tuhoaminen,"Tiimiläisen ominaisuudessa,
+haluan pystyä tuhoamaan actionin,
+jotta boardi pysyy siistinä
+
+Hyväksymiskriteerit:
+- Action on helppo tuhota
+- Tuhoamista on vaikea tehdä vahingossa
+
+Toteutusidea:
+- Tuplaklikkaamalla ilmestyy punainen roskakori, jota voi klikata
+- Kun actionilta poistaa tekstin, se poistuu",#ffffff,8,4,1,2024-03-26 14:43:21.394222+00:00,
+
+Column,0,,Sprint 5 voitot,8,False
+Ticket,(8) Kolumnien järjestys on muutettavissa,"Scrummarin ominaisuudessa,
+Haluan voida siirtää kolumneja oikealle ja vasemmalle,
+jotta ei ole pakko tehdä täydellistä boardia kerralla.
+
+Toteutusidea:
+Edit column toiminnallisuuteen lisätään <> -nappulat josta kolumnia voi siirtää.
+
+Hyväksymiskriteerit:
+-On jokin PO:n mielestä sopivan intuitiivinen tapa siirtää kolumnia oikealle ja vasemmalle",#8bc34a,8,8,4,2024-03-06 13:13:39.755371+00:00,
+Ticket,Filepohjainen board output,"Scrummarin ominaisuudessa,
+Haluan voida ladata boardin tärkeimmät tiedot paikalliseen tiedostoon
+jotta 
+-voin olla varma että tietoni ei katoa vaikka Futuboardille kävisi hassusti
+
+AC:
+-Boardilla on löydettävissä nappula josta käyttäjä voi exportata boardin oleellisen sisällön paikalliseen failiin 
+-Sisältö ihmisten luettavissa",#8bc34a,8,8,8,2024-03-06 13:10:55.111362+00:00,Antonio Klasu
+Action,Boardilla on löydettävissä nappula josta käyttäjä voi exportata boardin oleellisen sisällön paikalliseen failiin ,0,3
+Action,Sisältö ihmisten luettavissa,1,3
+Ticket,Filepohjainen boardin luominen,"Scrummarin ominaisuudessa,
+Haluan voida luoda tiedostosta boardin,
+jotta
+-voin siirtää boardini toiseen futuboard instanssiin
+
+AC:
+-Työkalun pääsivulla on mahdollisuus luoda boardi myös exportatusta fileestä eikä vain käsin.
+
+Toteutusidea:
+Toinen linkki jossa kysytään nimi ja file",#8bc34a,8,8,9,2024-03-06 13:11:48.274596+00:00,Antonio Klaus
+Action,Työkalun pääsivulla on mahdollisuus luoda boardi myös exportatusta fileestä eikä vain käsin.,0,3
+Ticket,Siirrytään käyttämään Futuboardia Kasipallojen työssä,"Tuoteomistajan ominaisuudessa 
+haluan Kasipallojen siirtyvän käyttämään Futuboardia omassa toiminnassaan
+jotta heillä on intiimi ymmärrys käyttämisesta jne
+
+AC:
+-PE 8.3. tiimi käyttää Futuboardia sprintin työn hallintaan
+-Miroon on selvästi merkitty kun se ei ole enää oikea paikka seurata työtä ja priorisoida tulevaa työtä
+-Sprintin loppuun mennessä Futuboardissa on kaikki projektille tarpeelliset tiketit ja refinement toiminta tapahtuu siellä
+-Whatsapp kanavalle laitetaan linkki tiimin futuboardiin",#ffffff,8,8,7,2024-03-06 13:14:59.589640+00:00,Alex Antonio Viivi
+Action,Sprintin loppuun mennessä Futuboardissa on kaikki projektille tarpeelliset tiketit ja refinement toiminta tapahtuu siellä,3,3
+Action,PE 8.3. tiimi käyttää Futuboardia sprintin työn hallintaan,0,3
+Action,Miroon on selvästi merkitty kun se ei ole enää oikea paikka seurata työtä ja priorisoida tulevaa työtä -Sprintin loppuun mennessä Futuboardissa on kaikki projektille tarpeelliset tiketit ja refinement toiminta tapahtuu siellä -Whatsapp kanavalle laitetaan linkki tiimin futuboardiin,2,3
+Action,Whatsapp kanavalle laitetaan linkki tiimin futuboardiin,1,3
+Ticket,Sprintin 5 aikana tullut palaute ,"Towo:
+-""Delete card"" on siinä missä olettaisi olevan sulkemisruksi. Melkein painoin sitä jo yhdessä teidän tiketissä. Hiukan vaarallinen ominaisuus. 
+-Kun luo uuden boardin, on kiva että tulee ikonien selitykset siitä kuinka lisätään kolumnia jne. Niissä ei kuitenkaan sanota että ne on selityksiä ja todelliset nappulat löytyy yläoikealta, joten niitä pyrkii klikkaamaan. Niihin voisi lisätä otsikon vaikkapa ""Buttons at top right corner:"" tai jotain muuta selkeyttävää.
+
+Ryhmän:
+-fieldeihin jotka pakollisia joku merkki (esim. tähti)",#ffffff,8,0,11,2024-03-19 09:14:09.815796+00:00,
+Action,"""Buttons at top right corner:""",0,3
+Action,"""Delete card"" tehdä hankalemmaksi vahingossa painaa.",1,3
+Action,fieldeihin jotka pakollisia joku merkki (esim. tähti),2,3
+Ticket,Lapuille saa värejä,"Scrummarin ominaisuudessa,
+haluan että lapuille voi asettaa värejä,
+jotta eri tyyppiset työt erottuvat toisistaan.
+
+Hyväksymiskriteerit:
+-Kun lappu luodaan sille voi valita värin
+-Värin voi myös muuttaa jälkikäteen (jos on aikaa)
+
+Implementointi ajatus:
+4 eriväristä lappupinoa joissa perus lappujen värit. Sieltä voi luoda lappuja tai raahata niitä.
+Lappupinoon voi kirjoittaa mihin tiimi tämän värisiä lappuja käyttää.???
+
+Värit:
+Haalean keltainen
+Haalean vihreä
+Haalean pinkki
+Haalean sininen
+
+esim. Miron värisävyt ok.",#8bc34a,8,8,3,2024-03-06 13:12:17.931708+00:00,Alex Viivi
+Ticket,Sprintin 4 pikkupalaute,"-Poistetaan 'Assignee' toiminnallisuus
+-Korjataan: Description muutokset eivät katoa kun klikkaa kortin ulkopuolelle
+-Korjataan: Add column -> add card
+-Magneetin deleten tulee poistaa ko. magneetit lapuilta
+-Kun kirjoitetaan Action swimlaneen ja painetaan enter, avataan uusi ikkuna johon voi heti kirjoittaa seuraavan actionin. Cancelilla ja Escillä pääsee eroon",#8bc34a,8,4,10,2024-03-06 13:10:21.349525+00:00,Alex Matias 
+Action,Magneetin deleten tulee poistaa ko. magneetit lapuilta,0,3
+Action,Korjataan: Add column -> add card,3,3
+Action,Poistetaan 'Assignee' toiminnallisuus,2,3
+Action,Korjataan: Description muutokset eivät katoa kun klikkaa kortin ulkopuolelle,1,3
+Action,"Kun kirjoitetaan Action swimlaneen ja painetaan enter, avataan uusi ikkuna johon voi heti kirjoittaa seuraavan actionin. Cancelilla ja Escillä pääsee eroon",4,3
+Action,,5,3
+Ticket,Boardin tuhoaminen,"Käyttäjän ominaisuudessa,
+haluan voida poistaa boardin, 
+jotta voin pitää boardini järjestyksessä ja poistaa tietoa jonka en halua enää olevan maailmalle saatavilla.
+
+AC:
+-Boardista löytyy jostain näppäin joka tuhoaa boardin kysyttyään salasanan
+-Ei ole liian helppoa tuhota boardia vahingossa
+-Data poistuu DBstä",#8bc34a,8,8,5,2024-03-06 13:11:21.267966+00:00,Aarne Samuli
+Action,Boardin voi tuhota backend,1,3
+Action,Data poistuu DBstä,0,3
+Action,Ei ole liian helppoa tuhota boardia vahingossa,2,3
+Action,Boardista löytyy jostain näppäin joka tuhoaa boardin kysyttyään salasanan,3,3
+Ticket,Lappuja ja kolumneja voi tuhota,"Peruskäyttäjän ominaisuudessa,
+haluan voida tuhota lappuja ja kolumneja,
+jotta pääsen eroon asioista joiden ei kuuluisi olla taululla ollenkaan.
+
+Hyväksymiskriteerit:
+-Lapussa on intuitiivinen tuhoamismekanismi
+-Kolumnissa on intuitiivinen tuhoamismekanismi
+-Mekanismia on vaikea käyttää vahingossa",#8bc34a,8,4,2,2024-03-06 13:09:43.847262+00:00,Aarne Samuli
+Action,Kolumneja voi tuhota backend,0,3
+Action,Lappuja voi tuhota backend,1,3
+Ticket," Tiloille saa WIP limitit (number stickies, size)","Kanban mestarin ominaisuudessa,
+haluan voida asettaa eri tiketin tiloille WIP limitit,
+jotta voimme tiiminä optimoida virtausta tiimin läpi.
+
+Hyväksymiskriteerit:
+-WIP limitin voi editoida tilalle
+-se näkyy jotenkin käyttäjälle
+-jos se ylitetään, siitä tulee hyvin selkeitä merkkejä
+-limitin voi asettaa lappujen määrälle tai yhteiselle koolle
+
+Toteutusidea:
+Jos wippiraja ylitetään, taustaväri muuttuu varoittavaksi
+Tiloilla on jokin menu josta voidaan muokata niiden ominaisuuksia. Aukeaa varmaan jostain napista.",#8bc34a,8,8,6,2024-03-06 13:13:17.288292+00:00,Matias Viivi
+Action,limitin voi asettaa lappujen määrälle tai yhteiselle koolle,3,3
+Action,se näkyy jotenkin käyttäjälle,1,3
+Action,"jos se ylitetään, siitä tulee hyvin selkeitä merkkejä",2,3
+Action,WIP limitin voi editoida tilalle,0,3
+Action,WIP limitit backendiin x 2,4,3
+Action,WIP limit voi asettaa kolumnia tehdessä,5,0
+Ticket,Sprint Goal: Tehosta taulun hallintaa toteuttamalla tiedostosyöte/-tuloste funktionaalisuus ja parantamalla poistotoimintoja.,,#ffffff,8,0,1,2024-03-25 12:05:04.339405+00:00,
+
+Column,0,,Sprint 4 voitot,9,False
+Ticket,Eriytetään testaus ja devaus ympäristöt,"Tiiminä haluamme, että voimme testailla eri ympäristössä kuin missä käyttäjä työskentelee
+, jotta kehitys ei häiritse käyttäjän tekemistä.
+
+Production  siirretään domainiin 
+Dev tulee tämän hetkiseen osoitteeseen
+Molemmille erilliset databaset
+Lisää .env filut ",#ffffff,8,8,1,2024-03-06 13:15:37.610908+00:00,
+Ticket,Lapulle saa kirjoitettua nurkkahuomautuksen ja näytettyä koon,"Scrummarin ominaisuudessa,
+haluan että ainakin yhteen lapun nurkkaan voi kirjoittaa,
+jotta voin laittaa satunnaista tärkeää informaatiota näkyviin.
+
+Hyväksymiskriteerit:
+Lapun vasempaan ylänurkkaan voi kirjoittaa tekstin, jota voi myös myöhemmin muuttaa
+Oikeaan alanurkkaan kirjoitetaan koko (max 3 digits)
+
+Tarve:
+Piirrettään yhdessä demolappu DONE 
+",#ffffff,8,8,0,2024-03-06 13:15:26.538771+00:00,
+Ticket,Taululla on osio jossa on swimlanet,"Scrummarin ominaisuudessa,
+haluan taululle swimlaneja,
+jotta voin visualisoida kuinka suuremmat työn palat muuttuvat pienemmiksi, ja sitten seurata pienempien etenemistä.
+
+Hyväksymiskriteerit:
+Kun lapun siirtää tiettyyn tilaan, se synnyttää swimlanen
+Swimlaneen voi luoda pienempiä lappuja
+Pikkulappujen (action) tekstiriviä voi muokata
+Swimlane sisältää tilat 'Todo', 'Doing', 'Verify', 'Done'
+Swimlane tilojen nimiä voi editoida
+Tarvitsee olla vain yksi swimlane",#ffffff,8,32,3,2024-03-06 13:16:05.044859+00:00,
+Ticket,Project Review valmistelu,"Halutaan valmistautua project reviewhun,
+jotta ei tarvitse hävetä ja tulee paremi arvosana.
+
+Power Point tehty
+Tehtävät jaettu ryhmäläisten kesken
+Info paketti",#ffffff,8,8,2,2024-03-06 13:15:52.381132+00:00,
+
+Column,0,,Sprint 3 voitot,10,False
+Ticket,Bugirapsa 26JAN24,"Havaittu seuraavat ongelmat 26JAN24 10.20:
+
+Reload aiheutti ""Loading..."" tilan 1-2 minuutiksi
+Salasanan jälkeen meni taas minuutti että boardi ilmestyi
+Tiketeissä ei näkynyt äskettäin tehtyjä päivityksiä 
+Boardin nimi ei yhäkään näy boardilla (vain ""COPY LINK"") vaikka oli ruksittu tehdyksi kosmeettisesta tiketistä
+""No tasks yet"" lukee yhä kolumneissa, vaikka ""task"" sanan korvaaminen oli ruksittu kosmeettisesta tiketistä
+kosmeettinen tiketti ei ollut ""työn alla"" vaikka asioita oli tehty 
+",#ffffff,8,0,0,2024-03-06 13:16:17.114836+00:00,
+Ticket,Työkalunäkymä päivittyy automaattisesti,"Tiimiläisen ominaisuudessa,
+haluan nähdä toisten tekemät muutokset päivittämättä manuaalisesti sicua,
+jotta voin vaan aina pitää työkalun auki ja nähdä mikä on tilanne.
+
+Hyväksymiskriteerit:
+Muilla selaimilla tehdyt muutokset näkyvät viimeistään 20 sek. kuluttua näytöllä.",#ffffff,8,16,7,2024-03-06 13:17:26.090277+00:00,
+Ticket,Git hakemistojen siivous,"Devaajan ominaisuudessa,
+haluan että git hakemistorakenteemme katselmoidaan ja siivotaan,
+jotta 
+syntyy vähemmän sotkuja
+frontti ja backki on kunnolla erotettu toisistaan
+
+Hyväksymiskriteerit
+Antonio ja Matias hyväksyvät uuden rakenteen
+Se on toteutettu
+Tiimiä on informoitu",#ffffff,8,2,4,2024-03-06 13:16:56.755950+00:00,
+Ticket,Lapulle saa asetettua koon (työmäärä),"PO:n ominaisuudessa,
+haluan että tiimi voi asettaa lapulle koon (työmäärä),
+jotta voimme suunnitella luotettavasti projektia ja mitata velocityä ja voin priorisoida viisaammin.
+
+Hyväksymiskriteerit:
+Lappuun saa laitettua kokonaisluvun jonka järjestelmä ymmärtää olevan ""koko""
+Jostain näkee kätevästi paljonko on tilassa olevien lappujen koot yhteensä",#ffffff,8,4,2,2024-03-06 13:16:35.883082+00:00,
+Ticket,Ensimmäinen versio tuotteen laatutavoitteista ,"Tuotteen laadusta vastaavan ominaisuudessa,
+haluan että tiimi määrittelee laaturaportin joka kattaa PUBS FIRST ei-toiminnalliset ominaisuudet,
+jotta tiimillä ja PO:lla on yhteinen käsitys tavoiteltavan järjestelmän laadullisista ominaisuuksista.
+
+Hyväksymiskriteerit:
+Dokumentti on olemassa ja PO + tiimi hyväksyy sen sisällön hyödylliseksi
+Dokumentti löytyy Mirosta
+
+PUBS FIRST:
+Performance
+User experience
+Business support
+Security
+Functionality
+Interoperability
+Reliability
+Supportability
+Testability",#ffffff,8,8,3,2024-03-06 13:16:47.968407+00:00,
+Ticket,Tiimiläisten aktiviteetin voi osoittaa magneeteilla,"Tiimiläisen ominaisuudessa,
+haluan voida nähdä mitä muut tekevät juuri nyt ja osoittaa mitä itse teen,
+jotta pysymme selvillä tilanteesta ja voimme koordinoida tehokkaasti.
+
+Hyväksymiskriteerit:
+Tiimiläinen voi raahata ""magneettinsa"" jonkin lapun päälle, niin että se jää sen lapun tuntumaan
+Kaikki katselijat näkevät magneetin siirtyneen
+Kullakin tiimiläisellä on enemmän kuin yksi magneetti
+Tiimiläiset voi määritellä",#ffffff,8,16,6,2024-03-06 13:17:17.568421+00:00,
+Ticket,Tiimiläisten lista näkyy taululla,"Sidosryhmäläisen ominaisuudessa,
+haluan voida nähdä tiimiläisten listan,
+jotta tiedän ketkä työskentelevät näiden asioiden parissa.
+
+Hyväksymiskriteerit:
+Lista on näkyvissä jossain häiriöttömässä paikassa
+Lista on muokattavissa",#ffffff,8,8,5,2024-03-06 13:17:07.042090+00:00,
+Ticket,Kosmeettisia parannuksia sprint 2,"kun luo kolumnin, laita kursori aktiiviseksi että voi kirjoittaa
+tiketti pitäisi voida siirtää myös huomattavasti alemmas kuin sen kolumnin alin tiketti
+taskin koolle voisi tehdä tarkistuksia
+Liian suuri, negatiivinen..
+laitetaan otsikoksi Futuboard ja ikoniksi kasipallo
+Boardin nimi näkyviin
+PO käy testaamassa että ylläolevat on korjattu
+
+Sprintin suunnittelun jälkeen löytyneitä:
+Editoidessa käytä tiketin ""Name"" lootalle koko leveys jotta näkee mitä on kirjoittamassa
+valmis lappu näyttää vain yhden rivin nimeä vaikka kolme riviä mahtuisi, pitäisi näyttää mahd paljon
+paljon käytetään sanaa ""task"" joka voi olla hämäävä. Vaihdetaan kaikkialla sanaan ""card""
+
+
+
+Pohdin uudestaan ja poistin tän:
+""Luonnin yhteydessä salasana ei saa näkyä ellei pyydetä"". On ihan hyvä että se näkyy, jottei tule ongelmia myöhemmin kun salasanan on typottanut.",#ffffff,8,8,1,2024-03-06 13:16:25.123767+00:00,
+
+Column,0,,Sprint 2 voitot,11,False
+Ticket,"""Hello world"" pilvestä ja DB:stä","Tuotteesta vastaavan ominaisuudessa,
+haluan nähdä ""Hello world"" ominaisuuden käyttäen pilveä ja sen DB:tä,
+jotta vakuutun että nämä teknologiariskit ovat hallinnassa.
+
+Hyväksymiskriteerit:
+PO voi mennä omalla browserillaan linkillä pilviosoitteeseen ja nähdä siellä ""Futuboard 1.0"" tekstin, joka haetaan DB:stä.
+
+Riippuvuudet:
+Teknologiavalinnat on tehty
+Valittuun pilveen on saatu access",#ffffff,8,4,4,2024-03-06 13:18:26.970303+00:00,
+Ticket,Käyttäjä voi luoda lapun jossa tekstiä,"Scrummarin ominaisuudessa,
+haluan voida mennä omalle taululleni ja luoda sinne lapun johon voin kirjoittaa tekstiä,
+jotta voin visualisoida työn palasia.
+
+Hyväksymiskriteerit:
+Käyttäjä voi ladata sivun ja luoda sitä kautta uuden lapun, jolle antaa itse määritellyn tekstin.
+Kun käyttäjä tulee uudelleen samaan osoitteeseen, löytää sieltä itse luomansa lapun yhä.
+Jos käyttäjä määrittelee tekstin joka ei mahdu lappuun, loppu jätetään näyttämättä.
+Käyttäjä voi tulla luomaan toisenkin lapun (up to 20)",#ffffff,8,8,3,2024-03-06 13:18:17.455527+00:00,
+Ticket,Käyttäjä voi määritellä tiloja,"Scrummarin ominaisuudessa,
+haluan voida määritellä tiloja joihin laput voidaan asettaa,
+jotta voin visualisoida kuinka työt kypsyvät kohti lopullista arvoa.
+
+Hyväksymiskriteerit:
+Käyttäjä voi luoda 2-8 saraketta
+Käyttäjä voi nimetä ne itse ja uudelleennimetä",#ffffff,8,4,1,2024-03-06 13:17:55.345090+00:00,
+Ticket,Voi tehdä valmistelun (refinement) lapulle,"Scrummarin ominaisuudessa,
+haluan voida muuttaa lapun sisältöä samalla kun näytän sitä muille,
+jotta voin tehokkaasti johtaa backlogin jalostusta.
+
+Hyväksymiskriteerit:
+On jokin näkymä jossa näkyy lapun muutettavat ominaisuudet samalla kun niitä voi muuttaa
+Samalla ruudulla näkyy ainakin osa muista lapuista niin, että prioriteeteista säilyy käsitys
+Lappuun saa kirjoitettua kunnollisen mittaisen user storyn johonkin kenttään
+Lappuun saa kirjoitettua hyväksymiskriteerit ja hiukan muutakin tietoa
+
+Toteutusidea:
+Vähän niin kuin Miron kanban ;)",#ffffff,8,8,2,2024-03-06 13:18:05.308664+00:00,
+Ticket,Lappua voi liikuttaa tilojen välillä,"Loppukäyttäjän ominaisuudessa,
+haluan että Lappuja voi siirtää tilasta toiseen kätevästi,
+jotta voin visualisoida missä vaiheessa työ on.
+
+Hyväksymiskriteerit:
+PO voi koejärjestelmässä siirtää lappuja  tilasta toiseen (tässä tapauksessa voi olla fiksatut tilat)
+PO:n mielestä siirtäminen on riittävän kätevää
+Drag 'n drop tai muuten helpostikäytettävä",#ffffff,8,16,0,2024-03-06 13:17:46.379956+00:00,
+
+Column,,,Sprint 6 voitot,7,False
+Ticket,Testeissä nousseet kysymykset,"Devaajan/automaatiotestaajan ominaisuudessa,
+haluan että hämäävät (metodien nimien? objektien nimien? ) duplikaatit poistetaan koodista,
+jotta seuraava tiimi pystyy tehokkaasti kehittämään työkalua edelleen.
+
+Backendissä on ollut saman nimiset funktioiden nimet, jotka estävät testi API Clientiä päättämästä mitä funktiota käytetään. Pitäisi poistaa toinen saman nimisistä funktion implementaatioista, jotta yksikkötestit voivat testaa kaikkia toiminnallisuuksia.",#ffeb3b,8,8,6,2024-03-06 13:00:44.722071+00:00,"Edris, Klaus"
+Action,Backend korjattu,0,3
+Ticket,Jatkokehitystä helpottava dokumentointi,"Työkalua jatkokehittävän tiimin ominaisuudessa,
+haluamme selkeän ja ytimekkään dokumentaation josta ilmenee kuinka tätä koodimassaa voi kehittää, kääntää ja asentaa,
+jotta voimme luoda Futuboard 2.0:n sujuvasti ja tehokkaasti.
+
+Hyväksymiskriteerit:
+-dokumentaatio on kirjoitettu ja katselmoitu
+-löytyy gitin hakemistosta
+-linkki dokumentaatioon löytyy miro boardilta
+-kaverin katselmoima",white,8,16,10,2024-03-06 13:09:08.324337+00:00,"Aarne, Antonio"
+Action,kaverin katselmoima,1,0
+Action,pilvi dokumentointi,0,1
+Action,dokumentaatio on kirjoitettu,3,0
+Action,dokumentaatio on katselmoitu,2,2
+Action,backend dokumentointi,0,2
+Action,linkki dokumentaatioon löytyy miro boardilta,0,0
+Action,frontend dokumentointi,1,2
+Action,löytyy gitin hakemistosta ,2,0
+Ticket,Toiselle ryhmälle palautteen anto,"Kurssin puolesta,
+halutaan tehdä vertaisarviointia,
+jotta voidaan kehittää työkalua parempaan suuntaan.  
+
+-Some peer team members must test the system for at least 8 man hours in total during the latter half of the project using Session-based testing. Peer testing should be conducted before the last sprint so that potential improvements can be implemented before the end of the project. 
+-At least one Test Session Charter (see below) and other necessary materials (e.g. the software, test data, defect reporting guidelines), must be given to the testers about your own product. 
+-The testers must fill the exploration log in the Test Session Charter. 
+
+
+",#8bc34a,8,4,5,2024-03-20 14:12:10.635928+00:00,Ryhmä 12
+Action,Palautteen antaminen,0,2
+User,Matias
+Action,Test Charterin teko,0,3
+Action,Testauksen teko,1,3
+Ticket,Gala poster,"Kurssin puolesta
+halutaan posteri projektin tiedoilla,
+jotta voidaan gaalassa esitellä projektin tuloksia.  
+
+-Create a project poster and send the PDF by e-mail to cs-c2130 (at) aalto.fi by 18.4., The course personnel will print it.
+-Content: project goal, client, main sw features, technologies, ...
+-Format: A1 size PDF, max. 20MB, white background to save ink
+-Filename: ""team number_Client"" (e.g. ""09_Aalto"").",#03a9f4,8,8,1,2024-03-25 07:48:21.025200+00:00,"Viivi, Alex"
+Ticket,Futuboard on valmis seuraavaa kehitys tiimiä varten.,,#8bc34a,8,0,7,2024-03-26 16:30:32.044394+00:00,Sprint Goal
+Ticket,About us -linkki,"Tiimin ominaisuudessa,
+haluan Futuboardin etusivulle tietoa meistä,
+jotta maine ja kunnia löytää meidät
+
+-Pitäskö pääsivulla olla viel joku linkki jossa kerrotaan teistä tiiminä? Vaikka se teidän CV sivu jos ei muuta? Ihan siltä varalta että tulis mainetta tai kunniaa
+
+Idea: Tota kasipallon kuvaa vois editoida, niin että siinä mustassa osassa lukis valkosella ""Team Kasipallot"" ja se ois klikattava.",#03a9f4,8,4,9,2024-03-26 11:26:56.782646+00:00,"Antonio, Samuli"
+Action,CV tehty,0,3
+Action,"nappi ""Home"" -sivulle",1,3
+Action,pop up CV sivu,0,2
+Ticket,Ohjeistus kuinka Futuboardin saa käyttöön jos ei ole instanssia pyörimässä,"Teknisen Scrummarin ominaisuudessa,
+haluan ohjeen kuinka asentaa Futuboard johonkin,
+jotta voin ottaa sen käyttöön vaikkei missää pyörisi instanssia.
+
+Hyväksymiskriteerit:
+-Ulkopuolinen kaveri (joka ei ole mikään superguru) uskoo kykenevänsä tekemään homman tällä ohjeella 
+-Ohje löytyy readme:stä gitistä
+
+Taustatietoa: 
+Futuboardin pyörittäminen maksaa tällä hetkellä (FEB24) 
+DB 15e/kk, backend 5e/kk",white,8,8,8,2024-03-06 13:08:26.241498+00:00,"Klaus, Samuli"
+Action,ulkopuolinen hyväksynyt,0,3
+Action,ohjeistus backendistä,0,2
+User,Matias
+Action,ohjeistus pilvestä,0,0
+Action,ohje README:ssä,0,1
+Action,ohjeistus front-endistä,1,1
+Ticket,Projektin kaatajaisten valmistelu,"Wappua rakastavan asiakkaan ominaisuudessa,
+haluan tiimin valmistelevan projektille sopivat kaatajaiset Wapuksi,
+jotta kaikki halukkaat pääsevät muistelemaan, iloitsemaan, ja sulkemaan projektin omasta puolestaan.
+
+Hyväksymiskriteerit:
+- Hyvä tapa juhlistaa on sovittu
+- Kaikille on tiedotettu aika ja paikka
+- Työnjako on sovittu",#8bc34a,8,8,3,2024-03-18 09:36:45.591932+00:00,"Viivi, Matias"
+Ticket,Project Review 3 Valmistelu (22.4. klo 16),"Tiimin ominaisuudessa,
+halutaan valmistautua project reviewhun paremmin kuin viimeksi,
+jotta ei tarvitse hävetä ja tulee paremi arvosana.
+
+-Power Point tehty
+-Tehtävät jaettu ryhmäläisten kesken
+-Info paketti
+-Towonkaa sparraus esityksestä
+
+Ideoita:
+-Esittele enemmän projektin hankalempia puolia
+-prod ja dev ympäristöt
+-websocketit
+-näytä miten quality attributes on toteutettu
+-testit
+-Continous deliverystä: visualisoida softatuotaprosessia 
+-Statistiikkaa GitHubista",#03a9f4,8,16,4,2024-03-25 07:51:39.378762+00:00,"Alex, Matias"
+Action,Tehtävät jaettu ryhmäläisten kesken,1,2
+Action,Info paketti,2,2
+Action,Towonkaa sparraus esityksestä,0,0
+Action,Power Point,0,1
+Action,Esittäjät päätetty,0,2
+Action,,1,1
+Ticket,Työkalu toimii sekä läppärillä että puhelimella,"Tiimiläisen ominaisuudessa,
+haluan että voin työskennellä jonkin verran puhelimella ja kunnolla läppärillä,
+jotta pystyn
+Olemaan tilanteesta selvillä vaikka mukana on vain puhelin
+Kirjaamaan merkittävän yksityiskohdan vaikka mukana on vain puhelin
+Siirtämään tikettejä tiloissa ja siirtelemään magneetteja vaikka mukana on vain puhelin
+Työskentelemään täysimääräisesti kun käytössä on oikea tietokone
+
+Hyväksymiskriteerit:
+-Magneettien siirto onnistuu kännykällä
+-Tiketin kuvauksen selailu onnistuu kännykällä
+-Tikettien siirto tilojen välillä onnistuu kännykällä
+-Voin luoda uuden tiketin kännykällä
+-Voin tehdä kännykällä muistiinpanoja",#ffffff,8,32,2,2024-03-06 13:01:57.570265+00:00,
+
+Column,,,Sprint 0 done,6,False
+Ticket,Maalamisen ei tule sulkea tikettiä,"Jos maalaamisen lopettaa tiketin ulkopuolella, button up sulkee tiketin. Tämän ei tule toimia näin. Vain button down tulee sulkea tiketti.",#ffffff,8,4,1,2024-08-30 07:43:07.853777+00:00,
+Ticket,CI+TA ensimmäinen onnistunut ajo,"Tuotteen laadusta vastaavan ominaisuudessa,
+haluan että tiimillä on toimiva CI ja TA,
+jotta uskon tiimin käyttävän sitä jatkossa.
+
+Hyväksymiskriteerit:
+- CI käynnistyy kun tulee git muutos
+- CI kääntää ja ajaa TA
+- johonkin jää raportti tuloksista
+- tulos asentuu automaattisesti
+- PO:lle näytetään onnistuneen ajon tulos ",#ffffff,8,4,4,2024-10-21 15:06:25.105971+00:00,"Luka, Juuso"
+Action,ajetaan,1,3
+User,Otto
+Action,"tarkistetaan, että tulos asentuu",5,3
+Action,"tarkistetaan, että johonkin jää raportti",6,3
+Action,selvitetään miten toimii nykysellä github -setupilla,8,3
+Action,selvitetään mitä CI+TA meinaa,7,3
+Action,backend deployment toimii,3,3
+Action,PO:lle näytetään raportti tuloksista,0,2
+Action,Fixataan backending database,4,3
+User,Otto
+User,Atte
+Action,Lisätään tarvittavat avaimet Azuresta Githubiin,0,3
+User,Otto
+Action,Frontend deployment toimii,2,3
+User,Otto
+Ticket,Kukin devaaja tekee pikkumuutoksen,"Projektin asiakkaan ominaisuudessa,
+haluan joka devaajan tekevän pienen muutoksen onnistuneesti, 
+jotta voin olla varma että kaikilla on työskentelykyky Sprintin 1 alussa.
+
+Hyväksymiskriteerit:
+- Kaikilla on deviympäristö
+- Kukin on tehnyt pienen muutoksen joka on tuotannossa",#ffffff,8,16,5,2024-10-21 15:00:59.818145+00:00,"Atte, Matias"
+Action,Forkaa GitHub,1,3
+User,Otto
+Action,Kaikille toimiva dev ympäristö,3,3
+Action,Kaikki tekee muutoksen,4,3
+Action,Git oikeudet kaikille,2,3
+User,Otto
+Action,Selvitetään keneltä git oikeudet,0,3
+User,Otto
+Action,Kaikki pushaa muutoksensa jonnekkin ,5,3
+Action,Muutokset tuotantoon,6,3
+Ticket,Pilviaccess 2+ henkilölle,"Tuotteesta vastaavan ominaisuudessa,
+haluan että ainakin 2 hlö devitiimistä pystyy hallinnoimaan pilvipalvelua,
+jotta voin luottaa siihen, että pilven hallinnointi onnistuu.
+
+Hyväksymiskriteerit:
+- Ainakin 2 tiimiläistä pystyy asentamaan, poistamaan ja muokkaamaan Futuboardin instanssia pilvessä. ",#ffffff,8,8,3,2024-10-21 15:19:14.899859+00:00,"Otto, Milla"
+Action,testataan toisellakin,0,0
+Action,pyydetään access,2,3
+User,Otto
+Action,selvitä kenellä on jo,1,3
+User,Otto
+Action,testataan että toimii,3,3
+User,Otto
+Action,yhteys Jariin,0,3
+User,Otto
+Ticket,Tutkitaan Kasipallojen systeemi TA järjestelmän hyödyllisyys,"Laadusta vastaavan ominaisuudessa,
+haluan että Kasipallojen systeemi TA hyödyllisyys arvioidaan,
+jotta voimme päättää sen käyttöönotosta.
+
+Hyväksymiskriteerit:
+- Tiedämme paljonko arviodusti olisi työtä TA järjestelmän käyttöönotosta
+- Tiedämme paljonko arviodusti olisi hyötyä TA järjestelmän käyttöönotosta",#ffffff,8,4,0,2024-10-23 12:21:15.815890+00:00,
+Ticket,Sallitaan suuremmat koot,Koon maksimi nostetaan olemaan 9999,#ffffff,8,2,2,2024-08-30 07:43:29.797442+00:00,"Matias, Inka"
+Action,Missä elementin osissa on tämä ominaisuus?,5,1
+Action,Pieni tutustuminen material-Ui:hin,3,1
+Action,Muutetaan sääntö joka puolella,4,1
+Action,"Tuleeko arvo yhdestä muuttujasta, jos ei niin pitäisikö tulla? (suorituskyky)",0,0
+Action,Muutetaan koko 9999 Taskille,0,3
+User,Matias
+Action,Muutetaan error messaget täsmäämään uusia kokoja,1,3
+User,Matias
+Action,Kasvatetaan storypoint rajaa kuvaamaan uutta kokoa,2,3
+User,Matias
+Action,LuenEnsiKerrallaUserStorynHuolella,0,1
+User,Matias
+Action,Pieni CSS:ään tutustuminen/kertaus,1,1
+Action,"Ei tule material-UI:sta, <div> yms or jotain muuta kuin MUI:a",2,1
+
+Column,0,,Myöhemmin ehkä,0,False
+Ticket,Toimii avaruudessa,,white,8,0,9,2024-03-06 12:59:13.175355+00:00,
+Ticket,Lapun visuaalisen koon muuttaminen?,,white,8,0,4,2024-03-06 12:58:58.417501+00:00,
+Ticket,Fontin koon muuttaminen,,white,8,0,5,2024-03-06 12:59:05.694113+00:00,
+Ticket,Parannettu taulun design,"PO:n ominaisuudessa,
+haluan lähes valmiin taulun designin,
+jotta uskon, että minä ja tiimi jaemme yhteisen vision lopputuloksesta.
+
+Hyväksymiskriteerit:
+-Piirretty kaikille saatavilla välineillä
+-Katselmoitu tuotevisiota vastaan
+-Kehitetty yhteistyössä PO:n kanssa
+-Koko tiimin hyväksymä
+-Design on Mirossa",white,8,16,8,2024-03-06 13:07:52.282388+00:00,
+Ticket,Sprint goalin asettaminen,"Scrummarin ominaisuudessa,
+haluan saada sprint goalin tiimille näkyviin,
+jotta se pysyy mielessä koko sprintin ajan
+
+Hyväksymiskriteerit:
+- Tämänhetkinen sprint goal näkyy selkeästi boardia käytettäessä",#ffffff,8,0,2,2024-04-23 08:46:06.340271+00:00,
+Ticket,Best practice ohjeistus käyttämiseen,,#ffffff,8,0,3,2024-04-23 08:45:43.967070+00:00,
+Ticket,Hanskataan usean editoijan ongelma lapulle,"Tiimiläisen ominaisuudessa,
+haluan voida luottaa siihen etteivät tekemäni muutoksen katoa,
+jotta en menetä elämänhaluani ja uskoani työkaluun ",#ffffff,8,0,6,2024-03-06 13:00:00.495514+00:00,
+Ticket,Use-case dokumentin ensimmäinen versio,"Laadusta vastaavan ominaisuudessa,
+haluan tiimin pohtivan ja ymmärtävän tärkeimmät use-caset tuotteelle,
+jotta kaikilla on yhteinen ymmärrys siitä kuinka tuotetta yleensä käytetään ja näin olleen ne asiat tehdään kunnolla.
+
+Hyväksymiskriteerit:
+-Kattaa tärkeimmät 4 use-casea
+-Kuvaa yksinkertaisen voimakkaasti kuinka käyttäjä käyttää järjestelmää ja mitä järjestelmä tekee
+-PO:lta on saatu palautetta sprintin aikana
+-Dokumentti on Mirossa
+
+Top use-cases:
+1. Käyttäjä luo uuden taulun (tiimin)
+2. Backlog Refinement
+3. Ottaa töitä työn alle (lapun siirto, magneetti) ja saa valmiiksi
+4. Sprintin suunnittelu ja taskitus (suurempi lappu toimii swim lanena pienemmille laipuille)
+5. Käyttäjä asentaa oman instanssin",white,8,4,1,2024-03-06 13:06:01.016408+00:00,
+Ticket,Lapulle saa asetettua huolehtijat (caretakerit),"Scrummarin ominaisuudessa,
+haluan että lapusta näkee ketkä katsovat työn toteutumisen perään,
+jotta kaikille on selvää kuka huolehtii mistäkin.
+
+Hyväksymiskriteerit:
+-Voidaan määritellä huolehtijoita
+-Lapulle voidaan valita 1-3 huolehtijaa tiimiläisten listasta
+-Huolehtijat näkyvät lapun vasemmassa alalaidassa",white,8,8,7,2024-03-06 13:07:17.122259+00:00,
+
+Column,0,,Uudet,1,False
+Ticket,voin määritellä release scopin (tag),,white,8,0,4,2024-03-06 13:00:18.743285+00:00,
+Ticket,Release burn-up raportti,,white,8,0,5,2024-03-06 13:00:27.905231+00:00,
+Ticket,Lappuja voi kommentoida,,white,8,0,6,2024-03-06 13:00:08.899056+00:00,
+Ticket,Swimlanen lisääminen kolumniin jälkikäteen,,#ffffff,8,0,1,2024-03-26 14:47:13.695796+00:00,
+Ticket,velocityn mittaaminen,,#ffffff,8,0,2,2024-03-26 14:15:06.856796+00:00,
+Ticket,Custom taustaväri boardeille,,#ffffff,8,0,3,2024-10-21 16:03:11.692872+00:00,
+Ticket,Taulujen lista,"Scrummarin/ylläpitäjän ominaisuudessa,
+haluan voida nähdä instanssissa olevien taulujen listan,
+jotta voin löytää hukkuneita tauluja ja nähdä paljonko instanssia käytetään. 
+
+-taulujen nimien lista josta löytyy linkki kyseiseen tauluun
+-näyttää taulun viimeisimmän käyttöpäivän
+
+Toteutusidea:
+Tehdään pääsivulle linkki, jota ei vahingossa edes huomaa.",#ffffff,8,8,0,2024-03-06 13:00:58.417315+00:00,
+Action,"Backendissä valmis API, eli sen tutkiminen",1,1
+Action,Uuden komponentin lisääminen etusivulle,0,0
+Action,Tiedon välittäminen sivulle,0,1
+User,Matias
+Action,Uuden komponentin lisääminen etusivulle,2,1
+Action,LuenHuolellaUserStoryn,3,1
+Ticket,Timer toiminnallisuus,"Scrummrin ominaisuudessa, 
+haluan että taululla on kaikille näkyvä ajastin,
+jotta kaikki näkevät paljonko jollekin kokoukselle tai sen osalle on aikaa.",white,8,0,7,2024-03-06 12:59:45.242934+00:00,
+
+Column,0,,Sprint 1 voitot,12,False
+Ticket,Valitse käytettävä aihio,"Tuotteesta vastaavan ominaisuudessa,
+haluan tiimin valitsevan potentiaalisista aihioista sen joka on ylläpidettävin ja kehitettävin,
+jotta voimme käyttää sitä kaiken tulevan kehityksen pohjana.
+
+Hyväksymiskriteerit:
+Koko tiimille on selkeää minkä aihion pohjalta kehitys tapahtuu
+PO hyväksyy valinnan",#ffffff,8,8,1,2024-03-06 13:18:46.788300+00:00,
+Ticket,Arkkitehtuurihahmotelma,"Tuotteen laadusta vastaavan ominaisuudessa,
+haluan tiimin tekevän arkkitehtuurihahmotelman,
+jotta tiimillä on yhtenäinen järkevä käsitys siitä, millaista teknologista järjestelmää se on rakentamassa.
+
+Hyväksymiskriteerit:
+On dokumentti jossa on yhteinen näkemys siitä, millaisia osia järjestelmässä on ja kuinka ne keskustelevat keskenään (deployment view)
+Sisältää järkevän tasoiset rajapintakuvaukset",#ffffff,8,16,4,2024-03-06 13:19:28.646317+00:00,
+Ticket,"""Hello world"" Gitin ja CI:n kautta","Tuotteesta vastaavan ominaisuudessa,
+haluan nähdä ""Hello world"" ominaisuuden käyttäen versionhallintaa ja CI:tä,
+jotta vakuutun että nämä teknologiariskit ovat hallinnassa.
+
+Hyväksymiskriteerit:
+Versionhallintaan kommittoitu Hello World menee CI:hin ja ilmaantuu jonnekin",#ffffff,8,4,5,2024-03-06 13:19:39.352519+00:00,
+Ticket,Kasipallojen velocity seuranta,"Projektin onnistumisesta vastaavan ominaisuudessa,
+haluan että tiimi luo itselleen velocityn seurannan ja burn-up chartin,
+jotta näemme onko tiimin eteneminen luotettavaa.
+
+Hyväksymiskriteerit:",#ffffff,8,2,2,2024-03-06 13:18:56.226769+00:00,
+Ticket,2+ Yksikkötestiä ja raportti,"Tuotteen laadusta vastaavan ominaisuudessa,
+haluan nähdä ainakin 2 yksikkötestiä CI:ssä ja niiden ajoraportin,
+jotta vakuutun että nämä teknologiariskit ovat hallinnassa ja kynnys tehdä yksikkötestejä on riittävän pieni.
+
+Hyväksymiskriteerit:
+Ainakin 2 yksikkötestiä on implementoitu
+Ne pyörivät osana CI:tä
+Niiden raportti on helposti nähtävillä
+
+Riippuvuudet:
+Tarvitaan jotain toiminnallisuutta jota testata.",#ffffff,8,4,6,2024-03-06 13:19:19.002225+00:00,
+Ticket,Käyttäjä voi luoda itse nimetyn taulun,"Scrummarin ominaisuudessa,
+haluan voida mennä tuotteeseen ja perustaa itse nimeämäni taulun,
+jotta voin perustaa uudelle tiimilleni työnhallintaboardin.
+
+Hyväksymiskriteerit:
+Käyttäjä voi ladata sivun ja luoda sitä kautta uuden taulun, jolle antaa itse määritellyn nimen.
+Kun käyttäjä tulee uudelleen samaan osoitteeseen, löytää sieltä itse nimeämänsä taulun yhä.
+
+Riippuvuudet:
+ei kummempia",#ffffff,8,8,3,2024-03-06 13:19:09.820749+00:00,
+Ticket,DB rakenteen suunnittelu,"Tiimin ominaisuudessa,
+haluan suunnitellun DB rakenteen,
+jotta vältämme ylläpitohelvetin.
+
+Hyväksymiskriteerit:
+DB rakene on suunniteltu ja dokumentoitu ja kommunikoitu tiimille
+Rakenne ottaa huomioon, että tulevaisuudessa saatetaan implementoida undo-toiminnallisuus, läpimenoajan mittaus ja raportteja kuten cumulative flow diagram.",#ffffff,8,8,7,2024-03-06 13:19:49.541578+00:00,
+Ticket,Määritellään Kanban -taulun käyttö ,"Tiimin työnhallinnasta vastaavan ominaisuudessa,
+haluan että tiimi määrittelee kuinka aiomme käyttää työnohjauksen Kanban taulua,
+jotta tiimillä ja PO:lla on yhteinen käsitys siitä kuinka työtä hallitaan ja tilannekuvaa tulkitaan.
+
+Tarviiko review osiota? Prodcut ownerilla oma taulu?
+
+Hyväksymiskriteerit:
+",#ffffff,8,2,0,2024-03-06 13:18:38.330159+00:00,
+Ticket,Taulun protokuva (tai vast) pilvestä CI+TA läpi,"Tuotteen laadusta vastaavan ominaisuudessa,
+haluan nähdä taulun protokuvan/designin käyttäjän ominaisuudessa aidon julkaisuputken kautta,
+jotta voin vakuuttua siitä, että tiimin julkaisuputki toimii ja jatkossa kaikki inkrementit voidaan näyttää systeemiympäristössä.
+
+Hyväksymiskriteerit:
+PO voi omalta browseriltaan mennä pilveen katsomaan taulun protokuvan
+Protokuva on päätynyt pilveen aidon julkaisuputken läpi: Git + CI + TA + automaattiasennus
+
+Riippuvuudet:
+Palaset pitää olla päätetty ja hankittu
+Tarvitsee olla testit ja testattavaa",#ffffff,8,4,8,2024-03-06 13:19:58.141248+00:00,
+
+Column,,,Sprint 1 done,5,False
+Ticket,Futuboardille logo,"Tuotteesta vastaavan ominaisuudessa,
+haluan että Futuboardilla on oma logo joka näkyy tuotteessa,
+jotta ihmiset oppivat tunnistamaan tuotteen ja ehkä herkemmin suosittelevat sitä.
+
+Hyväksymiskriteerit
+- Logo suunniteltu
+- PO hyväksynyt logon
+- Logo vaihdettu kotisivulle
+- Logo vaihdettu browser tabiin
+- Logo vaihdettu boardille kotitalon tilalle",#ffffff,8,4,4,2024-10-23 11:50:58.082476+00:00,
+Action,Luonnosten tekeminen,0,3
+User,Milla
+Action,Vaihda logo kotisivulle,3,3
+User,Milla
+Action,Logon teko,1,3
+User,Milla
+Action,Vaihda logo koti-napin tilalle,4,3
+User,Milla
+Action,Vaihda logo browser tabiin,2,3
+User,Milla
+Ticket,selaimen tabiin boardin nimi,"peruskäyttäjän ominaisuudessa,
+haluan että boardin browser tab näyttää mistä Futuboardista on kyse,
+jotta 
+- kun menen boardille ja se kysyy salasanaa, tiedän oikean salasanan
+- eri tabeistani löydän helposti sen boardin jolle haluan mennä
+
+Hyväksymiskriteerit:
+- Firefox ja Chrome tabin päällä hoveroidessa näkee boardin nimen",#ffffff,8,2,1,2024-09-10 17:29:37.297853+00:00,
+Action,,0,3
+Action,Muuta documentin title useEffectillä silloin kun board renderöidään kirjautumisen jälkeen.,1,3
+User,Matias
+Ticket,Taulun nimen ja salasanan muuttaminen,"Scrummarin ominaisuudessa, 
+haluan voida muuttaa tarvittaessa taulun nimen ja salasanan,
+jotta en ole loputtomasti jumissa ensimmäisten valintojeni kanssa.
+
+-salasanan voi vaan vaihtaa antaessa vanhan salasanan
+-uusi salasana pitää kirjoittaa kahteen kertaan 
+-salasana ja nimi on helppo vaihtaa, mutta niitä ei voi tehdä vahingossa
+
+Toteutus idea:
+-Kolmen pisteen takaa löytyy mahdollisuus vaihtaa nimi ja salasana",#ffffff,8,8,5,2024-03-26 14:38:09.404054+00:00,
+Action,"Tee frontendiin UI, joka mahdollistaa salasanan ja taulun nimen vaihtamisen (käyttäen backendin uutta endpointtia)",1,3
+User,Luka
+Action,"Tee backendiin API-endpointit, jotka mahdollistavat nimen ja salasanan muutokset",0,3
+User,Luka
+Ticket,Kotisivun päivittäminen team Tenacitylle,"Tiimiläisen ominaisuudessa,
+haluan että Futuboardin kotisivu näyttää team Tenacityn tekevän sitä, 
+jotta kunnia ja maine menee oikeaan osoitteeseen.
+
+Hyväksymiskriteerit:
+- Kotisivulta ilmenee tiimi
+- Kasipallojen panostus yhä tunnustetaan
+- Tiimi on tyytyväinen näkyvyyteen",#ffffff,8,4,3,2024-10-21 16:39:19.499089+00:00,
+Action,Lisää sivumaininta kasipalloista etusivulle,2,3
+User,Milla
+Action,,3,3
+Action,Vaihda etusivun github linkki,0,3
+User,Milla
+Action,Vaihda etusivun tiimi-cv,1,3
+User,Milla
+Ticket,selaimelle ymmärrettävästi eri salasana eri boardille,"Peruskäyttäjän ominaisuudessa,
+haluan voida tallentaa eri Futuboardien salasanat,
+jotta voin käyttää boardeja kirjoittamatta aina salasanaa.
+
+Hyväksymiskriteerit:
+- Onnistuu Firefox:lla ja Chrome:lla
+
+Toteutusidea:
+Kysy Otolta lisää:
+Lisää localstorage, jossa salasanat säilytetään (Localstoragessa boardPasswords-JSON, jossa key=boardId, ja value=salasana), ja skippaa salasana-sivu, jos salasana löytyy localstoragesta, ja se on oikein. ",#ffffff,8,4,0,2024-09-10 17:29:58.395451+00:00,
+Action,"Lisää localstorage, skippaa salasana-sivu, jos localstoragessa oikea salasana",0,3
+User,Otto
+Ticket,Uusi tiketti luodaan ylimmäiseksi,"Scrummarin ominaisuudessa,
+haluan että Uusi tiketti luodaan ylimmäiseksi, ei alimmaiseksi,
+jotta juuri muistettu tärkeä asia päätyy heti pinon päälimmäiseksi.",#ffffff,8,4,6,2024-11-14 16:15:00.290986+00:00,
+Ticket,Lapun poistonapin siirto,Siirrä oikeaan alanurkkaan,#ffffff,8,1,7,2024-11-27 15:10:07.066871+00:00,
+Ticket,Project Review 1,"Kurssin proffan ominaisuudessa,
+haluan oppilastiimien valmistautuvan Project Review tapahtumaan,
+jotta materiaalit ovat laadukkaita ja kehtaa antaa hyviä arvosanoja.
+
+Hyväksymiskriteerit:
+- PPT katselmoitu
+- Dokumentit päivitetty
+- Esittäjä valittu
+- Demo valmisteltu
+",#ffffff,8,8,2,2024-11-14 15:29:29.704909+00:00,
+Action,Powerpoint 1st draft,7,3
+User,Milla
+User,Otto
+Action,Powerpoint pohja,8,3
+User,Milla
+Action,Kerää tarvittavat materiaalit (MyCourses Project Reviews -sivulta) yhden linkin taakse,3,3
+Action,Valitaan esittäjä(t),0,3
+User,Henna
+User,Otto
+Action,Tee/täytä powerpoint,4,3
+Action,Täydennä Process Overview,6,3
+Action,Täydennä Product Vision,5,3
+Action,Tee Technical Overview,2,3
+Action,"Lähetä linkki sähköpostilla opettajalle, coachille ja PO:lle",1,3
+

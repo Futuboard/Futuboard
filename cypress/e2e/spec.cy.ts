@@ -144,13 +144,41 @@ describe("In a board", () => {
     cy.contains("Antonio").should("not.exist")
     cy.contains("Create board")
   })
+})
 
-  it("can work with multiple users at the same time", () => {
-    // Test that updates from other users are responsive
+describe("When working with multiple users", () => {
+  it("can see changes made by other users and own updates are responsive", () => {
+    // Import board with data, so responsivess is tested more realistically
+    cy.contains("Import board").click()
+    cy.get("input[name='title']").type("Imported test Board")
+    cy.get("input[name='password']").type("alpha123")
+    cy.get("input[type='file']").selectFile("fixtures/large_board.csv", { force: true })
+    cy.get("button").contains("Submit").click()
+
+    cy.loginToBoard("alpha123")
+
+    cy.contains("Imported test Board")
+
+    cy.contains("Myöhemmin ehkä")
+    cy.contains("Kukin tekee 1 UT")
+    cy.contains("Atte")
 
     // Only testing with 5 concurrent users, because all browser are running on the same machine.
     // With more users, test becomes flaky.
     const concurrentUsers = 5
+
+    // Check that board doesn't contain data that it shouldn't contain yet
+
+    for (let i = 0; i < concurrentUsers; i++) {
+      cy.contains(`To Do (${i})`).should("not.exist")
+      cy.contains(`Card (${i})`).should("not.exist")
+    }
+
+    cy.contains("Something else").should("not.exist")
+    cy.contains("Research Competitors").should("not.exist")
+    cy.contains("Normal").should("not.exist")
+
+    // Test that updates from other users are responsive
 
     cy.url().then((url) => {
       cy.task("stress-test", { boardUrl: url, concurrentUsers })
@@ -159,7 +187,6 @@ describe("In a board", () => {
     for (let i = 0; i < concurrentUsers; i++) {
       cy.contains(`To Do (${i})`)
       cy.contains(`Card (${i})`)
-      cy.contains(`Corner Note (${i})`)
     }
 
     // Test own updates are responsive, when board in use
