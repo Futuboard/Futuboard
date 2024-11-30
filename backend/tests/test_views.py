@@ -6,7 +6,7 @@ import uuid
 from django.urls import reverse
 import json
 from .test_utils import addBoard, addBoardWithPassword, addColumn, addTicket, resetDB
-from ..futuboard.verification import new_password, verify_password
+from ..futuboard.verification import verify_password
 
 
 ############################################################################################################
