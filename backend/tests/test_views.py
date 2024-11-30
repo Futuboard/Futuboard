@@ -5,7 +5,7 @@ from django.utils import timezone
 import uuid
 from django.urls import reverse
 import json
-from .test_utils import addBoard, addColumn, addTicket, resetDB
+from .test_utils import addBoard, addBoardWithPassword, addColumn, addTicket, resetDB
 from ..futuboard.verification import new_password, verify_password
 
 
@@ -513,26 +513,17 @@ def test_deleting_ticket():
 
 
 @pytest.mark.django_db
-def test_changing_password_correctly():
+def test_password_change_correct():
     """
     Test that password changes correctly
     """
     api_client = APIClient()
 
-    boardid = uuid.uuid4()
-    new_board = md.Board(
-        boardid=boardid,
-        description="",
-        title="",
-        creation_date=timezone.now(),
-        passwordhash=new_password("password"),
-        salt="",
-    )
-    new_board.save()
+    boardid = addBoardWithPassword(uuid.uuid4(), password="password").boardid
 
+    # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
     assert response.status_code == 200
-
     data = response.json()
     token = data["token"]
 
@@ -547,33 +538,23 @@ def test_changing_password_correctly():
     )
 
     assert response.status_code == 200
-
     assert verify_password("newpassword", md.Board.objects.all()[0].passwordhash)
 
     resetDB()
 
 
 @pytest.mark.django_db
-def test_changing_password_with_wrong_old_password():
+def test_password_change_with_incorrect_old_password():
     """
-    Test that password doesn't change if given wrong old password
+    Test that password doesn't change if given incorrect old password
     """
     api_client = APIClient()
 
-    boardid = uuid.uuid4()
-    new_board = md.Board(
-        boardid=boardid,
-        description="",
-        title="",
-        creation_date=timezone.now(),
-        passwordhash=new_password("password"),
-        salt="",
-    )
-    new_board.save()
+    boardid = addBoardWithPassword(uuid.uuid4(), password="password").boardid
 
+    # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
     assert response.status_code == 200
-
     data = response.json()
     token = data["token"]
 
@@ -594,26 +575,17 @@ def test_changing_password_with_wrong_old_password():
 
 
 @pytest.mark.django_db
-def test_changing_password_with_different_confirm_password():
+def test_password_change_with_clashing_confirm_password():
     """
     Test that password doesn't change if new password and confirm password not matching
     """
     api_client = APIClient()
 
-    boardid = uuid.uuid4()
-    new_board = md.Board(
-        boardid=boardid,
-        description="",
-        title="",
-        creation_date=timezone.now(),
-        passwordhash=new_password("password"),
-        salt="",
-    )
-    new_board.save()
+    boardid = addBoardWithPassword(uuid.uuid4(), password="password").boardid
 
+    # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
     assert response.status_code == 200
-
     data = response.json()
     token = data["token"]
 
