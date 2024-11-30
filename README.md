@@ -276,6 +276,7 @@ To run all E2E tests with cypress:
 
 ```
 cd cypress/
+npm install
 npm test
 ```
 
@@ -283,6 +284,7 @@ To open Cypress with an interactive GUI:
 
 ```
 cd cypress/
+npm install
 npm start
 ```
 
