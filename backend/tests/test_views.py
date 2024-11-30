@@ -1,10 +1,12 @@
 import pytest
 import futuboard.models as md
 from rest_framework.test import APIClient
+from django.utils import timezone
 import uuid
 from django.urls import reverse
 import json
 from .test_utils import addBoard, addColumn, addTicket, resetDB
+from ..futuboard.verification import new_password, verify_password
 
 
 ############################################################################################################
@@ -506,5 +508,126 @@ def test_deleting_ticket():
 
     assert response.status_code == 200
     assert md.Ticket.objects.all()[0].ticketid == ticketid2
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_changing_password_correctly():
+    """
+    Test that password changes correctly
+    """
+    api_client = APIClient()
+
+    boardid = uuid.uuid4()
+    new_board = md.Board(
+        boardid=boardid,
+        description="",
+        title="",
+        creation_date=timezone.now(),
+        passwordhash=new_password("password"),
+        salt="",
+    )
+    new_board.save()
+
+    response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
+    assert response.status_code == 200
+
+    data = response.json()
+    token = data["token"]
+
+    response = api_client.put(
+        reverse("update_board_password", args=[boardid]),
+        data={
+            "old_password": "password",
+            "new_password": "newpassword",
+            "confirm_password": "newpassword",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 200
+
+    assert verify_password("newpassword", md.Board.objects.all()[0].passwordhash)
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_changing_password_with_wrong_old_password():
+    """
+    Test that password doesn't change if given wrong old password
+    """
+    api_client = APIClient()
+
+    boardid = uuid.uuid4()
+    new_board = md.Board(
+        boardid=boardid,
+        description="",
+        title="",
+        creation_date=timezone.now(),
+        passwordhash=new_password("password"),
+        salt="",
+    )
+    new_board.save()
+
+    response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
+    assert response.status_code == 200
+
+    data = response.json()
+    token = data["token"]
+
+    response = api_client.put(
+        reverse("update_board_password", args=[boardid]),
+        data={
+            "old_password": "wrong",
+            "new_password": "newpassword",
+            "confirm_password": "newpassword",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 401
+    assert verify_password("password", md.Board.objects.first().passwordhash)
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_changing_password_with_different_confirm_password():
+    """
+    Test that password doesn't change if new password and confirm password not matching
+    """
+    api_client = APIClient()
+
+    boardid = uuid.uuid4()
+    new_board = md.Board(
+        boardid=boardid,
+        description="",
+        title="",
+        creation_date=timezone.now(),
+        passwordhash=new_password("password"),
+        salt="",
+    )
+    new_board.save()
+
+    response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
+    assert response.status_code == 200
+
+    data = response.json()
+    token = data["token"]
+
+    response = api_client.put(
+        reverse("update_board_password", args=[boardid]),
+        data={
+            "old_password": "password",
+            "new_password": "newpassword1",
+            "confirm_password": "newpassword2",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 400
+    assert verify_password("password", md.Board.objects.first().passwordhash)
 
     resetDB()

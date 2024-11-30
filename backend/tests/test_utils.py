@@ -5,11 +5,11 @@ import django.apps
 # Utility functions
 
 
-def addBoard(boardId):
+def addBoard(boardId, title="title", description=""):
     new_board = md.Board(
         boardid=boardId,
-        description="",
-        title="title",
+        description=description,
+        title=title,
         creation_date=timezone.now(),
         passwordhash="",
         salt="",
