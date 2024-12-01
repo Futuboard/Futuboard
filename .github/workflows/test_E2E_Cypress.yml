@@ -24,9 +24,9 @@ jobs:
 
       - name: Start containers
         run: docker compose up -d --wait
-
+      
       - name: Run Cypress tests
-        run: npx cypress run --browser chrome
+        run: cd cypress && npm ci &&  npm test
 
       - name: Stop containers
         run: docker compose down
