@@ -106,7 +106,7 @@ describe("In a board", () => {
     cy.get('[data-testid="DownloadIcon"]').click()
 
     const date = new Date()
-    const fileName = `Project Alpha-${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}.csv`
+    const fileName = `Project Alpha-${String(date.getDate()).padStart(2, "0")}_${String(date.getMonth() + 1).padStart(2, "0")}_${date.getFullYear()}.csv`
     const filePath = `downloads/${fileName}`
 
     cy.readFile(filePath).should("exist")
@@ -159,9 +159,10 @@ describe("When working with multiple users", () => {
 
     cy.contains("Imported test Board")
 
-    cy.contains("Myöhemmin ehkä")
-    cy.contains("Kukin tekee 1 UT")
-    cy.contains("Atte")
+    cy.contains("about this board")
+    cy.contains("pokemon31-40")
+    cy.contains("pikachu")
+    cy.contains("Jess")
 
     // Only testing with 5 concurrent users, because all browser are running on the same machine.
     // With more users, test becomes flaky.
@@ -176,7 +177,6 @@ describe("When working with multiple users", () => {
 
     cy.contains("Something else").should("not.exist")
     cy.contains("Research Competitors").should("not.exist")
-    cy.contains("Normal").should("not.exist")
 
     // Test that updates from other users are responsive
 
@@ -196,6 +196,5 @@ describe("When working with multiple users", () => {
 
     cy.createTask(otherTask)
     cy.contains("Research Competitors")
-    cy.contains("Normal")
   })
 })

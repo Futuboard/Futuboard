@@ -32,11 +32,10 @@ export default defineConfig({
                 await page.click('button[type="submit"]')
 
                 await page.waitForSelector('button[aria-label="add column"]')
-
                 await page.click('button[aria-label="add column"]')
+                await delay(500)
 
                 const columnTitle = `To Do (${index})`
-
                 await page.type('input[name="columnTitle"]', columnTitle)
                 await page.click('button[type="submit"]')
 
