@@ -36,8 +36,6 @@ def addColumn(boardId, columnId, title="", swimlane=False):
 
 
 def addTicket(columnId, ticketId, title="", description="", color="", size=0, cornernote=""):
-    length = len(md.Ticket.objects.filter(columnid=columnId))
-
     new_ticket = md.Ticket(
         ticketid=ticketId,
         columnid=md.Column.objects.get(pk=columnId),
@@ -46,10 +44,16 @@ def addTicket(columnId, ticketId, title="", description="", color="", size=0, co
         color=color,
         storypoints=8,
         size=size,
-        order=length,
+        order=0,
         creation_date=timezone.now(),
         cornernote=cornernote,
     )
+
+    same_column_tickets = md.Ticket.objects.filter(columnid=new_ticket.columnid)
+    for ticket in same_column_tickets:
+        ticket.order += 1
+        ticket.save()
+
     new_ticket.save()
     return new_ticket
 
