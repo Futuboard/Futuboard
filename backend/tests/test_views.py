@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 import uuid
 from django.urls import reverse
 import json
-from .test_utils import addBoard, addBoardWithPassword, addColumn, addTicket, resetDB
+from .test_utils import addBoard, addColumn, addTicket, resetDB
 from ..futuboard.verification import verify_password
 
 
@@ -511,6 +511,7 @@ def test_deleting_ticket():
     resetDB()
 
 
+@pytest.mark.django_db
 def test_updating_columns_order():
     """
     Test updating columns order
@@ -558,7 +559,7 @@ def test_password_change_correct():
     """
     api_client = APIClient()
 
-    boardid = addBoardWithPassword(uuid.uuid4(), password="password").boardid
+    boardid = addBoard(uuid.uuid4(), password="password").boardid
 
     # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
@@ -589,7 +590,7 @@ def test_password_change_with_incorrect_old_password():
     """
     api_client = APIClient()
 
-    boardid = addBoardWithPassword(uuid.uuid4(), password="password").boardid
+    boardid = addBoard(uuid.uuid4(), password="password").boardid
 
     # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
@@ -620,7 +621,7 @@ def test_password_change_with_clashing_confirm_password():
     """
     api_client = APIClient()
 
-    boardid = addBoardWithPassword(uuid.uuid4(), password="password").boardid
+    boardid = addBoard(uuid.uuid4(), password="password").boardid
 
     # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
