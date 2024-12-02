@@ -67,17 +67,23 @@ def addSwimlanecolumn(columnId, swimlanecolumnId, title=""):
 
 
 def addAction(ticketId, swimlanecolumnId, actionId, title=""):
-    length = len(md.Action.objects.filter(swimlanecolumnid=swimlanecolumnId))
-
     new_action = md.Action(
         actionid=actionId,
         ticketid=md.Ticket.objects.get(pk=ticketId),
         swimlanecolumnid=md.Swimlanecolumn.objects.get(pk=swimlanecolumnId),
         title=title,
-        order=length,
+        order=0,
         creation_date=timezone.now(),
     )
     new_action.save()
+
+    same_swimlane_actions = md.Action.objects.filter(
+        swimlanecolumnid=new_action.swimlanecolumnid, ticketid=new_action.ticketid
+    )
+    for action in same_swimlane_actions:
+        action.order += 1
+        action.save()
+
     return new_action
 
 
