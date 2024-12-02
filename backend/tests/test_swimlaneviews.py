@@ -1,5 +1,6 @@
 import pytest
 import futuboard.models as md
+from .test_utils import addBoard, addColumn, addTicket, addAction, addSwimlanecolumn, resetDB
 from rest_framework.test import APIClient
 import uuid
 from django.utils import timezone
@@ -185,3 +186,43 @@ def test_action_on_swimlane():
     md.Swimlanecolumn.objects.all().delete()
     md.Ticket.objects.all().delete()
     md.Action.objects.all().delete()
+
+
+@pytest.mark.django_db
+def test_get_actions_by_columnId():
+    """
+    Test the get_actions_by_columnId function in backend/futuboard/views/swimlaneViews.py
+    Has one method: GET
+
+        GET: Returns all actions for a given column with a swimlane
+    """
+    # Initalize a client.
+    client = APIClient()
+
+    # Initalize some models in the backend using test_utils.py utilities.
+    boardid = addBoard(uuid.uuid4()).boardid
+    columnid = addColumn(boardid, uuid.uuid4(), title="swimlane", swimlane=True).columnid
+    swimlanecolumnid = addSwimlanecolumn(columnid, uuid.uuid4()).swimlanecolumnid
+    ticketid = addTicket(columnid, uuid.uuid4(), title="A test ticket").ticketid
+
+    # At this point, there should be no actions.
+    assert len(md.Action.objects.all()) == 0
+
+    # Create an action into the swimlanecolumn associated with the column.
+    addAction(ticketid, swimlanecolumnid, uuid.uuid4(), title="My test action")
+
+    # At this point, there should be one action.
+    assert len(md.Action.objects.all()) == 1
+
+    # Attempt to retrieve the action.
+    response = client.get(reverse("get_actions_by_columnId", args=[columnid]))
+
+    # Check that the operation was successful.
+    assert response.status_code == 200
+
+    # Check that the response contains one action.
+    data = response.json()
+    assert len(data) == 1
+
+    # Cleanup
+    resetDB()
