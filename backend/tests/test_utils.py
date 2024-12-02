@@ -53,6 +53,34 @@ def addTicket(columnId, ticketId, title="", description="", color="", size=0, co
     return new_ticket
 
 
+def addSwimlanecolumn(columnId, swimlanecolumnId, title=""):
+    length = len(md.Swimlanecolumn.objects.filter(columnid=columnId))
+
+    new_swimlanecolumn = md.Swimlanecolumn(
+        swimlanecolumnid = swimlanecolumnId,
+        columnid = md.Column.objects.get(pk=columnId),
+        title = title,
+        ordernum = length,
+    )
+    new_swimlanecolumn.save()
+    return new_swimlanecolumn
+
+
+def addAction(ticketId, swimlanecolumnId, actionId, title=""):
+    length = len(md.Action.objects.filter(swimlanecolumnid=swimlanecolumnId))
+
+    new_action = md.Action(
+        actionid = actionId,
+        ticketid = md.Ticket.objects.get(pk=ticketId),
+        swimlanecolumnid = md.Swimlanecolumn.objects.get(pk=swimlanecolumnId),
+        title=title,
+        order=length,
+        creation_date=timezone.now(),
+    )
+    new_action.save()
+    return new_action
+
+
 def resetDB():
     for model in django.apps.apps.get_models():
         model.objects.all().delete()
