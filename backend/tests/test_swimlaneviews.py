@@ -226,3 +226,79 @@ def test_get_actions_by_columnId():
 
     # Cleanup
     resetDB()
+
+
+@pytest.mark.django_db
+def test_update_action():
+    """
+    Test the update_action funtion in backend/futuboard/views/swimlaneViews.py
+    Has one method: PUT
+        PUT: updates action title
+    """
+    api_client = APIClient()
+
+    # Creata a board and a column
+
+    boardid = uuid.uuid4()
+    columnid = uuid.uuid4()
+    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "testboard", "password": "password"})
+    assert response.status_code == 200
+    data = {"columnid": str(columnid), "title": "column", "position": 0, "swimlane": True}
+    response = api_client.post(
+        reverse("columns_on_board", args =[boardid]), data = json.dumps(data), content_type="application/json"
+    )
+    assert response.status_code == 200
+
+    # One ticket to column
+    ticketid = uuid.uuid4()
+    data = {"ticketid": str(ticketid), "title": "ticket", "description": "ticket description", "position": 0, "size": 8}
+    response = api_client.post(reverse("tickets_on_column", args=[boardid, columnid]), data=json.dumps(data), content_type="application/json")
+    assert response.status_code == 200
+
+    # Create swimlane column
+    swimlanecolumnid = uuid.uuid4()
+    data = {"swimlanecolumnid": str(swimlanecolumnid), "columid": str(columnid), "title": "swimlanecolumn"}
+    response = api_client.post(reverse("swimlanecolumns_on_column", args=[columnid]), data=json.dumps(data), content_type="application/json")
+    assert response.status_code == 200
+
+    # Create action
+    actionid = uuid.uuid4()
+    data = {
+        "actionid": str(actionid),
+        "swimlanecolumnid": str(swimlanecolumnid),
+        "title": "action title",
+        }
+    reponse = api_client.post(
+        reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]), 
+        data=json.dumps(data), 
+        content_type="application/json",
+        )
+    assert response.status_code == 200
+
+    # Test PUT request to update action
+    data = {
+        "actionid": str(actionid),
+        "swimlanecolumnid": str(swimlanecolumnid),
+        "title": "updated action title",
+    }
+
+    response = api_client.put(
+        reverse("update_action", args=[actionid]),
+        data=json.dumps(data),
+        content_type="application/json"
+    )
+    assert response.status_code == 200
+
+    # Get action 
+    response = api_client.get(reverse("get_actions_by_columnId", args=[columnid]))
+    data = response.json()
+    print(data)
+    assert data[0]["title"] == "updated action title"
+    assert response.status_code == 200
+
+    # Clean up
+    md.Board.objects.all().delete()
+    md.Column.objects.all().delete()
+    md.Swimlanecolumn.objects.all().delete()
+    md.Ticket.objects.all().delete()
+    md.Action.objects.all().delete()
