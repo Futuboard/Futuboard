@@ -209,7 +209,7 @@ def test_get_actions_by_columnId():
     assert len(md.Action.objects.all()) == 0
 
     # Create an action into the swimlanecolumn associated with the column.
-    addAction(ticketid, swimlanecolumnid, uuid.uuid4(), title="My test action").actionid
+    addAction(ticketid, swimlanecolumnid, uuid.uuid4(), title="My test action")
 
     # At this point, there should be one action.
     assert len(md.Action.objects.all()) == 1
