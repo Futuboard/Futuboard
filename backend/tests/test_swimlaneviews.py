@@ -199,40 +199,30 @@ def test_get_actions_by_columnId():
     # Initalize a client.
     client = APIClient()
 
-
     # Initalize some models in the backend using test_utils.py utilities.
     boardid = addBoard(uuid.uuid4()).boardid
     columnid = addColumn(boardid, uuid.uuid4(), title="swimlane", swimlane=True).columnid
     swimlanecolumnid = addSwimlanecolumn(columnid, uuid.uuid4()).swimlanecolumnid
     ticketid = addTicket(columnid, uuid.uuid4(), title="A test ticket").ticketid
 
-
     # At this point, there should be no actions.
     assert len(md.Action.objects.all()) == 0
-
 
     # Create an action into the swimlanecolumn associated with the column.
     addAction(ticketid, swimlanecolumnid, uuid.uuid4(), title="My test action").actionid
 
-
     # At this point, there should be one action.
     assert len(md.Action.objects.all()) == 1
-
 
     # Attempt to retrieve the action.
     response = client.get(reverse("get_actions_by_columnId", args=[columnid]))
 
-
     # Check that the operation was successful.
     assert response.status_code == 200
 
-
     # Check that the response contains one action.
     data = response.json()
-    assert len (data) == 1
+    assert len(data) == 1
 
-    
     # Cleanup
     resetDB()
-
-    
