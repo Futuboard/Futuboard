@@ -6,7 +6,6 @@ import uuid
 from django.utils import timezone
 from django.urls import reverse
 import json
-from .test_utils import resetDB
 
 # TO-DO : Refactor to be like test_views.py
 
