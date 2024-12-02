@@ -268,7 +268,7 @@ def test_update_action():
         "swimlanecolumnid": str(swimlanecolumnid),
         "title": "action title",
         }
-    reponse = api_client.post(
+    response = api_client.post(
         reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]), 
         data=json.dumps(data), 
         content_type="application/json",
