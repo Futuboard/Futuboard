@@ -533,3 +533,44 @@ def test_deleting_ticket():
     assert md.Ticket.objects.all()[0].ticketid == ticketid2
 
     resetDB()
+
+
+@pytest.mark.django_db
+def test_updating_columns_order():
+    """
+    Test updating columns order
+    Test that columns new order is correct
+    """
+
+    api_client = APIClient()
+
+    boardid = addBoard(uuid.uuid4()).boardid
+    columnid1 = addColumn(boardid, uuid.uuid4()).columnid
+    columnid2 = addColumn(boardid, uuid.uuid4()).columnid
+    columnid3 = addColumn(boardid, uuid.uuid4()).columnid
+    columnid4 = addColumn(boardid, uuid.uuid4(), "Swimlane", True).columnid
+
+    data = [
+        {"columnid": str(columnid3)},
+        {"columnid": str(columnid4)},
+        {"columnid": str(columnid2)},
+        {"columnid": str(columnid1)},
+    ]
+
+    response = api_client.put(
+        reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
+    )
+    assert response.status_code == 200
+    assert md.Column.objects.get(pk=columnid1).ordernum == 3
+    assert md.Column.objects.get(pk=columnid2).ordernum == 2
+    assert md.Column.objects.get(pk=columnid3).ordernum == 0
+    assert md.Column.objects.get(pk=columnid4).ordernum == 1
+
+    response = api_client.get(reverse("columns_on_board", args=[boardid]))
+    data = response.json()
+    assert data[0]["columnid"] == str(columnid3)
+    assert data[1]["columnid"] == str(columnid4)
+    assert data[2]["columnid"] == str(columnid2)
+    assert data[3]["columnid"] == str(columnid1)
+
+    resetDB()

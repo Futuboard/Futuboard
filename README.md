@@ -275,13 +275,17 @@ pytest PATH_TO_TEST_FILE
 To run all E2E tests with cypress:
 
 ```
-npx cypress@13 run --browser chrome
+cd cypress/
+npm install
+npm test
 ```
 
 To open Cypress with an interactive GUI:
 
 ```
-npx cypress@13 open
+cd cypress/
+npm install
+npm start
 ```
 
 ## Instructions for future developers

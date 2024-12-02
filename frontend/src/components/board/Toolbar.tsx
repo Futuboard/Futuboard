@@ -1,7 +1,9 @@
-import { Download, MoreVert } from "@mui/icons-material"
+import { Download, MoreVert, EnhancedEncryption, Edit } from "@mui/icons-material"
 import {
   AppBar,
   Box,
+  Dialog,
+  DialogContent,
   Divider,
   IconButton,
   Menu,
@@ -18,6 +20,8 @@ import { useParams } from "react-router-dom"
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation } from "@/state/apiSlice"
 
 import BoardDeletionComponent from "./BoardDeletionComponent"
+import BoardPasswordChangeForm from "./BoardPasswordChangeForm"
+import BoardTitleChangeForm from "./BoardTitleChangeForm"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
 import HomeButton from "./HomeButton"
@@ -104,6 +108,9 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const open = Boolean(anchorEl)
 
+  const [passwordFormOpen, setPasswordFormOpen] = useState(false)
+  const [titleFormOpen, setTitleFormOpen] = useState(false)
+
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -115,6 +122,22 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
   const handleExportAndClose = () => {
     handleExport()
     handleClose()
+  }
+
+  const handleOpenTitleForm = () => {
+    setTitleFormOpen(true)
+  }
+
+  const handleCloseTitleForm = () => {
+    setTitleFormOpen(false)
+  }
+
+  const handleOpenPasswordForm = () => {
+    setPasswordFormOpen(true)
+  }
+
+  const handleClosePasswordForm = () => {
+    setPasswordFormOpen(false)
   }
 
   const handleExport = async () => {
@@ -148,13 +171,13 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
       position="fixed"
       sx={{ background: "white", height: "65px", boxShadow: "none", borderBottom: "2px solid #D1D5DB" }}
     >
-      <Toolbar sx={{ justifyContent: "center" }}>
+      <Toolbar disableGutters sx={{ justifyContent: "center", marginLeft: "10px", marginRight: "10px" }}>
         <Box display="flex" alignContent="center" sx={{ flexGrow: 1 }}>
           <HomeButton />
           <Divider
             orientation="vertical"
             flexItem
-            sx={{ margin: "0 10px", borderRightWidth: "2px", height: "35px", marginTop: "5px", borderColor: "#D1D5DB" }}
+            sx={{ margin: "0 10px", marginTop: "5px", borderRightWidth: "2px", height: "35px", borderColor: "#D1D5DB" }}
           />
           <Typography
             variant="h6"
@@ -163,7 +186,7 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
           >
             {title}
           </Typography>
-          <Box sx={{ flexGrow: 1 }} style={{ marginTop: "3px" }}>
+          <Box sx={{ flexGrow: 1 }} style={{ marginTop: "0px" }}>
             {isSuccess && users.length > 0 && <UserList users={users} />}
           </Box>
           <div style={{ marginLeft: "10px" }}>
@@ -176,7 +199,7 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
             aria-controls="long-menu"
             aria-haspopup="true"
             onClick={handleMenu}
-            sx={{ padding: "5px" }}
+            sx={{ padding: "5px", color: "#2D3748" }}
           >
             <MoreVert />
           </IconButton>
@@ -189,12 +212,32 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
               "aria-labelledby": "basic-button"
             }}
           >
+            <MenuItem onClick={handleOpenTitleForm} sx={{ py: 1 }}>
+              <Edit sx={{ fontSize: "1rem", mr: 1 }} />
+              <Typography variant="body2">Edit Board Name</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleOpenPasswordForm} sx={{ py: 1 }}>
+              <EnhancedEncryption sx={{ fontSize: "1rem", mr: 1 }} />
+              <Typography variant="body2">Change Board Password</Typography>
+            </MenuItem>
             <MenuItem onClick={handleExportAndClose} sx={{ py: 1 }}>
               <Download sx={{ fontSize: "1rem", mr: 1 }} />
               <Typography variant="body2">Download Board CSV</Typography>
             </MenuItem>
             <BoardDeletionComponent />
           </Menu>
+        </Box>
+        <Box>
+          <Dialog open={titleFormOpen} onClose={handleCloseTitleForm}>
+            <DialogContent>
+              <BoardTitleChangeForm title={title} onClose={handleCloseTitleForm} />
+            </DialogContent>
+          </Dialog>
+          <Dialog open={passwordFormOpen} onClose={handleClosePasswordForm}>
+            <DialogContent>
+              <BoardPasswordChangeForm onClose={handleClosePasswordForm} />
+            </DialogContent>
+          </Dialog>
         </Box>
       </Toolbar>
     </AppBar>
