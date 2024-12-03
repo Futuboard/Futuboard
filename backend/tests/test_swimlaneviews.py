@@ -244,7 +244,7 @@ def test_update_action():
     columnid = addColumn(boardid, uuid.uuid4(), title="swimlane", swimlane=True).columnid
     swimlanecolumnid = addSwimlanecolumn(columnid, uuid.uuid4()).swimlanecolumnid
     ticketid = addTicket(columnid, uuid.uuid4(), title="Test ticket").ticketid
-    
+
     # Create an action.
     actionid = addAction(ticketid, swimlanecolumnid, uuid.uuid4(), title="My action").actionid
 
@@ -255,9 +255,7 @@ def test_update_action():
         "title": "My updated action title",
     }
     response = api_client.put(
-        reverse("update_action", args=[actionid]),
-        data=json.dumps(data),
-        content_type="application/json"
+        reverse("update_action", args=[actionid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
 
