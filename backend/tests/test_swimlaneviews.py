@@ -61,9 +61,7 @@ def test_swimlanecolumns_on_column():
     data = response.json()
     assert len(data) == 5
     # Clean up
-    md.Board.objects.all().delete()
-    md.Column.objects.all().delete()
-    md.Swimlanecolumn.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -181,11 +179,7 @@ def test_action_on_swimlane():
     assert data[1]["order"] == 1
     assert data[2]["order"] == 2
     # Clean up
-    md.Board.objects.all().delete()
-    md.Column.objects.all().delete()
-    md.Swimlanecolumn.objects.all().delete()
-    md.Ticket.objects.all().delete()
-    md.Action.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db

@@ -5,6 +5,7 @@ import uuid
 from django.urls import reverse
 import json
 from .test_utils import addBoard, addColumn, addTicket, resetDB
+from ..futuboard.verification import verify_password
 
 
 ############################################################################################################
@@ -102,7 +103,7 @@ def test_board_by_id():
     # Ensure no boards are left in the database
     assert md.Board.objects.count() == 0
     # Delete all boards
-    md.Board.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -165,9 +166,8 @@ def test_columns_on_board():
     data = response.json()
     assert len(data) == 0
     assert response.status_code == 200
-    # Delete all boards and swimlanecolumns
-    md.Board.objects.all().delete()
-    md.Swimlanecolumn.objects.all().delete()
+
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -250,9 +250,7 @@ def test_tickets_on_column():
     assert len(data) == 3
     assert response.status_code == 200
 
-    md.Column.objects.all().delete()
-    md.Board.objects.all().delete()
-    md.Ticket.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -312,9 +310,7 @@ def test_update_ticket():
     assert data[0]["description"] == "This is an updated description"
     assert response.status_code == 200
 
-    md.Ticket.objects.all().delete()
-    md.Column.objects.all().delete()
-    md.Board.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -351,8 +347,7 @@ def test_update_column():
     assert data[0]["title"] == "updatedcolumn"
     assert response.status_code == 200
 
-    md.Column.objects.all().delete()
-    md.Board.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -388,7 +383,7 @@ def test_users_on_board():
     assert len(data) == 0
     assert response.status_code == 200
 
-    md.Board.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -461,9 +456,7 @@ def test_users_on_ticket():
     assert len(data) == 0
     assert response.status_code == 200
 
-    md.Column.objects.all().delete()
-    md.Board.objects.all().delete()
-    md.User.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -490,7 +483,7 @@ def test_update_user():
     # Check that amount of users is 0
     assert md.User.objects.count() == 0
 
-    md.Board.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -572,5 +565,98 @@ def test_updating_columns_order():
     assert data[1]["columnid"] == str(columnid4)
     assert data[2]["columnid"] == str(columnid2)
     assert data[3]["columnid"] == str(columnid1)
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_password_change_correct():
+    """
+    Test that password changes correctly
+    """
+    api_client = APIClient()
+
+    boardid = addBoard(uuid.uuid4(), password="password").boardid
+
+    # Get token for auth
+    response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
+    assert response.status_code == 200
+    data = response.json()
+    token = data["token"]
+
+    response = api_client.put(
+        reverse("update_board_password", args=[boardid]),
+        data={
+            "old_password": "password",
+            "new_password": "newpassword",
+            "confirm_password": "newpassword",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 200
+    assert verify_password("newpassword", md.Board.objects.all()[0].passwordhash)
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_password_change_with_incorrect_old_password():
+    """
+    Test that password doesn't change if given incorrect old password
+    """
+    api_client = APIClient()
+
+    boardid = addBoard(uuid.uuid4(), password="password").boardid
+
+    # Get token for auth
+    response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
+    assert response.status_code == 200
+    data = response.json()
+    token = data["token"]
+
+    response = api_client.put(
+        reverse("update_board_password", args=[boardid]),
+        data={
+            "old_password": "wrong",
+            "new_password": "newpassword",
+            "confirm_password": "newpassword",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 401
+    assert verify_password("password", md.Board.objects.first().passwordhash)
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_password_change_with_clashing_confirm_password():
+    """
+    Test that password doesn't change if new password and confirm password not matching
+    """
+    api_client = APIClient()
+
+    boardid = addBoard(uuid.uuid4(), password="password").boardid
+
+    # Get token for auth
+    response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
+    assert response.status_code == 200
+    data = response.json()
+    token = data["token"]
+
+    response = api_client.put(
+        reverse("update_board_password", args=[boardid]),
+        data={
+            "old_password": "password",
+            "new_password": "newpassword1",
+            "confirm_password": "newpassword2",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 400
+    assert verify_password("password", md.Board.objects.first().passwordhash)
 
     resetDB()

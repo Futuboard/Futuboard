@@ -106,7 +106,7 @@ describe("In a board", () => {
     cy.get('[data-testid="DownloadIcon"]').click()
 
     const date = new Date()
-    const fileName = `Project Alpha-${String(date.getDate()).padStart(2, "0")}_${String(date.getMonth() + 1).padStart(2, "0")}_${date.getFullYear()}.csv`
+    const fileName = `Project Alpha-${date.toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/[^a-zA-Z0-9]/g, "_")}.csv`
     const filePath = `downloads/${fileName}`
 
     cy.readFile(filePath).should("exist")
