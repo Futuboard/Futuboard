@@ -236,36 +236,23 @@ def test_update_action():
 
         PUT: updates action title
     """
+
     api_client = APIClient()
 
     # Create models for test using test_utils.py
     boardid = addBoard(uuid.uuid4()).boardid
     columnid = addColumn(boardid, uuid.uuid4(), title="swimlane", swimlane=True).columnid
     swimlanecolumnid = addSwimlanecolumn(columnid, uuid.uuid4()).swimlanecolumnid
-    ticketid = addTicket(columnid, uuid.uuid4(), title="A test ticket").ticketid
+    ticketid = addTicket(columnid, uuid.uuid4(), title="Test ticket").ticketid
     
     # Create an action.
-    actionid = uuid.uuid4()
-    data = {
-        "actionid": str(actionid),
-        "swimlanecolumnid": str(swimlanecolumnid),
-        "title": "action title",
-    }
-    response = api_client.post(
-        reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]),
-        data=json.dumps(data), 
-        content_type="application/json",
-    )
-    assert response.status_code == 200
-
-    # Check that we have one action now
-    assert len(md.Action.objects.all()) == 1
+    actionid = addAction(ticketid, swimlanecolumnid, uuid.uuid4(), title="My action").actionid
 
     # Test PUT request to update action.
     data = {
         "actionid": str(actionid),
         "swimlanecolumnid": str(swimlanecolumnid),
-        "title": "Updated action title",
+        "title": "My updated action title",
     }
     response = api_client.put(
         reverse("update_action", args=[actionid]),
@@ -277,7 +264,7 @@ def test_update_action():
     # Get action.
     response = api_client.get(reverse("get_actions_by_columnId", args=[columnid]))
     data = response.json()
-    assert data[0]["title"] == "Updated action title"
+    assert data[0]["title"] == "My updated action title"
     assert response.status_code == 200
 
     # Cleanup.
