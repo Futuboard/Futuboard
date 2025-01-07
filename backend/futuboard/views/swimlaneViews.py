@@ -101,7 +101,7 @@ def update_swimlanecolumn(request, swimlanecolumn_id):
         return JsonResponse(serializer.data, safe=False)
 
 
-@api_view(["PUT"])
+@api_view(["PUT", "DELETE"])
 def update_action(request, action_id):
     if request.method == "PUT":
         try:
@@ -114,6 +114,16 @@ def update_action(request, action_id):
 
         serializer = ActionSerializer(action)
         return JsonResponse(serializer.data, safe=False)
+
+    if request.method == "DELETE":
+        try:
+            action = Action.objects.get(pk=action_id)
+        except Ticket.DoesNotExist:
+            raise Http404("Action not found")
+
+        action.delete()
+
+        return JsonResponse({"message": "Action deleted succesfully"}, status=200)
 
 
 @api_view(["GET", "POST", "DELETE"])
