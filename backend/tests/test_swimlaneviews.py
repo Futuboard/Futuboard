@@ -283,5 +283,6 @@ def test_deleting_action():
 
     assert response.status_code == 200
     assert md.Action.objects.all()[0].actionid == actionid2
+    assert md.Action.objects.count() == 1
 
     resetDB()
