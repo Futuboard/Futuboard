@@ -16,15 +16,24 @@ class WebSocketContainer {
     this.lastBoardId = ""
   }
 
-  public connectToBoard(boardId: string) {
+  public connectToBoard(boardId: string, waitTime: number = 0) {
     const isDifferentBoard = this.lastBoardId !== boardId
 
     if (isDifferentBoard) {
-      if (this.socket) {
-        this.socket.close()
-      }
+      this.close()
       this.socket = new WebSocket(import.meta.env.VITE_WEBSOCKET_ADDRESS + boardId)
       this.lastBoardId = boardId
+      this.socket.onclose = () => {
+        // Attempt to reconnect, if disconnects and same board
+        if (this.lastBoardId == boardId) {
+          this.lastBoardId = ""
+
+          // Added wait time, so we don't spam reconnects
+          const newWaitTime = waitTime + 1000
+          setTimeout(() => this.connectToBoard(boardId, newWaitTime), newWaitTime)
+        }
+      }
+      setTimeout(() => this.close(), 30_000)
     }
   }
 
