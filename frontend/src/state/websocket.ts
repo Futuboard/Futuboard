@@ -8,33 +8,47 @@ type CacheInvalidationMessage = {
 class WebSocketContainer {
   private socket: WebSocket | null
   private clientId: string
-  private lastBoardId: string
+  private boardId: string
+  private onMessageHandler: (event: MessageEvent) => void
+  private onResetHandler: () => void
 
   constructor() {
     this.clientId = getId()
     this.socket = null
-    this.lastBoardId = ""
+    this.boardId = ""
+    this.onMessageHandler = () => null
+    this.onResetHandler = () => null
   }
 
-  public connectToBoard(boardId: string, waitTime: number = 0) {
-    const isDifferentBoard = this.lastBoardId !== boardId
+  public async connectToBoard(newBoardId: string) {
+    const isDifferentBoard = this.boardId !== newBoardId
 
     if (isDifferentBoard) {
-      this.close()
-      this.socket = new WebSocket(import.meta.env.VITE_WEBSOCKET_ADDRESS + boardId)
-      this.lastBoardId = boardId
-      this.socket.onclose = () => {
-        // Attempt to reconnect, if disconnects and same board
-        if (this.lastBoardId == boardId) {
-          this.lastBoardId = ""
-
-          // Added wait time, so we don't spam reconnects
-          const newWaitTime = waitTime + 1000
-          setTimeout(() => this.connectToBoard(boardId, newWaitTime), newWaitTime)
-        }
-      }
-      setTimeout(() => this.close(), 30_000)
+      this.boardId = newBoardId
+      this.socket = await this.getNewWebSocket()
     }
+  }
+
+  private async getNewWebSocket() {
+    this.close()
+
+    return new Promise<WebSocket>((resolve) => {
+      const newSocket = new WebSocket(import.meta.env.VITE_WEBSOCKET_ADDRESS + this.boardId)
+
+      newSocket.onopen = () => {
+        resolve(newSocket)
+      }
+    })
+  }
+
+  private async getCurrentOrNewWebSocket() {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      this.onResetHandler()
+      const newSocket = await this.getNewWebSocket()
+      newSocket.onmessage = this.onMessageHandler
+      return newSocket
+    }
+    return this.socket
   }
 
   public close() {
@@ -43,24 +57,29 @@ class WebSocketContainer {
     }
   }
 
-  public invalidateCacheOfOtherUsers(tags: CacheInvalidationTag[]) {
+  public async invalidateCacheOfOtherUsers(tags: CacheInvalidationTag[]) {
+    this.socket = await this.getCurrentOrNewWebSocket()
+    const message: CacheInvalidationMessage = { clientId: this.clientId, tags }
+    this.socket.send(JSON.stringify(message))
+  }
+
+  public setOnMessageHandler(invalidateLocalCache: (tags: CacheInvalidationTag[]) => void) {
+    this.onMessageHandler = (event) => {
+      const data = JSON.parse(event.data)
+      const { tags, clientId: messageClientId } = JSON.parse(data) as CacheInvalidationMessage
+
+      if (messageClientId !== this.clientId) {
+        invalidateLocalCache(tags)
+      }
+    }
+
     if (this.socket) {
-      const message: CacheInvalidationMessage = { clientId: this.clientId, tags }
-      this.socket.send(JSON.stringify(message))
+      this.socket.onmessage = this.onMessageHandler
     }
   }
 
-  public onMessage(invalidateLocalCache: (tags: CacheInvalidationTag[]) => void) {
-    if (this.socket) {
-      this.socket.onmessage = (event) => {
-        const data = JSON.parse(event.data)
-        const { tags, clientId: messageClientId } = JSON.parse(data) as CacheInvalidationMessage
-
-        if (messageClientId !== this.clientId) {
-          invalidateLocalCache(tags)
-        }
-      }
-    }
+  public setResetHandler(resetHandler: () => void) {
+    this.onResetHandler = resetHandler
   }
 }
 

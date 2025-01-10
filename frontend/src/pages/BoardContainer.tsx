@@ -45,8 +45,11 @@ const BoardContainer: React.FC = () => {
     if (!id) return
     dispatch(setBoardId(id))
     webSocketContainer.connectToBoard(id)
-    webSocketContainer.onMessage((tags) => {
+    webSocketContainer.setOnMessageHandler((tags) => {
       dispatch(boardsApi.util.invalidateTags(tags))
+    })
+    webSocketContainer.setResetHandler(() => {
+      dispatch(boardsApi.util.resetApiState())
     })
   }, [id, dispatch])
 
