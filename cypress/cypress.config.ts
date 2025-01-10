@@ -18,6 +18,8 @@ export default defineConfig({
               }
             })
 
+            let counter = 0
+
             await cluster.task(async ({ page, data }) => {
               try {
                 const { url, index } = data
@@ -55,8 +57,11 @@ export default defineConfig({
                 await delay(500)
                 await page.click('button[type="submit"]')
 
-                // Calling resolve() causes the Cypress test to continue.
-                resolve(null)
+                // Calling resolve() causes the Cypress test to continue. This is done when all dummy users have completed their tasks.
+                counter++
+                if (counter === concurrentUsers) {
+                  resolve(null)
+                }
 
                 // Add delay, so browser keeps loading updates to board
                 await delay(10_000)
