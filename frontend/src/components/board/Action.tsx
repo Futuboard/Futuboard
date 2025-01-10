@@ -77,9 +77,11 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
     setCurrentTitle(event.target.value)
   }
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
+  const handleKeyDown = async (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
       handleBlur()
+    } else if (event.key === "Delete") {
+      await deleteAction({ actionid: action.actionid })
     }
   }
 
