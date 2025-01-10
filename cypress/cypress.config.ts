@@ -32,6 +32,7 @@ export default defineConfig({
 
                 await page.waitForSelector('button[type="submit"]')
                 await page.click('button[type="submit"]')
+                await delay(500)
 
                 await page.waitForSelector('button[aria-label="add column"]')
                 await page.click('button[aria-label="add column"]')
