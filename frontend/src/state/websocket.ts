@@ -18,6 +18,11 @@ class WebSocketContainer {
     this.boardId = ""
     this.onMessageHandler = () => null
     this.onResetHandler = () => null
+
+    // Automatically reconnect to the websocket if the connection is lost. Check every 10 seconds.
+    setInterval(async () => {
+      this.socket = await this.getCurrentOrNewWebSocket()
+    }, 10_000)
   }
 
   public async connectToBoard(newBoardId: string) {
