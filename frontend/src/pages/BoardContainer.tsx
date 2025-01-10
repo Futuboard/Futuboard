@@ -42,15 +42,19 @@ const BoardContainer: React.FC = () => {
   const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "")
 
   useEffect(() => {
-    if (!id) return
-    dispatch(setBoardId(id))
-    webSocketContainer.connectToBoard(id)
-    webSocketContainer.setOnMessageHandler((tags) => {
-      dispatch(boardsApi.util.invalidateTags(tags))
-    })
-    webSocketContainer.setResetHandler(() => {
-      dispatch(boardsApi.util.resetApiState())
-    })
+    // Has to have inner function to use async in useEffect
+    const inner = async () => {
+      if (!id) return
+      dispatch(setBoardId(id))
+      await webSocketContainer.connectToBoard(id)
+      webSocketContainer.setOnMessageHandler((tags) => {
+        dispatch(boardsApi.util.invalidateTags(tags))
+      })
+      webSocketContainer.setResetHandler(() => {
+        dispatch(boardsApi.util.resetApiState())
+      })
+    }
+    inner()
   }, [id, dispatch])
 
   useEffect(() => {

@@ -21,7 +21,12 @@ class WebSocketContainer {
 
     // Automatically reconnect to the websocket if the connection is lost. Check every 10 seconds.
     setInterval(async () => {
-      this.socket = await this.getCurrentOrNewWebSocket()
+      if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+        this.onResetHandler()
+        const newSocket = await this.getNewWebSocket()
+        newSocket.onmessage = this.onMessageHandler
+        return newSocket
+      }
     }, 10_000)
   }
 
@@ -46,26 +51,17 @@ class WebSocketContainer {
     })
   }
 
-  private async getCurrentOrNewWebSocket() {
-    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-      this.onResetHandler()
-      const newSocket = await this.getNewWebSocket()
-      newSocket.onmessage = this.onMessageHandler
-      return newSocket
-    }
-    return this.socket
-  }
-
   public close() {
     if (this.socket) {
       this.socket.close()
     }
   }
 
-  public async invalidateCacheOfOtherUsers(tags: CacheInvalidationTag[]) {
-    this.socket = await this.getCurrentOrNewWebSocket()
-    const message: CacheInvalidationMessage = { clientId: this.clientId, tags }
-    this.socket.send(JSON.stringify(message))
+  public invalidateCacheOfOtherUsers(tags: CacheInvalidationTag[]) {
+    if (this.socket) {
+      const message: CacheInvalidationMessage = { clientId: this.clientId, tags }
+      this.socket.send(JSON.stringify(message))
+    }
   }
 
   public setOnMessageHandler(invalidateLocalCache: (tags: CacheInvalidationTag[]) => void) {
