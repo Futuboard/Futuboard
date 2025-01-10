@@ -75,6 +75,10 @@ def action_on_swimlane(request, swimlanecolumn_id, ticket_id):
             order=0,
             creation_date=timezone.now(),
         )
+
+        if request.data["title"] == "":
+            return JsonResponse({"message": "Action title empty. Action not created"}, status=400)
+
         new_action.save()
 
         same_swimlane_actions = Action.objects.filter(swimlanecolumnid=swimlanecolumn_id, ticketid=ticket_id)

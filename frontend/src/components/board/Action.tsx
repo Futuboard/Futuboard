@@ -2,7 +2,7 @@ import { Draggable, DraggableStateSnapshot, DraggableStyle, Droppable } from "@h
 import { Box, ClickAwayListener, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 
-import { useUpdateActionMutation } from "@/state/apiSlice"
+import { useDeleteActionMutation, useUpdateActionMutation } from "@/state/apiSlice"
 import { Action as ActionType, UserWithoutTicketsOrActions } from "@/types"
 
 import UserMagnet from "./UserMagnet"
@@ -53,6 +53,7 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
   }, [action.title])
 
   const [updateAction] = useUpdateActionMutation()
+  const [deleteAction] = useDeleteActionMutation()
 
   const handleDoubleClick = () => {
     setIsEditing(true)
@@ -63,10 +64,12 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
 
     if (currentTitle === action.title) {
       return
+    } else if (currentTitle === "") {
+      await deleteAction({ actionid: action.actionid })
+    } else {
+      const updatedAction = { ...action, title: currentTitle }
+      await updateAction({ action: updatedAction })
     }
-
-    const updatedAction = { ...action, title: currentTitle }
-    await updateAction({ action: updatedAction })
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
