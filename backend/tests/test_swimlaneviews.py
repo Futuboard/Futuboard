@@ -286,3 +286,26 @@ def test_deleting_action():
     assert md.Action.objects.count() == 1
 
     resetDB()
+
+
+@pytest.mark.django_db
+def test_creating_an_empty_action():
+    """
+    Test that new empty actions are rejected.
+    """
+
+    api_client = APIClient()
+
+    boardid = addBoard(uuid.uuid4()).boardid
+    columnid = addColumn(boardid, uuid.uuid4(), swimlane=True).columnid
+    swimlanecolumnid = addSwimlanecolumn(columnid, uuid.uuid4()).swimlanecolumnid
+    ticketid = addTicket(columnid, uuid.uuid4(), title="Test ticket").ticketid
+
+    response = api_client.post(
+        reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]), {"actionid": uuid.uuid4(), "title": ""}
+    )
+
+    assert response.status_code == 400
+    assert md.Action.objects.count() == 0
+
+    resetDB()
