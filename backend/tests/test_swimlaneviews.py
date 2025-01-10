@@ -266,7 +266,7 @@ def test_update_action():
 @pytest.mark.django_db
 def test_deleting_action():
     """
-    Test deleting a action by id
+    Test deleting an action by id
     Test that the right action is deleted.
     """
 
