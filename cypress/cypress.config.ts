@@ -14,7 +14,9 @@ export default defineConfig({
               concurrency: Cluster.CONCURRENCY_CONTEXT,
               maxConcurrency: concurrentUsers,
               puppeteerOptions: {
-                headless: HEADLESS
+                headless: HEADLESS,
+                args: ["--window-size=1920,1080"],
+                defaultViewport: null
               }
             })
 
@@ -30,12 +32,13 @@ export default defineConfig({
                 await delay(500)
                 await page.type('input[name="password"]', "alpha123")
 
-                await page.waitForSelector('button[type="submit"]')
-                await page.click('button[type="submit"]')
+                const submitButton = await page.waitForSelector('button[type="submit"]')
+                await submitButton.click()
                 await delay(500)
 
-                await page.waitForSelector('button[aria-label="add column"]')
-                await page.click('button[aria-label="add column"]')
+                const header = await page.waitForSelector("header")
+                const addColumnButton = await header.waitForSelector('button[aria-label="add column"]')
+                await addColumnButton.click()
                 await delay(500)
 
                 await page.waitForSelector('input[name="columnTitle"]')
@@ -65,7 +68,7 @@ export default defineConfig({
                 }
 
                 // Add delay, so browser keeps loading updates to board
-                await delay(10_000)
+                await delay(30_000)
               } catch (error) {
                 // Calling reject() causes the Cypress test to fail.
                 reject(error)
