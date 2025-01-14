@@ -26,6 +26,19 @@ import { useDeleteTaskMutation } from "@/state/apiSlice"
 
 import { Task, Task as TaskType, User } from "../../types"
 
+import "@mdxeditor/editor/style.css"
+import {
+  CreateLink,
+  headingsPlugin,
+  linkDialogPlugin,
+  linkPlugin,
+  listsPlugin,
+  MDXEditor,
+  MDXEditorMethods,
+  toolbarPlugin,
+  UndoRedo
+} from "@mdxeditor/editor"
+
 interface DeleteTaskButtonProps {
   task: Task
 }
@@ -131,6 +144,8 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
     onSubmit(data)
   }
 
+  const ref = React.useRef<MDXEditorMethods>(null)
+
   return (
     <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={closeModule}>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -207,6 +222,24 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
             <TextField label="Corner note" fullWidth {...register("cornerNote", {})} />
           </Grid>
           <Grid item xs={240}>
+            <MDXEditor
+              className="description"
+              markdown="ihaokmutootkok"
+              ref={ref}
+              plugins={[
+                toolbarPlugin({
+                  toolbarContents: () => (
+                    <>
+                      <UndoRedo />
+                      <CreateLink />
+                    </>
+                  )
+                }),
+                linkPlugin(),
+                linkDialogPlugin()
+              ]}
+              onChange={() => register("description", {})}
+            />
             <TextField
               label="Description"
               multiline
