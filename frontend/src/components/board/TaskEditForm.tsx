@@ -25,19 +25,8 @@ import { Controller, useForm } from "react-hook-form"
 import { useDeleteTaskMutation } from "@/state/apiSlice"
 
 import { Task, Task as TaskType, User } from "../../types"
+import DescriptionEditField from "./DescriptionEditField"
 
-import "@mdxeditor/editor/style.css"
-import {
-  CreateLink,
-  headingsPlugin,
-  linkDialogPlugin,
-  linkPlugin,
-  listsPlugin,
-  MDXEditor,
-  MDXEditorMethods,
-  toolbarPlugin,
-  UndoRedo
-} from "@mdxeditor/editor"
 
 interface DeleteTaskButtonProps {
   task: Task
@@ -144,7 +133,6 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
     onSubmit(data)
   }
 
-  const ref = React.useRef<MDXEditorMethods>(null)
 
   return (
     <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={closeModule}>
@@ -220,33 +208,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
             <TextField label="Corner note" fullWidth {...register("cornerNote", {})} />
           </Grid>
           <Grid item xs={240}>
-            <MDXEditor
-              className="description"
-              markdown="ihaokmutootkok"
-              ref={ref}
-              plugins={[
-                toolbarPlugin({
-                  toolbarContents: () => (
-                    <>
-                      <UndoRedo />
-                      <CreateLink />
-                    </>
-                  )
-                }),
-                linkPlugin(),
-                linkDialogPlugin()
-              ]}
-              onChange={() => register("description", {})}
-            />
-            <TextField
-              label="Description"
-              multiline
-              rows={11}
-              fullWidth
-              {...register("description", {
-                //rows amount hardcoded due to bug with multiline textAreaAutoSize
-              })}
-            />
+            <DescriptionEditField description = {task.description || ""} setValue = {setValue} />
           </Grid>
           <Grid item xs={12}>
             <FormControl component="fieldset">
@@ -256,9 +218,9 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
                 aria-label="color"
                 value={selectedColor}
                 onChange={handleColorChange}
-                sx={{ bgcolor: "#c7c7c7", borderRadius: 1000, paddingLeft: 3 }}
+                sx={{ bgcolor: "#eaeaea", borderRadius: 3, paddingLeft: 3 }}
               >
-                <FormControlLabel value="#ffffff" control={<Radio style={{ color: "#ffffff" }} />} label={null} />
+                <FormControlLabel value="#ffffff" control={<Radio  style={{ color: "#ffffff" }} />} label={null} />
                 <FormControlLabel value="#ffeb3b" control={<Radio style={{ color: "#ffeb3b" }} />} label={null} />
                 <FormControlLabel value="#8bc34a" control={<Radio style={{ color: "#8bc34a" }} />} label={null} />
                 <FormControlLabel value="#ff4081" control={<Radio style={{ color: "#ff4081" }} />} label={null} />
