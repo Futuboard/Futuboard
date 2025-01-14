@@ -79,6 +79,17 @@ export const boardsApi = createApi({
       invalidatesTags: () => invalidateRemoteCache(["Boards"])
     }),
 
+    importBoard: builder.mutation<Board, FormData>({
+      query: (formData) => {
+        return {
+          url: "import/",
+          method: "POST",
+          body: formData
+        }
+      },
+      invalidatesTags: () => invalidateRemoteCache(["Boards"])
+    }),
+
     deleteBoard: builder.mutation<Board, string>({
       query: (boardId) => ({
         url: `boards/${boardId}/`,
@@ -594,6 +605,7 @@ export const {
   useGetUsersByBoardIdQuery,
   useGetBoardQuery,
   useAddBoardMutation,
+  useImportBoardMutation,
   useDeleteBoardMutation,
   useUpdateBoardTitleMutation,
   useUpdateBoardPasswordMutation,
