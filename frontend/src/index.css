@@ -51,3 +51,23 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+.mdxeditor {
+  border: none;
+  border-radius: 2pt;
+  outline-style: solid;
+  outline-color: #b3b3b3;
+  outline-width: 1px;
+}
+
+.mdxeditor:hover {
+  outline-color: #1a1a1a;
+}
+
+.mdxeditor:focus {
+  outline-color: #646cff;
+  outline-width: 2px;
+}
+.mdxeditor-popup-container {
+  z-index: 9999;
+}
