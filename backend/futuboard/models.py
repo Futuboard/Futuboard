@@ -89,7 +89,9 @@ class User(models.Model):
 
 class BoardTemplate(models.Model):
     boardtemplateid = models.UUIDField(db_column="boardTemplateID", default=uuid.uuid4, primary_key=True)
-    name = models.TextField()
+    boardid = models.ForeignKey(Board, models.DO_NOTHING, db_column="boardID")
+    title = models.TextField()
+    description = models.TextField()
     image = models.ImageField(upload_to="boardTemplates", blank=True, null=True)
 
     class Meta:

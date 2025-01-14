@@ -1,4 +1,4 @@
-from .models import Board, Column, Ticket, User, Swimlanecolumn, Action
+from .models import Board, BoardTemplate, Column, Ticket, User, Swimlanecolumn, Action
 from rest_framework import serializers
 
 
@@ -68,3 +68,9 @@ class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         fields = ["actionid", "ticketid", "swimlanecolumnid", "title", "order", "creation_date", "users"]
+
+
+class BoardTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoardTemplate
+        fields = ["boardtemplateid", "boardid", "title", "description", "image"]
