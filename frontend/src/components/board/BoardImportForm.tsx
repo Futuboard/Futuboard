@@ -9,6 +9,8 @@ import { useForm } from "react-hook-form"
 
 import { NewBoardFormImport } from "../../types"
 
+import PasswordField from "./PasswordField"
+
 interface AddBoardCreationFormProps {
   onSubmit: (_: NewBoardFormImport) => void
   onCancel: () => void
@@ -48,7 +50,15 @@ const BoardImportForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCanc
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
-      <Grid container spacing={1} textAlign="center" height="285px" width="250px">
+      <Grid
+        container
+        spacing={1}
+        textAlign="center"
+        height="285px"
+        width="250px"
+        justifyContent="center"
+        alignItems="center"
+      >
         <Grid item xs={12}>
           <Typography gutterBottom variant="h6">
             {" "}
@@ -78,7 +88,7 @@ const BoardImportForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCanc
           />
         </Grid>
         <Grid item xs={12}>
-          <TextField label="Password" type="password" {...register("password")} />
+          <PasswordField register={register("password")} />
         </Grid>
         <Grid item xs={12}>
           <Button
