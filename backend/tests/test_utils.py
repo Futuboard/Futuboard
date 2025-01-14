@@ -6,11 +6,12 @@ from ..futuboard.verification import new_password
 # Utility functions
 
 
-def addBoard(boardId, title="title", password="", description=""):
+def addBoard(boardId, title="title", password="", description="", background_color="white"):
     new_board = md.Board(
         boardid=boardId,
         description=description,
         title=title,
+        background_color=background_color,
         creation_date=timezone.now(),
         passwordhash="" if password == "" else new_password(password),
         salt="",

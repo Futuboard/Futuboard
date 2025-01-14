@@ -246,7 +246,7 @@ const BoardContainer: React.FC = () => {
   if (isLoggedIn) {
     return (
       <DragDropContext onDragEnd={handleOnDragEnd}>
-        <GlobalStyles styles={{ ":root": { backgroundColor: "blue" }}} />
+        <GlobalStyles styles={{ ":root": { backgroundColor: board?.background_color || "pink" } }} />
         <ToolBar boardId={id} title={board?.title || ""} />
         <Board />
       </DragDropContext>

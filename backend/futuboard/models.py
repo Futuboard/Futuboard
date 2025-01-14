@@ -27,6 +27,7 @@ class Board(models.Model):
     boardid = models.UUIDField(db_column="boardID", primary_key=True)
     description = models.TextField(blank=True, null=True)
     title = models.TextField()
+    background_color = models.TextField(default="#ffffff")
     creation_date = models.DateTimeField()
     passwordhash = models.TextField(db_column="passwordHash")
     salt = models.TextField()

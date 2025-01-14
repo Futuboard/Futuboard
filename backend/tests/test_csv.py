@@ -66,7 +66,7 @@ def test_import_export():
                     users[k].tickets.add(md.Ticket.objects.get(ticketid=ticket.ticketid))
         # One column that is a swimlane
         column = md.Column.objects.create(
-            columnid=uuid.uuid4(), boardid=board, title=f"column{n_columns-1}", ordernum=n_columns - 1, swimlane=True
+            columnid=uuid.uuid4(), boardid=board, title=f"column{n_columns - 1}", ordernum=n_columns - 1, swimlane=True
         )
         n_swimlanecolumns = random.randint(1, 10)
         for i in range(n_swimlanecolumns):

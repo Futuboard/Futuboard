@@ -1,6 +1,7 @@
 export type Board = {
   id: string
   title: string
+  background_color: string
   password: string
   columns: Column[]
   users: User[]

@@ -32,7 +32,7 @@ def all_boards(request: rest_framework.request.Request, format=None):
         return JsonResponse(serializer.data, safe=False)
 
 
-@api_view(["GET", "POST", "DELETE"])
+@api_view(["GET", "POST", "PUT", "DELETE"])
 def board_by_id(request, board_id):
     if request.method == "POST":
         # Get password from request
@@ -65,6 +65,33 @@ def board_by_id(request, board_id):
             serializer = BoardSerializer(board)
             return JsonResponse(serializer.data, safe=False)
 
+        except Board.DoesNotExist:
+            raise Http404("Board does not exist")
+        except jwt.ExpiredSignatureError:
+            return JsonResponse({"message": "Access token expired"}, status=401)
+        except jwt.InvalidTokenError:
+            return JsonResponse({"message": "Access token invalid"}, status=401)
+
+    if request.method == "PUT":
+        try:
+            # TODO: v make this one function?
+            token = get_token_from_request(request)
+            if token is None:
+                return JsonResponse({"message": "Access token missing"}, status=401)
+
+            decoded_token = decode_token(token)
+
+            if decoded_token["board_id"] != str(board_id):
+                return JsonResponse({"message": "Access token to wrong board"}, status=405)
+            # TODO: ^ make this one function?
+
+            board = Board.objects.get(pk=board_id)
+            board.description = request.data.get("description", board.description)
+            board.background_color = request.data.get("background_color", board.background_color)
+            board.save()
+
+            serializer = BoardSerializer(board)
+            return JsonResponse(serializer.data, safe=False)
         except Board.DoesNotExist:
             raise Http404("Board does not exist")
         except jwt.ExpiredSignatureError:
