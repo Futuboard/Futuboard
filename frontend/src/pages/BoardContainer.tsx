@@ -1,6 +1,6 @@
 import ToolBar from "@components/board/Toolbar"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
-import { Box } from "@mui/material"
+import { Box, GlobalStyles } from "@mui/material"
 import { produce } from "immer"
 import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
@@ -246,6 +246,7 @@ const BoardContainer: React.FC = () => {
   if (isLoggedIn) {
     return (
       <DragDropContext onDragEnd={handleOnDragEnd}>
+        <GlobalStyles styles={{ ":root": { backgroundColor: "blue" }}} />
         <ToolBar boardId={id} title={board?.title || ""} />
         <Board />
       </DragDropContext>
