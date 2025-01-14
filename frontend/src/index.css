@@ -54,9 +54,9 @@ button:focus-visible {
 
 .mdxeditor {
   border: none;
-  border-radius: 2pt;
+  border-radius: 3pt;
   outline-style: solid;
-  outline-color: #b3b3b3;
+  outline-color: #C4C4C4;
   outline-width: 1px;
 }
 
@@ -64,10 +64,11 @@ button:focus-visible {
   outline-color: #1a1a1a;
 }
 
-.mdxeditor:focus {
-  outline-color: #646cff;
+.mdxeditor:focus-within {
+  outline-color: #1976D2;
   outline-width: 2px;
 }
+
 .mdxeditor-popup-container {
   z-index: 9999;
 }

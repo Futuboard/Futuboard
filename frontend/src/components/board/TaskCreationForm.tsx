@@ -14,6 +14,7 @@ import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 
 import { User } from "@/types"
+import DescriptionEditField from "./DescriptionEditField"
 
 interface TaskCreationFormProps {
   onSubmit: (data: FormData) => void
@@ -148,8 +149,8 @@ const TaskCreationForm: React.FC<TaskCreationFormProps> = (props) => {
           <Grid item xs={12}>
             <TextField label="Corner note" fullWidth {...register("cornerNote")} />
           </Grid>
-          <Grid item xs={12}>
-            <TextField label="Description" multiline minRows={6} maxRows={15} fullWidth {...register("description")} />
+          <Grid item xs={12}> 
+            <DescriptionEditField description = {defaultValues?.description || ""} setValue = {setValue} />
           </Grid>
           <Grid item xs={12}>
             <FormControl component="fieldset">
