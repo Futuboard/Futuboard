@@ -2,15 +2,15 @@ import BoardCreationForm from "@components/board/BoardCreationForm"
 import { Dialog, DialogContent, Typography } from "@mui/material"
 import Button from "@mui/material/Button"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
+import { useAddBoardMutation } from "@/state/apiSlice"
 import { NewBoardFormData } from "@/types"
 
-interface CreateBoardButtonProps {
-  onNewBoard: (data: NewBoardFormData) => Promise<void>
-}
-
-const CreateBoardButton = ({ onNewBoard }: CreateBoardButtonProps) => {
+const CreateBoardButton = () => {
   const [open, setOpen] = useState(false)
+  const navigate = useNavigate()
+  const [addBoard] = useAddBoardMutation()
 
   const handleOpenDialog = () => {
     setOpen(true)
@@ -18,11 +18,16 @@ const CreateBoardButton = ({ onNewBoard }: CreateBoardButtonProps) => {
   const handleCloseDialog = () => {
     setOpen(false)
   }
-  const handleSubmit = (data: NewBoardFormData) => {
-    //TODO: should only temporarily update the board name. (not in this function though)
-    //later should create entirely new board object and send it to database
-    onNewBoard(data)
-    setOpen(false)
+  const handleSubmit = async (newBoardData: NewBoardFormData) => {
+    const response = await addBoard(newBoardData)
+    if ("data" in response) {
+      // redirect to created board page
+      navigate(`/board/${response.data.boardid}`)
+
+      setOpen(false)
+    } else {
+      // TODO: add error handling
+    }
   }
   return (
     <div>

@@ -48,7 +48,7 @@ urlpatterns = [
         "api/columns/<uuid:column_id>/actions/", swimlaneViews.get_actions_by_columnId, name="get_actions_by_columnId"
     ),
     path("api/export/<uuid:board_id>/<str:filename>/", csv_views.export_board_data, name="export_board_data"),
-    path("api/import/<uuid:board_id>/", csv_views.import_board_data, name="import_board_data"),
+    path("api/import/", csv_views.import_board_data, name="import_board_data"),
     path("api/board_templates/", boardTemplateViews.board_templates, name="board_templates"),
     path(
         "api/create_board_from_template/",

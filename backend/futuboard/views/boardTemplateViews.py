@@ -1,13 +1,12 @@
 import csv
 import io
-import uuid
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 
 from ..csv_parser import read_board_data, verify_csv_header, write_board_data, write_csv_header
 from ..verification import new_password
 from ..models import Board, BoardTemplate
-from ..serializers import BoardTemplateSerializer
+from ..serializers import BoardSerializer, BoardTemplateSerializer
 import rest_framework.request
 
 
@@ -53,8 +52,7 @@ def create_board_from_template(request: rest_framework.request.Request, format=N
         if not verify_csv_header(csv_reader):
             return JsonResponse({"success": False})
 
-        new_board_id = uuid.uuid4()
+        new_board = read_board_data(csv_reader, board.title, new_password(password))
 
-        read_board_data(csv_reader, new_board_id, board.title, new_password(password))
-
-        return JsonResponse({"boardid": new_board_id})
+        serializer = BoardSerializer(new_board)
+        return JsonResponse(serializer.data, safe=False)

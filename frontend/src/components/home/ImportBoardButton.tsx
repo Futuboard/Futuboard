@@ -4,8 +4,7 @@ import Button from "@mui/material/Button"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { getId } from "@/services/Utils"
-import { NewBoardFormImport } from "@/types"
+import { Board, NewBoardFormImport } from "@/types"
 
 const CreateBoardButton = () => {
   const navigate = useNavigate()
@@ -18,25 +17,18 @@ const CreateBoardButton = () => {
     setOpen(false)
   }
   const handleSubmit = async (data: NewBoardFormImport) => {
-    //TODO: should only temporarily update the board name. (not in this function though)
-    //later should create entirely new board object and send it to database
-    const board = {
-      title: data.title,
-      password: data.password,
-      id: getId()
-    }
-
     const formData = new FormData()
     formData.append("file", data.file[0])
-    formData.append("board", JSON.stringify(board))
+    formData.append("board", JSON.stringify(data))
 
-    await fetch(`${import.meta.env.VITE_DB_ADDRESS}import/${board.id}/`, {
+    await fetch(`${import.meta.env.VITE_DB_ADDRESS}import/`, {
       method: "POST",
       body: formData
     })
       .then((response) => response.json())
-      .then(() => {
-        navigate(`/board/${board.id}`)
+      .then((data) => {
+        const board = data as Board
+        navigate(`/board/${board.boardid}`)
       })
       .catch((error) => {
         console.error("Error:", error)

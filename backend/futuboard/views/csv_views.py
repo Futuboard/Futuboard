@@ -3,6 +3,8 @@ Views to import and export CSV files of board data
 """
 
 from django.http import HttpResponse
+
+from ..serializers import BoardSerializer
 from ..csv_parser import write_csv_header, write_board_data, verify_csv_header, read_board_data
 import csv
 import io
@@ -29,7 +31,7 @@ def export_board_data(request, board_id, filename):
 
 
 @api_view(["POST"])
-def import_board_data(request, board_id):
+def import_board_data(request):
     """
     Import board data from a csv file
     """
@@ -38,15 +40,15 @@ def import_board_data(request, board_id):
         csv_file = request.FILES["file"]
         print(csv_file)
         if not csv_file.name.endswith(".csv"):
-            return JsonResponse({"success": False})
+            return HttpResponse("Invalid file type", status=400)
         data_set = csv_file.read().decode("UTF-8")
         io_string = io.StringIO(data_set)
         reader = csv.reader(io_string, delimiter=",", quotechar='"')
         if not verify_csv_header(reader):
-            return JsonResponse({"success": False})
-        board = request.data["board"]
-        board = json.loads(board)
-        read_board_data(reader, board_id, board["title"], new_password(board["password"]))
-        return JsonResponse({"success": True})
+            return HttpResponse("Invalid file header", status=400)
+        board_data = json.loads(request.data["board"])
+        board = read_board_data(reader, board_data["title"], new_password(board_data["password"]))
+        serializer = BoardSerializer(board)
+        return JsonResponse(serializer.data, safe=False)
 
-    return JsonResponse({"success": False})
+    return HttpResponse("Invalid request", status=400)

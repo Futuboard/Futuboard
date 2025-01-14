@@ -24,7 +24,7 @@ class Action(models.Model):
 
 
 class Board(models.Model):
-    boardid = models.UUIDField(db_column="boardID", primary_key=True)
+    boardid = models.UUIDField(db_column="boardID", primary_key=True, default=uuid.uuid4)
     description = models.TextField(blank=True, null=True)
     title = models.TextField()
     creation_date = models.DateTimeField()

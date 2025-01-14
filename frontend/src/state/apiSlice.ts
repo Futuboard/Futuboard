@@ -11,7 +11,8 @@ import {
   Task,
   User,
   UserWithoutTicketsOrActions,
-  PasswordChangeFormData
+  PasswordChangeFormData,
+  NewBoardFormData
 } from "@/types"
 
 import { getAuth, setToken } from "./auth"
@@ -67,12 +68,12 @@ export const boardsApi = createApi({
       providesTags: ["Boards"]
     }),
 
-    addBoard: builder.mutation<Board, Board>({
-      query: (board) => {
+    addBoard: builder.mutation<Board, NewBoardFormData>({
+      query: (boardData) => {
         return {
           url: "boards/",
           method: "POST",
-          body: board
+          body: boardData
         }
       },
       invalidatesTags: () => invalidateRemoteCache(["Boards"])

@@ -14,7 +14,6 @@ from ..verification import decode_token, encode_token, get_token_from_request, n
 def all_boards(request: rest_framework.request.Request, format=None):
     if request.method == "POST":
         new_board = Board(
-            boardid=request.data["id"],
             description="",
             title=request.data["title"],
             creation_date=timezone.now(),

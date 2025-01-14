@@ -4,35 +4,12 @@ import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
 import Link from "@mui/material/Link"
 import Typography from "@mui/material/Typography"
-import { getId } from "@services/Utils"
 import { useEffect } from "react"
-import { useNavigate } from "react-router-dom"
 
 import ImportBoardButton from "@/components/home/ImportBoardButton"
 import ModalFrameCv from "@/components/home/ModalFrameCv"
-import { useAddBoardMutation } from "@/state/apiSlice"
-import { Board, NewBoardFormData } from "@/types"
 
 const Home: React.FC = () => {
-  const navigate = useNavigate()
-  const [addBoard] = useAddBoardMutation()
-
-  const handleCreateBoard = async ({ title, password }: NewBoardFormData) => {
-    const id = getId()
-    const board: Board = {
-      id,
-      title,
-      password,
-      users: [],
-      columns: []
-    }
-    //send board object to server
-    // TODO: add error handling
-    await addBoard(board)
-    //redirect to created board page
-    navigate(`/board/${id}`)
-  }
-
   useEffect(() => {
     document.title = "Futuboard"
   })
@@ -59,7 +36,7 @@ const Home: React.FC = () => {
         <Grid item xs={12}>
           <Grid container spacing={1} justifyContent="center">
             <Grid item>
-              <CreateBoardButton onNewBoard={handleCreateBoard} />
+              <CreateBoardButton />
             </Grid>
             <Grid item>
               <ImportBoardButton />

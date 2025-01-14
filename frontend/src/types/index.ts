@@ -1,5 +1,5 @@
 export type Board = {
-  id: string
+  boardid: string
   title: string
   password: string
   columns: Column[]
