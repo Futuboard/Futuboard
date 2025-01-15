@@ -85,7 +85,6 @@ def tickets_on_column(request, board_id, column_id):
             storypoints=8,
             size=int(request.data["size"]) if request.data["size"] else 0,
             order=0,
-            order=0,
             creation_date=timezone.now(),
             cornernote=request.data["cornernote"] if "cornernote" in request.data else "",
         )

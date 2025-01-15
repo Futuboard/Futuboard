@@ -15,7 +15,6 @@ import { useForm } from "react-hook-form"
 
 import { User } from "@/types"
 import DescriptionEditField from "./DescriptionEditField"
-import DescriptionEditField from "./DescriptionEditField"
 
 interface TaskCreationFormProps {
   onSubmit: (data: FormData) => void
