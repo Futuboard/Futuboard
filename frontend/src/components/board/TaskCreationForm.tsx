@@ -150,7 +150,7 @@ const TaskCreationForm: React.FC<TaskCreationFormProps> = (props) => {
             <TextField label="Corner note" fullWidth {...register("cornerNote")} />
           </Grid>
           <Grid item xs={12}>
-            <DescriptionEditField description={defaultValues?.description || ""} setValue={setValue} />
+            <DescriptionEditField description={defaultValues?.description || ""} onChange={(markdown) => setValue("description", markdown)} />
           </Grid>
           <Grid item xs={12}>
             <FormControl component="fieldset">

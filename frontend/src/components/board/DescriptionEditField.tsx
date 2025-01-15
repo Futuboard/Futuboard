@@ -15,20 +15,11 @@ import React from "react"
 
 interface DescriptionEditFieldProps {
   description: string
-  setValue: (
-    name: "description",
-    value: string,
-    options?:
-      | Partial<{
-          shouldValidate: boolean
-          shouldDirty: boolean
-          shouldTouch: boolean
-        }>
-      | undefined
-  ) => void
+  onChange: (markdown: string) => void
+
 }
 
-const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description, setValue }) => {
+const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description, onChange }) => {
   const ref = React.useRef<MDXEditorMethods>(null)
 
   return (
@@ -49,7 +40,7 @@ const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description
         linkDialogPlugin(),
         tablePlugin()
       ]}
-      onChange={(markdown) => setValue("description", markdown)}
+      onChange={(markdown) => onChange(markdown)}
       ref={ref}
     />
   )
