@@ -46,6 +46,7 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
         </Grid>
         <Grid item xs={12}>
           <TextField
+            sx={{ width: "90%" }}
             label="Name"
             helperText={errors.title?.message}
             error={Boolean(errors.title)}

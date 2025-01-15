@@ -68,6 +68,7 @@ const BoardImportForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCanc
         </Grid>
         <Grid item xs={12}>
           <TextField
+            sx={{ width: "90%" }}
             label="Name"
             helperText={errors.title?.message}
             error={Boolean(errors.title)}
