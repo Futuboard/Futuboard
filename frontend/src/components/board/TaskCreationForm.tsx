@@ -149,8 +149,8 @@ const TaskCreationForm: React.FC<TaskCreationFormProps> = (props) => {
           <Grid item xs={12}>
             <TextField label="Corner note" fullWidth {...register("cornerNote")} />
           </Grid>
-          <Grid item xs={12}> 
-            <DescriptionEditField description = {defaultValues?.description || ""} setValue = {setValue} />
+          <Grid item xs={12}>
+            <DescriptionEditField description={defaultValues?.description || ""} setValue={setValue} />
           </Grid>
           <Grid item xs={12}>
             <FormControl component="fieldset">

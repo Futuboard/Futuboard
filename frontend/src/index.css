@@ -56,7 +56,7 @@ button:focus-visible {
   border: none;
   border-radius: 3pt;
   outline-style: solid;
-  outline-color: #C4C4C4;
+  outline-color: #c4c4c4;
   outline-width: 1px;
 }
 
@@ -65,7 +65,7 @@ button:focus-visible {
 }
 
 .mdxeditor:focus-within {
-  outline-color: #1976D2;
+  outline-color: #1976d2;
   outline-width: 2px;
 }
 
