@@ -13,7 +13,8 @@ import {
   UserWithoutTicketsOrActions,
   PasswordChangeFormData,
   NewBoardFormData,
-  BoardTemplate
+  BoardTemplate,
+  NewBoardTemplate
 } from "@/types"
 
 import { getAuth, setToken } from "./auth"
@@ -94,6 +95,28 @@ export const boardsApi = createApi({
     getBoardTemplates: builder.query<BoardTemplate[], void>({
       query: () => "boardtemplates/",
       providesTags: ["BoardTemplate"]
+    }),
+
+    addBoardTemplate: builder.mutation<BoardTemplate, NewBoardTemplate>({
+      query: (newBoardTemplate) => {
+        return {
+          url: "boardtemplates/",
+          method: "POST",
+          body: newBoardTemplate
+        }
+      },
+      invalidatesTags: ["BoardTemplate"]
+    }),
+
+    deleteBoardTemplate: builder.mutation<BoardTemplate, string>({
+      query: (boardtemplateid) => {
+        return {
+          url: `boardtemplates/`,
+          method: "DELETE",
+          body: { boardtemplateid }
+        }
+      },
+      invalidatesTags: ["BoardTemplate"]
     }),
 
     createBoardFromTemplate: builder.mutation<Board, NewBoardFormData>({

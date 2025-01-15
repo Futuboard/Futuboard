@@ -11,7 +11,7 @@ import rest_framework.request
 
 
 # Create your views here.
-@api_view(["GET", "POST"])
+@api_view(["GET", "POST", "DELETE"])
 def board_templates(request: rest_framework.request.Request):
     if request.method == "POST":
         board = Board.objects.get(boardid=request.data["boardid"])
@@ -29,6 +29,11 @@ def board_templates(request: rest_framework.request.Request):
         query_set = BoardTemplate.objects.all()
         serializer = BoardTemplateSerializer(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
+
+    if request.method == "DELETE":
+        board_template = BoardTemplate.objects.get(boardtemplateid=request.data["boardtemplateid"])
+        board_template.delete()
+        return JsonResponse({"success": True})
 
 
 @api_view(["POST"])

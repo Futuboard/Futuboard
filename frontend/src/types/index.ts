@@ -103,5 +103,6 @@ export type BoardTemplate = {
   boardid: string
   title: string
   description: string
-  image?: string
 }
+
+export type NewBoardTemplate = Omit<BoardTemplate, "boardtemplateid">

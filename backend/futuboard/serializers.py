@@ -73,4 +73,4 @@ class ActionSerializer(serializers.ModelSerializer):
 class BoardTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoardTemplate
-        fields = ["boardtemplateid", "boardid", "title", "description", "image"]
+        fields = ["boardtemplateid", "boardid", "title", "description"]
