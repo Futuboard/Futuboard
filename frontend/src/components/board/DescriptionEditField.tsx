@@ -9,7 +9,14 @@ import {
   BoldItalicUnderlineToggles,
   CodeToggle,
   InsertTable,
-  tablePlugin
+  tablePlugin,
+  listsPlugin,
+  quotePlugin,
+  headingsPlugin,
+  thematicBreakPlugin,
+  markdownShortcutPlugin,
+  ListsToggle,
+  Separator,
 } from "@mdxeditor/editor"
 import React from "react"
 
@@ -30,7 +37,11 @@ const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description
           toolbarContents: () => (
             <>
               <BoldItalicUnderlineToggles />
+              <Separator />
+              <ListsToggle />
+              <Separator />
               <CreateLink />
+              <Separator />
               <CodeToggle />
               <InsertTable />
             </>
@@ -38,7 +49,12 @@ const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description
         }),
         linkPlugin(),
         linkDialogPlugin(),
-        tablePlugin()
+        tablePlugin(),
+        listsPlugin(),
+        quotePlugin(),
+        headingsPlugin(),
+        thematicBreakPlugin(),
+        markdownShortcutPlugin(),
       ]}
       onChange={(markdown) => onChange(markdown)}
       ref={ref}
