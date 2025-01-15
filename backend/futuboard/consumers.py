@@ -14,6 +14,7 @@ class BoardConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         message = text_data
+
         await self.channel_layer.group_send(
             str(self.board_id),
             {
@@ -26,4 +27,4 @@ class BoardConsumer(AsyncWebsocketConsumer):
         # Extract the message from the event
         message = event["message"]
         # Send the message to the WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        await self.send(text_data=json.dumps(message))

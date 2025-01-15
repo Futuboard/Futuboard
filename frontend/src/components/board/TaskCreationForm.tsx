@@ -13,7 +13,7 @@ import {
 import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 
-import { User } from "../../types"
+import { User } from "@/types"
 
 interface TaskCreationFormProps {
   onSubmit: (data: FormData) => void

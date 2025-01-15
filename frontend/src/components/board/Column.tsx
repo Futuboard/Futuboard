@@ -5,12 +5,12 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 import { Box, Dialog, DialogContent, Divider, IconButton, List, Popover, Tooltip, Typography } from "@mui/material"
 import Paper from "@mui/material/Paper"
-import { useContext, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useSelector } from "react-redux"
 import { useParams } from "react-router"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
 import { RootState } from "@/state/store"
+import type { Column, Task as TaskType, User } from "@/types"
 
 import { getId } from "../../services/Utils"
 import {
@@ -19,7 +19,6 @@ import {
   useGetTaskListByColumnIdQuery,
   useUpdateColumnMutation
 } from "../../state/apiSlice"
-import { Column, Task as TaskType, User } from "../../types"
 
 import ColumnEditForm from "./ColumnEditForm"
 import SwimlaneContainer from "./SwimlaneContainer"
@@ -43,9 +42,6 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
   const { id = "default-id" } = useParams()
 
   const [defaultValues, setDefaultValues] = useState<FormData | null>(null)
-
-  //function for sending a websocket message
-  const sendMessage = useContext(WebsocketContext)
 
   const [addTask] = useAddTaskMutation()
 
@@ -77,9 +73,6 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
       .unwrap()
       .then(() => {
         setOpen(false)
-        if (sendMessage !== null) {
-          sendMessage("Task added")
-        }
       })
       .catch((error) => {
         console.error(error)
@@ -191,7 +184,6 @@ interface ColumnFormData {
 const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [updateColumn] = useUpdateColumnMutation()
-  const sendMessage = useContext(WebsocketContext)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -210,9 +202,6 @@ const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
     }
 
     await updateColumn({ column: columnObject })
-    if (sendMessage !== null) {
-      sendMessage("Column updated")
-    }
     setAnchorEl(null)
   }
 
@@ -339,7 +328,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
             </div>
           </Paper>
           <Box sx={{ overflowX: "hidden", height: "fit-content" }}>
-            <Box sx={{ width: showSwimlanes ? "820px" : "0px", transition: "width 300ms" }}>
+            <Box sx={{ width: showSwimlanes ? "900px" : "0px", transition: "width 300ms" }}>
               {showSwimlanes && <SwimlaneContainer column={column} />}
             </Box>
           </Box>

@@ -1,30 +1,28 @@
 import { Droppable } from "@hello-pangea/dnd"
 import { Add } from "@mui/icons-material"
-import { Box, IconButton, Paper, Popover, Typography } from "@mui/material"
-import { useContext, useState } from "react"
+import { Box, IconButton, Paper, Popover } from "@mui/material"
+import { useState } from "react"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
 import { getId } from "@/services/Utils"
-import { useGetActionListByTaskIdAndSwimlaneColumnIdQuery, usePostActionMutation } from "@/state/apiSlice"
-import { Action as ActionType, SwimlaneColumn, Task } from "@/types"
+import { usePostActionMutation } from "@/state/apiSlice"
+import { Action as ActionType, NewAction, SwimlaneColumn, Task } from "@/types"
 
 import Action from "./Action"
 import ActionCreationForm from "./ActionCreationForm"
 
 interface SwimlaneActionListProps {
   taskId: string
-  swimlanecolumnid: string
+  swimlanecolumn: SwimlaneColumn
+  actionList: ActionType[]
 }
 
-const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlanecolumnid }) => {
-  const { data: actionList, isLoading } = useGetActionListByTaskIdAndSwimlaneColumnIdQuery({
-    taskId,
-    swimlaneColumnId: swimlanecolumnid
-  })
-
+const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlanecolumn, actionList }) => {
   return (
     <>
-      <Droppable droppableId={swimlanecolumnid + "/" + taskId} type={"SWIMLANE" + "/" + taskId}>
+      <Droppable
+        droppableId={swimlanecolumn.swimlanecolumnid + "/" + taskId + "/" + swimlanecolumn.columnid}
+        type={"SWIMLANE" + "/" + taskId}
+      >
         {(provided, snapshot) => (
           <Box
             ref={provided.innerRef}
@@ -32,29 +30,13 @@ const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlan
             sx={{
               display: "flex",
               flexDirection: "column",
-              flex: "1",
               padding: "2px",
               alignContent: "center",
               border: snapshot.isDraggingOver ? "1px solid rgba(22, 95, 199)" : "1px solid rgba(0, 0, 0, 0.12)",
               backgroundColor: snapshot.isDraggingOver ? "rgba(22, 95, 199, 0.1)" : "#E5DB0",
-              height: "118px",
-              overflowX: "hidden",
-              //custom scrollbar has issues with react-beautiful-dnd, remove if it's causing problems
-              "&::-webkit-scrollbar": {
-                width: "5px"
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "#f1f1f1"
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: "#888"
-              },
-              "&::-webkit-scrollbar-thumb:hover": {
-                background: "#555"
-              }
+              overflowX: "hidden"
             }}
           >
-            {isLoading && <Typography>Loading actions...</Typography>}
             {actionList &&
               actionList.map((action, index) => <Action key={action.actionid} action={action} index={index} />)}
             {provided.placeholder}
@@ -65,11 +47,14 @@ const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlan
   )
 }
 
-const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }> = ({ taskId, swimlanecolumnid }) => {
+const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string; columnid: string }> = ({
+  taskId,
+  swimlanecolumnid,
+  columnid
+}) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [createAction] = usePostActionMutation()
 
-  const sendMessage = useContext(WebsocketContext)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -79,17 +64,17 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }>
   }
 
   const handleOnSubmit = async (data: { actionTitle: string; resetActionTitle: () => void }) => {
-    const actionObject: ActionType = {
+    const action: NewAction = {
       title: data.actionTitle,
+      columnid: columnid,
       actionid: getId(),
-      color: "white"
+      ticketid: taskId,
+      swimlanecolumnid,
+      order: 0
     }
 
-    await createAction({ taskId, swimlaneColumnId: swimlanecolumnid, action: actionObject })
+    await createAction({ action })
 
-    if (sendMessage !== null) {
-      sendMessage("Action created")
-    }
     data.resetActionTitle()
   }
 
@@ -98,7 +83,7 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }>
 
   return (
     <div>
-      <IconButton size={"small"} onClick={handleClick}>
+      <IconButton sx={{ marginTop: "10px" }} size={"small"} onClick={handleClick}>
         <Add sx={{ fontSize: "15px" }} />
       </IconButton>
       <Popover
@@ -127,34 +112,42 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string }>
 interface SwimlaneProps {
   task: Task
   swimlaneColumns: SwimlaneColumn[]
+  actions: ActionType[]
+  columnid: string
 }
 
-const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns }) => {
+const Swimlane: React.FC<SwimlaneProps> = ({ task, swimlaneColumns, actions, columnid }) => {
   return (
-    <div style={{ display: "flex" }}>
+    <Box sx={{ display: "flex" }}>
       {swimlaneColumns && (
-        <CreateActionButton taskId={task.ticketid} swimlanecolumnid={swimlaneColumns[0].swimlanecolumnid} />
+        <CreateActionButton
+          taskId={task.ticketid}
+          swimlanecolumnid={swimlaneColumns[0].swimlanecolumnid}
+          columnid={columnid}
+        />
       )}
       <Box
         sx={{
-          height: "129px",
-          /*might later need to change swimlane height to show all actions*/ width: "100%",
-          backgroundColor: "#E5DB0",
-          paddingBottom: "10px"
+          height: "120px",
+          paddingBottom: "9px",
+          paddingTop: "9px",
+          paddingRight: "25px",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr 1fr",
+          width: "100%"
         }}
       >
-        <Box sx={{ display: "flex" }}>
-          {swimlaneColumns &&
-            swimlaneColumns.map((swimlaneColumn, index) => (
-              <SwimlaneActionList
-                key={index}
-                taskId={task.ticketid}
-                swimlanecolumnid={swimlaneColumn.swimlanecolumnid}
-              />
-            ))}
-        </Box>
+        {swimlaneColumns &&
+          swimlaneColumns.map((swimlaneColumn, index) => (
+            <SwimlaneActionList
+              key={index}
+              taskId={task.ticketid}
+              swimlanecolumn={swimlaneColumn}
+              actionList={actions.filter((action) => action.swimlanecolumnid == swimlaneColumn.swimlanecolumnid)}
+            />
+          ))}
       </Box>
-    </div>
+    </Box>
   )
 }
 

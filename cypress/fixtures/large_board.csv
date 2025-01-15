@@ -1,0 +1,284 @@
+Futuboard,v1.0,Board Data
+
+Board,
+User,Linda
+User,Ellie
+User,Will
+User,Bob
+User,Joe
+User,Nat
+User,Jess
+User,Patrick
+
+Column,,,pokemon1-10,1,True
+Swimlanecolumn,To Do,0
+Swimlanecolumn,Doing,1
+Swimlanecolumn,Verify,2
+Swimlanecolumn,Done,3
+Ticket,venusaur,"It is the mascot of Pokémon Green and LeafGreen.[15] The bud on its back has bloomed into a flower. It has a soothing aroma, and converts sunlight into energy. For this reason, Venusaur is more powerful during the summer. It gained a Mega Evolution in generation VI, and a Gigantamax form in generation VIII.",#8bc34a,8,3,2,2024-12-01 16:40:22.960643+00:00,type Grass / Poison
+Action,Fushigibana,0,3
+User,Linda
+Ticket,charmander,"It is one of Kanto's starter Pokémon. From the moment it hatches, there is a flame at the tip of its tail. Still unfamiliar with fire, a Charmander might accidentally burn itself. If its flame goes out, it dies.",#ff4081,8,1,3,2024-12-01 16:40:37.128084+00:00,type Fire	
+Action,Hitokage,0,0
+User,Ellie
+Ticket,ivysaur,"It is a playable character in Super Smash Bros. Brawl and Super Smash Bros. Ultimate as a part of the ""Pokémon Trainer"" fighter. Its bulb has grown into a bud, which it uses to convert sunlight into power. The bud is heavy, to the point of rendering Ivysaur unable to move properly if it has stored enough nutrients, so its hind legs have grown stronger to counter the weight.",#8bc34a,8,2,1,2024-12-01 16:40:17.017517+00:00,type Grass / Poison
+Action,Fushigisō,0,2
+User,Will
+Ticket,wartortle,"Because it is bigger and heavier than Squirtle, it has trouble walking, and has to use its furry ears and tail as rudders and balancing rods to swim. It withdraws into its shell to attack, defend itself, and sleep, though it cannot fully withdraw its tail. It is said to be able to live for up to 10,000 years. Older Wartortle have darker tail fur, and may have scars and algae on their shells.",#03a9f4,8,2,7,2024-12-01 16:41:12.386479+00:00,type Water
+Action,Kamēru,0,2
+User,Bob
+Ticket,blastoise,"It is the mascot of Pokémon Blue.[20] The two cannons on its shell shoot out pressurized jets of water strong enough to shatter thick steel walls, and accurate enough to hit empty cans from over 160 feet away. Blastoise itself can tackle at high speeds. A cruel Pokémon, it deliberately makes itself heavier to withstand its cannons' recoil and crush its opponents. It gained a Mega Evolution in generation VI and a Gigantamax form in generation VIII. A Blastoise trading card, which was originally made as a test print before the commercial English cards, was sold for $360,000 in 2021.[21]",#03a9f4,8,3,8,2024-12-01 16:41:23.187354+00:00,type Water
+Action,Kamekkusu,0,3
+User,Joe
+Ticket,bulbasaur,"It is one of Kanto's starter Pokémon. It has a bulb on its back, which stores nutrients. Since the bulb can photosynthesize, Bulbasaur can go days without eating. As with the rest of its evolutionary line, its bulb has vines the Pokémon uses as tentacles.",#8bc34a,8,1,0,2024-12-01 16:40:09.919153+00:00,type Grass / Poison
+Action,top tier pokemon,0,3
+User,Nat
+Action,Fushigidane,0,1
+User,Will
+Action,win at a debut,0,0
+User,Bob
+Action,blablabla,1,0
+User,Ellie
+User,Joe
+Action,testy,2,0
+Ticket,charmeleon,"A feisty Pokémon, it seeks out potential opponents and torments them in battle. It attacks by spewing fire from its mouth, swinging its tail around, or clawing away. Its fire turns bluish-white when it is excited.",#ff4081,8,2,4,2024-12-01 16:40:44.343279+00:00,type Fire
+Action,Rizādo,0,2
+User,Ellie
+Ticket,charizard,"It is a playable character as a part of the ""Pokémon Trainer"" fighter in Super Smash Bros. Brawl and Super Smash Bros. Ultimate, a standalone fighter in Super Smash Bros. for Nintendo 3DS and Wii U, and the mascot of Pokémon Red and FireRed. Its fire is hot enough to melt boulders and glaciers, and it is known to start forest fires by accident, though it will not use it against weaker foes. The flame on its tail can burn underwater, and turns bluish-white if Charizard is angry. It gained two Mega Evolutions in generation VI, one Fire/Flying-type and one Fire/Dragon-type, and a Gigantamax form in generation VIII.",#ff4081,8,3,5,2024-12-01 16:40:51.666307+00:00,type Fire / Flying
+Action,Rizādon,0,3
+User,Nat
+Ticket,squirtle,"It is a playable character in Super Smash Bros. Brawl and Super Smash Bros. Ultimate as a part of the ""Pokémon Trainer"" fighter, and one of Kanto's starter Pokémon.[16] After it hatches, its back gradually swells and hardens into a shell. It withdraws into its shell for protection or to sleep, and its grooved, rounded shape reduce its water resistance, allowing it to swim faster. To attack, it sprays foamy water from its mouth.",#03a9f4,8,1,6,2024-12-01 16:41:00.941173+00:00,type Water
+Action,Zenigame,0,0
+User,Will
+Ticket,caterpie,"Its feet have suction pads that allow it to climb slopes, walls, and trees. To protect itself, it releases a stench from its antennae. It camouflages itself in piles of leaves, or tries to scare predators with the eye patterns on its body. Across its life, it eats hundreds of leaves, some bigger than itself. When nearing evolution, it sheds its skin, covers itself with silk, and becomes a cocoon.",#8bc34a,8,1,9,2024-12-01 16:41:31.017819+00:00,type Bug
+Action,Kyatapī,0,0
+User,Jess
+
+Column,,,pokemon11-20,2,True
+Swimlanecolumn,To Do,0
+Swimlanecolumn,Doing,1
+Swimlanecolumn,Verify,2
+Swimlanecolumn,Done,3
+Ticket,pidgeot,"Its wings are strong enough to fly at Mach 2 speed, whip up windstorms strong enough to bend trees, and fly up to 3,300 feet over the air. It skims over the water to hunt for unsuspecting fish Pokémon like Magikarp. Its glossy feathers make it a popular pick among trainers. It gained a Mega Evolution in generation VI.",#ffffff,8,3,7,2024-12-01 16:42:58.806645+00:00,type Normal / Flying
+Action,Pijotto,0,0
+User,Will
+Ticket,pidgey,"A common and docile Pokémon, it prefers using flapping up sand in opponents' eyes over fighting. Its sense of direction allows it to return home from however far it may be.",#ffffff,8,1,5,2024-12-01 16:42:46.039642+00:00,type Normal / Flying
+Action,Poppo,0,3
+User,Will
+Ticket,weedle,"A common sight in forests and grassy areas, it has a two-inch poisonous stinger on its head, which it uses to defend itself. It has an acute sense of smell, being able to distinguish leaves it likes from those it dislikes with its big nose. It eats its weight in leaves every day.",#8bc34a,8,1,2,2024-12-01 16:42:13.169519+00:00,type Bug / Poison
+Action,Bīdoru,0,0
+User,Bob
+Ticket,kakuna,"Kakuna remains immobile, but can stick out its stinger in self-defense. The process of its cells' rearrangement raises its body temperature to the point of making it hot to the touch.",#8bc34a,8,2,3,2024-12-01 16:42:29.648277+00:00,type Bug / Poison
+Action,Kokūn,0,0
+User,Linda
+Ticket,pidgeotto,"A territorial species, it will peck and claw at its opponents. It uses its claws to carry prey like Exeggcute for over 60 miles. It flies in circles, keeping a lookout for prey.",#ffffff,8,2,6,2024-12-01 16:43:08.692099+00:00,type Normal / Flying
+Action,Pijon,0,1
+User,Will
+Ticket,raticate,"It uses its whiskers to maintain balance, and slows down if they are cut off. Its webbed hind feet act as flippers, allowing it to swim in rivers to hunt or escape from opponents. To keep its teeth ground down, it chews on anything, from machinery to concrete. Like Rattata, Raticate has a Dark/Normal-type Alolan form.",#ffffff,8,2,9,2024-12-01 16:43:25.888538+00:00,type Normal
+Action,Ratta,0,2
+User,Joe
+Ticket,metapod,"Though hard, Metapod's shell is said to be easy to break open, so it hardens it further when threatened to avoid spilling its thick, liquid innards. It waits for evolution while its cells restructure. Ume Aoki, a Japanese cartoonist who is famous for her work on the manga Hidamari Sketch and the anime Puella Magi Madoka Magica, utils a likeness of herself cosplaying as a Metapod in her drawn works.[22]",#8bc34a,8,2,0,2024-12-01 16:41:39.505570+00:00,type Bug
+Action,Toranseru,0,2
+User,Linda
+Ticket,butterfree,"Its wings are covered in poisonous, water-repelling powder, which it uses to defend itself and fly in the rain. It goes from flower to flower to collect nectar, and rubs honey onto the hairs of its legs to carry back to its nest. It spreads its scales around to defend nearby Caterpie from predators. It competes with Cutiefly for territory. It gained a Gigantamax form in generation VIII.",#8bc34a,8,3,1,2024-12-01 16:41:49.175348+00:00,type Bug / Flying
+User,Bob
+Action,Batafurī,0,3
+User,Nat
+Ticket,rattata,"It will procreate and form nests anywhere that has enough food; each nest contains at least 40 Rattata. The colony spends entire days scavenging for food. A cautious species, it constantly listens around by moving its ears. Its incisor teeth do not stop growing, so it gnaws on hard objects, like table legs and door frames, to keep them ground down. Due to their commonness and habits of stealing food and gnawing on structures, it and Raticate are considered invasive species. Rattata has a Dark/Normal-type Alolan form.",#ffffff,8,1,8,2024-12-01 16:43:19.351900+00:00,type Normal
+Action,Koratta,0,3
+User,Bob
+Ticket,beedrill,"Swarms of Beedrill set their nest in forests, and attack anything that goes near. It uses its three poisonous stingers to defeat its prey and carry them home. It gained a Mega Evolution in generation VI.",#8bc34a,8,3,4,2024-12-01 16:42:35.737250+00:00,type Bug / Poison
+Action,Supiā,0,2
+User,Jess
+
+Column,,,pokemon21-30,3,True
+Swimlanecolumn,To Do,0
+Swimlanecolumn,Doing,1
+Swimlanecolumn,Verify,2
+Swimlanecolumn,Done,3
+Ticket,spearow,"It can fly quickly, but is not adept at it. Its cries can be heard from a mile away, and it uses them to communicate with other Spearow. It flies around warmer climates, looking for bug Pokémon to eat.",#ffffff,8,1,0,2024-12-01 16:43:44.039661+00:00,type Normal / Flying
+User,Joe
+User,Bob
+Action,Onisuzume,0,0
+User,Bob
+Ticket,raichu,"Its tail can be used as a lightning rod to gather electricity, or as a ground to protect itself. It can store and eject up to 100,000 volts, enough to knock out a Copperajah. To avoid physically straining itself, it will discharge excess electricity into the ground, leaving its surroundings burned. Because it evolves via a stone and Pikachu is more popular, Raichu are rarely seen. It has an Electric/Psychic-type Alolan form. Both forms of Raichu were created by Atsuko Nishida.[23]",#ffeb3b,8,2,5,2024-12-01 16:44:30.776723+00:00,type Electric
+User,Bob
+Action,Raichū,0,1
+User,Bob
+Ticket,nidoran girl,"Eggs from both Nidoran lines can contain Nidoran of either gender. It is docile and unwilling to fight, but when encouraged, its horn and barbs can secrete poison. It uses its whiskers to check the wind for predators, and its incisors for chewing through berries.",#8bc34a,8,1,8,2024-12-01 16:45:08.297591+00:00,type Poison
+Action,Nidoran♀,0,0
+User,Bob
+Ticket,nidorina,"Its horn grows slowly and it does not like fighting, but when forced to do so, it tends to resort to clawing and biting opponents. It lives in groups with others of its evolutionary line, and chews food for its young.",#8bc34a,8,2,9,2024-12-01 16:45:15.765901+00:00,type Poison
+Action,Nidorina,0,1
+User,Ellie
+Ticket,fearow,"Drawings resembling Fearow can be seen ancient murals, implying that it has not evolved since ancient days. Its stamina lets it fly for an entire day, and its long neck and beak are convenient for plucking bug and fish Pokémon.",#ffffff,8,2,1,2024-12-01 16:43:48.367056+00:00,type Normal / Flying
+User,Nat
+Action,Onidoriru,0,0
+User,Ellie
+Ticket,ekans,"It uses its tongue to detect its surroundings and look for the scent for its prey. It wraps itself around trees to rest at night. If no trees are available, it coils to be able to respond from any given direction. It preys on bird Pokémon and their eggs and can stretch its jaw to swallow them whole, but eating something too big can leave it too heavy to move.",#8bc34a,8,1,2,2024-12-01 16:43:55.673702+00:00,type Poison
+Action,Ābo,0,0
+User,Jess
+Ticket,arbok,"The pattern under its head is similar to a face, and differs by region. Research has shown over 20 different patterns. Its coiling is strong enough to flatten oil drums, and its fangs are used to inject poison into its prey. It can use its pattern or hiss to intimidate opponents. If any part of its body besides its head is cut off, the rest of its body can grow back in weeks. It preys on smaller Pokémon like Wooper, or eggs of bird Pokémon like Pidgey and Spearow.",#8bc34a,8,2,3,2024-12-01 16:44:05.623269+00:00,type Poison
+Action,Ābokku,0,2
+User,Patrick
+Ticket,sandshrew,"Based on the Chinese pangolin, Sandshrew is known to curl into a ball to defend itself. It burrows nests into the ground, and only digs back up to look for berries and hunt for bug Pokémon. Sandshrew has an Ice/Steel-type Alolan form.",#ffeb3b,8,1,6,2024-12-01 16:44:38.916852+00:00,type Ground
+Action,Sando,0,3
+User,Nat
+Ticket,sandslash,"It can curl into a spiky ball to roll around, attack opponents, and protect itself from heatstroke or attacks. In addition to the spikes on its back, it can use its claws to attack and slash berries for its young. Like Sandshrew, it has an Ice/Steel-type Alolan form.",#ffeb3b,8,2,7,2024-12-01 16:44:51.844526+00:00,type Ground
+Action,Sandopan,0,1
+User,Will
+Ticket,pikachu,"Pikachu is the primary mascot of the Pokémon franchise, as well as Pokémon Yellow and Let's Go, Pikachu!. It is also playable in every Super Smash Bros. game. It raises its tail to check its surroundings, but may be struck by a lightning bolt in this position. It gathers electricity from the atmosphere, and uses it to roast berries, communicate with other Electric-type Pokémon, and attack its opponents. Groups of Pikachu having their tails raised can inadvertedly cause lightning storms. Cramorant often swallow Pikachu by accident.",#ffeb3b,8,1,4,2024-12-01 16:44:19.671196+00:00,type Electric
+Action,Pikachū,0,3
+User,Ellie
+
+Column,,,pokemon41-50,5,True
+Swimlanecolumn,To Do,0
+Swimlanecolumn,Doing,1
+Swimlanecolumn,Verify,2
+Swimlanecolumn,Done,3
+Ticket,oddish,"It buries itself in the soil to absorb the nutrients and to sleep during the day. If pulled out, it starts screaming. A nocturnal Pokémon, it wanders around to scatter seeds and absorb moonlight. It is one of the few species with a scientific name; ""Oddium Wanderus.""",#8bc34a,8,1,2,2024-12-01 16:47:17.529622+00:00,type Grass / Poison
+Action,Nazonokusa,0,0
+User,Ellie
+Ticket,venonat,"It uses its compounded eyes as a radar to locate prey in the dark, and can shoot light beams from them. It hunts for small bug Pokémon at night.",#8bc34a,8,1,7,2024-12-01 16:48:01.852442+00:00,type Bug / Poison
+Action,Konpan,0,2
+User,Bob
+Ticket,venomoth,"Its wings have scales that leak venom when in contact with its opponent's skin. Lighter scales can cause paralysis, and darker ones are poisonous. A nocturnal Pokémon, it goes out at night to hunt for prey. It is attracted to bright lights.",#8bc34a,8,2,8,2024-12-01 16:48:07.310888+00:00,type Bug / Poison
+Action,Morufon,0,0
+User,Will
+Ticket,parasect,"The tochukaso mushrooms have completely drained the Paras's body of its nutrients and taken it over. Groups of Parasect will gather around a tree, suck the nutrients out of it, and move to the next tree when it dies. Its spores can be made into medicine. Parasect in Alola are known to compete with Shiinotic, and have lower-quality spores. The bug is mostly dead, so removing the mushroom causes it to stop moving entirely.",#8bc34a,8,2,6,2024-12-01 16:47:53.330000+00:00,type Bug / Grass
+Action,Parasekuto,0,1
+User,Bob
+Ticket,zubat,"Zubat has evolved to not have eyes or nostrils, so it uses echolocation to find its way. It hides in dark places while the sun is out, as its skin is sensitive to bright lights. Groups of Zubat will gather around in the cold to heat each other's bodies.",#03a9f4,8,1,0,2024-12-01 16:47:02.369316+00:00,type Poison / Flying
+Action,Zubatto,0,0
+User,Patrick
+Ticket,golbat,"Its fangs are hollow like straws. It uses them to stab through the hide of its prey, but may break them when trying to bite a Steel-type Pokémon. It may sometimes suck so much blood that its blood type changes to that of its prey, and its weight leaves it unable to fly, making it easy prey.",#03a9f4,8,2,1,2024-12-01 16:47:09.874052+00:00,type Poison / Flying
+User,Bob
+Action,Gorubatto,0,1
+User,Joe
+Ticket,gloom,"Its leaves and the drool-like nectar on its mouth smell rancid enough to cause fainting in a mile-wide radius, though some people enjoy the smell, and some use it to produce perfume. It amplifies the odor when in danger, and stops emitting it when safe.",#8bc34a,8,2,3,2024-12-01 16:47:31.297504+00:00,type Grass / Poison
+Action,Kusaihana,0,2
+User,Ellie
+Ticket,vileplume,"Vileplume's large petals can be shaken or forcibly bloomed to release clouds of pollen that poison and paralyze anything near it, which it uses to weaken its prey before eating it. Walking around causes it to spread pollen around, turning the air around it yellow.",#8bc34a,8,3,4,2024-12-01 16:47:40.250898+00:00,type Grass / Poison
+Action,Rafureshia,0,3
+User,Linda
+Ticket,paras,"typeParas has tochukaso mushrooms growing on its back. They drain nutrients from the host and control it into draining nutrients from trees. Their spores can be used to make medicine. In Alola, those spores do not grow properly.",#8bc34a,8,1,5,2024-12-01 16:47:47.370772+00:00,type Bug / Grass
+Action,Parasu,0,0
+User,Will
+Ticket,diglet,"Some farmers like to use Diglett and Dugtrio to plough the soil for crops to grow, and some consider them pests for eating crops. No one has ever seen the full body of a Diglett. It has a Ground/Steel-type Alolan form.",#ffeb3b,8,1,9,2024-12-01 16:48:15.607248+00:00,type Ground
+Action,Diguda,0,3
+User,Linda
+
+Column,,,pokemon50-61,6,True
+Swimlanecolumn,To Do,0
+Swimlanecolumn,Doing,1
+Swimlanecolumn,Verify,2
+Swimlanecolumn,Done,3
+Ticket,psyduck,"It has constant headaches. When they worsen, normally inactive brain cells activate, causing it to accidentally unleash psychic energy. It then forgets that it used those powers.",#03a9f4,8,1,3,2024-12-01 16:54:41.343396+00:00,type Water
+User,Ellie
+Ticket,mankey,"Nearly anything will anger it, and when it gets angry, it will immediately attack, giving its opponent no time to flee. If it does flee or is left alone, the loneliness will make it angrier. If one Mankey in a colony gets mad, the rest will rampage with it.",#ffeb3b,8,1,5,2024-12-01 16:55:33.588770+00:00,type Fighting
+Ticket,dugtrio,"Dugtrio is a three-headed Diglett. It can burrow at a speed of 60 miles per hour, and up to 60 miles underground. Like Diglett, no one has ever seen its full body. Occasionally, they will fight over which head gets to eat first. Like Diglett, Dugtrio has a Ground/Steel-type Alolan form.",#ffeb3b,8,2,0,2024-12-01 16:48:28.122750+00:00,type Ground
+Action,Diguda,0,0
+User,Linda
+Ticket,meowth,"One of the main members of Team Rocket in the Pokémon anime series. Meowth withdraws its claws into its paws to sneak around without leaving footsteps. It loves round and shiny objects, coins being its favorite toys, which it will play with until it falls asleep. It sleeps during the daytime, and patrols its territory during the night, looking for loose change. It tends to fight with Murkrow over shiny objects. Giving coins to a Meowth can make it friendlier, but no less fickle. Meowth has a Dark-type Alolan form, and a Steel-type Galarian form, which evolves into Perrserker. It gained a Gigantamax form in generation VIII. Meowth is a popular Pokémon among fans of the series, primarily due to its role on the villainous organization Team Rocket.[29][30][31][32] It has widely been used in promotion for the series.[33][34][35][36]",#ffffff,8,1,1,2024-12-01 16:54:21.916962+00:00,type Normal
+Action,Nyāsu,0,3
+User,Ellie
+Ticket,persian,"Its fur and jewel make it popular with the rich, but its fickle, uncaring attitude makes it hard to raise. Though it will attack anyone without provocation, including its trainer, pulling on its whiskers will temporarily make it docile. It has a Dark-type Alolan form, and a Galarian counterpart in Perrserker, whose barbaric habits clash with both Persian's elegance and ego. A Persian is owned by Team Rocket's leader Giovanni in the Pokémon anime series.",#ffffff,8,2,2,2024-12-01 16:54:32.118001+00:00,type Normal
+Ticket,golduck,"It was almost hunted to extinction by hunters wanting the jewel on its forehead, believing it would grant them supernatural powers. Its psychic abilities are superior to Psyduck's. It swims effortlessly, even in rough, stormy seas. It is known to rescue people from wrecked ships.",#03a9f4,8,2,4,2024-12-01 16:55:22.718529+00:00,type Water
+Ticket,poliwag,"Due to its underdeveloped legs, it is not good at standing or walking, so it prefers swimming, though its trainer should train it to walk every day. Despite the danger, it wants to come up on land, so it does its best to waddle along, but when an enemy finds it, it rushes back to the water. Poliwag's thin skin leaves its spiraling innards visible. If the swirl is tinged white, that means Poliwag is sick. Despite its thinness, its skin is flexible and slimy, so even sharp fangs bounce off of it. The direction of its spiral tends to differ by area. Poliwag experts can tell them apart at a glance. In rivers with fast-flowing water, it will cling to a rock by using its lips, which act like a suction cup.",#03a9f4,8,1,9,2024-12-01 16:56:22.884214+00:00,type Water
+Ticket,primeape,"Getting angry causes Primeape's blood to rush faster than usual, tightening its body muscles, but making it dumber. Any form of stimuli will anger it, even while it is asleep. It can get so angry that it dies as a result, but looks peaceful in death.",#ffeb3b,8,2,6,2024-12-01 16:55:47.829118+00:00,type Fighting
+Ticket,growlithe,"Growlithe are friendly, loyal, and have a strong sense of smell, making them popular as guard and police dogs. Growlithe bones have been found in ruins from the Stone Age, implying that humans have used them since then. It is based on the Shisa. It has a Fire/Rock-type Hisuian form.",#ff4081,8,1,7,2024-12-01 16:55:57.308102+00:00,type Fire
+Ticket,arcanine,"Arcanine is a fan-favorite Pokémon and has been described as having ""the mane of a lion... the stripes of a tiger [and] the speed of a panther"".[37][38][39] It has been admired since the past for its beauty. It runs agilely as if on wings. Arcanine is known for its great speed, as it is said to be capable of running over 6,200 miles in a single day and night. The fire that blazes within Arcanine's body is its source of power. Legends tell of its fighting alongside a general and conquering a whole country. There are so many old tales about them that Arcanine is spoken of and categorized in the Pokédex as the Legendary Pokémon, though it is a common wild Pokémon. Like Growlithe, it has a Fire/Rock-type Hisuian form.",#ff4081,8,2,8,2024-12-01 16:56:10.034711+00:00,type Fire
+
+Column,,,pokemon61-70,7,True
+Swimlanecolumn,To Do,0
+Swimlanecolumn,Doing,1
+Swimlanecolumn,Verify,2
+Swimlanecolumn,Done,3
+Ticket,machop,"Machop's muscles never get sore. It trains itself by lifting Graveler. Stronger, more confident Machop will compete with Makuhita.",#ffeb3b,8,1,5,2024-12-01 16:57:18.720834+00:00,type Fighting
+Ticket,poliwrath,"A skilled swimmer, it can outswim professional athletes with ease, and children imitate its movements to learn to swim. It is also skilled in martial arts, and strong enough to punch boulders into dust. Despite being adapted to life in water, it chooses to live in dry land.",#03a9f4,8,3,1,2024-12-01 16:56:52.469241+00:00,type Water / Fighting
+User,Linda
+Ticket,abra,"Even when sleeping, which Abra does for most of its life, it can sense danger with its highly potent psychic power. When it is in danger, it will teleport to safety. Its powers may be affected by what it is dreaming about.",#ffeb3b,8,1,2,2024-12-01 16:56:58.382900+00:00,type Psychic
+Ticket,bellsprout,"It can plant itself into the ground to absorb moisture, but is unable to move while rooted. It can spit acid from its mouth.",#8bc34a,8,1,8,2024-12-01 16:57:43.676447+00:00,type Grass / Poison
+Ticket,weepinbell,"It has a hook on its rear-end that it hooks on trees with and sleeps, but it may fall off if it moves around too much. If it cannot dissolve its prey with acid, it will cut them with its sharp leaves.",#8bc34a,8,2,9,2024-12-01 16:57:50.053723+00:00,typeGrass / Poison
+Ticket,poliwihrl,"Poliwhirl is among the most-marketed Pokémon.[40][41] It can live in or out of the water, but prefers living in water where, it has fewer natural enemies and more plentiful prey. When out of water, it constantly sweats so its body is always wet and slick with an oily fluid. Because of this, it can easily slip out of the clutches of its enemies. Its health suffers when its skin dries out, so trainers have to keep it moist. It goes on land in search of bug Pokémon, then takes them underwater so it can safely eat them. The spiral pattern on its belly subtly moves, and staring at it for too long can lead children and Pokémon to sleep.",#03a9f4,8,2,0,2024-12-01 16:56:40.426049+00:00,type Water
+User,Joe
+Ticket,kadabra,"In November 2000, Israeli magician Uri Geller sued Nintendo, claiming Kadabra embodies an unauthorized appropriation of his identity.[42][43][44] However, in 2020, he released a claim that Nintendo could use Kadabra in cards again.[45] Some Kadabra are theorized to have once been human children who could not control their powers. Its psychic powers can cause clocks to run backwards, or other devices to stop functioning.",#ffeb3b,8,2,3,2024-12-01 16:57:05.367256+00:00,type Psychic
+Ticket,machoke,"Machoke is typically used for heavy lifting jobs due to its strength.Its belt regulates its power, and it only removes it when faced with a particularly powerful opponent.",#ffeb3b,8,2,6,2024-12-01 16:57:24.036155+00:00,type Fighting
+Ticket,machamp,"Machamp has four arms. It can throw around 500 punches in one second and move mountains with one arm. It has poor reflexes and dexterity, with its arms reacting faster than Machamp can think, and getting tangled up when doing delicate tasks. As with Machoke, its belt regulates its power, with more destructive consequences when removed. It gained a Gigantamax form in generation VIII.",#ffeb3b,8,3,7,2024-12-01 16:57:33.616996+00:00,type Fighting
+Ticket,alakazam,"Its brain cells multiply infinitely with age, amplifying its psychic powers and allowing it to remember everything since its hatching as an Abra. Its muscles are weak, so it lifts its body with its psychic powers. It may give its spoons to someone it trusts. It gained a Mega Evolution in generation VI.",#ffeb3b,8,3,4,2024-12-01 16:57:11.440820+00:00,type Psychic
+
+Column,,,pokemon71-80,8,True
+Swimlanecolumn,To Do,0
+Swimlanecolumn,Doing,1
+Swimlanecolumn,Verify,2
+Swimlanecolumn,Done,3
+Ticket,ponyta,"When born, it cannot stand properly and runs with its parents to strengthen its legs. It can choose when its flames can burn people or not. It has a Psychic-type Galarian form.",#ff4081,8,1,6,2024-12-01 16:59:01.919231+00:00,type Fire
+Ticket,geodude,"Geodude are proud of their hard bodies, showing them off or competing with Roggenrola, Carbink, or other Geodude to see who is the hardest. Groups of Geodude sit still in mountainous routes, so unsuspecting people often mistake them for ordinary rocks. It has a Rock/Electric-type Alolan form.",#ffeb3b,8,1,3,2024-12-01 16:58:42.039833+00:00,type Rock / Ground
+Ticket,victreebel,"Groups of Victreebel wait in temperate forests for unsuspecting prey to walk into their mouths, mistaking their acid for nectar. The more prey it has consumed, the sweeter its acid smells.",#8bc34a,8,3,0,2024-12-01 16:58:20.020307+00:00,type Grass / Poison
+Ticket,tentacool,"It is 99% composed of water, with the other 1% being an organ that generates poison. If its tentacles are broken off, they can grow back quickly. Its body shrivels up while outside of water, but its poison does not. Though it is visually similar to Toedscool, the two species are not biologically related.",#03a9f4,8,1,1,2024-12-01 16:58:27.978319+00:00,type Water / Poison
+Ticket,tentacruel,"Its 80 tentacles can grow back or shrink at will, and it uses them to constrict its prey while immobilizing it with poison. While rare, Tentacruel tend to hunt in groups. Though it is visually similar to Toedscruel, the two species are not biologically related.",#03a9f4,8,2,2,2024-12-01 16:58:34.465151+00:00,type Water / Poison
+Ticket,graveler,"It tumbles down mountains for transportation or fun, breaking most of what it crashes into. It does not mind if pieces of itself fall or are scraped off, as they can grow back. It has a Rock/Electric-type Alolan form.",#ffeb3b,8,2,4,2024-12-01 16:58:49.408852+00:00,type Rock / Ground
+Ticket,golem,"It sheds its skin once a year to grow, which in turn crumbles into nutritious soil. It can withdraw its head and limbs into its hollow shell to roll around and down mountains, trampling whatever it passes through. To avoid crushing property, people dig grooves into mountains to guide it. Older Golem stop shedding and have moss growing on their shells. It has a Rock/Electric-type Alolan form.",#ffeb3b,8,3,5,2024-12-01 16:58:55.108909+00:00,type Rock / Ground
+Ticket,rapidash,"As a popular Pokémon, Rapidash is considered ""universally appealing"" to fans of cute and cool Pokémon alike. Both Ponyta and Rapidash can enable their body's flames to be harmful or harmless as seen in the anime.[46][47][48][49] A competitive Pokémon, if it sees anything faster than it, such as a car or another Pokémon, it will run at up to 150 mph to try to outrun it. At that point, its hooves barely touch the ground. It can traverse all of Hisui in a day and a half. The faster it goes, the longer its mane becomes. Otherwise, it can be seen cantering in fields. It has a Psychic/Fairy-type Galarian form.",#ff4081,8,2,7,2024-12-01 16:59:09.175226+00:00,type Fire
+Ticket,slowpoke,"Slowpoke is dumb and lazy, to the point of taking up to five seconds to process pain. It lives on the edges of bodies of water and uses its tail to fish for prey, but may take a day to notice that its tail has already been bitten off. Some cultures believe its yawns bring rain, and worship it. It evolves into Slowbro when a Shellder bites its tail, or into Slowking when it bites its head. It has a Psychic-type Galarian form.",#03a9f4,8,1,8,2024-12-01 16:59:17.129487+00:00,type Water / Psychic
+Ticket,slowbro,"Slowpoke has fished up a Shellder with its tail, which shocked it into evolving and made it stand on two legs. The Shellder has transformed into a spiral-shaped shell to suck more sweet fluids from the Slowbro's tail. If the Shellder were to detach itself from Slowbro in any way, it will devolve back to Slowpoke. Being slow-witted to begin with, the Slowbro does not feel pain in its tail because of Shellder's seeping poison. Since its tail has been bitten by Shellder, it has to grudgingly swim for prey instead. Whenever Shellder bites harder on its tail, it gives Slowbro a flash of inspiration, which it forgets a moment later. It gained a Mega Evolution in generation VI. It has a Poison/Psychic-type Galarian form.",#03a9f4,8,2,9,2024-12-01 16:59:24.636383+00:00,type Water / Psychic
+
+Column,,,pokemon81-90,9,True
+Swimlanecolumn,To Do,0
+Swimlanecolumn,Doing,1
+Swimlanecolumn,Verify,2
+Swimlanecolumn,Done,3
+Ticket,grimer,"Being mostly composed of poisonous filth, it can squeeze into sewage pipes with ease. Grimer lived mostly in urban cities, factories, and lakes, where it could find waste to consume, though environmental improvements have caused its population to start dwindling. It has a Poison/Dark-type Alolan form.",#8bc34a,8,1,7,2024-12-01 17:01:29.284314+00:00,type Poison
+Ticket,farfetch'd,"It carries around a green onion stalk like a sword. It apparently knows where the best ones are and will fight other Farfetch'd over them. In emergencies, it will eat them, and then run off to find a new one. Farfetch'd were so rare at one point that people bred them to regrow the population. Since it cannot live without it, it will defend its stalk with its life. It has a Fighting-type Galarian form.",#ffffff,8,1,2,2024-12-01 16:59:51.978535+00:00,type Normal / Flying
+Ticket,dewgong,"Dewgong can store thermal energy in its body to withstand cold temperatures. At night, it hunts for prey like Wishiwashi, and during the day, it sleeps on ice or shallow water, or sunbathes on beaches. A fisherman once mistook a Dewgong on an iceberg for a mermaid.",#03a9f4,8,2,6,2024-12-01 17:00:41.218830+00:00,type Water / Ice
+Ticket,shellder,"Tugging on its tongue, which is always sticking out, will startle it into opening its shell. It opens and closes its shell in rapid succession to propel itself backwards. Shellder have been known to seek out Slowpoke's tails, inadvertently causing them to evolve into Slowbro. Biting its head will instead cause it to evolve into Slowking. It and Cloyster are related to the Shellos line.",#03a9f4,8,1,9,2024-12-01 17:01:43.187809+00:00,type Water
+Ticket,doduo,"Its short wings make flying difficult, so it has instead become a powerful runner, being able to reach speeds of 60 mph. Both heads have identical brains, though it is believed that some Doduo have different brains. It raises and lowers its heads to maintain balance while running. One head will stay on alert while the other sleeps.",#ffffff,8,1,3,2024-12-01 16:59:58.416518+00:00,type Normal / Flying
+Ticket,seel,"It loves swimming around in 14 °F waters. Its horn is hard enough to bash its way through ice. It has a thick hide covered in warm fur. It goes in waters up to -40 °F. Though not a great walker, it is a skilled swimmer. It closes its nostrils when it swims. In the daytime, it can be found sleeping on the seabed of shallow waters. Their presence in the Alolan climate is considered a mystery.",#03a9f4,8,1,5,2024-12-01 17:00:13.284296+00:00,type Water
+Ticket,muk,"It is based on the dorotabō, a one-eyed, three-fingered yōkai that rises from the mud of neglected, overgrown rice fields. Muk is covered in a toxic filthy sludge so vile that any land it walks through becomes inhospitable for up to three years. A drop of its body fluid can turn a pool rancid or leave a person bedridden for days. Its nose has devolved, so it cannot smell anything. It feeds on anything repugnant and filthy, like sewer water. Its numbers have started declining since people have begun cleaning up towns, and because some people think it may go extinct, sludge pools are being built to prevent this. Like Grimer, it has a Poison/Dark-type Alolan form.",#8bc34a,8,2,8,2024-12-01 17:01:34.963145+00:00,type Poison
+Ticket,magnemite,"The two magnets on its side are used for discharging attacks and floating. It is attracted to electromagnetic waves from devices such as Pokégears, and attaches itself to power breakers. Power outages not caused by storms could be the result of a colony of Magnemite feeding on it. It becomes incapable of flight if it out of electricity. The two magnets on its side are powerful enough to draw in iron objects from up to 300 feet away, and get stronger the faster they spin. Touching it while it is eating electricity will give a full body shock. Its numbers have been decreasing because most modern power lines are buried under the ground.",#ffeb3b,8,1,0,2024-12-01 16:59:38.708175+00:00,type Electric / Steel
+Ticket,dodrio,"The head with the thickest neck is deemed the leader, and has control over the body. The three heads express joy, sorrow, and anger as they plan strategies together. If they cannot agree on something to do or overthink their plans, they will be unable to move. When two heads sleep, one head remains awake. It has three hearts and six lungs, giving it increased endurance, so while it is slower than Doduo, it can run for longer periods of time.",#ffffff,8,2,4,2024-12-01 17:00:03.234565+00:00,type Normal / Flying
+Ticket,magneton,"Formed when several Magnemite fuse together, it tends to raise the temperature up by 3.6 °F within 3,600 ft (1,100 m). It generates strange radio signals. Groups of Magneton tend to gather where sun flares happen. Exposure to one can cause earaches. Its magnetism is so powerful it dries up moisture in its vicinity, and is potentially fatal to devices like TVs. As a result, large cities have sirens to warn their citizens of Magneton appearances, and trainers are warned to keep Magneton inside their Poké Balls. When it evolves, the Magnemite's brains link up, though they do not become three times smarter. When rain clouds form, they like to gather in high spots where lightning could strike. Sandy Shocks appears to be an ancient relative of it.",#ffeb3b,8,2,1,2024-12-01 16:59:44.486830+00:00,type Electric / Steel
+
+Column,,,pokemon91-100,10,True
+Swimlanecolumn,To Do,0
+Swimlanecolumn,Doing,1
+Swimlanecolumn,Verify,2
+Swimlanecolumn,Done,3
+Ticket,drowzee,"Drowzee's design is based on the dream-eating tapir Baku. It puts people to sleep with its hypnotism and eats their dreams through their noses. It can get sick from eating nightmares. If one sleeps by it frequently, it might show them dreams it ate in the past. If someone has forgotten their dreams, Drowzee may have eaten them. It remembers every dream it has eaten, and rarely eats the dreams of adults because children's are tastier.",#ffeb3b,8,1,5,2024-12-01 17:02:50.686128+00:00,type Psychic
+Ticket,voltorb,"It is believed that Voltorb was created when a Poké Ball was hit with an energy pulse. When agitated or tapped, it will explode. Sometimes, humans will mistake a stray Voltorb for a Poké Ball, touch it, and get shocked or exploded. It has an Electric/Grass-type Hisuian form.",#ffeb3b,8,1,9,2024-12-01 17:03:24.461243+00:00,type Electric
+Ticket,hypno,none.,#ffeb3b,8,2,6,2024-12-01 17:02:58.267667+00:00,type Psychic
+Ticket,cloyster,It normally keeps its shell closed unless it is attacking. It uses the same projectile system — swallowing seawater and ejecting it from the front or rear — to shoot its spikes and swim. Its internal anatomy has yet to be seen.,#03a9f4,8,2,0,2024-12-01 17:01:50.535381+00:00,type Water / Ice
+Ticket,haunter,"Because of its ability to slip through walls, Haunter is said to be from another dimension. It saps its victims' life by licking them with its cold, gaseous tongue. Those licked by it grow weaker with each passing day, shaking uncontrollably until they die. If one trips and falls for no apparent reason or hear a sound when no one is around, it may be a Haunter. Because it fears the light and revels in the dark, it may be on the verge of extinction in cities that stay brightly lit at night. On moonless nights, Haunter searches for someone to curse.",#8bc34a,8,2,2,2024-12-01 17:02:10.520778+00:00,type Ghost / Poison
+Ticket,onix,"It usually lives underground. As it grows, the stone portions of its body harden to become similar to a diamond, but colored black. Despite its large body being over 26 feet long, it can squirm its way through the ground at 50 mph. As it digs through the ground, it eats hard objects, which makes its body more solid. Diglett may use the tunnels it burrows as homes. Onix has a magnet in its brain, which acts as a compass so that it does not lose direction while it is tunneling. As it grows older, its body becomes increasingly rounder and smoother. It evolves into Steelix when traded while holding a Metal Coat.[8][56][57][58] While its Defense and Speed are high, Onix' other values are deceptively low, making it a relatively weak Rock-type choice compared to Golem and Rhydon.[59]",#ffeb3b,8,1,4,2024-12-01 17:02:41.920897+00:00,type Rock / Ground
+Ticket,gastly,"It hides under structures to stop the wind from blowing away its gaseous body. It engulfs prey of any size with its gas, poisoning it through its skin or suffocating it.",#8bc34a,8,1,1,2024-12-01 17:02:02.171824+00:00,type Ghost / Poison
+Ticket,kingler,"Its left claw has grown twice as big as its right, and is now strong enough to break Cloyster shells open. However, swinging it can cause balancing issues and tire it out. Kingler are said to communicate with each other by waving their pincers around. It gained a Gigantamax form in generation VIII.",#03a9f4,8,2,8,2024-12-01 17:03:11.441265+00:00,type Water
+Ticket,krabby,"Krabby and Kingler live near the edge of water, usually in beaches. It can shroud its body in foam to look bigger than it is. If damaged or lost in battle, its pincers grow back quickly, though it has trouble balancing without them.",#03a9f4,8,1,7,2024-12-01 17:03:05.869666+00:00,type Water
+Ticket,gengar,"Gengar seeps into the shadows of people and Pokémon to scare them for fun or eat their life force. A sudden chill of 10 °F or cooler may be a Gengar trying to curse someone. Gengar will lurk in whatever dark corner of a room it can find and wait for its chance to catch its prey. It likes to attack people in mountains. Sometimes, Gengar will pose as people's shadows. It apparently wishes for a traveling companion. Since it may have once been human, it tries to create one by taking the lives of other humans. Initially created by Satoshi Tajiri and Ken Sugimori,[50][51] it has become one of the most popular Pokémon, placing tenth on the Google Pokémon of the Year 2020 poll.[52] Kotaku's Zack Zwiezen said Gengar was ""one of [their] favorite gen 1 designs"", calling it a ""great design [because] it's simple, yet not boring or generic"".[53] Gengar has appeared in many Pokémon spin-offs or crossovers, including Pokkén Tournament[54] and Pokémon Unite.[55] It gained a Mega Evolution in generation VI and a Gigantamax form in generation VIII.",#8bc34a,8,3,3,2024-12-01 17:02:16.677521+00:00,type Ghost / Poison
+
+Column,,,pokemon31-40,4,False
+Ticket,nidorino,"Its horn and the spikes around its body are laced with poison, and its horn is harder than diamond. It uses its horn to break rocks to find Moon Stones, which it uses to evolve.",#8bc34a,8,2,2,2024-12-01 16:45:49.171371+00:00,type Poison
+Ticket,ninetales,"Its design is inspired by the nine-tailed fox of East Asian myth.[28] It can understand human speech, use its psychic power to control minds, and curse anyone who mistreats it. According to legends, nine saints reincarnated as Ninetales, and each of its tails has a different ability. It has an Ice/Fairy-type Alolan form.",#ff4081,8,2,7,2024-12-01 16:46:28.938691+00:00,type Fire
+Ticket,wigglytuff,"By inhaling air, it can inflate itself to up to 20 times its size, and float around. It does so to scare opponents away or compete with other Wigglytuff.",#ffffff,8,2,9,2024-12-01 16:46:41.983644+00:00,type Normal / Fairy
+Ticket,clefairy,"Timid creatures, they rarely come out, only appearing in groups to dance under a full moon. While dancing, the nearby area is enveloped in a magnetic field.",#ffffff,8,1,4,2024-12-01 16:46:05.626431+00:00,type Fairy
+Ticket,nidoking,"It is more offensively-focused than its female counterpart, Nidoqueen. Its tail can topple transmission towers and crush its opponents' bones, its horn can crush diamonds, and its hide is as hard as steel. If it begins to rampage, only a Nidoqueen it has lived with for a long time can calm it down.",#8bc34a,8,3,3,2024-12-01 16:45:54.779617+00:00,type Poison / Ground
+Ticket,clefable,"It and Clefairy are said to have come from the moon, and spend full moon nights staring at it. Its hearing is acute, being able to hear pin drops from up to 1,100 yards away, so it lives in quiet mountainous areas. Its steps are light and floaty enough to allow it to walk on water.",#ffffff,8,2,5,2024-12-01 16:46:10.090561+00:00,type Fairy
+Ticket,jigglypuff,"It is a playable character in every Super Smash Bros. game. It can inflate itself like a balloon to float around and it can sing. Its voice's wavelength can match the brain waves of sleeping people and Pokémon, lulling them to sleep. If the foe does not fall asleep, it can risk its life by singing until it runs out of air. It also keeps singing if the foe does fall asleep.",#ffffff,8,1,8,2024-12-01 16:46:35.482935+00:00,type Normal / Fairy
+Ticket,nidoran boy,"It flaps its ears around to detect potential opponents' footsteps. It injects poison into its prey with its horn. It lives with its female equivalent, and may risk its life to protect its female counterpart.",#8bc34a,8,1,1,2024-12-01 16:45:39.769606+00:00,type Poison
+User,Patrick
+Ticket,nidoqueen,"It is more defensively focused than its male counterpart, Nidoking. It can poison prey with its spikes, cause tremors, or knock opponents flying with tackles. It is protective of its children, carrying them in the gaps between its spines, and sealing its burrow. While around its young, its spikes do not secrete poison. Despite Pokédex and anime descriptions, it and Nidorina cannot breed, though Nidoran♀ can.[24]",#8bc34a,8,3,0,2024-12-01 16:45:29.806169+00:00,type Poison / Ground
+User,Nat
+User,Patrick
+Ticket,vulpix,"When it is born, it has one white tail that sprouts into 6 curled ones at the tip as it gets older. It can freely control fire, creating will-o-wisps that are commonly mistaken for ghosts. Before it evolves, its tails glow hotter than usual. If not properly groomed, its tails will tangle up. If raised young, it will follow its trainer like a puppy. It has an Ice-type Alolan form. It has been selected as an ""ambassador"" for Hokkaido,[25][26] and it and its Alolan form have been featured in the livery of an Air Do Boeing 767 aircraft.[27]",#ff4081,8,1,6,2024-12-01 16:46:21.116065+00:00,type Fire
+
+Column,,,about this board,0,False
+Ticket,A group of 8 friends are talking about pokemon and listing various things,,#ffffff,8,0,1,2024-12-01 18:16:19.166418+00:00,
+User,Nat
+Ticket,The friends are presenting information from Wikipedia,,#ffffff,8,0,3,2024-12-01 18:16:50.287350+00:00,
+Ticket,This board is a mockup to test this project,,#ffffff,8,0,0,2024-12-01 18:16:01.324800+00:00,
+User,Linda
+User,Jess
+User,Patrick
+Ticket,Not a real use case just an imaginary scenario,,#ffffff,8,0,2,2024-12-01 18:16:33.498781+00:00,
+User,Nat
+User,Patrick
+

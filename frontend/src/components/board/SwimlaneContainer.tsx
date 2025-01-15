@@ -1,20 +1,19 @@
-import { Box, Typography } from "@mui/material"
+import { Box, Skeleton, Typography } from "@mui/material"
 import Paper from "@mui/material/Paper"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
 import {
   useGetSwimlaneColumnsByColumnIdQuery,
-  useGetTaskListByColumnIdQuery,
-  useUpdateSwimlaneColumnMutation
+  useUpdateSwimlaneColumnMutation,
+  useGetActionsByColumnIdQuery,
+  useGetTaskListByColumnIdQuery
 } from "@/state/apiSlice"
-import { Column, SwimlaneColumn } from "@/types"
+import type { Column, SwimlaneColumn } from "@/types"
 
 import Swimlane from "./Swimlane"
 
 const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }> = ({ swimlanecolumn }) => {
   const [updateSwimlaneColumn] = useUpdateSwimlaneColumnMutation()
-  const sendMessage = useContext(WebsocketContext)
 
   const [isEditing, setIsEditing] = useState(false)
   const [currentTitle, setCurrentTitle] = useState(swimlanecolumn.title)
@@ -34,9 +33,6 @@ const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }>
     }
     const updatedSwimlaneColumn = { ...swimlanecolumn, title: currentTitle }
     await updateSwimlaneColumn({ swimlaneColumn: updatedSwimlaneColumn })
-    if (sendMessage !== null) {
-      sendMessage("Swimlane column updated")
-    }
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,12 +46,9 @@ const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }>
   }
 
   return (
-    <Box
-      sx={{ width: swimlanecolumn.title == "" ? "100%" : "fit-content", overflow: "hidden" }}
-      onDoubleClick={handleDoubleClick}
-    >
+    <Box onDoubleClick={handleDoubleClick}>
       {isEditing ? (
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box sx={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
           <input
             name="swimlaneColumnTitle"
             autoFocus
@@ -80,59 +73,64 @@ interface SwimlaneContainerProps {
 }
 
 const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
-  const { data: taskList } = useGetTaskListByColumnIdQuery({ boardId: column.boardid, columnId: column.columnid })
   const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(column.columnid)
-
+  const { data: taskList } = useGetTaskListByColumnIdQuery({ boardId: column.boardid, columnId: column.columnid })
   const tasks = taskList
+  const { data: actions } = useGetActionsByColumnIdQuery(column.columnid)
 
   return (
-    <Paper
-      elevation={4}
-      sx={{
-        margin: "25px 0px",
-        width: "800px",
-        minHeight: "85vh",
-        backgroundColor: "#E5DBD9",
-        padding: "4px",
-        border: "2px solid #000",
-        borderBottom: "5px solid #000",
-        borderColor: "rgba(0, 0, 0, 0.12)"
-      }}
-    >
-      <Box
+    <>
+      <Paper
+        elevation={4}
         sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginBottom: "30px",
-          paddingTop: "20px",
-          paddingLeft: "30px"
+          margin: "25px 0px",
+          minHeight: "85vh",
+          backgroundColor: "#E5DBD9",
+          padding: "4px",
+          border: "2px solid #000",
+          borderBottom: "5px solid #000",
+          borderColor: "rgba(0, 0, 0, 0.12)"
         }}
       >
-        {swimlaneColumns &&
-          swimlaneColumns.map((swimlaneColumn) => (
-            <Box
-              key={swimlaneColumn.swimlanecolumnid}
-              sx={{
-                flexGrow: 1,
-                flexShrink: 1,
-                flexBasis: "0",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                overflow: "hidden"
-              }}
-            >
-              <SwimlaneColumnTitleComponent swimlanecolumn={swimlaneColumn} />
-            </Box>
-          ))}
-      </Box>
-      {tasks && isSuccess && tasks.length ? (
-        tasks.map((task) => <Swimlane key={task.ticketid} task={task} swimlaneColumns={swimlaneColumns} />)
-      ) : (
-        <div style={{ textAlign: "center", paddingTop: "15px", color: "#2D3748" }}>No cards yet</div>
-      )}
-    </Paper>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-around",
+            paddingLeft: "25px",
+            paddingRight: "25px",
+            paddingTop: "25px",
+            paddingBottom: "23px"
+          }}
+        >
+          {isSuccess ? (
+            swimlaneColumns &&
+            swimlaneColumns.map((swimlaneColumn) => (
+              <SwimlaneColumnTitleComponent swimlanecolumn={swimlaneColumn} key={swimlaneColumn.swimlanecolumnid} />
+            ))
+          ) : (
+            <Skeleton variant="rectangular" width="96%" height={44} />
+          )}
+        </Box>
+
+        {tasks && tasks.length ? (
+          isSuccess && actions ? (
+            tasks.map((task) => (
+              <Swimlane
+                key={task.ticketid}
+                task={task}
+                swimlaneColumns={swimlaneColumns}
+                columnid={column.columnid}
+                actions={actions.filter((a) => a.ticketid == task.ticketid)}
+              />
+            ))
+          ) : (
+            <Skeleton variant="rectangular" width="100%" height={tasks.length * (120 + 18)} />
+          )
+        ) : (
+          <div style={{ textAlign: "center", paddingTop: "15px", color: "#2D3748" }}>No cards yet</div>
+        )}
+      </Paper>
+    </>
   )
 }
 

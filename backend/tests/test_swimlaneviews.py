@@ -1,10 +1,13 @@
 import pytest
 import futuboard.models as md
+from .test_utils import addBoard, addColumn, addTicket, addAction, addSwimlanecolumn, resetDB
 from rest_framework.test import APIClient
 import uuid
 from django.utils import timezone
 from django.urls import reverse
 import json
+
+# TO-DO : Refactor to be like test_views.py
 
 ############################################################################################################
 ######################################### SWIMLANE VIEW TESTS ##############################################
@@ -58,9 +61,7 @@ def test_swimlanecolumns_on_column():
     data = response.json()
     assert len(data) == 5
     # Clean up
-    md.Board.objects.all().delete()
-    md.Column.objects.all().delete()
-    md.Swimlanecolumn.objects.all().delete()
+    resetDB()
 
 
 @pytest.mark.django_db
@@ -131,10 +132,12 @@ def test_action_on_swimlane():
         )
         assert response.status_code == 200
     # Get the actions for the swimlanecolumn and ticket
-    response = client.get(reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]))
+    response = client.get(reverse("get_actions_by_columnId", args=[columnid]))
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 3
+    for action in data:
+        assert action["swimlanecolumnid"] == str(swimlanecolumnid)
     # Create another swimlanecolumn to be moved to
     swimlanecolumnid2 = uuid.uuid4()
     data = {
@@ -148,10 +151,10 @@ def test_action_on_swimlane():
     assert response.status_code == 200
     data = [
         {
-            "actionid": str(actionids[0]),
+            "actionid": str(actionids[1]),
         },
         {
-            "actionid": str(actionids[1]),
+            "actionid": str(actionids[0]),
         },
         {
             "actionid": str(actionids[2]),
@@ -165,22 +168,96 @@ def test_action_on_swimlane():
     )
     assert response.status_code == 200
     # Get the actions for the new swimlanecolumn and ticket
-    response = client.get(reverse("action_on_swimlane", args=[swimlanecolumnid2, ticketid]))
+    response = client.get(reverse("get_actions_by_columnId", args=[columnid]))
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 3
+    for action in data:
+        assert action["swimlanecolumnid"] == str(swimlanecolumnid2)
     # Check that the order of the actions has been updated
     assert data[0]["order"] == 0
     assert data[1]["order"] == 1
     assert data[2]["order"] == 2
-    # Check that the actions have been removed from the old swimlanecolumn
-    response = client.get(reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]))
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data) == 0
     # Clean up
-    md.Board.objects.all().delete()
-    md.Column.objects.all().delete()
-    md.Swimlanecolumn.objects.all().delete()
-    md.Ticket.objects.all().delete()
-    md.Action.objects.all().delete()
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_get_actions_by_columnId():
+    """
+    Test the get_actions_by_columnId function in backend/futuboard/views/swimlaneViews.py
+    Has one method: GET
+
+        GET: Returns all actions for a given column with a swimlane
+    """
+    # Initalize a client.
+    client = APIClient()
+
+    # Initalize some models in the backend using test_utils.py utilities.
+    boardid = addBoard(uuid.uuid4()).boardid
+    columnid = addColumn(boardid, uuid.uuid4(), title="swimlane", swimlane=True).columnid
+    swimlanecolumnid = addSwimlanecolumn(columnid, uuid.uuid4()).swimlanecolumnid
+    ticketid = addTicket(columnid, uuid.uuid4(), title="A test ticket").ticketid
+
+    # At this point, there should be no actions.
+    assert len(md.Action.objects.all()) == 0
+
+    # Create an action into the swimlanecolumn associated with the column.
+    addAction(ticketid, swimlanecolumnid, uuid.uuid4(), title="My test action")
+
+    # At this point, there should be one action.
+    assert len(md.Action.objects.all()) == 1
+
+    # Attempt to retrieve the action.
+    response = client.get(reverse("get_actions_by_columnId", args=[columnid]))
+
+    # Check that the operation was successful.
+    assert response.status_code == 200
+
+    # Check that the response contains one action.
+    data = response.json()
+    assert len(data) == 1
+
+    # Cleanup
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_update_action():
+    """
+    Test the update_action function in backend/futuboard/views/swimlaneViews.py
+    Has one method: PUT
+
+        PUT: updates action title
+    """
+
+    api_client = APIClient()
+
+    # Create models for test using test_utils.py
+    boardid = addBoard(uuid.uuid4()).boardid
+    columnid = addColumn(boardid, uuid.uuid4(), title="swimlane", swimlane=True).columnid
+    swimlanecolumnid = addSwimlanecolumn(columnid, uuid.uuid4()).swimlanecolumnid
+    ticketid = addTicket(columnid, uuid.uuid4(), title="Test ticket").ticketid
+
+    # Create an action.
+    actionid = addAction(ticketid, swimlanecolumnid, uuid.uuid4(), title="My action").actionid
+
+    # Test PUT request to update action.
+    data = {
+        "actionid": str(actionid),
+        "swimlanecolumnid": str(swimlanecolumnid),
+        "title": "My updated action title",
+    }
+    response = api_client.put(
+        reverse("update_action", args=[actionid]), data=json.dumps(data), content_type="application/json"
+    )
+    assert response.status_code == 200
+
+    # Get action.
+    response = api_client.get(reverse("get_actions_by_columnId", args=[columnid]))
+    data = response.json()
+    assert data[0]["title"] == "My updated action title"
+    assert response.status_code == 200
+
+    # Cleanup.
+    resetDB()

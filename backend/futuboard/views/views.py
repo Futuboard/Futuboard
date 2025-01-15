@@ -76,7 +76,6 @@ def tickets_on_column(request, board_id, column_id):
             raise Http404("Task does not exist")
 
     if request.method == "POST":
-        length = len(Ticket.objects.filter(columnid=column_id))
         new_ticket = Ticket(
             ticketid=request.data["ticketid"],
             columnid=Column.objects.get(pk=column_id),
@@ -85,11 +84,18 @@ def tickets_on_column(request, board_id, column_id):
             color=request.data["color"] if "color" in request.data else "white",
             storypoints=8,
             size=int(request.data["size"]) if request.data["size"] else 0,
-            order=length,
+            order=0,
             creation_date=timezone.now(),
             cornernote=request.data["cornernote"] if "cornernote" in request.data else "",
         )
+
+        same_column_tickets = Ticket.objects.filter(columnid=column_id)
+        for ticket in same_column_tickets:
+            ticket.order += 1
+            ticket.save()
+
         new_ticket.save()
+
         serializer = TicketSerializer(new_ticket)
         return JsonResponse(serializer.data, safe=False)
 

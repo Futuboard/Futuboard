@@ -1,0 +1,22 @@
+{
+  "name": "futuboard-e2e-tests",
+  "version": "1.0.0",
+  "main": "cypress.config.js",
+  "scripts": {
+    "test": "cypress run",
+    "start": "cypress open"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cypress": "^13.16.0",
+    "puppeteer": "^23.9.0",
+    "puppeteer-cluster": "^0.24.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.1",
+    "typescript": "^5.7.2"
+  }
+}

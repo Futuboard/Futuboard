@@ -2,15 +2,14 @@ import ToolBar from "@components/board/Toolbar"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 import { Box } from "@mui/material"
 import { produce } from "immer"
-import { createContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useParams } from "react-router-dom"
-import useWebSocket, { SendMessage } from "react-use-websocket"
 
-import { getId } from "@/services/Utils"
 import { setBoardId } from "@/state/auth"
 import { store } from "@/state/store"
-import { Action, Task } from "@/types"
+import { webSocketContainer } from "@/state/websocket"
+import { Action, Task, User } from "@/types"
 
 import AccessBoardForm from "../components/board/AccessBoardForm"
 import Board from "../components/board/Board"
@@ -27,46 +26,9 @@ import {
   useUpdateTaskListByColumnIdMutation
 } from "../state/apiSlice"
 
-export const WebsocketContext = createContext<SendMessage | null>(null)
-
-const clientId = getId()
-
 const BoardContainer: React.FC = () => {
   const dispatch = useDispatch()
-  const { id = "default-id" } = useParams()
-  // websocket object
-  const { sendMessage: originalSendMessage } = useWebSocket(import.meta.env.VITE_WEBSOCKET_ADDRESS + id, {
-    //`wss://futuboardbackend.azurewebsites.net/board/${id}`
-    onOpen: () => {},
-    //Will attempt to reconnect on all close events, such as server shutting down
-    shouldReconnect: () => true,
-    onMessage: (event) => {
-      const data = JSON.parse(event.data)
-      if (data.message !== clientId) {
-        dispatch(
-          boardsApi.util.invalidateTags([
-            "Boards",
-            "Columns",
-            "Ticket",
-            "Users",
-            "Action",
-            "ActionList",
-            "SwimlaneColumn"
-          ])
-        )
-      }
-    },
-    share: true
-  })
-
-  useEffect(() => {
-    dispatch(setBoardId(id))
-  }, [id, dispatch])
-
-  //wrap the original sendMessage function to include the clientId with every message, so that client can ignore its own messages
-  const updatedSendMessage = () => {
-    originalSendMessage(clientId)
-  }
+  const { id } = useParams()
 
   const [updateTaskList] = useUpdateTaskListByColumnIdMutation()
   const [updateColumns] = useUpdateColumnOrderMutation()
@@ -77,11 +39,36 @@ const BoardContainer: React.FC = () => {
   const [deleteUserFromAction] = useDeleteUserFromActionMutation()
   const [tryLogin] = useLoginMutation()
   const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
+  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "")
+
+  useEffect(() => {
+    if (!id) return
+    dispatch(setBoardId(id))
+    webSocketContainer.connectToBoard(id)
+    webSocketContainer.onMessage((tags) => {
+      dispatch(boardsApi.util.invalidateTags(tags))
+    })
+  }, [id, dispatch])
+
+  useEffect(() => {
+    if (!id) return
+    const inner = async () => {
+      await tryLogin({ boardId: id, password: "" })
+      setHasTriedEmptyPasswordLogin(true)
+    }
+    inner()
+  }, [id, tryLogin])
+
+  useEffect(() => {
+    document.title = board?.title ? board?.title + " - Futuboard" : "Futuboard"
+  }, [board])
+
+  if (!id) {
+    return null
+  }
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
-  const selectUsersByTaskId = boardsApi.endpoints.getUsersByTicketId.select
-  const selectUsersByActionId = boardsApi.endpoints.getUsersByActionId.select
-  const selectActions = boardsApi.endpoints.getActionListByTaskIdAndSwimlaneColumnId.select
+  const selectActions = boardsApi.endpoints.getActionsByColumnId.select
   const selectColumns = boardsApi.endpoints.getColumnsByBoardId.select(id)
 
   const handleOnDragEnd = async (result: DropResult) => {
@@ -92,35 +79,18 @@ const BoardContainer: React.FC = () => {
 
     const state = store.getState()
 
-    //task logic:
-
-    const selectDestinationTasks = selectTasksByColumnId({ boardId: id, columnId: destination.droppableId })
-    const destinationTasks = selectDestinationTasks(state).data || []
-
-    const selectSourceTasks = selectTasksByColumnId({ boardId: id, columnId: source.droppableId })
-    const sourceTasks = selectSourceTasks(state).data || []
-
-    //action logic:
-
-    const selectDestionationActions = selectActions({
-      taskId: destination.droppableId.split("/")[1],
-      swimlaneColumnId: destination.droppableId.split("/")[0]
-    })
-    const destinationActions = selectDestionationActions(state).data || []
-
-    const selectSourceActions = selectActions({
-      taskId: source.droppableId.split("/")[1],
-      swimlaneColumnId: source.droppableId.split("/")[0]
-    })
-    const sourceActions = selectSourceActions(state).data || []
-
     if (type === "task") {
+      const selectDestinationTasks = selectTasksByColumnId({ boardId: id, columnId: destination.droppableId })
+      const destinationTasks = selectDestinationTasks(state).data || []
+
+      const selectSourceTasks = selectTasksByColumnId({ boardId: id, columnId: source.droppableId })
+      const sourceTasks = selectSourceTasks(state).data || []
+
       //dragging tasks in the same column
       if (destination.droppableId === source.droppableId) {
         const dataCopy = [...(destinationTasks ?? [])]
         const newOrdered = reorder<Task>(dataCopy, source.index, destination.index)
         await updateTaskList({ boardId: id, columnId: source.droppableId, tasks: newOrdered })
-        updatedSendMessage()
       }
       //dragging tasks to different columns
       if (destination.droppableId !== source.droppableId) {
@@ -139,7 +109,6 @@ const BoardContainer: React.FC = () => {
           updateTaskList({ boardId: id, columnId: destination.droppableId, tasks: nextDestinationTasks ?? [] }),
           updateTaskList({ boardId: id, columnId: source.droppableId, tasks: nextSourceTasks ?? [] })
         ])
-        updatedSendMessage()
       }
     }
 
@@ -150,12 +119,6 @@ const BoardContainer: React.FC = () => {
       const destinationId = destination.droppableId.split("/")[0]
       const sourceId = source.droppableId.split("/")[0]
 
-      const selectDestinationTaskUsers = selectUsersByTaskId(destinationId)
-      const destinationTaskUsers = selectDestinationTaskUsers(state).data || []
-
-      const selectDestinationActionUsers = selectUsersByActionId(destinationId)
-      const destinationActionUsers = selectDestinationActionUsers(state).data || []
-
       const draggableIdParts = draggableId.split("/")
       const draggedUserId = draggableIdParts[0]
 
@@ -163,19 +126,27 @@ const BoardContainer: React.FC = () => {
         return
       }
 
-      if (destinationTaskUsers.length >= 3) {
-        alert("Destination task already has 3 or more user magnets. Move not allowed.")
-        return
+      let destinationUsers: User[] = []
+
+      const allUsers = boardsApi.endpoints.getUsersByBoardId.select(id)(state).data || []
+
+      if (destinationType === "ticket") {
+        destinationUsers = allUsers.filter((user) => user.tickets.includes(destinationId))
+        if (destinationUsers.length >= 3) {
+          alert("Destination task already has 3 or more user magnets. Move not allowed.")
+          return
+        }
       }
 
-      if (destinationActionUsers.length >= 2) {
-        alert("Destination action already has 2 or more user magnets. Move not allowed.")
-        return
+      if (destinationType === "action") {
+        destinationUsers = allUsers.filter((user) => user.actions.includes(destinationId))
+        if (destinationUsers.length >= 2) {
+          alert("Destination action already has 2 or more user magnets. Move not allowed.")
+          return
+        }
       }
 
-      const isUnique =
-        !destinationActionUsers.some((user) => user.userid === draggedUserId) &&
-        !destinationTaskUsers.some((user) => user.userid === draggedUserId)
+      const isUnique = !destinationUsers.some((user) => user.userid === draggedUserId)
 
       if (!isUnique && destinationId !== "user-list") {
         alert("This member is already on the card. Move not allowed.")
@@ -201,20 +172,36 @@ const BoardContainer: React.FC = () => {
       if (destinationType === "action") {
         postUserToAction({ actionId: destinationId, userid: draggedUserId })
       }
-
-      updatedSendMessage()
     }
     if (type.split("/")[0] === "SWIMLANE") {
+      const [destSwimLaneColumnId, destTicketId, destColumnId] = destination.droppableId.split("/")
+
+      const selectDestionationActions = selectActions(destColumnId)
+
+      const destinationActions =
+        selectDestionationActions(state).data?.filter(
+          (a) => a.ticketid == destTicketId && a.swimlanecolumnid == destSwimLaneColumnId
+        ) || []
+
+      const [sourceSwimlaneColumnId, sourceTicketId, sourceColumnId] = source.droppableId.split("/")
+
+      const selectSourceActions = selectActions(sourceColumnId)
+
+      const sourceActions =
+        selectSourceActions(state).data?.filter(
+          (a) => a.ticketid == sourceTicketId && a.swimlanecolumnid == sourceSwimlaneColumnId
+        ) || []
+
       if (destination.droppableId === source.droppableId && destination.index === source.index) return
       if (destination.droppableId === source.droppableId) {
         const dataCopy = [...(destinationActions ?? [])]
         const newOrdered = reorder<Action>(dataCopy, source.index, destination.index)
         await updateActions({
-          taskId: destination.droppableId.split("/")[1],
-          swimlaneColumnId: destination.droppableId.split("/")[0],
-          actions: newOrdered
+          taskId: destTicketId,
+          swimlaneColumnId: destSwimLaneColumnId,
+          actions: newOrdered,
+          columnid: destColumnId
         })
-        updatedSendMessage()
       }
       if (destination.droppableId !== source.droppableId) {
         const nextSourceActions = produce(sourceActions, (draft) => {
@@ -224,19 +211,21 @@ const BoardContainer: React.FC = () => {
         const nextDestinationActions = produce(destinationActions, (draft) => {
           draft?.splice(destination!.index, 0, sourceActions![source.index])
         })
+
         await Promise.all([
           updateActions({
-            taskId: destination.droppableId.split("/")[1],
-            swimlaneColumnId: destination.droppableId.split("/")[0],
-            actions: nextDestinationActions ?? []
+            taskId: destTicketId,
+            swimlaneColumnId: destSwimLaneColumnId,
+            actions: nextDestinationActions ?? [],
+            columnid: destColumnId
           }),
           updateActions({
-            taskId: source.droppableId.split("/")[1],
-            swimlaneColumnId: source.droppableId.split("/")[0],
-            actions: nextSourceActions ?? []
+            taskId: sourceTicketId,
+            swimlaneColumnId: sourceSwimlaneColumnId,
+            actions: nextSourceActions ?? [],
+            columnid: sourceColumnId
           })
         ])
-        updatedSendMessage()
       }
     }
     //reordering columns
@@ -247,19 +236,8 @@ const BoardContainer: React.FC = () => {
       const dataCopy = [...columns]
       const newOrdered = reorder(dataCopy, source.index, destination.index) //reorder column list
       await updateColumns({ boardId: id, columns: newOrdered })
-      updatedSendMessage()
     }
   }
-
-  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id)
-
-  useEffect(() => {
-    const inner = async () => {
-      await tryLogin({ boardId: id, password: "" })
-      setHasTriedEmptyPasswordLogin(true)
-    }
-    inner()
-  }, [id, tryLogin])
 
   if (isLoading || !hasTriedEmptyPasswordLogin) {
     return null
@@ -267,14 +245,10 @@ const BoardContainer: React.FC = () => {
 
   if (isLoggedIn) {
     return (
-      <WebsocketContext.Provider value={updatedSendMessage}>
-        <>
-          <DragDropContext onDragEnd={handleOnDragEnd}>
-            <ToolBar boardId={id} title={board?.title || ""} />
-            <Board />
-          </DragDropContext>
-        </>
-      </WebsocketContext.Provider>
+      <DragDropContext onDragEnd={handleOnDragEnd}>
+        <ToolBar boardId={id} title={board?.title || ""} />
+        <Board />
+      </DragDropContext>
     )
   }
 

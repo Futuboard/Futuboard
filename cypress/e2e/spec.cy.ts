@@ -26,7 +26,7 @@ const otherTask = {
 
 describe("At the Futuboard home page", () => {
   it("has the correct title", () => {
-    cy.get(".MuiTypography-root").should("contain", "FutuBoard")
+    cy.get(".MuiTypography-root").should("contain", "Futuboard")
   })
 
   it("can create board and log in ", () => {
@@ -85,9 +85,9 @@ describe("In a board", () => {
   })
 
   it("can add users", () => {
-    cy.createUser({ name: "Antonio", buttoIndex: 0 })
-    cy.createUser({ name: "Samuli", buttoIndex: 0 })
-    cy.createUser({ name: "Alex", buttoIndex: 1 })
+    cy.createUser({ name: "Antonio", buttonIndex: 0 })
+    cy.createUser({ name: "Samuli", buttonIndex: 0 })
+    cy.createUser({ name: "Alex", buttonIndex: 1 })
 
     cy.contains("Antonio")
     cy.contains("Samuli")
@@ -99,15 +99,15 @@ describe("In a board", () => {
     cy.createTask(defaultTask)
     cy.createTask(otherTask)
     cy.createColumn(otherColumn)
-    cy.createUser({ name: "Antonio", buttoIndex: 0 })
-    cy.createUser({ name: "Samuli", buttoIndex: 0 })
+    cy.createUser({ name: "Antonio", buttonIndex: 0 })
+    cy.createUser({ name: "Samuli", buttonIndex: 0 })
 
     cy.get('[data-testid="MoreVertIcon"]').click()
     cy.get('[data-testid="DownloadIcon"]').click()
 
     const date = new Date()
-    const fileName = `Project Alpha-${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}.csv`
-    const filePath = `cypress/downloads/${fileName}`
+    const fileName = `Project Alpha-${date.toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/[^a-zA-Z0-9]/g, "_")}.csv`
+    const filePath = `downloads/${fileName}`
 
     cy.readFile(filePath).should("exist")
 
@@ -131,7 +131,7 @@ describe("In a board", () => {
 
   it("can delete a board", () => {
     cy.createColumn(defaultColumn)
-    cy.createUser({ name: "Antonio", buttoIndex: 0 })
+    cy.createUser({ name: "Antonio", buttonIndex: 0 })
     cy.createTask(defaultTask)
 
     cy.get('[data-testid="MoreVertIcon"]').click()
@@ -140,8 +140,61 @@ describe("In a board", () => {
     cy.get(".MuiDialog-root").contains("button", "Submit").click()
     cy.get("button").contains("Confirm Deletion").click()
 
-    cy.contains("FutuBoard")
+    cy.contains("Futuboard")
     cy.contains("Antonio").should("not.exist")
     cy.contains("Create board")
+  })
+})
+
+describe("When working with multiple users", () => {
+  it("can see changes made by other users and own updates are responsive", () => {
+    // Import board with data, so responsivess is tested more realistically
+    cy.contains("Import board").click()
+    cy.get("input[name='title']").type("Imported test Board")
+    cy.get("input[name='password']").type("alpha123")
+    cy.get("input[type='file']").selectFile("fixtures/large_board.csv", { force: true })
+    cy.get("button").contains("Submit").click()
+
+    cy.loginToBoard("alpha123")
+
+    cy.contains("Imported test Board")
+
+    cy.contains("about this board")
+    cy.contains("pokemon31-40")
+    cy.contains("pikachu")
+    cy.contains("Jess")
+
+    // Only testing with 5 concurrent users, because all browser are running on the same machine.
+    // With more users, test becomes flaky.
+    const concurrentUsers = 5
+
+    // Check that board doesn't contain data that it shouldn't contain yet
+
+    for (let i = 0; i < concurrentUsers; i++) {
+      cy.contains(`To Do (${i})`).should("not.exist")
+      cy.contains(`Card (${i})`).should("not.exist")
+    }
+
+    cy.contains("Something else").should("not.exist")
+    cy.contains("Research Competitors").should("not.exist")
+
+    // Test that updates from other users are responsive
+
+    cy.url().then((url) => {
+      cy.task("stress-test", { boardUrl: url, concurrentUsers })
+    })
+
+    for (let i = 0; i < concurrentUsers; i++) {
+      cy.contains(`To Do (${i})`)
+      cy.contains(`Card (${i})`)
+    }
+
+    // Test own updates are responsive, when board in use
+
+    cy.createColumn(otherColumn)
+    cy.contains("Something else")
+
+    cy.createTask(otherTask)
+    cy.contains("Research Competitors")
   })
 })

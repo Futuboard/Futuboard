@@ -13,6 +13,8 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("api/boards/", boardViews.all_boards, name="all_boards"),
     path("api/boards/<uuid:board_id>/", boardViews.board_by_id, name="board_by_id"),
+    path("api/boards/<uuid:board_id>/title/", boardViews.update_board_title, name="update_board_title"),
+    path("api/boards/<uuid:board_id>/password/", boardViews.update_board_password, name="update_board_password"),
     path("api/boards/<uuid:board_id>/columns/", views.columns_on_board, name="columns_on_board"),
     path("api/boards/<uuid:board_id>/columns/<uuid:column_id>/", views.update_column, name="update_column"),
     path(
@@ -41,6 +43,9 @@ urlpatterns = [
         "api/swimlanecolumns/<uuid:swimlanecolumn_id>/",
         swimlaneViews.update_swimlanecolumn,
         name="update_swimlanecolumn",
+    ),
+    path(
+        "api/columns/<uuid:column_id>/actions/", swimlaneViews.get_actions_by_columnId, name="get_actions_by_columnId"
     ),
     path("api/export/<uuid:board_id>/<str:filename>/", csv_views.export_board_data, name="export_board_data"),
     path("api/import/<uuid:board_id>/", csv_views.import_board_data, name="import_board_data"),

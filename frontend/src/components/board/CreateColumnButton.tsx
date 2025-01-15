@@ -2,9 +2,8 @@ import ColumnCreationForm from "@components/board/ColumnCreationForm"
 import { Dialog, DialogContent, IconButton, Tooltip } from "@mui/material"
 import Box from "@mui/material/Box"
 import { getId } from "@services/Utils"
-import { useContext, useState } from "react"
+import { useState } from "react"
 
-import { WebsocketContext } from "@/pages/BoardContainer"
 import { useAddColumnMutation } from "@/state/apiSlice"
 import { ColumnData } from "@/types"
 
@@ -14,7 +13,6 @@ interface CreateColumnButtonProps {
 const CreateColumnButton: React.FC<CreateColumnButtonProps> = ({ boardId }) => {
   const [addColumn] = useAddColumnMutation()
   const [open, setOpen] = useState(false)
-  const sendMessage = useContext(WebsocketContext)
 
   const handleOpenDialog = () => {
     setOpen(true)
@@ -31,9 +29,6 @@ const CreateColumnButton: React.FC<CreateColumnButtonProps> = ({ boardId }) => {
       swimlane: data.swimlane
     }
     await addColumn({ boardId: boardId, column: column })
-    if (sendMessage !== null) {
-      sendMessage("Column added")
-    }
     setOpen(false)
   }
   return (

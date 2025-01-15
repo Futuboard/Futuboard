@@ -79,3 +79,71 @@ def board_by_id(request, board_id):
             return JsonResponse({"message": "Board deleted successfully"}, status=200)
         except:  # noqa: E722
             raise Http404("Board deletion failed")
+
+
+@api_view(["PUT"])
+def update_board_title(request, board_id):
+    try:
+        token = get_token_from_request(request)
+        if token is None:
+            return JsonResponse({"message": "Access token missing"}, status=401)
+
+        decoded_token = decode_token(token)
+
+        if decoded_token["board_id"] != str(board_id):
+            return JsonResponse({"message": "Access token to wrong board"}, status=405)
+
+        board = Board.objects.get(pk=board_id)
+        board.title = request.data.get("title", board.title)
+        board.save()
+
+        serializer = BoardSerializer(board)
+        return JsonResponse(serializer.data, safe=False)
+
+    except Board.DoesNotExist:
+        raise Http404("Board does not exist")
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({"message": "Access token expired"}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({"message": "Access token invalid"}, status=401)
+    except Exception:
+        return JsonResponse({"message": "An unexpected error occurred"}, status=500)
+
+
+@api_view(["PUT"])
+def update_board_password(request, board_id):
+    try:
+        token = get_token_from_request(request)
+        if token is None:
+            return JsonResponse({"message": "Access token missing"}, status=401)
+
+        decoded_token = decode_token(token)
+
+        if decoded_token["board_id"] != str(board_id):
+            return JsonResponse({"message": "Access token to wrong board"}, status=405)
+
+        board = Board.objects.get(pk=board_id)
+
+        if not verify_password(request.data["old_password"], board.passwordhash):
+            return JsonResponse({"message": "Wrong old password"}, status=401)
+
+        candidate_password = request.data["new_password"]
+        confirm_password = request.data["confirm_password"]
+
+        if candidate_password != confirm_password:
+            return JsonResponse({"message": "Passwords do not match"}, status=400)
+
+        board.passwordhash = new_password(candidate_password)
+        board.save()
+
+        serializer = BoardSerializer(board)
+        return JsonResponse(serializer.data, safe=False)
+
+    except Board.DoesNotExist:
+        raise Http404("Board does not exist")
+    except jwt.ExpiredSignatureError:
+        return JsonResponse({"message": "Access token expired"}, status=401)
+    except jwt.InvalidTokenError:
+        return JsonResponse({"message": "Access token invalid"}, status=401)
+    except Exception:
+        return JsonResponse({"message": "An unexpected error occurred"}, status=500)

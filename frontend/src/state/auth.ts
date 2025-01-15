@@ -20,7 +20,9 @@ type AuthState = {
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: { boardId: "dfasda" },
+  initialState: {
+    boardId: ""
+  },
   reducers: {
     setBoardId: (state: AuthState, action: PayloadAction<string>) => {
       state.boardId = action.payload
