@@ -12,7 +12,7 @@ import rest_framework.request
 
 # Create your views here.
 @api_view(["GET", "POST"])
-def board_templates(request: rest_framework.request.Request, format=None):
+def board_templates(request: rest_framework.request.Request):
     if request.method == "POST":
         board = Board.objects.get(boardid=request.data["boardid"])
         new_board_template = BoardTemplate(
@@ -32,9 +32,8 @@ def board_templates(request: rest_framework.request.Request, format=None):
 
 
 @api_view(["POST"])
-def create_board_from_template(request: rest_framework.request.Request, format=None):
+def create_board_from_template(request: rest_framework.request.Request, board_template_id: str):
     if request.method == "POST":
-        board_template_id = request.data["boardtemplateid"]
         password = request.data["password"]
         board_template = BoardTemplate.objects.get(boardtemplateid=board_template_id)
         board = board_template.boardid

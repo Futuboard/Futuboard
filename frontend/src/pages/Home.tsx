@@ -6,7 +6,6 @@ import Link from "@mui/material/Link"
 import Typography from "@mui/material/Typography"
 import { useEffect } from "react"
 
-import ImportBoardButton from "@/components/home/ImportBoardButton"
 import ModalFrameCv from "@/components/home/ModalFrameCv"
 
 const Home: React.FC = () => {
@@ -37,9 +36,6 @@ const Home: React.FC = () => {
           <Grid container spacing={1} justifyContent="center">
             <Grid item>
               <CreateBoardButton />
-            </Grid>
-            <Grid item>
-              <ImportBoardButton />
             </Grid>
           </Grid>
         </Grid>

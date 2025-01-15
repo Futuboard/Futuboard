@@ -12,7 +12,8 @@ import {
   User,
   UserWithoutTicketsOrActions,
   PasswordChangeFormData,
-  NewBoardFormData
+  NewBoardFormData,
+  BoardTemplate
 } from "@/types"
 
 import { getAuth, setToken } from "./auth"
@@ -60,7 +61,7 @@ export const boardsApi = createApi({
     }
   }),
 
-  tagTypes: ["Boards", "Columns", "Ticket", "Users", "Action", "ActionList", "SwimlaneColumn"],
+  tagTypes: ["Boards", "Columns", "Ticket", "Users", "Action", "ActionList", "SwimlaneColumn", "BoardTemplate"],
 
   endpoints: (builder) => ({
     getBoard: builder.query<Board, string>({
@@ -68,7 +69,7 @@ export const boardsApi = createApi({
       providesTags: ["Boards"]
     }),
 
-    addBoard: builder.mutation<Board, NewBoardFormData>({
+    addBoard: builder.mutation<Board, { title: string; password: string }>({
       query: (boardData) => {
         return {
           url: "boards/",
@@ -85,6 +86,22 @@ export const boardsApi = createApi({
           url: "import/",
           method: "POST",
           body: formData
+        }
+      },
+      invalidatesTags: () => invalidateRemoteCache(["Boards"])
+    }),
+
+    getBoardTemplates: builder.query<BoardTemplate[], void>({
+      query: () => "boardtemplates/",
+      providesTags: ["BoardTemplate"]
+    }),
+
+    createBoardFromTemplate: builder.mutation<Board, NewBoardFormData>({
+      query: ({ title, password, boardTemplateId }) => {
+        return {
+          url: `boardtemplates/${boardTemplateId}/`,
+          method: "POST",
+          body: { title, password }
         }
       },
       invalidatesTags: () => invalidateRemoteCache(["Boards"])
@@ -605,6 +622,8 @@ export const {
   useGetUsersByBoardIdQuery,
   useGetBoardQuery,
   useAddBoardMutation,
+  useCreateBoardFromTemplateMutation,
+  useGetBoardTemplatesQuery,
   useImportBoardMutation,
   useDeleteBoardMutation,
   useUpdateBoardTitleMutation,

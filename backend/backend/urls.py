@@ -49,9 +49,9 @@ urlpatterns = [
     ),
     path("api/export/<uuid:board_id>/<str:filename>/", csv_views.export_board_data, name="export_board_data"),
     path("api/import/", csv_views.import_board_data, name="import_board_data"),
-    path("api/board_templates/", boardTemplateViews.board_templates, name="board_templates"),
+    path("api/boardtemplates/", boardTemplateViews.board_templates, name="board_templates"),
     path(
-        "api/create_board_from_template/",
+        "api/boardtemplates/<uuid:board_template_id>/",
         boardTemplateViews.create_board_from_template,
         name="create_board_from_template",
     ),
