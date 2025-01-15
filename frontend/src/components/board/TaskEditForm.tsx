@@ -27,7 +27,6 @@ import { useDeleteTaskMutation } from "@/state/apiSlice"
 import { Task, Task as TaskType, User } from "../../types"
 import DescriptionEditField from "./DescriptionEditField"
 
-
 interface DeleteTaskButtonProps {
   task: Task
 }
@@ -133,7 +132,6 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
     onSubmit(data)
   }
 
-
   return (
     <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={closeModule}>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -210,7 +208,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
             <TextField label="Corner note" fullWidth {...register("cornerNote", {})} />
           </Grid>
           <Grid item xs={240}>
-            <DescriptionEditField description = {task.description || ""} setValue = {setValue} />
+            <DescriptionEditField description={task.description || ""} setValue={setValue} />
           </Grid>
           <Grid item xs={12}>
             <FormControl component="fieldset">
@@ -222,7 +220,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
                 onChange={handleColorChange}
                 sx={{ bgcolor: "#eaeaea", borderRadius: 3, paddingLeft: 3 }}
               >
-                <FormControlLabel value="#ffffff" control={<Radio  style={{ color: "#ffffff" }} />} label={null} />
+                <FormControlLabel value="#ffffff" control={<Radio style={{ color: "#ffffff" }} />} label={null} />
                 <FormControlLabel value="#ffeb3b" control={<Radio style={{ color: "#ffeb3b" }} />} label={null} />
                 <FormControlLabel value="#8bc34a" control={<Radio style={{ color: "#8bc34a" }} />} label={null} />
                 <FormControlLabel value="#ff4081" control={<Radio style={{ color: "#ff4081" }} />} label={null} />
