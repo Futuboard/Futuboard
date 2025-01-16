@@ -10,9 +10,7 @@ import {
   TextField,
   Typography
 } from "@mui/material"
-
 import { useEffect, useRef } from "react"
-
 import { useForm } from "react-hook-form"
 
 import { User } from "@/types"
