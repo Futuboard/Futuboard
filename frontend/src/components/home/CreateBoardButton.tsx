@@ -1,4 +1,3 @@
-import BoardCreationForm from "@components/board/BoardCreationForm"
 import { Dialog, DialogContent, Typography } from "@mui/material"
 import Button from "@mui/material/Button"
 import { SerializedError } from "@reduxjs/toolkit"
@@ -6,6 +5,7 @@ import { FetchBaseQueryError } from "@reduxjs/toolkit/query"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+import BoardCreationForm from "@/components/home/BoardCreationForm"
 import { useAddBoardMutation, useCreateBoardFromTemplateMutation, useImportBoardMutation } from "@/state/apiSlice"
 import { Board, NewBoardFormData } from "@/types"
 
