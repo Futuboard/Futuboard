@@ -16,14 +16,13 @@ import {
   thematicBreakPlugin,
   markdownShortcutPlugin,
   ListsToggle,
-  Separator,
+  Separator
 } from "@mdxeditor/editor"
 import React from "react"
 
 interface DescriptionEditFieldProps {
   description: string
   onChange: (markdown: string) => void
-
 }
 
 const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description, onChange }) => {
@@ -54,7 +53,7 @@ const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description
         quotePlugin(),
         headingsPlugin(),
         thematicBreakPlugin(),
-        markdownShortcutPlugin(),
+        markdownShortcutPlugin()
       ]}
       onChange={(markdown) => onChange(markdown)}
       ref={ref}
