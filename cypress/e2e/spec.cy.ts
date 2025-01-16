@@ -113,7 +113,7 @@ describe("In a board", () => {
 
     cy.get("button[aria-label='Home']").click()
 
-    cy.contains("Import board").click()
+    cy.contains("Create board").click()
 
     cy.get("input[name='title']").type("Imported test Board")
     cy.get("input[name='password']").type("password")
@@ -149,7 +149,7 @@ describe("In a board", () => {
 describe("When working with multiple users", () => {
   it("can see changes made by other users and own updates are responsive", () => {
     // Import board with data, so responsivess is tested more realistically
-    cy.contains("Import board").click()
+    cy.contains("Create board").click()
     cy.get("input[name='title']").type("Imported test Board")
     cy.get("input[name='password']").type("alpha123")
     cy.get("input[type='file']").selectFile("fixtures/large_board.csv", { force: true })
