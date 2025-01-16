@@ -114,43 +114,45 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
           </Typography>
           <Divider sx={{ marginX: 6, marginY: 1 }} />
         </Grid>
-        <Grid
-          item
-          xs={12}
-          sx={{
-            width: "100%",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(min(150px, 100%), 1fr))",
-            gap: 2,
-            marginBottom: 2
-          }}
-        >
-          {cards.map((card, index) => (
-            <Card key={card.title}>
-              <CardActionArea
-                onClick={() => handleCardSelection(card, index)}
-                data-active={selectedCard === index ? "" : undefined}
-                sx={{
-                  height: "100%",
-                  "&[data-active]": {
-                    backgroundColor: "action.selected",
-                    "&:hover": {
-                      backgroundColor: "action.selectedHover"
+
+        <Grid item xs={12} display="flex" justifyContent="center">
+          <Grid
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "150px 150px 150px",
+              gap: 2,
+              marginBottom: 2,
+              maxHeight: 200,
+              overflowY: "scroll"
+            }}
+          >
+            {cards.map((card, index) => (
+              <Card key={card.title} sx={{ width: 150, height: 150, textAlign: "center", position: "relative" }}>
+                <CardActionArea
+                  onClick={() => handleCardSelection(card, index)}
+                  data-active={selectedCard === index ? "" : undefined}
+                  sx={{
+                    height: "100%",
+                    "&[data-active]": {
+                      backgroundColor: "action.selected",
+                      "&:hover": {
+                        backgroundColor: "action.selectedHover"
+                      }
                     }
-                  }
-                }}
-              >
-                <CardContent sx={{ height: "100%" }}>
-                  <Typography variant="body1" color="text.primary">
-                    {card.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {card.description}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          ))}
+                  }}
+                >
+                  <CardContent sx={{ height: "100%" }}>
+                    <Typography variant="body1" color="text.primary">
+                      {card.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {card.description}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            ))}
+          </Grid>
         </Grid>
         {currentCardBoardType === "import" && (
           <Grid item xs={12}>

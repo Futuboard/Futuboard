@@ -132,6 +132,12 @@ const Admin = () => {
               </form>
             </DialogContent>
           </Dialog>
+          <Grid item xs={12}>
+            <Typography gutterBottom variant="h6" sx={{ paddingX: 4 }}>
+              Templates
+            </Typography>
+            <Divider />
+          </Grid>
           <Grid
             item
             xs={12}
@@ -145,17 +151,20 @@ const Admin = () => {
             <Card sx={{ width: 150, height: 150, textAlign: "center" }}>
               <CardContent>
                 <Typography variant="body1" color="text.primary">
-                  New board template
+                  New template
                 </Typography>
                 <Grid container justifyContent="center">
                   <IconButton onClick={() => setIsDialogOpen(true)}>
-                    <AddIcon sx={{ fontSize: 50 }} color="primary" />
+                    <AddIcon sx={{ fontSize: 50, mt: 1 }} color="primary" />
                   </IconButton>
                 </Grid>
               </CardContent>
             </Card>
             {boardTemplates.map((boardTemplate) => (
-              <Card key={boardTemplate.title} sx={{ width: 150, height: 150, textAlign: "center" }}>
+              <Card
+                key={boardTemplate.title}
+                sx={{ width: 150, height: 150, textAlign: "center", position: "relative" }}
+              >
                 <CardContent sx={{ height: "100%" }}>
                   <Typography variant="body1" color="text.primary">
                     {boardTemplate.title}
@@ -164,8 +173,11 @@ const Admin = () => {
                     {boardTemplate.description}
                   </Typography>
 
-                  <IconButton onClick={() => handleBoardTemplateDelete(boardTemplate.boardtemplateid)}>
-                    <DeleteIcon sx={{ fontSize: 40, bottom: 0 }} color="error" />
+                  <IconButton
+                    sx={{ position: "absolute", left: 50, bottom: 0 }}
+                    onClick={() => handleBoardTemplateDelete(boardTemplate.boardtemplateid)}
+                  >
+                    <DeleteIcon sx={{ fontSize: 40 }} color="error" />
                   </IconButton>
                 </CardContent>
               </Card>
