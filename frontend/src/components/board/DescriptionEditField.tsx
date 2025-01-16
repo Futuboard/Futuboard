@@ -30,6 +30,7 @@ const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description
 
   return (
     <MDXEditor
+      className="description"
       markdown={description}
       plugins={[
         toolbarPlugin({

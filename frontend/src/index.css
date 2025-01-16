@@ -52,7 +52,7 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.mdxeditor {
+.description {
   border: none;
   border-radius: 3pt;
   outline-style: solid;
@@ -60,11 +60,11 @@ button:focus-visible {
   outline-width: 1px;
 }
 
-.mdxeditor:hover {
+.description:hover {
   outline-color: #1a1a1a;
 }
 
-.mdxeditor:focus-within {
+.description:focus-within {
   outline-color: #1976d2;
   outline-width: 2px;
 }
