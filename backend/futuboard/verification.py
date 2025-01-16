@@ -14,7 +14,7 @@ def verify_password(password: str, hash: str):
         return False
 
 
-def new_password(password):
+def hash_password(password):
     ph = PasswordHasher()
     hash = ph.hash(password)
     return hash
@@ -47,4 +47,11 @@ def decode_token(token: str):
     if not JWT_SECRET:
         raise ValueError("JWT_SECRET not set")
 
-    return jwt.decode(token, JWT_SECRET, algorithms="HS256")
+    return jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+
+
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+
+
+def is_admin_password_correct(password: str):
+    return ADMIN_PASSWORD == password

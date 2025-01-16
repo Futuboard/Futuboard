@@ -1,7 +1,7 @@
 import futuboard.models as md
 from django.utils import timezone
 import django.apps
-from ..futuboard.verification import new_password
+from ..futuboard.verification import hash_password
 
 # Utility functions
 
@@ -12,7 +12,7 @@ def addBoard(boardId, title="title", password="", description=""):
         description=description,
         title=title,
         creation_date=timezone.now(),
-        passwordhash="" if password == "" else new_password(password),
+        passwordhash="" if password == "" else hash_password(password),
         salt="",
     )
     new_board.save()

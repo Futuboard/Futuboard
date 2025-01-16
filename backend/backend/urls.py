@@ -55,4 +55,5 @@ urlpatterns = [
         boardTemplateViews.create_board_from_template,
         name="create_board_from_template",
     ),
+    path("api/checkadminpassword/", views.check_admin_password, name="check_admin_password"),
 ]

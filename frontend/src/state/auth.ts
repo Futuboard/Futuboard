@@ -30,6 +30,14 @@ const authSlice = createSlice({
   }
 })
 
+export const getAdminPassword = () => {
+  return localStorage.getItem("admin-password")
+}
+
+export const setAdminPassword = (password: string) => {
+  localStorage.setItem("admin-password", password)
+}
+
 export const authReducer = authSlice.reducer
 
 export const { setBoardId } = authSlice.actions

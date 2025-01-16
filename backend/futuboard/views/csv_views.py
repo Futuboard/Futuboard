@@ -9,7 +9,7 @@ from ..csv_parser import write_csv_header, write_board_data, verify_csv_header, 
 import csv
 import io
 from rest_framework.decorators import api_view
-from ..verification import new_password
+from ..verification import hash_password
 from django.http import JsonResponse
 import json
 
@@ -47,7 +47,7 @@ def import_board_data(request):
         if not verify_csv_header(reader):
             return HttpResponse("Invalid file header", status=400)
         board_data = json.loads(request.data["board"])
-        board = read_board_data(reader, board_data["title"], new_password(board_data["password"]))
+        board = read_board_data(reader, board_data["title"], hash_password(board_data["password"]))
         serializer = BoardSerializer(board)
         return JsonResponse(serializer.data, safe=False)
 
