@@ -6,27 +6,36 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('futuboard', '0008_remove_action_color_remove_board_creator_and_more'),
+        ("futuboard", "0008_remove_action_color_remove_board_creator_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='board',
-            name='boardid',
-            field=models.UUIDField(db_column='boardID', default=uuid.uuid4, primary_key=True, serialize=False),
+            model_name="board",
+            name="boardid",
+            field=models.UUIDField(db_column="boardID", default=uuid.uuid4, primary_key=True, serialize=False),
         ),
         migrations.CreateModel(
-            name='BoardTemplate',
+            name="BoardTemplate",
             fields=[
-                ('boardtemplateid', models.UUIDField(db_column='boardTemplateID', default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('title', models.TextField()),
-                ('description', models.TextField()),
-                ('boardid', models.ForeignKey(db_column='boardID', on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.board')),
+                (
+                    "boardtemplateid",
+                    models.UUIDField(
+                        db_column="boardTemplateID", default=uuid.uuid4, primary_key=True, serialize=False
+                    ),
+                ),
+                ("title", models.TextField()),
+                ("description", models.TextField()),
+                (
+                    "boardid",
+                    models.ForeignKey(
+                        db_column="boardID", on_delete=django.db.models.deletion.DO_NOTHING, to="futuboard.board"
+                    ),
+                ),
             ],
             options={
-                'db_table': 'BoardTemplate',
+                "db_table": "BoardTemplate",
             },
         ),
     ]
