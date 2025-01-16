@@ -54,7 +54,6 @@ button:focus-visible {
 
 .description {
   overflow-y: auto;
-  height: 350px;
   border: none;
   border-radius: 3pt;
   outline-style: solid;
@@ -73,4 +72,8 @@ button:focus-visible {
 
 .mdxeditor-popup-container {
   z-index: 9999;
+}
+
+.content {
+  height: 330px;
 }
