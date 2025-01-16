@@ -1,4 +1,7 @@
+import CloseIcon from "@mui/icons-material/Close"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
+import { IconButton } from "@mui/material"
+import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardActionArea from "@mui/material/CardActionArea"
@@ -21,7 +24,7 @@ interface AddBoardCreationFormProps {
   onCancel: () => void
 }
 
-type Card = { boardtemplateid?: string; title: string; type: NewBoardType; description: string }
+type Template = { boardtemplateid?: string; title: string; type: NewBoardType; description: string }
 
 const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCancel }) => {
   const {
@@ -43,21 +46,16 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
   const { data: boardTemplates, isSuccess } = useGetBoardTemplatesQuery()
   const [selectedCard, setSelectedCard] = useState<number>(0)
 
-  const cards: Card[] = [
+  const templates: Template[] = [
     {
       type: "empty",
       title: "Empty board",
       description: "An empty board with no columns or cards"
-    },
-    {
-      type: "import",
-      title: "Imported board ",
-      description: "A board from CSV file on your computer"
     }
   ]
 
   if (isSuccess) {
-    cards.push(
+    templates.push(
       ...boardTemplates.map(({ title, description, boardtemplateid }) => ({
         boardtemplateid,
         type: "template" as NewBoardType,
@@ -67,14 +65,19 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
     )
   }
 
-  const handleCardSelection = (card: Card, index: number) => {
+  const handleCardSelection = (card: Template, index: number) => {
     setValue("boardType", card.type)
     setValue("boardTemplateId", card.boardtemplateid)
     setSelectedCard(index)
+    setValue("file", undefined)
+  }
+
+  const handleFileSelect = () => {
+    setValue("boardType", "import")
+    setSelectedCard(-1)
   }
 
   const uploadedFileName = watch("file")?.[0]?.name || ""
-  const currentCardBoardType = watch("boardType")
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -109,25 +112,27 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
           <PasswordField register={register("password")} />
         </Grid>
         <Grid item xs={12} sx={{ marginTop: 2 }}>
-          <Typography variant="h6" color="text.primary">
-            Template
+          <Typography variant="h6" color="text.primary" sx={{ marginY: 1 }}>
+            Choose a template
           </Typography>
-          <Divider sx={{ marginX: 6, marginY: 1 }} />
         </Grid>
 
-        <Grid item xs={12} display="flex" justifyContent="center">
+        <Grid
+          item
+          xs={12}
+          sx={{ maxHeight: "225px", overflowY: "auto", border: "1px solid rgba(0, 0, 0, 0.12)", borderRadius: 2 }}
+        >
           <Grid
             sx={{
-              display: "grid",
-              gridTemplateColumns: "150px 150px 150px",
-              gap: 2,
-              marginBottom: 2,
-              maxHeight: 200,
-              overflowY: "scroll"
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+              paddingBottom: 1,
+              paddingRight: 1
             }}
           >
-            {cards.map((card, index) => (
-              <Card key={card.title} sx={{ width: 150, height: 150, textAlign: "center", position: "relative" }}>
+            {templates.map((card, index) => (
+              <Card key={card.title} sx={{ width: "100%", textAlign: "left" }}>
                 <CardActionArea
                   onClick={() => handleCardSelection(card, index)}
                   data-active={selectedCard === index ? "" : undefined}
@@ -154,29 +159,40 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
             ))}
           </Grid>
         </Grid>
-        {currentCardBoardType === "import" && (
-          <Grid item xs={12}>
-            <Button
-              component="label"
-              role={undefined}
-              variant="contained"
-              tabIndex={-1}
-              startIcon={<CloudUploadIcon />}
-              sx={{ width: "84%" }}
-            >
-              Upload file
-              <input
-                type="file"
-                {...register("file", { required: currentCardBoardType === "import" })}
-                style={{ display: "none" }}
-                accept=".csv"
-              />
-            </Button>
-            <Typography variant="body2" color="textSecondary" style={{ marginTop: "8px" }}>
-              Uploaded file: {uploadedFileName || "No file uploaded"}
-            </Typography>
-          </Grid>
-        )}
+
+        <Box display="flex" justifyContent="center" sx={{ marginY: 1, width: "100%" }}>
+          <Typography color="text.primary" fontSize="1.3rem">
+            or
+          </Typography>
+        </Box>
+
+        <Grid item xs={12}>
+          <Button
+            component="label"
+            role={undefined}
+            variant="contained"
+            tabIndex={-1}
+            startIcon={<CloudUploadIcon />}
+            sx={{ width: "84%" }}
+          >
+            Import from CSV
+            <input
+              type="file"
+              {...register("file", { onChange: handleFileSelect })}
+              style={{ display: "none" }}
+              accept=".csv"
+            />
+          </Button>
+          <Typography variant="body2" color="textSecondary" style={{ marginTop: "8px" }}>
+            {uploadedFileName || "No file uploaded"}
+            {uploadedFileName && (
+              <IconButton onClick={() => setValue("file", undefined)} sx={{ padding: 0.5 }}>
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            )}
+          </Typography>
+        </Grid>
+
         <Grid item xs={12} sx={{ marginTop: 2 }}>
           <Button type="submit" color="primary" variant="contained">
             Submit
