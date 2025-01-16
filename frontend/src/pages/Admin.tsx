@@ -3,6 +3,7 @@ import DeleteIcon from "@mui/icons-material/Delete"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
+import CardActionArea from "@mui/material/CardActionArea"
 import CardContent from "@mui/material/CardContent"
 import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
@@ -20,7 +21,7 @@ import {
   useDeleteBoardTemplateMutation,
   useGetBoardTemplatesQuery
 } from "@/state/apiSlice"
-import { NewBoardTemplate } from "@/types"
+import { BoardTemplate, NewBoardTemplate } from "@/types"
 
 type FormValues = { boardUrl: string; title: string; description: string }
 
@@ -41,6 +42,7 @@ const Admin = () => {
     setError,
     register,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm<FormValues>({
     defaultValues: {
@@ -69,11 +71,20 @@ const Admin = () => {
       setError("boardUrl", {
         message: "Board might not exist"
       })
+    } else {
+      setIsDialogOpen(false)
+      reset()
     }
   }
 
-  const handleBoardTemplateDelete = async (boardTemplateId: string) => {
-    await deleteBoardTemplate(boardTemplateId)
+  const handleBoardTemplateDelete = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    boardTemplate: BoardTemplate
+  ) => {
+    event.preventDefault()
+    if (confirm(`Are you sure you want to delete ${boardTemplate.title}?`)) {
+      await deleteBoardTemplate(boardTemplate.boardtemplateid)
+    }
   }
 
   boardTemplates = boardTemplates || []
@@ -81,7 +92,7 @@ const Admin = () => {
   return (
     <Box display="flex" justifyContent="center" alignItems="center" height="100vh" bgcolor="white">
       {isAuthenticated ? (
-        <Grid spacing={2} display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+        <Grid display="flex" flexDirection="column" justifyContent="center" alignItems="center">
           <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
             <DialogContent>
               <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -165,21 +176,32 @@ const Admin = () => {
                 key={boardTemplate.title}
                 sx={{ width: 150, height: 150, textAlign: "center", position: "relative" }}
               >
-                <CardContent sx={{ height: "100%" }}>
-                  <Typography variant="body1" color="text.primary">
-                    {boardTemplate.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {boardTemplate.description}
-                  </Typography>
+                <CardActionArea
+                  href={`/board/${boardTemplate.boardid}`}
+                  target="_blank"
+                  sx={{
+                    height: "100%",
+                    "&:hover": {
+                      backgroundColor: "action.selectedHover"
+                    }
+                  }}
+                >
+                  <CardContent sx={{ height: "100%" }}>
+                    <Typography variant="body1" color="text.primary">
+                      {boardTemplate.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {boardTemplate.description}
+                    </Typography>
 
-                  <IconButton
-                    sx={{ position: "absolute", left: 50, bottom: 0 }}
-                    onClick={() => handleBoardTemplateDelete(boardTemplate.boardtemplateid)}
-                  >
-                    <DeleteIcon sx={{ fontSize: 40 }} color="error" />
-                  </IconButton>
-                </CardContent>
+                    <IconButton
+                      sx={{ position: "absolute", left: 50, bottom: 0 }}
+                      onClick={(event) => handleBoardTemplateDelete(event, boardTemplate)}
+                    >
+                      <DeleteIcon sx={{ fontSize: 40 }} color="error" />
+                    </IconButton>
+                  </CardContent>
+                </CardActionArea>
               </Card>
             ))}
           </Grid>
