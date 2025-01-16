@@ -76,6 +76,9 @@ const AdminLoginForm = ({ setIsAuthenticated }: Props) => {
           <Button type="submit" color="primary" variant="contained">
             Submit
           </Button>
+          <Button sx={{ marginLeft: 2 }} href="/">
+            Cancel
+          </Button>
         </Grid>
       </Grid>
     </form>

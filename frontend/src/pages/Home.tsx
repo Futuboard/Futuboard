@@ -1,7 +1,9 @@
 import CreateBoardButton from "@components/home/CreateBoardButton"
 import GitHubIcon from "@mui/icons-material/GitHub"
+import SettingsIcon from "@mui/icons-material/Settings"
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
+import IconButton from "@mui/material/IconButton"
 import Link from "@mui/material/Link"
 import Typography from "@mui/material/Typography"
 import { useEffect } from "react"
@@ -74,6 +76,9 @@ const Home: React.FC = () => {
           </Grid>
         </Grid>
       </Grid>
+      <IconButton href="/admin" sx={{ position: "absolute", right: 10, top: 10 }} title="Admin panel">
+        <SettingsIcon fontSize="large" />
+      </IconButton>
     </Box>
   )
 }
