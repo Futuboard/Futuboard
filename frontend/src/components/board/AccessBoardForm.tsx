@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom"
 
 import { useLoginMutation } from "@/state/apiSlice"
 
-import PasswordField from "./PasswordField"
+import PasswordField from "../home/PasswordField"
 
 interface AccessBoardFormProps {
   id: string
@@ -19,38 +19,40 @@ interface FormData {
 }
 
 const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id }) => {
-  const { register, handleSubmit } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors }
+  } = useForm<FormData>({
     defaultValues: {
       password: ""
     }
   })
   const navigate = useNavigate()
+
   const [tryLogin] = useLoginMutation()
+
   const onSubmit = async (data: FormData) => {
     const loginResponse = await tryLogin({ boardId: id, password: data.password })
     if ("error" in loginResponse) {
-      alert("Hmm we got an error")
+      alert("An error occurred. Please try again later.")
       return
     }
 
     const { success } = loginResponse.data
 
-    // Succesful login in handles in apiSlice.ts
+    // Succesful login in handled in apiSlice.ts
     if (!success) {
-      alert("Wrong password")
+      setError("password", { message: "Invalid password" })
     }
   }
   const onCancel = () => {
     navigate("/")
   }
 
-  const handleFormSubmit = (data: FormData) => {
-    // Perform password validation or authentication here
-    onSubmit(data)
-  }
-
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <Typography gutterBottom variant="h6">
@@ -59,7 +61,7 @@ const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id }) => {
           <Divider />
         </Grid>
         <Grid item xs={12}>
-          <PasswordField register={register("password")} />
+          <PasswordField register={register("password")} errorText={errors.password?.message} />
         </Grid>
         <Grid item xs={12}>
           <Button type="submit" color="primary" variant="contained">

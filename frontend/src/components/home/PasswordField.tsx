@@ -1,4 +1,5 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material/"
+import { Typography } from "@mui/material"
 import FormControl from "@mui/material/FormControl"
 import IconButton from "@mui/material/IconButton"
 import InputAdornment from "@mui/material/InputAdornment"
@@ -9,9 +10,10 @@ import { UseFormRegisterReturn } from "react-hook-form"
 
 interface AddPasswordFieldProps {
   register: UseFormRegisterReturn
+  errorText?: string
 }
 
-const PasswordField: React.FC<AddPasswordFieldProps> = ({ register }) => {
+const PasswordField: React.FC<AddPasswordFieldProps> = ({ register, errorText }) => {
   const [showPassword, setShowPassword] = useState(false)
 
   const handleClickShowPassword = () => setShowPassword((show) => !show)
@@ -21,6 +23,7 @@ const PasswordField: React.FC<AddPasswordFieldProps> = ({ register }) => {
       <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
       <OutlinedInput
         type={showPassword ? "Text" : "Password"}
+        error={Boolean(errorText)}
         {...register}
         endAdornment={
           <InputAdornment position="end">
@@ -31,6 +34,9 @@ const PasswordField: React.FC<AddPasswordFieldProps> = ({ register }) => {
         }
         label="Password"
       />
+      <Typography variant="caption" color="error">
+        {errorText || ""}
+      </Typography>
     </FormControl>
   )
 }

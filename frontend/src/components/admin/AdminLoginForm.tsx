@@ -1,13 +1,14 @@
 import Button from "@mui/material/Button"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
-import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 
 import { useCheckAdminPasswordMutation } from "@/state/apiSlice"
 import { getAdminPassword, setAdminPassword } from "@/state/auth"
+
+import PasswordField from "../home/PasswordField"
 
 interface Props {
   setIsAuthenticated: (value: boolean) => void
@@ -64,13 +65,9 @@ const AdminLoginForm = ({ setIsAuthenticated }: Props) => {
           <Divider />
         </Grid>
         <Grid item xs={12}>
-          <TextField
-            label="Password"
-            type="password"
-            helperText={errors.password?.message}
-            error={Boolean(errors.password)}
-            {...register("password")}
-          />
+          <Grid item xs={12}>
+            <PasswordField register={register("password")} errorText={errors.password?.message} />
+          </Grid>
         </Grid>
         <Grid item xs={12}>
           <Button type="submit" color="primary" variant="contained">

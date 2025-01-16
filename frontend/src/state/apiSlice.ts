@@ -323,7 +323,12 @@ export const boardsApi = createApi({
           return data
         }
       }),
-      invalidatesTags: ["Boards"]
+      invalidatesTags: (result) => {
+        if (result?.success) {
+          return ["Boards"]
+        }
+        return []
+      }
     }),
 
     postUserToTicket: builder.mutation<User, { ticketId: string; userid: string }>({
