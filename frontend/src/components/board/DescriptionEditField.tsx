@@ -27,9 +27,9 @@ interface DescriptionEditFieldProps {
 
 const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description, onChange }) => {
   const ref = React.useRef<MDXEditorMethods>(null)
-
+  
   return (
-    <div className="description" onClick={() => ref.current?.focus()}>
+    <div className="description">
       <MDXEditor
         placeholder="Description"
         markdown={description}
