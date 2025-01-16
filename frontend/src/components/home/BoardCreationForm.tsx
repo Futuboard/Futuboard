@@ -170,10 +170,9 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
           <Button
             component="label"
             role={undefined}
-            variant="contained"
             tabIndex={-1}
             startIcon={<CloudUploadIcon />}
-            sx={{ width: "84%" }}
+            sx={{ border: 1, paddingX: 4 }}
           >
             Import from CSV
             <input
@@ -197,7 +196,9 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
           <Button type="submit" color="primary" variant="contained">
             Submit
           </Button>
-          <Button onClick={onCancel}>Cancel</Button>
+          <Button onClick={onCancel} sx={{ marginLeft: 2, border: 1 }}>
+            Cancel
+          </Button>
         </Grid>
       </Grid>
     </form>
