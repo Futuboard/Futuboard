@@ -16,6 +16,7 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 
 import AdminLoginForm from "@/components/admin/AdminLoginForm"
+import ToolBar from "@/components/board/Toolbar"
 import {
   useAddBoardTemplateMutation,
   useDeleteBoardTemplateMutation,
@@ -90,126 +91,131 @@ const Admin = () => {
   boardTemplates = boardTemplates || []
 
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" height="100vh" bgcolor="white">
-      {isAuthenticated ? (
-        <Grid display="flex" flexDirection="column" justifyContent="center" alignItems="center">
-          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-            <DialogContent>
-              <form onSubmit={handleSubmit(handleFormSubmit)}>
-                <Grid
-                  container
-                  spacing={2}
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <Grid item xs={12}>
-                    <Typography gutterBottom variant="h6">
-                      New Board Template
-                    </Typography>
-                    <Divider />
+    <>
+      <ToolBar title="Manage Board Templates" />
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh" bgcolor="white">
+        {isAuthenticated ? (
+          <Grid display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+            <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+              <DialogContent>
+                <form onSubmit={handleSubmit(handleFormSubmit)}>
+                  <Grid
+                    container
+                    spacing={2}
+                    display="flex"
+                    flexDirection="column"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <Grid item xs={12}>
+                      <Typography gutterBottom variant="h6">
+                        New Board Template
+                      </Typography>
+                      <Divider />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        label="Board URL"
+                        error={Boolean(errors.boardUrl)}
+                        helperText={errors.boardUrl?.message}
+                        {...register("boardUrl")}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        label="Title"
+                        error={Boolean(errors.title)}
+                        helperText={errors.title?.message}
+                        {...register("title")}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        label="Description"
+                        error={Boolean(errors.description)}
+                        helperText={errors.description?.message}
+                        {...register("description")}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Button type="submit" color="primary" variant="contained">
+                        Create
+                      </Button>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Board URL"
-                      error={Boolean(errors.boardUrl)}
-                      helperText={errors.boardUrl?.message}
-                      {...register("boardUrl")}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Title"
-                      error={Boolean(errors.title)}
-                      helperText={errors.title?.message}
-                      {...register("title")}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Description"
-                      error={Boolean(errors.description)}
-                      helperText={errors.description?.message}
-                      {...register("description")}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button type="submit" color="primary" variant="contained">
-                      Create
-                    </Button>
-                  </Grid>
-                </Grid>
-              </form>
-            </DialogContent>
-          </Dialog>
-          <Grid item xs={12}>
-            <Typography gutterBottom variant="h6" sx={{ paddingX: 4 }}>
-              Templates
-            </Typography>
-            <Divider />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            display="flex"
-            justifyContent="center"
-            sx={{
-              gap: 2,
-              marginY: 4
-            }}
-          >
-            <Card sx={{ width: 150, height: 150, textAlign: "center" }}>
-              <CardContent>
-                <Typography variant="body1" color="text.primary">
-                  New template
-                </Typography>
-                <Grid container justifyContent="center">
-                  <IconButton onClick={() => setIsDialogOpen(true)}>
-                    <AddIcon sx={{ fontSize: 50, mt: 1 }} color="primary" />
-                  </IconButton>
-                </Grid>
-              </CardContent>
-            </Card>
-            {boardTemplates.map((boardTemplate) => (
-              <Card
-                key={boardTemplate.title}
-                sx={{ width: 150, height: 150, textAlign: "center", position: "relative" }}
-              >
-                <CardActionArea
-                  href={`/board/${boardTemplate.boardid}`}
-                  target="_blank"
-                  sx={{
-                    height: "100%",
-                    "&:hover": {
-                      backgroundColor: "action.selectedHover"
-                    }
-                  }}
-                >
-                  <CardContent sx={{ height: "100%" }}>
-                    <Typography variant="body1" color="text.primary">
-                      {boardTemplate.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {boardTemplate.description}
-                    </Typography>
-
-                    <IconButton
-                      sx={{ position: "absolute", left: 50, bottom: 0 }}
-                      onClick={(event) => handleBoardTemplateDelete(event, boardTemplate)}
-                    >
-                      <DeleteIcon sx={{ fontSize: 40 }} color="error" />
+                </form>
+              </DialogContent>
+            </Dialog>
+            <Grid item xs={12}>
+              <Typography gutterBottom variant="h6" sx={{ paddingX: 4 }}>
+                Templates
+              </Typography>
+              <Divider />
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              display="flex"
+              justifyContent="center"
+              flexWrap="wrap"
+              sx={{
+                gap: 2,
+                marginY: 4
+              }}
+            >
+              <Card sx={{ width: 150, height: 150, textAlign: "center" }}>
+                <CardContent>
+                  <Typography variant="body1" color="text.primary">
+                    New template
+                  </Typography>
+                  <Grid container justifyContent="center">
+                    <IconButton onClick={() => setIsDialogOpen(true)} aria-label="Create new template">
+                      <AddIcon sx={{ fontSize: 50, mt: 1 }} color="primary" />
                     </IconButton>
-                  </CardContent>
-                </CardActionArea>
+                  </Grid>
+                </CardContent>
               </Card>
-            ))}
+              {boardTemplates.map((boardTemplate) => (
+                <Card
+                  key={boardTemplate.title}
+                  sx={{ width: 150, height: 150, textAlign: "center", position: "relative" }}
+                >
+                  <CardActionArea
+                    href={`/board/${boardTemplate.boardid}`}
+                    target="_blank"
+                    sx={{
+                      height: "100%",
+                      "&:hover": {
+                        backgroundColor: "action.selectedHover"
+                      }
+                    }}
+                  >
+                    <CardContent sx={{ height: "100%" }}>
+                      <Typography variant="body1" color="text.primary">
+                        {boardTemplate.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {boardTemplate.description}
+                      </Typography>
+
+                      <IconButton
+                        sx={{ position: "absolute", left: 50, bottom: 0 }}
+                        onClick={(event) => handleBoardTemplateDelete(event, boardTemplate)}
+                        aria-label={`Delete template ${boardTemplate.title}`}
+                      >
+                        <DeleteIcon sx={{ fontSize: 40 }} color="error" />
+                      </IconButton>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              ))}
+            </Grid>
           </Grid>
-        </Grid>
-      ) : (
-        <AdminLoginForm setIsAuthenticated={setIsAuthenticated} />
-      )}
-    </Box>
+        ) : (
+          <AdminLoginForm setIsAuthenticated={setIsAuthenticated} />
+        )}
+      </Box>
+    </>
   )
 }
 

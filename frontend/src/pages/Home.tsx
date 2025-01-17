@@ -76,7 +76,7 @@ const Home: React.FC = () => {
           </Grid>
         </Grid>
       </Grid>
-      <IconButton href="/admin" sx={{ position: "absolute", right: 10, top: 10 }} title="Admin panel">
+      <IconButton href="/admin" sx={{ position: "absolute", right: 10, top: 10 }} title="Manage Board Templates">
         <SettingsIcon fontSize="large" />
       </IconButton>
     </Box>
