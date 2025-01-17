@@ -493,7 +493,7 @@ def test_deleting_column():
     """
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4()).boardid
+    boardid = addBoard().boardid
     columnid = addColumn(boardid, uuid.uuid4()).columnid
     columnid2 = addColumn(boardid, uuid.uuid4()).columnid
 
@@ -514,7 +514,7 @@ def test_deleting_ticket():
 
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4()).boardid
+    boardid = addBoard().boardid
     columnid = addColumn(boardid, uuid.uuid4()).columnid
     ticketid = addTicket(columnid, uuid.uuid4()).ticketid
     ticketid2 = addTicket(columnid, uuid.uuid4()).ticketid
@@ -536,7 +536,7 @@ def test_updating_columns_order():
 
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4()).boardid
+    boardid = addBoard().boardid
     columnid1 = addColumn(boardid, uuid.uuid4()).columnid
     columnid2 = addColumn(boardid, uuid.uuid4()).columnid
     columnid3 = addColumn(boardid, uuid.uuid4()).columnid
@@ -575,7 +575,7 @@ def test_password_change_correct():
     """
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4(), password="password").boardid
+    boardid = addBoard(password="password").boardid
 
     # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
@@ -606,7 +606,7 @@ def test_password_change_with_incorrect_old_password():
     """
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4(), password="password").boardid
+    boardid = addBoard(password="password").boardid
 
     # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
@@ -637,7 +637,7 @@ def test_password_change_with_clashing_confirm_password():
     """
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4(), password="password").boardid
+    boardid = addBoard(password="password").boardid
 
     # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
