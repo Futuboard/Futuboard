@@ -14,7 +14,8 @@ export default defineConfig({
               concurrency: Cluster.CONCURRENCY_CONTEXT,
               maxConcurrency: concurrentUsers,
               puppeteerOptions: {
-                headless: HEADLESS
+                headless: HEADLESS,
+                args: ["--no-sandbox", "--disable-setuid-sandbox"]
               }
             })
 
