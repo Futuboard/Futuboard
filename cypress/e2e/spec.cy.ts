@@ -146,6 +146,57 @@ describe("In a board", () => {
   })
 })
 
+describe("When using board templates", () => {
+  it("can create board template and a new board from a template", () => {
+    cy.createBoard()
+    cy.loginToBoard("alpha123")
+    cy.createColumn(defaultColumn)
+    cy.createTask(defaultTask)
+
+    cy.url().then((boardUrl) => {
+      cy.get("button[aria-label='Home']").click()
+
+      cy.get("a[href='/admin']").click()
+
+      cy.get("input[name='password']").type("admin")
+      cy.get("button").contains("Submit").click()
+
+      cy.get("button[aria-label='Create new template']").click()
+
+      const testTemplateName = Math.random().toString(36)
+
+      cy.get("input[name='boardUrl']").type(boardUrl)
+      cy.get("input[name='title']").type(testTemplateName)
+      cy.get("input[name='description']").type("This is a test template")
+      cy.get("button").contains("Create").click()
+
+      cy.get("button[aria-label='Home']").click()
+      cy.contains("Create board").click()
+
+      cy.contains(testTemplateName).click()
+      cy.contains("This is a test template")
+
+      cy.get("input[name='title']").type("Template Board")
+      cy.get("input[name='password']").type("password for template board")
+      cy.get("button").contains("Submit").click()
+
+      cy.loginToBoard("password for template board")
+
+      cy.contains("Template Board")
+      cy.contains(defaultColumn.title)
+      cy.contains(defaultTask.title)
+
+      cy.get("button[aria-label='Home']").click()
+      cy.get("a[href='/admin']").click()
+
+      cy.contains(testTemplateName)
+      cy.get(`button[aria-label="Delete template ${testTemplateName}"]`).click()
+
+      cy.contains(testTemplateName).should("not.exist")
+    })
+  })
+})
+
 describe("When working with multiple users", () => {
   it("can see changes made by other users and own updates are responsive", () => {
     // Import board with data, so responsivess is tested more realistically
@@ -169,7 +220,6 @@ describe("When working with multiple users", () => {
     const concurrentUsers = 5
 
     // Check that board doesn't contain data that it shouldn't contain yet
-
     for (let i = 0; i < concurrentUsers; i++) {
       cy.contains(`To Do (${i})`).should("not.exist")
       cy.contains(`Card (${i})`).should("not.exist")
