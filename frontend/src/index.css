@@ -53,7 +53,6 @@ button:focus-visible {
 }
 
 .description {
-  overflow-y: auto;
   border: none;
   border-radius: 3pt;
   outline-style: solid;
@@ -75,5 +74,6 @@ button:focus-visible {
 }
 
 .content {
+  overflow-y: auto;
   height: 330px;
 }

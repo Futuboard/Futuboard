@@ -29,38 +29,39 @@ const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description
   const ref = React.useRef<MDXEditorMethods>(null)
 
   return (
-    <MDXEditor
-      placeholder="Description"
-      className="description"
-      markdown={description}
-      plugins={[
-        toolbarPlugin({
-          toolbarContents: () => (
-            <>
-              <BoldItalicUnderlineToggles />
-              <Separator />
-              <ListsToggle />
-              <Separator />
-              <CreateLink />
-              <Separator />
-              <CodeToggle />
-              <InsertTable />
-            </>
-          )
-        }),
-        linkPlugin(),
-        linkDialogPlugin(),
-        tablePlugin(),
-        listsPlugin(),
-        quotePlugin(),
-        headingsPlugin(),
-        thematicBreakPlugin(),
-        markdownShortcutPlugin()
-      ]}
-      onChange={(markdown) => onChange(markdown)}
-      ref={ref}
-      contentEditableClassName="content"
-    />
+    <div className="description">
+      <MDXEditor
+        placeholder="Description"
+        markdown={description}
+        plugins={[
+          toolbarPlugin({
+            toolbarContents: () => (
+              <>
+                <BoldItalicUnderlineToggles />
+                <Separator />
+                <ListsToggle />
+                <Separator />
+                <CreateLink />
+                <Separator />
+                <CodeToggle />
+                <InsertTable />
+              </>
+            )
+          }),
+          linkPlugin(),
+          linkDialogPlugin(),
+          tablePlugin(),
+          listsPlugin(),
+          quotePlugin(),
+          headingsPlugin(),
+          thematicBreakPlugin(),
+          markdownShortcutPlugin()
+        ]}
+        onChange={(markdown) => onChange(markdown)}
+        ref={ref}
+        contentEditableClassName="content"
+      />
+    </div>
   )
 }
 
