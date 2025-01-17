@@ -75,7 +75,7 @@ def test_delete_board_template():
 
     response = api_client.delete(reverse("board_templates"), data=data)
     assert response.status_code == 200
-    assert response.json()["success"] == True
+    assert response.json()["success"] is True
 
     get_response = api_client.get(reverse("board_templates"))
     assert len(get_response.json()) == 0
