@@ -220,7 +220,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
                 aria-label="color"
                 value={selectedColor}
                 onChange={handleColorChange}
-                sx={{ bgcolor: "#eaeaea", borderRadius: 3, paddingLeft: 3 }}
+                sx={{ bgcolor: "#F0F0F3", borderRadius: 3, paddingLeft: 3 }}
               >
                 <FormControlLabel value="#ffffff" control={<Radio style={{ color: "#ffffff" }} />} label={null} />
                 <FormControlLabel value="#ffeb3b" control={<Radio style={{ color: "#ffeb3b" }} />} label={null} />
