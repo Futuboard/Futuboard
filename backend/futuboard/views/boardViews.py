@@ -86,7 +86,6 @@ def board_by_id(request, board_id):
             # TODO: ^ make this one function?
 
             board = Board.objects.get(pk=board_id)
-            board.description = request.data.get("description", board.description)
             board.background_color = request.data.get("background_color", board.background_color)
             board.save()
 

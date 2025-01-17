@@ -1,4 +1,4 @@
-import { Button, TextField, Grid, Typography } from "@mui/material"
+import { Button, TextField, Grid, Typography, Dialog, DialogContent } from "@mui/material"
 import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { useParams } from "react-router-dom"
@@ -8,9 +8,10 @@ import { PasswordChangeFormData } from "@/types"
 
 interface BoardPasswordChangeFormProps {
   onClose: () => void
+  open: boolean
 }
 
-const BoardPasswordChangeForm = ({ onClose }: BoardPasswordChangeFormProps) => {
+const BoardPasswordChangeForm = ({ onClose, open }: BoardPasswordChangeFormProps) => {
   const { id = "default-id" } = useParams()
   const [updateBoardPassword] = useUpdateBoardPasswordMutation()
 
@@ -61,47 +62,51 @@ const BoardPasswordChangeForm = ({ onClose }: BoardPasswordChangeFormProps) => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={2} height="400px" width="250px">
-        <Grid item>
-          <Typography variant="h6">Enter a New Password</Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            inputRef={inputRef}
-            label="Old Password"
-            type="password"
-            helperText={errors.old_password?.message}
-            error={Boolean(errors.old_password)}
-            {...register("old_password")}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="New Password"
-            type="password"
-            helperText={errors.new_password?.message}
-            error={Boolean(errors.new_password)}
-            {...register("new_password")}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="Confirm Password"
-            type="password"
-            helperText={errors.confirm_password?.message}
-            error={Boolean(errors.confirm_password)}
-            {...register("confirm_password")}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Button variant="contained" type="submit">
-            Submit
-          </Button>
-          <Button onClick={onClose}>Cancel</Button>
-        </Grid>
-      </Grid>
-    </form>
+    <Dialog open={open} onClose={onClose}>
+      <DialogContent>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container spacing={2} height="400px" width="250px">
+            <Grid item>
+              <Typography variant="h6">Enter a New Password</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                inputRef={inputRef}
+                label="Old Password"
+                type="password"
+                helperText={errors.old_password?.message}
+                error={Boolean(errors.old_password)}
+                {...register("old_password")}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="New Password"
+                type="password"
+                helperText={errors.new_password?.message}
+                error={Boolean(errors.new_password)}
+                {...register("new_password")}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Confirm Password"
+                type="password"
+                helperText={errors.confirm_password?.message}
+                error={Boolean(errors.confirm_password)}
+                {...register("confirm_password")}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button variant="contained" type="submit">
+                Submit
+              </Button>
+              <Button onClick={onClose}>Cancel</Button>
+            </Grid>
+          </Grid>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 

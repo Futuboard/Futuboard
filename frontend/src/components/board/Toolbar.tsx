@@ -1,9 +1,7 @@
-import { Download, MoreVert, EnhancedEncryption, Edit } from "@mui/icons-material"
+import { Download, MoreVert, EnhancedEncryption, Edit, Settings } from "@mui/icons-material"
 import {
   AppBar,
   Box,
-  Dialog,
-  DialogContent,
   Divider,
   IconButton,
   Menu,
@@ -21,6 +19,7 @@ import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation } from "@/state/a
 
 import BoardDeletionComponent from "./BoardDeletionComponent"
 import BoardPasswordChangeForm from "./BoardPasswordChangeForm"
+import BoardSettings from "./BoardSettings"
 import BoardTitleChangeForm from "./BoardTitleChangeForm"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
@@ -110,6 +109,7 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
 
   const [passwordFormOpen, setPasswordFormOpen] = useState(false)
   const [titleFormOpen, setTitleFormOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -122,22 +122,6 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
   const handleExportAndClose = () => {
     handleExport()
     handleClose()
-  }
-
-  const handleOpenTitleForm = () => {
-    setTitleFormOpen(true)
-  }
-
-  const handleCloseTitleForm = () => {
-    setTitleFormOpen(false)
-  }
-
-  const handleOpenPasswordForm = () => {
-    setPasswordFormOpen(true)
-  }
-
-  const handleClosePasswordForm = () => {
-    setPasswordFormOpen(false)
   }
 
   const handleExport = async () => {
@@ -212,11 +196,11 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
               "aria-labelledby": "basic-button"
             }}
           >
-            <MenuItem onClick={handleOpenTitleForm} sx={{ py: 1 }}>
+            <MenuItem onClick={() => setTitleFormOpen(true)} sx={{ py: 1 }}>
               <Edit sx={{ fontSize: "1rem", mr: 1 }} />
               <Typography variant="body2">Edit Board Name</Typography>
             </MenuItem>
-            <MenuItem onClick={handleOpenPasswordForm} sx={{ py: 1 }}>
+            <MenuItem onClick={() => setPasswordFormOpen(true)} sx={{ py: 1 }}>
               <EnhancedEncryption sx={{ fontSize: "1rem", mr: 1 }} />
               <Typography variant="body2">Change Board Password</Typography>
             </MenuItem>
@@ -224,20 +208,17 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
               <Download sx={{ fontSize: "1rem", mr: 1 }} />
               <Typography variant="body2">Download Board CSV</Typography>
             </MenuItem>
+            <MenuItem onClick={() => setSettingsOpen(true)} sx={{ py: 1 }}>
+              <Settings sx={{ fontSize: "1rem", mr: 1 }} />
+              <Typography variant="body2">Board Settings</Typography>
+            </MenuItem>
             <BoardDeletionComponent />
           </Menu>
         </Box>
         <Box>
-          <Dialog open={titleFormOpen} onClose={handleCloseTitleForm}>
-            <DialogContent>
-              <BoardTitleChangeForm title={title} onClose={handleCloseTitleForm} />
-            </DialogContent>
-          </Dialog>
-          <Dialog open={passwordFormOpen} onClose={handleClosePasswordForm}>
-            <DialogContent>
-              <BoardPasswordChangeForm onClose={handleClosePasswordForm} />
-            </DialogContent>
-          </Dialog>
+          <BoardTitleChangeForm title={title} onClose={() => setTitleFormOpen(false)} open={titleFormOpen} />
+          <BoardPasswordChangeForm onClose={() => setPasswordFormOpen(false)} open={passwordFormOpen} />
+          <BoardSettings onClose={() => setSettingsOpen(false)} open={settingsOpen} />
         </Box>
       </Toolbar>
     </AppBar>

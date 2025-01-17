@@ -1,4 +1,4 @@
-import { Button, Grid, TextField, Typography } from "@mui/material"
+import { Button, Grid, TextField, Typography, Dialog, DialogContent } from "@mui/material"
 import { useRef, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useParams } from "react-router-dom"
@@ -9,9 +9,10 @@ import { BoardTitleChangeFormData } from "@/types"
 interface BoardTitleChangeFormProps {
   title: string
   onClose: () => void
+  open: boolean
 }
 
-const BoardTitleChangeForm = ({ title, onClose }: BoardTitleChangeFormProps) => {
+const BoardTitleChangeForm = ({ title, onClose, open }: BoardTitleChangeFormProps) => {
   const { id = "default-id" } = useParams()
   const [updateBoardName] = useUpdateBoardTitleMutation()
 
@@ -43,41 +44,45 @@ const BoardTitleChangeForm = ({ title, onClose }: BoardTitleChangeFormProps) => 
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={1} height="200px" width="250px">
-        <Grid item>
-          <Typography variant="h6">Edit Board Name</Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            inputRef={inputRef}
-            spellCheck={false}
-            helperText={errors.title?.message}
-            error={Boolean(errors.title)}
-            {...register("title", {
-              minLength: {
-                value: 3,
-                message: "Board name must be at least 3 characters"
-              },
-              maxLength: {
-                value: 40,
-                message: "Board name can be up to 40 characters"
-              },
-              required: {
-                value: true,
-                message: "Board name is required"
-              }
-            })}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Button variant="contained" type="submit">
-            Submit
-          </Button>
-          <Button onClick={onClose}>Cancel</Button>
-        </Grid>
-      </Grid>
-    </form>
+    <Dialog open={open} onClose={onClose}>
+      <DialogContent>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container spacing={1} height="200px" width="250px">
+            <Grid item>
+              <Typography variant="h6">Edit Board Name</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                inputRef={inputRef}
+                spellCheck={false}
+                helperText={errors.title?.message}
+                error={Boolean(errors.title)}
+                {...register("title", {
+                  minLength: {
+                    value: 3,
+                    message: "Board name must be at least 3 characters"
+                  },
+                  maxLength: {
+                    value: 40,
+                    message: "Board name can be up to 40 characters"
+                  },
+                  required: {
+                    value: true,
+                    message: "Board name is required"
+                  }
+                })}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Button variant="contained" type="submit">
+                Submit
+              </Button>
+              <Button onClick={onClose}>Cancel</Button>
+            </Grid>
+          </Grid>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 
