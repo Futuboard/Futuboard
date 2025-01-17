@@ -62,7 +62,7 @@ def create_board_from_template(request: rest_framework.request.Request, board_te
         if not verify_csv_header(csv_reader):
             return JsonResponse({"success": False})
 
-        new_board = read_board_data(csv_reader, board.title, hash_password(password))
+        new_board = read_board_data(csv_reader, request.data["title"], hash_password(password))
 
         serializer = BoardSerializer(new_board)
         return JsonResponse(serializer.data, safe=False)
