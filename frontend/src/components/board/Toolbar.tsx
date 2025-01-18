@@ -1,4 +1,4 @@
-import { Download, MoreVert, EnhancedEncryption, Edit, Settings } from "@mui/icons-material"
+import { Download, MoreVert, EnhancedEncryption, Edit, ColorLens } from "@mui/icons-material"
 import {
   AppBar,
   Box,
@@ -17,9 +17,9 @@ import { useParams } from "react-router-dom"
 
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation } from "@/state/apiSlice"
 
+import BoardBackgroundColorForm from "./BoardBackgroundColorForm"
 import BoardDeletionComponent from "./BoardDeletionComponent"
 import BoardPasswordChangeForm from "./BoardPasswordChangeForm"
-import BoardSettings from "./BoardSettings"
 import BoardTitleChangeForm from "./BoardTitleChangeForm"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
@@ -98,10 +98,11 @@ export const AddUserButton: React.FC = () => {
 interface ToolBarProps {
   title: string
   boardId: string // Assuming boardId is also a string
+  boardBackgroundColor: string
 }
 
 //refactor later
-const ToolBar = ({ title, boardId }: ToolBarProps) => {
+const ToolBar = ({ title, boardId, boardBackgroundColor }: ToolBarProps) => {
   const { data: users, isSuccess } = useGetUsersByBoardIdQuery(boardId)
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
@@ -204,13 +205,13 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
               <EnhancedEncryption sx={{ fontSize: "1rem", mr: 1 }} />
               <Typography variant="body2">Change Board Password</Typography>
             </MenuItem>
+            <MenuItem onClick={() => setSettingsOpen(true)} sx={{ py: 1 }}>
+              <ColorLens sx={{ fontSize: "1rem", mr: 1 }} />
+              <Typography variant="body2">Board Background Color</Typography>
+            </MenuItem>
             <MenuItem onClick={handleExportAndClose} sx={{ py: 1 }}>
               <Download sx={{ fontSize: "1rem", mr: 1 }} />
               <Typography variant="body2">Download Board CSV</Typography>
-            </MenuItem>
-            <MenuItem onClick={() => setSettingsOpen(true)} sx={{ py: 1 }}>
-              <Settings sx={{ fontSize: "1rem", mr: 1 }} />
-              <Typography variant="body2">Board Settings</Typography>
             </MenuItem>
             <BoardDeletionComponent />
           </Menu>
@@ -218,7 +219,11 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
         <Box>
           <BoardTitleChangeForm title={title} onClose={() => setTitleFormOpen(false)} open={titleFormOpen} />
           <BoardPasswordChangeForm onClose={() => setPasswordFormOpen(false)} open={passwordFormOpen} />
-          <BoardSettings onClose={() => setSettingsOpen(false)} open={settingsOpen} />
+          <BoardBackgroundColorForm
+            onClose={() => setSettingsOpen(false)}
+            open={settingsOpen}
+            boardColor={boardBackgroundColor}
+          />
         </Box>
       </Toolbar>
     </AppBar>

@@ -65,11 +65,13 @@ const BoardPasswordChangeForm = ({ onClose, open }: BoardPasswordChangeFormProps
     <Dialog open={open} onClose={onClose}>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={2} height="400px" width="250px">
+          <Grid container spacing={1} flexDirection="column">
             <Grid item>
-              <Typography variant="h6">Enter a New Password</Typography>
+              <Typography gutterBottom variant="h6">
+                Enter a New Password
+              </Typography>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item marginBottom={1}>
               <TextField
                 inputRef={inputRef}
                 label="Old Password"
@@ -79,7 +81,7 @@ const BoardPasswordChangeForm = ({ onClose, open }: BoardPasswordChangeFormProps
                 {...register("old_password")}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item marginBottom={1}>
               <TextField
                 label="New Password"
                 type="password"
@@ -88,7 +90,7 @@ const BoardPasswordChangeForm = ({ onClose, open }: BoardPasswordChangeFormProps
                 {...register("new_password")}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item marginBottom={2}>
               <TextField
                 label="Confirm Password"
                 type="password"
@@ -97,11 +99,13 @@ const BoardPasswordChangeForm = ({ onClose, open }: BoardPasswordChangeFormProps
                 {...register("confirm_password")}
               />
             </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" type="submit">
+            <Grid item>
+              <Button variant="contained" color="primary" type="submit">
                 Submit
               </Button>
-              <Button onClick={onClose}>Cancel</Button>
+              <Button sx={{ marginLeft: 2 }} onClick={onClose}>
+                Cancel
+              </Button>
             </Grid>
           </Grid>
         </form>

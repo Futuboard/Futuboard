@@ -47,11 +47,11 @@ const BoardTitleChangeForm = ({ title, onClose, open }: BoardTitleChangeFormProp
     <Dialog open={open} onClose={onClose}>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={1} height="200px" width="250px">
+          <Grid container spacing={1} flexDirection="column">
             <Grid item>
               <Typography variant="h6">Edit Board Name</Typography>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item>
               <TextField
                 inputRef={inputRef}
                 spellCheck={false}
@@ -73,11 +73,13 @@ const BoardTitleChangeForm = ({ title, onClose, open }: BoardTitleChangeFormProp
                 })}
               />
             </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" type="submit">
+            <Grid item sx={{ marginTop: 1 }}>
+              <Button variant="contained" color="primary" type="submit">
                 Submit
               </Button>
-              <Button onClick={onClose}>Cancel</Button>
+              <Button sx={{ marginLeft: 2 }} onClick={onClose}>
+                Cancel
+              </Button>
             </Grid>
           </Grid>
         </form>
