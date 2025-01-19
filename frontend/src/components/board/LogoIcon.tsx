@@ -11,7 +11,7 @@ const LogoIcon = () => {
         y="0px"
         width="100%"
         viewBox="0 0 1636 2050"
-        enable-background="new 0 0 1636 2050"
+        enableBackground="new 0 0 1636 2050"
       >
         <path
           fill="#89C344"

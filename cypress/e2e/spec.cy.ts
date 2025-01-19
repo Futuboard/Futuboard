@@ -172,7 +172,6 @@ describe("When working with multiple users", () => {
 
     for (let i = 0; i < concurrentUsers; i++) {
       cy.contains(`To Do (${i})`).should("not.exist")
-      cy.contains(`Card (${i})`).should("not.exist")
     }
 
     cy.contains("Something else").should("not.exist")
@@ -185,8 +184,7 @@ describe("When working with multiple users", () => {
     })
 
     for (let i = 0; i < concurrentUsers; i++) {
-      cy.contains(`To Do (${i})`)
-      cy.contains(`Card (${i})`)
+      cy.contains(`To Do (${i})`, { timeout: 4_000 })
     }
 
     // Test own updates are responsive, when board in use

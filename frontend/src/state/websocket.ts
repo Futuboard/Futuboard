@@ -8,24 +8,47 @@ type CacheInvalidationMessage = {
 class WebSocketContainer {
   private socket: WebSocket | null
   private clientId: string
-  private lastBoardId: string
+  private boardId: string
+  private onMessageHandler: (event: MessageEvent) => void
+  private onResetHandler: () => void
 
   constructor() {
     this.clientId = getId()
     this.socket = null
-    this.lastBoardId = ""
+    this.boardId = ""
+    this.onMessageHandler = () => null
+    this.onResetHandler = () => null
+
+    // Automatically reconnect to the websocket if the connection is lost. Check every 10 seconds.
+    setInterval(async () => {
+      if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+        this.onResetHandler()
+        const newSocket = await this.getNewWebSocket()
+        newSocket.onmessage = this.onMessageHandler
+        return newSocket
+      }
+    }, 10_000)
   }
 
-  public connectToBoard(boardId: string) {
-    const isDifferentBoard = this.lastBoardId !== boardId
+  public async connectToBoard(newBoardId: string) {
+    const isDifferentBoard = this.boardId !== newBoardId
 
     if (isDifferentBoard) {
-      if (this.socket) {
-        this.socket.close()
-      }
-      this.socket = new WebSocket(import.meta.env.VITE_WEBSOCKET_ADDRESS + boardId)
-      this.lastBoardId = boardId
+      this.boardId = newBoardId
+      this.socket = await this.getNewWebSocket()
     }
+  }
+
+  private async getNewWebSocket() {
+    this.close()
+
+    return new Promise<WebSocket>((resolve) => {
+      const newSocket = new WebSocket(import.meta.env.VITE_WEBSOCKET_ADDRESS + this.boardId)
+
+      newSocket.onopen = () => {
+        resolve(newSocket)
+      }
+    })
   }
 
   public close() {
@@ -41,17 +64,23 @@ class WebSocketContainer {
     }
   }
 
-  public onMessage(invalidateLocalCache: (tags: CacheInvalidationTag[]) => void) {
-    if (this.socket) {
-      this.socket.onmessage = (event) => {
-        const data = JSON.parse(event.data)
-        const { tags, clientId: messageClientId } = JSON.parse(data) as CacheInvalidationMessage
+  public setOnMessageHandler(invalidateLocalCache: (tags: CacheInvalidationTag[]) => void) {
+    this.onMessageHandler = (event) => {
+      const data = JSON.parse(event.data)
+      const { tags, clientId: messageClientId } = JSON.parse(data) as CacheInvalidationMessage
 
-        if (messageClientId !== this.clientId) {
-          invalidateLocalCache(tags)
-        }
+      if (messageClientId !== this.clientId) {
+        invalidateLocalCache(tags)
       }
     }
+
+    if (this.socket) {
+      this.socket.onmessage = this.onMessageHandler
+    }
+  }
+
+  public setResetHandler(resetHandler: () => void) {
+    this.onResetHandler = resetHandler
   }
 }
 
