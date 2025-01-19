@@ -43,14 +43,19 @@ const BoardContainer: React.FC = () => {
   const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
 
   useEffect(() => {
-    if (!id) return
-    dispatch(setBoardId(id))
-    setIsBoardIdset(true)
-
-    webSocketContainer.connectToBoard(id)
-    webSocketContainer.onMessage((tags) => {
-      dispatch(boardsApi.util.invalidateTags(tags))
-    })
+    const inner = async () => {
+      if (!id) return
+      dispatch(setBoardId(id))
+      setIsBoardIdset(true)
+      await webSocketContainer.connectToBoard(id)
+      webSocketContainer.setOnMessageHandler((tags) => {
+        dispatch(boardsApi.util.invalidateTags(tags))
+      })
+      webSocketContainer.setResetHandler(() => {
+        dispatch(boardsApi.util.resetApiState())
+      })
+    }
+    inner()
   }, [id, dispatch])
 
   useEffect(() => {

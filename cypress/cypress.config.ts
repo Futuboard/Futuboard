@@ -15,9 +15,12 @@ export default defineConfig({
               maxConcurrency: concurrentUsers,
               puppeteerOptions: {
                 headless: HEADLESS,
-                args: ["--no-sandbox", "--disable-setuid-sandbox"]
+                args: ["--no-sandbox", "--disable-setuid-sandbox", "--window-size=1920,1080"],
+                defaultViewport: null
               }
             })
+
+            let doneCounter = 0
 
             await cluster.task(async ({ page, data }) => {
               try {
@@ -25,35 +28,21 @@ export default defineConfig({
 
                 await page.goto(url)
 
-                await page.waitForSelector('input[name="password"]')
-                await delay(500)
-                await page.type('input[name="password"]', "alpha123")
+                await page.locator('input[name="password"]').fill("alpha123")
+                await page.locator('button[type="submit"]').click()
 
-                await page.waitForSelector('button[type="submit"]')
-                await page.click('button[type="submit"]')
-
-                await page.waitForSelector('button[aria-label="add column"]')
-                await page.click('button[aria-label="add column"]')
-                await delay(500)
+                await page.locator('button[aria-label="add column"]').click()
 
                 const columnTitle = `To Do (${index})`
-                await page.type('input[name="columnTitle"]', columnTitle)
-                await page.click('button[type="submit"]')
+                await page.locator('input[name="columnTitle"]').fill(columnTitle)
 
-                await page.waitForSelector('button[aria-label="add task"]')
+                await page.locator('button[type="submit"]').click()
 
-                // Puppeteer fails in clicking the button if something is loading, so we wait for that
-                await delay(5_000)
-                await page.click('button[aria-label="add task"]')
-
-                await page.waitForSelector('textarea[name="taskTitle"]')
-                await delay(500)
-                await page.type('textarea[name="taskTitle"]', `Card (${index})`)
-                await delay(500)
-                await page.click('button[type="submit"]')
-
-                // Calling resolve() causes the Cypress test to continue.
-                resolve(null)
+                // Calling resolve() causes the Cypress test to continue. This is done when all dummy users have completed their tasks.
+                doneCounter++
+                if (doneCounter === concurrentUsers) {
+                  resolve(null)
+                }
 
                 // Add delay, so browser keeps loading updates to board
                 await delay(10_000)
