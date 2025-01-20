@@ -49,3 +49,9 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+@media only screen and (min-width: 1300px) {
+  .user-list {
+    min-width: 500px;
+  }
+}

@@ -166,13 +166,9 @@ const BoardToolBar = ({ title, boardId }: BoardToolBarProps) => {
   }
 
   return (
-    <Box display="flex" alignItems="center" justifyContent="flex-end" width="100%">
-      <Box sx={{ marginX: 10, width: "fit-content", "@media (min-width: 1050px)": { minWidth: "500px" } }}>
-        {isSuccess && users.length > 0 && <UserList users={users} />}
-      </Box>
-      <div style={{ marginLeft: "10px" }}>
-        <AddUserButton />
-      </div>
+    <Box display="flex" alignItems="center" justifyContent="flex-end" sx={{ minWidth: 0, flexGrow: 1 }}>
+      {isSuccess && users.length > 0 && <UserList users={users} />}
+      <AddUserButton />
       <CopyToClipboardButton />
       <CreateColumnButton boardId={boardId} />
       <IconButton
@@ -234,18 +230,19 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
       position="fixed"
       sx={{ background: "white", height: "65px", boxShadow: "none", borderBottom: "2px solid #D1D5DB" }}
     >
-      <Toolbar disableGutters sx={{ justifyContent: "center", marginLeft: "10px", marginRight: "10px" }}>
-        <Box display="flex" alignItems="center" sx={{ width: "100%", height: "100%" }}>
-          <HomeButton />
-          <Divider
-            orientation="vertical"
-            sx={{ marginX: 2, borderRightWidth: "2px", height: "35px", borderColor: "#D1D5DB" }}
-          />
-          <Typography variant="h6" sx={{ color: "#213547", display: "flex", alignItems: "center", marginLeft: 1 }}>
-            {title}
-          </Typography>
-          {boardId && <BoardToolBar title={title} boardId={boardId} />}
-        </Box>
+      <Toolbar disableGutters sx={{ paddingX: 2 }}>
+        <HomeButton />
+        <Divider
+          orientation="vertical"
+          sx={{ marginX: 2, borderRightWidth: "2px", height: "35px", borderColor: "#D1D5DB" }}
+        />
+        <Typography
+          variant="h6"
+          sx={{ color: "#213547", marginLeft: 1, height: "100%", display: "flex", alignItems: "center", flexGrow: 1 }}
+        >
+          {title}
+        </Typography>
+        {boardId && <BoardToolBar title={title} boardId={boardId} />}
       </Toolbar>
     </AppBar>
   )
