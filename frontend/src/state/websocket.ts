@@ -11,6 +11,7 @@ class WebSocketContainer {
   private boardId: string
   private onMessageHandler: (event: MessageEvent) => void
   private onResetHandler: () => void
+  private sendNotification: (message: string) => void
 
   constructor() {
     this.clientId = getId()
@@ -18,13 +19,18 @@ class WebSocketContainer {
     this.boardId = ""
     this.onMessageHandler = () => null
     this.onResetHandler = () => null
+    this.sendNotification = () => null
 
     // Automatically reconnect to the websocket if the connection is lost. Check every 10 seconds.
     setInterval(async () => {
-      if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      if (
+        !this.socket ||
+        (this.socket.readyState !== WebSocket.OPEN && this.socket.readyState !== WebSocket.CONNECTING)
+      ) {
         this.onResetHandler()
         const newSocket = await this.getNewWebSocket()
         newSocket.onmessage = this.onMessageHandler
+        this.sendNotification("Board connection interrupted. Reconnecting...")
         return newSocket
       }
     }, 10_000)
@@ -81,6 +87,10 @@ class WebSocketContainer {
 
   public setResetHandler(resetHandler: () => void) {
     this.onResetHandler = resetHandler
+  }
+
+  public setSendNotificationHandler(sendNotification: (message: string) => void) {
+    this.sendNotification = sendNotification
   }
 }
 
