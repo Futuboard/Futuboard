@@ -1,13 +1,14 @@
 import Button from "@mui/material/Button"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
-import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import React from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
 import { useLoginMutation } from "@/state/apiSlice"
+
+import PasswordField from "./PasswordField"
 
 interface AccessBoardFormProps {
   id: string
@@ -18,11 +19,7 @@ interface FormData {
 }
 
 const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<FormData>({
+  const { register, handleSubmit } = useForm<FormData>({
     defaultValues: {
       password: ""
     }
@@ -62,13 +59,7 @@ const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id }) => {
           <Divider />
         </Grid>
         <Grid item xs={12}>
-          <TextField
-            label="Password"
-            type="password"
-            helperText={errors.password?.message}
-            error={Boolean(errors.password)}
-            {...register("password")}
-          />
+          <PasswordField register={register("password")} />
         </Grid>
         <Grid item xs={12}>
           <Button type="submit" color="primary" variant="contained">
