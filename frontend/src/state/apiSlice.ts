@@ -1,5 +1,6 @@
 import { TagDescription, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 
+import { cacheTagTypes } from "@/constants"
 import {
   Action,
   Board,
@@ -62,7 +63,7 @@ export const boardsApi = createApi({
     }
   }),
 
-  tagTypes: ["Boards", "Columns", "Ticket", "Users", "Action", "ActionList", "SwimlaneColumn", "BoardTemplate"],
+  tagTypes: cacheTagTypes,
 
   endpoints: (builder) => ({
     getBoard: builder.query<Board, string>({
