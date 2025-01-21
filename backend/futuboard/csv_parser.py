@@ -31,6 +31,7 @@ def write_board_data(writer, boardid):
     # Write board data to the csv file
     board = Board.objects.get(boardid=boardid)
     writer.writerow(["Board", board.description])
+    # writer.writerow(["Board", board.background_color])
     users = User.objects.filter(boardid=boardid)
     # Get userids
     for user in users:
