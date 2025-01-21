@@ -138,8 +138,11 @@ const Admin = () => {
                       />
                     </Grid>
                     <Grid item xs={12}>
-                      <Button type="submit" color="primary" variant="contained">
+                      <Button type="submit" color="primary" variant="contained" sx={{ marginRight: 2 }}>
                         Create
+                      </Button>
+                      <Button sx={{ border: "1px solid" }} onClick={() => setIsDialogOpen(false)}>
+                        Cancel
                       </Button>
                     </Grid>
                   </Grid>
@@ -169,8 +172,12 @@ const Admin = () => {
                     New template
                   </Typography>
                   <Grid container justifyContent="center">
-                    <IconButton onClick={() => setIsDialogOpen(true)} aria-label="Create new template">
-                      <AddIcon sx={{ fontSize: 50, mt: 1 }} color="primary" />
+                    <IconButton
+                      onClick={() => setIsDialogOpen(true)}
+                      aria-label="Create new template"
+                      sx={{ marginTop: 1 }}
+                    >
+                      <AddIcon sx={{ fontSize: 50 }} color="primary" />
                     </IconButton>
                   </Grid>
                 </CardContent>

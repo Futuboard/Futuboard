@@ -3,9 +3,8 @@ import io
 from rest_framework.decorators import api_view
 from django.http import HttpResponse, JsonResponse
 
-from ..verification import is_admin_password_correct
 from ..csv_parser import read_board_data, verify_csv_header, write_board_data, write_csv_header
-from ..verification import hash_password
+from ..verification import hash_password, is_admin_password_correct
 from ..models import Board, BoardTemplate
 from ..serializers import BoardSerializer, BoardTemplateSerializer
 import rest_framework.request

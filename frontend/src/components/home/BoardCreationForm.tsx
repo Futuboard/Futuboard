@@ -1,13 +1,14 @@
 import CloseIcon from "@mui/icons-material/Close"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
-import { IconButton } from "@mui/material"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardActionArea from "@mui/material/CardActionArea"
 import CardContent from "@mui/material/CardContent"
+import CircularProgress from "@mui/material/CircularProgress"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
+import IconButton from "@mui/material/IconButton"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { useState } from "react"
@@ -45,6 +46,7 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
 
   const { data: boardTemplates, isSuccess } = useGetBoardTemplatesQuery()
   const [selectedCard, setSelectedCard] = useState<number>(0)
+  const [isProcessingSubmit, setIsProcessingSubmit] = useState(false)
 
   const templates: Template[] = [
     {
@@ -77,10 +79,15 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
     setSelectedCard(-1)
   }
 
+  const handleFormSubmit = (data: NewBoardFormData) => {
+    setIsProcessingSubmit(true)
+    onSubmit(data)
+  }
+
   const uploadedFileName = watch("file")?.[0]?.name || ""
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(handleFormSubmit)}>
       <Grid container spacing={1} textAlign="center">
         <Grid item xs={12}>
           <Typography variant="h5">Create board</Typography>
@@ -193,7 +200,13 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
         </Grid>
 
         <Grid item xs={12} sx={{ marginTop: 2 }}>
-          <Button type="submit" color="primary" variant="contained">
+          <Button
+            type="submit"
+            color="primary"
+            variant="contained"
+            disabled={isProcessingSubmit}
+            startIcon={isProcessingSubmit && <CircularProgress sx={{ color: "white" }} size={16} />}
+          >
             Submit
           </Button>
           <Button onClick={onCancel} sx={{ marginLeft: 2, border: 1 }}>
