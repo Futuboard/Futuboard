@@ -52,28 +52,11 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.description {
-  border: none;
-  border-radius: 3pt;
-  outline-style: solid;
-  outline-color: #c4c4c4;
-  outline-width: 1px;
-}
-
-.description:hover {
-  outline-color: #1a1a1a;
-}
-
-.description:focus-within {
-  outline-color: #1976d2;
-  outline-width: 2px;
-}
-
 .mdxeditor-popup-container {
   z-index: 9999;
 }
 
-.content {
+.md-editor-contenteditable {
   overflow-y: auto;
   height: 330px;
 }

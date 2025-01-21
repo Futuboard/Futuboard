@@ -19,6 +19,7 @@ import {
   Separator
 } from "@mdxeditor/editor"
 import React from "react"
+import { Box } from "@mui/material"
 
 interface DescriptionEditFieldProps {
   description: string
@@ -29,7 +30,23 @@ const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description
   const ref = React.useRef<MDXEditorMethods>(null)
 
   return (
-    <div className="description">
+    <Box
+      className="description"
+      sx={{
+        border: "none",
+        borderRadius: "3pt",
+        outlineStyle: "solid",
+        outlineColor: "#c4c4c4",
+        outlineWidth: "1px",
+        "&:hover": {
+          outlineColor: "#1a1a1a"
+        },
+        "&:focus-within": {
+          outlineColor: "#1976d2",
+          outlineWidth: "2px"
+        }
+      }}
+    >
       <MDXEditor
         placeholder="Description"
         markdown={description}
@@ -59,9 +76,9 @@ const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description
         ]}
         onChange={(markdown) => onChange(markdown)}
         ref={ref}
-        contentEditableClassName="content"
+        contentEditableClassName="md-editor-contenteditable"
       />
-    </div>
+    </Box>
   )
 }
 
