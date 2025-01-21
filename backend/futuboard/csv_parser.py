@@ -30,8 +30,7 @@ def verify_csv_header(reader):
 def write_board_data(writer, boardid):
     # Write board data to the csv file
     board = Board.objects.get(boardid=boardid)
-    writer.writerow(["Board", board.description])
-    # writer.writerow(["Board", board.background_color])
+    writer.writerow(["Board", board.description, board.background_color])
     users = User.objects.filter(boardid=boardid)
     # Get userids
     for user in users:
@@ -108,6 +107,7 @@ def read_board_data(reader, boardid, board_title, password_hash):
         boardid=boardid,
         title=board_title,
         description=board_data[1],
+        background_color=board_data[2],
         passwordhash=password_hash,
         salt="",
         creation_date=timezone.now(),
