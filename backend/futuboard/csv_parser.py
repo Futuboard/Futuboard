@@ -205,6 +205,7 @@ def read_board_data(reader, boardid, board_title, password_hash):
                         user = User.objects.get(name=row[1], boardid=board)
                         user.actions.add(action)
                         row = next(reader, None)
+            swimlanecolumns = []
         else:
             row = next(reader, None)
     return True
