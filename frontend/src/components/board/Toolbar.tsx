@@ -96,13 +96,12 @@ export const AddUserButton: React.FC = () => {
   )
 }
 
-interface ToolBarProps {
+type BoardToolBarProps = {
   title: string
-  boardId: string // Assuming boardId is also a string
+  boardId: string
 }
 
-//refactor later
-const ToolBar = ({ title, boardId }: ToolBarProps) => {
+const BoardToolBar = ({ title, boardId }: BoardToolBarProps) => {
   const { data: users, isSuccess } = useGetUsersByBoardIdQuery(boardId)
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
@@ -167,78 +166,83 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
   }
 
   return (
+    <Box display="flex" alignItems="center" justifyContent="flex-end" sx={{ minWidth: 0, flexGrow: 1 }}>
+      {isSuccess && users.length > 0 && <UserList users={users} />}
+      <AddUserButton />
+      <CopyToClipboardButton />
+      <CreateColumnButton boardId={boardId} />
+      <IconButton
+        aria-label="more"
+        aria-controls="long-menu"
+        aria-haspopup="true"
+        onClick={handleMenu}
+        sx={{ padding: "5px", color: "#2D3748" }}
+      >
+        <MoreVert />
+      </IconButton>
+      <Menu
+        id="long-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          "aria-labelledby": "basic-button"
+        }}
+      >
+        <MenuItem onClick={handleOpenTitleForm} sx={{ py: 1 }}>
+          <Edit sx={{ fontSize: "1rem", mr: 1 }} />
+          <Typography variant="body2">Edit Board Name</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleOpenPasswordForm} sx={{ py: 1 }}>
+          <EnhancedEncryption sx={{ fontSize: "1rem", mr: 1 }} />
+          <Typography variant="body2">Change Board Password</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleExportAndClose} sx={{ py: 1 }}>
+          <Download sx={{ fontSize: "1rem", mr: 1 }} />
+          <Typography variant="body2">Download Board CSV</Typography>
+        </MenuItem>
+        <BoardDeletionComponent />
+      </Menu>
+      <Box>
+        <Dialog open={titleFormOpen} onClose={handleCloseTitleForm}>
+          <DialogContent>
+            <BoardTitleChangeForm title={title} onClose={handleCloseTitleForm} />
+          </DialogContent>
+        </Dialog>
+        <Dialog open={passwordFormOpen} onClose={handleClosePasswordForm}>
+          <DialogContent>
+            <BoardPasswordChangeForm onClose={handleClosePasswordForm} />
+          </DialogContent>
+        </Dialog>
+      </Box>
+    </Box>
+  )
+}
+
+interface ToolBarProps {
+  title: string
+  boardId?: string
+}
+
+const ToolBar = ({ title, boardId }: ToolBarProps) => {
+  return (
     <AppBar
       position="fixed"
       sx={{ background: "white", height: "65px", boxShadow: "none", borderBottom: "2px solid #D1D5DB" }}
     >
-      <Toolbar disableGutters sx={{ justifyContent: "center", marginLeft: "10px", marginRight: "10px" }}>
-        <Box display="flex" alignContent="center" sx={{ flexGrow: 1 }}>
-          <HomeButton />
-          <Divider
-            orientation="vertical"
-            flexItem
-            sx={{ margin: "0 10px", marginTop: "5px", borderRightWidth: "2px", height: "35px", borderColor: "#D1D5DB" }}
-          />
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, color: "#2D3748", marginLeft: "10px", marginTop: "7px" }}
-          >
-            {title}
-          </Typography>
-          <Box sx={{ flexGrow: 1 }} style={{ marginTop: "0px" }}>
-            {isSuccess && users.length > 0 && <UserList users={users} />}
-          </Box>
-          <div style={{ marginLeft: "10px" }}>
-            <AddUserButton />
-          </div>
-          <CopyToClipboardButton />
-          <CreateColumnButton boardId={boardId} />
-          <IconButton
-            aria-label="more"
-            aria-controls="long-menu"
-            aria-haspopup="true"
-            onClick={handleMenu}
-            sx={{ padding: "5px", color: "#2D3748" }}
-          >
-            <MoreVert />
-          </IconButton>
-          <Menu
-            id="long-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-              "aria-labelledby": "basic-button"
-            }}
-          >
-            <MenuItem onClick={handleOpenTitleForm} sx={{ py: 1 }}>
-              <Edit sx={{ fontSize: "1rem", mr: 1 }} />
-              <Typography variant="body2">Edit Board Name</Typography>
-            </MenuItem>
-            <MenuItem onClick={handleOpenPasswordForm} sx={{ py: 1 }}>
-              <EnhancedEncryption sx={{ fontSize: "1rem", mr: 1 }} />
-              <Typography variant="body2">Change Board Password</Typography>
-            </MenuItem>
-            <MenuItem onClick={handleExportAndClose} sx={{ py: 1 }}>
-              <Download sx={{ fontSize: "1rem", mr: 1 }} />
-              <Typography variant="body2">Download Board CSV</Typography>
-            </MenuItem>
-            <BoardDeletionComponent />
-          </Menu>
-        </Box>
-        <Box>
-          <Dialog open={titleFormOpen} onClose={handleCloseTitleForm}>
-            <DialogContent>
-              <BoardTitleChangeForm title={title} onClose={handleCloseTitleForm} />
-            </DialogContent>
-          </Dialog>
-          <Dialog open={passwordFormOpen} onClose={handleClosePasswordForm}>
-            <DialogContent>
-              <BoardPasswordChangeForm onClose={handleClosePasswordForm} />
-            </DialogContent>
-          </Dialog>
-        </Box>
+      <Toolbar disableGutters sx={{ paddingX: 2 }}>
+        <HomeButton />
+        <Divider
+          orientation="vertical"
+          sx={{ marginX: 2, borderRightWidth: "2px", height: "35px", borderColor: "#D1D5DB" }}
+        />
+        <Typography
+          variant="h6"
+          sx={{ color: "#213547", marginLeft: 1, height: "100%", display: "flex", alignItems: "center", flexGrow: 1 }}
+        >
+          {title}
+        </Typography>
+        {boardId && <BoardToolBar title={title} boardId={boardId} />}
       </Toolbar>
     </AppBar>
   )

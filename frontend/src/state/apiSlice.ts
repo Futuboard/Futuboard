@@ -11,10 +11,13 @@ import {
   Task,
   User,
   UserWithoutTicketsOrActions,
-  PasswordChangeFormData
+  PasswordChangeFormData,
+  NewBoardFormData,
+  BoardTemplate,
+  NewBoardTemplate
 } from "@/types"
 
-import { getAuth, setToken } from "./auth"
+import { getAdminPassword, getAuth, setToken } from "./auth"
 import { RootState } from "./store"
 import { webSocketContainer } from "./websocket"
 
@@ -59,7 +62,7 @@ export const boardsApi = createApi({
     }
   }),
 
-  tagTypes: ["Boards", "Columns", "Ticket", "Users", "Action", "ActionList", "SwimlaneColumn"],
+  tagTypes: ["Boards", "Columns", "Ticket", "Users", "Action", "ActionList", "SwimlaneColumn", "BoardTemplate"],
 
   endpoints: (builder) => ({
     getBoard: builder.query<Board, string>({
@@ -67,12 +70,63 @@ export const boardsApi = createApi({
       providesTags: ["Boards"]
     }),
 
-    addBoard: builder.mutation<Board, Board>({
-      query: (board) => {
+    addBoard: builder.mutation<Board, { title: string; password: string }>({
+      query: (boardData) => {
         return {
           url: "boards/",
           method: "POST",
-          body: board
+          body: boardData
+        }
+      },
+      invalidatesTags: () => invalidateRemoteCache(["Boards"])
+    }),
+
+    importBoard: builder.mutation<Board, FormData>({
+      query: (formData) => {
+        return {
+          url: "import/",
+          method: "POST",
+          body: formData
+        }
+      },
+      invalidatesTags: () => invalidateRemoteCache(["Boards"])
+    }),
+
+    getBoardTemplates: builder.query<BoardTemplate[], void>({
+      query: () => "boardtemplates/",
+      providesTags: ["BoardTemplate"]
+    }),
+
+    addBoardTemplate: builder.mutation<BoardTemplate, NewBoardTemplate>({
+      query: (newBoardTemplate) => {
+        const password = getAdminPassword()
+        return {
+          url: "boardtemplates/",
+          method: "POST",
+          body: { ...newBoardTemplate, password }
+        }
+      },
+      invalidatesTags: ["BoardTemplate"]
+    }),
+
+    deleteBoardTemplate: builder.mutation<BoardTemplate, string>({
+      query: (boardtemplateid) => {
+        const password = getAdminPassword()
+        return {
+          url: `boardtemplates/`,
+          method: "DELETE",
+          body: { boardtemplateid, password }
+        }
+      },
+      invalidatesTags: ["BoardTemplate"]
+    }),
+
+    createBoardFromTemplate: builder.mutation<Board, NewBoardFormData>({
+      query: ({ title, password, boardTemplateId }) => {
+        return {
+          url: `boardtemplates/${boardTemplateId}/`,
+          method: "POST",
+          body: { title, password }
         }
       },
       invalidatesTags: () => invalidateRemoteCache(["Boards"])
@@ -269,7 +323,12 @@ export const boardsApi = createApi({
           return data
         }
       }),
-      invalidatesTags: ["Boards"]
+      invalidatesTags: (result) => {
+        if (result?.success) {
+          return ["Boards"]
+        }
+        return []
+      }
     }),
 
     postUserToTicket: builder.mutation<User, { ticketId: string; userid: string }>({
@@ -585,6 +644,15 @@ export const boardsApi = createApi({
           boardsApi.util.invalidateTags(invalidationTags)
         })
       }
+    }),
+
+    // Not really a mutation, but mutation API better fits the use case
+    checkAdminPassword: builder.mutation<{ success: boolean }, string>({
+      query: (password) => ({
+        url: "checkadminpassword/",
+        method: "POST",
+        body: { password }
+      })
     })
   })
 })
@@ -593,6 +661,11 @@ export const {
   useGetUsersByBoardIdQuery,
   useGetBoardQuery,
   useAddBoardMutation,
+  useAddBoardTemplateMutation,
+  useDeleteBoardTemplateMutation,
+  useCreateBoardFromTemplateMutation,
+  useGetBoardTemplatesQuery,
+  useImportBoardMutation,
   useDeleteBoardMutation,
   useUpdateBoardTitleMutation,
   useUpdateBoardPasswordMutation,
@@ -618,5 +691,6 @@ export const {
   useUpdateActionListMutation,
   usePostUserToActionMutation,
   useDeleteUserFromActionMutation,
-  useDeleteUserFromTicketMutation
+  useDeleteUserFromTicketMutation,
+  useCheckAdminPasswordMutation
 } = boardsApi

@@ -26,48 +26,48 @@ const UserList: React.FC<UserListProps> = ({ users }) => {
   const [showEditable, setShowEditable] = useState(false)
 
   return (
-    <div>
-      <Droppable droppableId="user-list" type="user" direction="horizontal">
-        {(provided: DroppableProvided) => {
-          return (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                overflowX: "auto",
-                maxWidth: "750px", //change to something else
-                border: "solid 2px #D1D5DB",
-                borderRadius: "10px"
-              }}
-            >
-              {users &&
-                users.map((user, index) => (
-                  <Draggable key={user.userid} draggableId={user.userid} index={index}>
-                    {(provided, snapshot) => {
-                      return (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={dropStyle(provided.draggableProps.style, snapshot)}
-                        >
-                          <UserMagnet user={user} editable={showEditable} />
-                        </div>
-                      )
-                    }}
-                  </Draggable>
-                ))}
-              {provided.placeholder}
-              <div title="Toggle Delete" style={{ marginLeft: "auto" }}>
-                <Switch onClick={() => setShowEditable(!showEditable)} />
-              </div>
+    <Droppable droppableId="user-list" type="user" direction="horizontal">
+      {(provided: DroppableProvided) => {
+        return (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className="user-list"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              overflowX: "auto",
+              border: "solid 2px #D1D5DB",
+              borderRadius: "10px",
+              marginRight: "3rem",
+              marginLeft: "3rem"
+            }}
+          >
+            {users &&
+              users.map((user, index) => (
+                <Draggable key={user.userid} draggableId={user.userid} index={index}>
+                  {(provided, snapshot) => {
+                    return (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        style={dropStyle(provided.draggableProps.style, snapshot)}
+                      >
+                        <UserMagnet user={user} editable={showEditable} />
+                      </div>
+                    )
+                  }}
+                </Draggable>
+              ))}
+            {provided.placeholder}
+            <div title="Toggle Delete" style={{ marginLeft: "auto" }}>
+              <Switch onClick={() => setShowEditable(!showEditable)} />
             </div>
-          )
-        }}
-      </Droppable>
-    </div>
+          </div>
+        )
+      }}
+    </Droppable>
   )
 }
 

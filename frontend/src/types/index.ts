@@ -1,5 +1,5 @@
 export type Board = {
-  id: string
+  boardid: string
   title: string
   password: string
   columns: Column[]
@@ -43,9 +43,14 @@ export type User = {
 
 export type UserWithoutTicketsOrActions = Omit<User, "tickets" | "actions">
 
+export type NewBoardType = "empty" | "import" | "template"
+
 export type NewBoardFormData = {
   title: string
   password: string
+  boardType: NewBoardType
+  boardTemplateId?: string
+  file?: FileList
 }
 
 export type NewBoardFormImport = {
@@ -84,7 +89,7 @@ export type SwimlaneColumn = {
   order: number
 }
 
-type Tag = "Boards" | "Columns" | "Ticket" | "Users" | "Action" | "ActionList" | "SwimlaneColumn"
+type Tag = "Boards" | "Columns" | "Ticket" | "Users" | "Action" | "ActionList" | "SwimlaneColumn" | "BoardTemplate"
 
 export type CacheInvalidationTag =
   | {
@@ -92,3 +97,12 @@ export type CacheInvalidationTag =
       id?: string
     }
   | Tag
+
+export type BoardTemplate = {
+  boardtemplateid: string
+  boardid: string
+  title: string
+  description: string
+}
+
+export type NewBoardTemplate = Omit<BoardTemplate, "boardtemplateid">
