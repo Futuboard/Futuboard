@@ -1,18 +1,17 @@
 import futuboard.models as md
 from django.utils import timezone
 import django.apps
-from ..futuboard.verification import new_password
+from ..futuboard.verification import hash_password
 
 # Utility functions
 
 
-def addBoard(boardId, title="title", password="", description=""):
+def addBoard(title="title", password="", description=""):
     new_board = md.Board(
-        boardid=boardId,
         description=description,
         title=title,
         creation_date=timezone.now(),
-        passwordhash="" if password == "" else new_password(password),
+        passwordhash="" if password == "" else hash_password(password),
         salt="",
     )
     new_board.save()
@@ -90,6 +89,16 @@ def addAction(ticketId, swimlanecolumnId, actionId, title=""):
         action.save()
 
     return new_action
+
+
+def addBoardTemplate(boardId, title="Template title", description="Template description"):
+    new_board_template = md.BoardTemplate(
+        boardid=md.Board.objects.get(pk=boardId),
+        title=title,
+        description=description,
+    )
+    new_board_template.save()
+    return new_board_template
 
 
 def resetDB():
