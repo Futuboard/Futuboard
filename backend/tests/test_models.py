@@ -27,7 +27,7 @@ def test_user():
         description="Test board",
         title="Board",
         creation_date=timezone.now(),
-        passwordhash=ver.new_password("password"),
+        passwordhash=ver.hash_password("password"),
         salt="",
     )
     for i in range(n):
@@ -59,7 +59,7 @@ def test_board():
             description=f"Test board{i}",
             title=f"Board{i}",
             creation_date=timezone.now(),
-            passwordhash=ver.new_password(f"password{i}"),
+            passwordhash=ver.hash_password(f"password{i}"),
             salt="",
         )
     assert md.Board.objects.count() == n
@@ -93,7 +93,7 @@ def test_column():
             description=f"Test board{i}",
             title=f"Board{i}",
             creation_date=timezone.now(),
-            passwordhash=ver.new_password(f"password{i}"),
+            passwordhash=ver.hash_password(f"password{i}"),
             salt="",
         )
         md.Column.objects.create(
@@ -142,7 +142,7 @@ def test_swimlanecolumn():
                 description=f"Test board{i}",
                 title=f"Board{i}",
                 creation_date=timezone.now(),
-                passwordhash=ver.new_password(f"password{i}"),
+                passwordhash=ver.hash_password(f"password{i}"),
                 salt="",
             ),
             wip_limit=5,
@@ -190,7 +190,7 @@ def test_action():
                     description=f"Test board{i}",
                     title=f"Board{i}",
                     creation_date=timezone.now(),
-                    passwordhash=ver.new_password(f"password{i}"),
+                    passwordhash=ver.hash_password(f"password{i}"),
                     salt="",
                 ),
                 wip_limit=5,
@@ -244,7 +244,7 @@ def test_ticket():
                 description=f"Test board{i}",
                 title=f"Board{i}",
                 creation_date=timezone.now(),
-                passwordhash=ver.new_password(f"password{i}"),
+                passwordhash=ver.hash_password(f"password{i}"),
                 salt="",
             ),
             wip_limit=5,

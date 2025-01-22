@@ -8,6 +8,7 @@ on:
 
 env:
   JWT_SECRET: secret
+  ADMIN_PASSWORD: admin
 
 jobs:
   pytest-unit-tests:

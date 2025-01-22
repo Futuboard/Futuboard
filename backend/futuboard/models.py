@@ -24,7 +24,7 @@ class Action(models.Model):
 
 
 class Board(models.Model):
-    boardid = models.UUIDField(db_column="boardID", primary_key=True)
+    boardid = models.UUIDField(db_column="boardID", primary_key=True, default=uuid.uuid4)
     description = models.TextField(blank=True, null=True)
     title = models.TextField()
     creation_date = models.DateTimeField()
@@ -85,3 +85,13 @@ class User(models.Model):
 
     class Meta:
         db_table = "User"
+
+
+class BoardTemplate(models.Model):
+    boardtemplateid = models.UUIDField(db_column="boardTemplateID", default=uuid.uuid4, primary_key=True)
+    boardid = models.ForeignKey(Board, models.DO_NOTHING, db_column="boardID")
+    title = models.TextField()
+    description = models.TextField()
+
+    class Meta:
+        db_table = "BoardTemplate"

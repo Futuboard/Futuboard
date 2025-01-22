@@ -1,12 +1,13 @@
 from django.http import Http404
 from rest_framework.decorators import api_view
 from django.http import HttpResponse, JsonResponse
+
+from ..verification import is_admin_password_correct
 from ..models import Board, Column, Ticket, User, Swimlanecolumn
 from ..serializers import ColumnSerializer, TicketSerializer, UserSerializer
 from django.utils import timezone
 
 
-# Create your views here.
 @api_view(["GET", "POST", "PUT"])
 def columns_on_board(request, board_id):
     if request.method == "GET":
@@ -192,3 +193,13 @@ def update_user(request, user_id):
         response = "Successfully deleted user: {}".format(user_id)
         user.delete()
         return HttpResponse(response)
+
+
+@api_view(["POST"])
+def check_admin_password(request):
+    if request.method == "POST":
+        password = request.data["password"]
+        if is_admin_password_correct(password):
+            return JsonResponse({"success": True}, status=200)
+        else:
+            return JsonResponse({"success": False}, status=200)

@@ -38,14 +38,15 @@ const BoardContainer: React.FC = () => {
   const [deleteUserFromTicket] = useDeleteUserFromTicketMutation()
   const [deleteUserFromAction] = useDeleteUserFromActionMutation()
   const [tryLogin] = useLoginMutation()
+  const [isBoardIdSet, setIsBoardIdset] = useState(false)
   const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
-  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "")
+  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
 
   useEffect(() => {
-    // Has to have inner function to use async in useEffect
     const inner = async () => {
       if (!id) return
       dispatch(setBoardId(id))
+      setIsBoardIdset(true)
       await webSocketContainer.connectToBoard(id)
       webSocketContainer.setOnMessageHandler((tags) => {
         dispatch(boardsApi.util.invalidateTags(tags))
@@ -253,7 +254,7 @@ const BoardContainer: React.FC = () => {
   if (isLoggedIn) {
     return (
       <DragDropContext onDragEnd={handleOnDragEnd}>
-        <ToolBar boardId={id} title={board?.title || ""} />
+        <ToolBar boardId={id} title={board.title || ""} />
         <Board />
       </DragDropContext>
     )

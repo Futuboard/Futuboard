@@ -194,7 +194,7 @@ def test_get_actions_by_columnId():
     client = APIClient()
 
     # Initalize some models in the backend using test_utils.py utilities.
-    boardid = addBoard(uuid.uuid4()).boardid
+    boardid = addBoard().boardid
     columnid = addColumn(boardid, uuid.uuid4(), title="swimlane", swimlane=True).columnid
     swimlanecolumnid = addSwimlanecolumn(columnid, uuid.uuid4()).swimlanecolumnid
     ticketid = addTicket(columnid, uuid.uuid4(), title="A test ticket").ticketid
@@ -234,7 +234,7 @@ def test_update_action():
     api_client = APIClient()
 
     # Create models for test using test_utils.py
-    boardid = addBoard(uuid.uuid4()).boardid
+    boardid = addBoard().boardid
     columnid = addColumn(boardid, uuid.uuid4(), title="swimlane", swimlane=True).columnid
     swimlanecolumnid = addSwimlanecolumn(columnid, uuid.uuid4()).swimlanecolumnid
     ticketid = addTicket(columnid, uuid.uuid4(), title="Test ticket").ticketid
