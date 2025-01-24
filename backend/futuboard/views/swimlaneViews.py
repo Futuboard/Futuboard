@@ -77,7 +77,7 @@ def action_on_swimlane(request, swimlanecolumn_id, ticket_id):
         )
 
         if request.data["title"] == "":
-            return JsonResponse({"message": "Action title empty. Action not created"}, status=400)
+            return JsonResponse({"message": "Action must have a title"}, status=400)
 
         new_action.save()
 
