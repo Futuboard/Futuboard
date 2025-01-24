@@ -94,7 +94,7 @@ def write_board_data(writer, boardid):
     return writer
 
 
-def read_board_data(reader, boardid, board_title, password_hash):
+def read_board_data(reader, board_title, password_hash):
     """
     Read the board data from the csv file and create the board in the database with new ids for all the objects
     except for board which gets its id from the frontend.
@@ -104,10 +104,9 @@ def read_board_data(reader, boardid, board_title, password_hash):
     board_data = next(reader)
     swimlanecolumns = []
     board = Board.objects.create(
-        boardid=boardid,
         title=board_title,
         description=board_data[1],
-        background_color=board_data[2],
+        background_color=board_data[2] if len(board_data) > 2 else "#FFFFFF",
         passwordhash=password_hash,
         salt="",
         creation_date=timezone.now(),
@@ -208,4 +207,4 @@ def read_board_data(reader, boardid, board_title, password_hash):
             swimlanecolumns = []
         else:
             row = next(reader, None)
-    return True
+    return board

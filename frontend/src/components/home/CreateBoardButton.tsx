@@ -1,16 +1,20 @@
-import BoardCreationForm from "@components/board/BoardCreationForm"
 import { Dialog, DialogContent, Typography } from "@mui/material"
 import Button from "@mui/material/Button"
+import { SerializedError } from "@reduxjs/toolkit"
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
-import { NewBoardFormData } from "@/types"
+import BoardCreationForm from "@/components/home/BoardCreationForm"
+import { useAddBoardMutation, useCreateBoardFromTemplateMutation, useImportBoardMutation } from "@/state/apiSlice"
+import { Board, NewBoardFormData } from "@/types"
 
-interface CreateBoardButtonProps {
-  onNewBoard: (data: NewBoardFormData) => Promise<void>
-}
-
-const CreateBoardButton = ({ onNewBoard }: CreateBoardButtonProps) => {
+const CreateBoardButton = () => {
   const [open, setOpen] = useState(false)
+  const navigate = useNavigate()
+  const [addBoard] = useAddBoardMutation()
+  const [importBoard] = useImportBoardMutation()
+  const [createBoardFromTemplate] = useCreateBoardFromTemplateMutation()
 
   const handleOpenDialog = () => {
     setOpen(true)
@@ -18,11 +22,34 @@ const CreateBoardButton = ({ onNewBoard }: CreateBoardButtonProps) => {
   const handleCloseDialog = () => {
     setOpen(false)
   }
-  const handleSubmit = (data: NewBoardFormData) => {
-    //TODO: should only temporarily update the board name. (not in this function though)
-    //later should create entirely new board object and send it to database
-    onNewBoard(data)
-    setOpen(false)
+  const handleSubmit = async (newBoardData: NewBoardFormData) => {
+    let response: { data: Board } | { error: FetchBaseQueryError | SerializedError } | null = null
+
+    if (newBoardData.boardType === "empty") {
+      response = await addBoard(newBoardData)
+    }
+
+    if (newBoardData.boardType === "import" && newBoardData.file) {
+      const { file, password, title } = newBoardData
+      const formData = new FormData()
+      formData.append("file", file[0])
+      formData.append("board", JSON.stringify({ password, title }))
+
+      response = await importBoard(formData)
+    }
+
+    if (newBoardData.boardType === "template" && newBoardData.boardTemplateId) {
+      response = await createBoardFromTemplate(newBoardData)
+    }
+
+    if (response && "data" in response) {
+      // redirect to created board page
+      navigate(`/board/${response.data.boardid}`)
+
+      setOpen(false)
+    } else {
+      // TODO: add error handling
+    }
   }
   return (
     <div>

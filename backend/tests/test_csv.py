@@ -32,7 +32,6 @@ def test_import_export():
     boards = []
     for i in range(n):
         board = md.Board.objects.create(
-            boardid=uuid.uuid4(),
             title=f"Test Board{i}",
             creation_date=timezone.now(),
             description="",
@@ -106,15 +105,15 @@ def test_import_export():
         data = response.content
         # Create a file from the data
         file = SimpleUploadedFile("test.csv", data, content_type="text/csv")
-        # print file content to see if it is correct
-        print(file)
         assert response.status_code == 200
         # Import the board, response should have the data of the exported board csv as a content disposition
-        new_boardid = uuid.uuid4()
         board_data = {"title": "Test Board", "password": "abc"}
         board_data = json.dumps(board_data)
-        response = client.post(reverse("import_board_data", args=[new_boardid]), {"board": board_data, "file": file})
+        response = client.post(reverse("import_board_data"), {"board": board_data, "file": file})
         assert response.status_code == 200
+        json_response = response.json()
+        assert json_response["boardid"] is not None
+        new_boardid = json_response["boardid"]
         # Check that the imported board is the same as the exported board
         imported_board = md.Board.objects.get(boardid=new_boardid)
         # Description should be the same, other fields can be different

@@ -38,16 +38,24 @@ const BoardContainer: React.FC = () => {
   const [deleteUserFromTicket] = useDeleteUserFromTicketMutation()
   const [deleteUserFromAction] = useDeleteUserFromActionMutation()
   const [tryLogin] = useLoginMutation()
+  const [isBoardIdSet, setIsBoardIdset] = useState(false)
   const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
-  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "")
+  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
 
   useEffect(() => {
-    if (!id) return
-    dispatch(setBoardId(id))
-    webSocketContainer.connectToBoard(id)
-    webSocketContainer.onMessage((tags) => {
-      dispatch(boardsApi.util.invalidateTags(tags))
-    })
+    const inner = async () => {
+      if (!id) return
+      dispatch(setBoardId(id))
+      setIsBoardIdset(true)
+      await webSocketContainer.connectToBoard(id)
+      webSocketContainer.setOnMessageHandler((tags) => {
+        dispatch(boardsApi.util.invalidateTags(tags))
+      })
+      webSocketContainer.setResetHandler(() => {
+        dispatch(boardsApi.util.resetApiState())
+      })
+    }
+    inner()
   }, [id, dispatch])
 
   useEffect(() => {
@@ -246,8 +254,8 @@ const BoardContainer: React.FC = () => {
   if (isLoggedIn) {
     return (
       <DragDropContext onDragEnd={handleOnDragEnd}>
-        <GlobalStyles styles={{ ":root": { backgroundColor: board?.background_color || "white" } }} />
-        <ToolBar boardId={id} title={board?.title || ""} boardBackgroundColor={board?.background_color || "white"} />
+        <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
+        <ToolBar boardId={id} title={board.title || ""} boardBackgroundColor={board.background_color || "white"} />
         <Board />
       </DragDropContext>
     )

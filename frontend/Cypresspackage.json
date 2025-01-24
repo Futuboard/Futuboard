@@ -1,6 +1,0 @@
-{
-  "devDependencies": {
-    "@types/jest": "^29.5.12",
-    "cypress": "^13.6.6"
-  }
-}

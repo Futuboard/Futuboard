@@ -6,7 +6,7 @@ from ..models import Board
 from ..serializers import BoardSerializer
 import rest_framework.request
 from django.utils import timezone
-from ..verification import decode_token, encode_token, get_token_from_request, new_password, verify_password
+from ..verification import decode_token, encode_token, get_token_from_request, hash_password, verify_password
 
 
 # Create your views here.
@@ -14,11 +14,10 @@ from ..verification import decode_token, encode_token, get_token_from_request, n
 def all_boards(request: rest_framework.request.Request, format=None):
     if request.method == "POST":
         new_board = Board(
-            boardid=request.data["id"],
             description="",
             title=request.data["title"],
             creation_date=timezone.now(),
-            passwordhash=new_password(request.data["password"]),
+            passwordhash=hash_password(request.data["password"]),
             salt="",
         )
         new_board.save()
@@ -159,7 +158,7 @@ def update_board_password(request, board_id):
         if candidate_password != confirm_password:
             return JsonResponse({"message": "Passwords do not match"}, status=400)
 
-        board.passwordhash = new_password(candidate_password)
+        board.passwordhash = hash_password(candidate_password)
         board.save()
 
         serializer = BoardSerializer(board)

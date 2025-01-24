@@ -54,12 +54,11 @@ def test_board_by_id():
     """
     api_client = APIClient()
     # Add 5 boards to the database
-    boardids = [uuid.uuid4() for i in range(5)]
+    boardids = []
     for i in range(5):
-        response = api_client.post(
-            reverse("all_boards"), {"id": boardids[i], "title": "board" + str(i), "password": "password" + str(i)}
-        )
+        response = api_client.post(reverse("all_boards"), {"title": "board" + str(i), "password": "password" + str(i)})
         assert response.status_code == 200
+        boardids.append(response.json()["boardid"])
     tokens = []
     # Post board by id (Password verification)
     for i in range(5):
@@ -109,14 +108,12 @@ def test_board_by_id():
 @pytest.mark.django_db
 def test_getting_board_requires_auth():
     api_client = APIClient()
-    boardId = uuid.uuid4()
 
-    creation_response = api_client.post(
-        reverse("all_boards"), {"id": boardId, "title": "board", "password": "password"}
-    )
+    creation_response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
     assert creation_response.status_code == 200
+    boardid = creation_response.json()["boardid"]
 
-    get_response_unauthenticated = api_client.get(reverse("board_by_id", args=[boardId]))
+    get_response_unauthenticated = api_client.get(reverse("board_by_id", args=[boardid]))
     assert get_response_unauthenticated.status_code == 401
 
 
@@ -130,10 +127,10 @@ def test_columns_on_board():
     """
     api_client = APIClient()
     # Create a board and add 5 columns to it, of which 1 is a swimlane column
-    boardid = uuid.uuid4()
     columnids = [uuid.uuid4() for i in range(5)]
-    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
     assert response.status_code == 200
+    boardid = response.json()["boardid"]
     # Non-swimlane columns
     for i in range(4):
         # Using json.dumps assures swimlane is a boolean not a string
@@ -181,9 +178,9 @@ def test_tickets_on_column():
     """
     api_client = APIClient()
     # Create a board and a column and add 5 tickets to it
-    boardid = uuid.uuid4()
     columnid = uuid.uuid4()
-    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
+    boardid = response.json()["boardid"]
     assert response.status_code == 200
     data = {"columnid": str(columnid), "title": "column", "position": 0, "swimlane": False}
     response = api_client.post(
@@ -263,9 +260,9 @@ def test_update_ticket():
     """
     api_client = APIClient()
     # Create a board and a column and add a ticket to it
-    boardid = uuid.uuid4()
     columnid = uuid.uuid4()
-    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
+    boardid = response.json()["boardid"]
     assert response.status_code == 200
     data = {"columnid": str(columnid), "title": "column", "position": 0, "swimlane": False}
     response = api_client.post(
@@ -324,10 +321,11 @@ def test_update_column():
     api_client = APIClient()
 
     # Create a board and a column
-    boardid = uuid.uuid4()
     columnid = uuid.uuid4()
-    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
     assert response.status_code == 200
+    boardid = response.json()["boardid"]
+
     data = {"columnid": str(columnid), "title": "column", "position": 0, "swimlane": False}
     response = api_client.post(
         reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
@@ -360,9 +358,9 @@ def test_users_on_board():
     """
     api_client = APIClient()
     # Create a board and add 5 users to it
-    boardid = uuid.uuid4()
-    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
     assert response.status_code == 200
+    boardid = response.json()["boardid"]
     userids = [uuid.uuid4() for i in range(5)]
     for i in range(5):
         response = api_client.post(
@@ -398,11 +396,12 @@ def test_users_on_ticket():
 
     api_client = APIClient()
     # Create a board, a column, a ticket and add 5 users to it
-    boardid = uuid.uuid4()
     columnid = uuid.uuid4()
     ticketid = uuid.uuid4()
-    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
     assert response.status_code == 200
+    boardid = response.json()["boardid"]
+
     data = {"columnid": str(columnid), "title": "column", "position": 0, "swimlane": False}
     response = api_client.post(
         reverse("columns_on_board", args=[boardid]), data=json.dumps(data), content_type="application/json"
@@ -468,9 +467,9 @@ def test_update_user():
     """
     api_client = APIClient()
     # Create a board and a user
-    boardid = uuid.uuid4()
-    response = api_client.post(reverse("all_boards"), {"id": boardid, "title": "board", "password": "password"})
+    response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
     assert response.status_code == 200
+    boardid = response.json()["boardid"]
     response = api_client.post(reverse("users_on_board", args=[boardid]), {"name": "user"})
     data = response.json()
     # get user id from response
@@ -494,7 +493,7 @@ def test_deleting_column():
     """
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4()).boardid
+    boardid = addBoard().boardid
     columnid = addColumn(boardid, uuid.uuid4()).columnid
     columnid2 = addColumn(boardid, uuid.uuid4()).columnid
 
@@ -515,7 +514,7 @@ def test_deleting_ticket():
 
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4()).boardid
+    boardid = addBoard().boardid
     columnid = addColumn(boardid, uuid.uuid4()).columnid
     ticketid = addTicket(columnid, uuid.uuid4()).ticketid
     ticketid2 = addTicket(columnid, uuid.uuid4()).ticketid
@@ -537,7 +536,7 @@ def test_updating_columns_order():
 
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4()).boardid
+    boardid = addBoard().boardid
     columnid1 = addColumn(boardid, uuid.uuid4()).columnid
     columnid2 = addColumn(boardid, uuid.uuid4()).columnid
     columnid3 = addColumn(boardid, uuid.uuid4()).columnid
@@ -576,7 +575,7 @@ def test_password_change_correct():
     """
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4(), password="password").boardid
+    boardid = addBoard(password="password").boardid
 
     # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
@@ -607,7 +606,7 @@ def test_password_change_with_incorrect_old_password():
     """
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4(), password="password").boardid
+    boardid = addBoard(password="password").boardid
 
     # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
@@ -638,7 +637,7 @@ def test_password_change_with_clashing_confirm_password():
     """
     api_client = APIClient()
 
-    boardid = addBoard(uuid.uuid4(), password="password").boardid
+    boardid = addBoard(password="password").boardid
 
     # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
