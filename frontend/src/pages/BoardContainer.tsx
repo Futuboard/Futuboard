@@ -6,7 +6,9 @@ import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useParams } from "react-router-dom"
 
+import { cacheTagTypes } from "@/constants"
 import { setBoardId } from "@/state/auth"
+import { setNotification } from "@/state/notification"
 import { store } from "@/state/store"
 import { webSocketContainer } from "@/state/websocket"
 import { Action, Task, User } from "@/types"
@@ -52,7 +54,10 @@ const BoardContainer: React.FC = () => {
         dispatch(boardsApi.util.invalidateTags(tags))
       })
       webSocketContainer.setResetHandler(() => {
-        dispatch(boardsApi.util.resetApiState())
+        dispatch(boardsApi.util.invalidateTags([...cacheTagTypes]))
+      })
+      webSocketContainer.setSendNotificationHandler((message) => {
+        dispatch(setNotification({ text: message, type: "info" }))
       })
     }
     inner()

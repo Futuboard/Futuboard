@@ -1,3 +1,5 @@
+import { cacheTagTypes } from "@/constants"
+
 export type Board = {
   boardid: string
   title: string
@@ -89,7 +91,7 @@ export type SwimlaneColumn = {
   order: number
 }
 
-type Tag = "Boards" | "Columns" | "Ticket" | "Users" | "Action" | "ActionList" | "SwimlaneColumn" | "BoardTemplate"
+type Tag = (typeof cacheTagTypes)[number]
 
 export type CacheInvalidationTag =
   | {
