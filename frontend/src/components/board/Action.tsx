@@ -127,12 +127,10 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           sx={{
-            backgroundColor: isHighlighted ? "#d6d6d6" : "white",
+            backgroundColor: isHighlighted ? "#d3d3d3" : "white",
             marginBottom: "2px",
             borderRadius: "4px",
-            borderWidth: "2px",
-            borderStyle: isHighlighted ? "inset" : "solid",
-            borderColor: isHighlighted ? "#d6d6d6" : "white"
+            borderWidth: "2px"
           }}
         >
           <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={handleBlur}>
