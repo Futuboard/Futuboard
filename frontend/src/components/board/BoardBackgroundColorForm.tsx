@@ -1,9 +1,22 @@
-import { Button, Grid, Typography, Dialog, DialogContent, GlobalStyles } from "@mui/material"
+import { Button, Grid, Typography, Dialog, DialogContent, GlobalStyles, styled } from "@mui/material"
 import { useEffect, useState } from "react"
 import { HexColorPicker, HexColorInput } from "react-colorful"
 import { useParams } from "react-router-dom"
 
 import { useUpdateBoardColorMutation } from "@/state/apiSlice"
+
+const StyledHexColorInput = styled(HexColorInput)(({ theme }) => ({
+  padding: theme.spacing(1),
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: theme.shape.borderRadius,
+  outline: "none",
+  fontSize: theme.typography.body1.fontSize,
+  fontFamily: theme.typography.body1.fontFamily,
+  "&:focus": {
+    borderColor: theme.palette.primary.main,
+    boxShadow: `0 0 0 2px ${theme.palette.primary.light}`
+  }
+}))
 
 interface BoardBackgroundColorFormProps {
   boardColor: string
@@ -46,7 +59,7 @@ const BoardBackgroundColorForm = ({ boardColor, onClose, open }: BoardBackground
             <HexColorPicker color={color} onChange={setColor} />
           </Grid>
           <Grid item>
-            <HexColorInput color={color} onChange={setColor} prefixed />
+            <StyledHexColorInput color={color} onChange={setColor} prefixed />
           </Grid>
           <Grid item>
             <Button variant="contained" color="primary" onClick={handleColorSet}>
