@@ -75,6 +75,10 @@ def action_on_swimlane(request, swimlanecolumn_id, ticket_id):
             order=0,
             creation_date=timezone.now(),
         )
+
+        if request.data["title"] == "":
+            return JsonResponse({"message": "Action must have a title"}, status=400)
+
         new_action.save()
 
         same_swimlane_actions = Action.objects.filter(swimlanecolumnid=swimlanecolumn_id, ticketid=ticket_id)
@@ -101,19 +105,23 @@ def update_swimlanecolumn(request, swimlanecolumn_id):
         return JsonResponse(serializer.data, safe=False)
 
 
-@api_view(["PUT"])
+@api_view(["PUT", "DELETE"])
 def update_action(request, action_id):
-    if request.method == "PUT":
-        try:
-            action = Action.objects.get(pk=action_id)
-        except Ticket.DoesNotExist:
-            raise Http404("Action not found")
+    try:
+        action = Action.objects.get(pk=action_id)
+    except Ticket.DoesNotExist:
+        raise Http404("Action not found")
 
+    if request.method == "PUT":
         action.title = request.data.get("title", action.title)
         action.save()
 
         serializer = ActionSerializer(action)
         return JsonResponse(serializer.data, safe=False)
+
+    if request.method == "DELETE":
+        action.delete()
+        return JsonResponse({"message": "Action deleted succesfully"}, status=200)
 
 
 @api_view(["GET", "POST", "DELETE"])

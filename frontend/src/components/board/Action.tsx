@@ -1,8 +1,8 @@
 import { Draggable, DraggableStateSnapshot, DraggableStyle, Droppable } from "@hello-pangea/dnd"
 import { Box, ClickAwayListener, Typography } from "@mui/material"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 
-import { useUpdateActionMutation } from "@/state/apiSlice"
+import { useDeleteActionMutation, useUpdateActionMutation } from "@/state/apiSlice"
 import { Action as ActionType, UserWithoutTicketsOrActions } from "@/types"
 
 import UserMagnet from "./UserMagnet"
@@ -45,14 +45,47 @@ const ActionUserList: React.FC<{ users: UserWithoutTicketsOrActions[]; actionid:
 }
 
 const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index }) => {
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditingState] = useState(false)
+  const [isHighlighted, setIsHighlightedState] = useState(false)
   const [currentTitle, setCurrentTitle] = useState(action.title)
+
+  const [updateAction] = useUpdateActionMutation()
+  const [deleteAction] = useDeleteActionMutation()
+
+  const setIsEditing = (value: boolean) => {
+    if (value) {
+      setIsHighlightedState(false)
+    }
+    setIsEditingState(value)
+  }
+
+  const setIsHighlighted = (value: boolean) => {
+    if (!isEditing) {
+      setIsHighlightedState(value)
+    }
+  }
 
   useEffect(() => {
     setCurrentTitle(action.title)
   }, [action.title])
 
-  const [updateAction] = useUpdateActionMutation()
+  useEffect(() => {
+    const handleKeyDown = async (event: KeyboardEvent) => {
+      if (isHighlighted && event.key === "Delete") {
+        await deleteAction({ actionid: action.actionid })
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [isHighlighted, action.actionid, deleteAction])
+
+  const handleClick = () => {
+    setIsHighlighted(true)
+  }
 
   const handleDoubleClick = () => {
     setIsEditing(true)
@@ -60,13 +93,16 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
 
   const handleBlur = async () => {
     setIsEditing(false)
+    setIsHighlighted(false)
 
     if (currentTitle === action.title) {
       return
+    } else if (currentTitle === "") {
+      await deleteAction({ actionid: action.actionid })
+    } else {
+      const updatedAction = { ...action, title: currentTitle }
+      await updateAction({ action: updatedAction })
     }
-
-    const updatedAction = { ...action, title: currentTitle }
-    await updateAction({ action: updatedAction })
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +110,7 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
     setCurrentTitle(event.target.value)
   }
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
+  const handleKeyDownInput = (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
       handleBlur()
     }
@@ -85,21 +121,27 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
       {(provided) => (
         <Box
           boxShadow={1}
+          onClick={handleClick}
           onDoubleClick={handleDoubleClick}
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          sx={{ backgroundColor: "white", marginBottom: "2px", borderRadius: "4px" }}
+          sx={{
+            backgroundColor: isHighlighted ? "#d3d3d3" : "white",
+            marginBottom: "2px",
+            borderRadius: "4px",
+            borderWidth: "2px"
+          }}
         >
-          {isEditing ? (
-            <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={handleBlur}>
+          <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={handleBlur}>
+            {isEditing ? (
               <input
                 name={"actionTitle"}
                 autoFocus
                 value={currentTitle}
                 onBlur={handleBlur}
                 onChange={handleChange}
-                onKeyDown={handleKeyDown}
+                onKeyDown={handleKeyDownInput}
                 style={{
                   width: "100%",
                   boxSizing: "border-box",
@@ -109,39 +151,40 @@ const Action: React.FC<{ action: ActionType; index: number }> = ({ action, index
                   fontSize: "12px"
                 }}
               />
-            </ClickAwayListener>
-          ) : (
-            <div title={currentTitle}>
-              <Droppable droppableId={action.actionid + "/action"} type="user">
-                {(provided, snapshot) => (
-                  <Box
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    sx={{
-                      minHeight: "20px",
-                      backgroundColor: snapshot.isDraggingOver ? "lightblue" : "transparent",
-                      maxHeight: "50px",
-                      overflow: "hidden",
-                      padding: "2px"
-                    }}
-                  >
-                    <Typography
-                      variant={"body1"}
-                      noWrap={
-                        action.users.length > 0 /*if action has users, limit the text into a single row to save space*/
-                      }
-                      fontSize={12}
+            ) : (
+              <div title={currentTitle}>
+                <Droppable droppableId={action.actionid + "/action"} type="user">
+                  {(provided, snapshot) => (
+                    <Box
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      sx={{
+                        minHeight: "20px",
+                        backgroundColor: snapshot.isDraggingOver ? "lightblue" : "transparent",
+                        maxHeight: "50px",
+                        overflow: "hidden",
+                        padding: "2px"
+                      }}
                     >
-                      {currentTitle}
-                    </Typography>
-                    {action.users.length > 0 && <ActionUserList users={action.users} actionid={action.actionid} />}
+                      <Typography
+                        variant={"body1"}
+                        noWrap={
+                          action.users.length >
+                          0 /*if action has users, limit the text into a single row to save space*/
+                        }
+                        fontSize={12}
+                      >
+                        {currentTitle}
+                      </Typography>
+                      {action.users.length > 0 && <ActionUserList users={action.users} actionid={action.actionid} />}
 
-                    {provided.placeholder}
-                  </Box>
-                )}
-              </Droppable>
-            </div>
-          )}
+                      {provided.placeholder}
+                    </Box>
+                  )}
+                </Droppable>
+              </div>
+            )}
+          </ClickAwayListener>
         </Box>
       )}
     </Draggable>
