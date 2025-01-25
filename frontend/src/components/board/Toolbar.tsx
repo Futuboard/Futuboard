@@ -109,7 +109,7 @@ const BoardToolBar = ({ title, boardId, boardBackgroundColor }: BoardToolBarProp
 
   const [passwordFormOpen, setPasswordFormOpen] = useState(false)
   const [titleFormOpen, setTitleFormOpen] = useState(false)
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [colorFormOpen, setColorFormOpen] = useState(false)
 
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -182,7 +182,7 @@ const BoardToolBar = ({ title, boardId, boardBackgroundColor }: BoardToolBarProp
           <EnhancedEncryption sx={{ fontSize: "1rem", mr: 1 }} />
           <Typography variant="body2">Change Board Password</Typography>
         </MenuItem>
-        <MenuItem onClick={() => setSettingsOpen(true)} sx={{ py: 1 }}>
+        <MenuItem onClick={() => setColorFormOpen(true)} sx={{ py: 1 }}>
           <ColorLens sx={{ fontSize: "1rem", mr: 1 }} />
           <Typography variant="body2">Board Background Color</Typography>
         </MenuItem>
@@ -196,8 +196,8 @@ const BoardToolBar = ({ title, boardId, boardBackgroundColor }: BoardToolBarProp
         <BoardTitleChangeForm title={title} onClose={() => setTitleFormOpen(false)} open={titleFormOpen} />
         <BoardPasswordChangeForm onClose={() => setPasswordFormOpen(false)} open={passwordFormOpen} />
         <BoardBackgroundColorForm
-          onClose={() => setSettingsOpen(false)}
-          open={settingsOpen}
+          onClose={() => setColorFormOpen(false)}
+          open={colorFormOpen}
           boardColor={boardBackgroundColor}
         />
       </Box>
