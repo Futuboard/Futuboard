@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('futuboard', '0009_alter_board_boardid_boardtemplate'),
+        ("futuboard", "0009_alter_board_boardid_boardtemplate"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='board',
-            name='background_color',
-            field=models.TextField(default='#ffffff'),
+            model_name="board",
+            name="background_color",
+            field=models.TextField(default="#ffffff"),
         ),
     ]
