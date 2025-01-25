@@ -50,6 +50,15 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.mdxeditor-popup-container {
+  z-index: 9999;
+}
+
+.md-editor-contenteditable {
+  overflow-y: auto;
+  height: 330px;
+}
+
 @media only screen and (min-width: 1300px) {
   .user-list {
     min-width: 500px;
