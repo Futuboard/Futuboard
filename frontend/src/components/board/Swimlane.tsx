@@ -72,10 +72,8 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string; c
       swimlanecolumnid,
       order: 0
     }
-
-    await createAction({ action })
-
     data.resetActionTitle()
+    await createAction({ action })
   }
 
   const open = Boolean(anchorEl)
