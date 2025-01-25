@@ -193,7 +193,9 @@ def read_board_data(reader, board_title, password_hash):
                         ticketid=ticket,
                         title=row[1],
                         order=row[2],
-                        swimlanecolumnid=swimlanecolumns[int(row[3])],
+                        swimlanecolumnid=swimlanecolumns[
+                            int(row[3])
+                        ],  # This crashes application if ticket is left of all columns with swimlanes (or if ticket is not on a column with swimlanes when the fix below is implemented)
                     )
                     # Read the action users from the csv file
                     row = next(reader, None)
@@ -204,7 +206,7 @@ def read_board_data(reader, board_title, password_hash):
                         user = User.objects.get(name=row[1], boardid=board)
                         user.actions.add(action)
                         row = next(reader, None)
-            swimlanecolumns = []
+            # swimlanecolumns = [] TODO: This fixes the CSV export/import action displacement bug but currently is more unstable because of how creating old actions is handled
         else:
             row = next(reader, None)
     return board
