@@ -101,7 +101,6 @@ const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetSt
       columnid: task.columnid
     }
     await updateTask({ task: taskObject })
-    console.log(data.size)
   }
 
   const open = Boolean(anchorEl)
