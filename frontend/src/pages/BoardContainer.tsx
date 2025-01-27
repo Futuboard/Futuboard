@@ -252,9 +252,16 @@ const BoardContainer: React.FC = () => {
   }
 
   if (isLoggedIn) {
+    const defaultValues = {
+      title: board?.default_ticket_title || "",
+      description: board?.default_ticket_description || "",
+      cornernote: board?.default_ticket_cornernote || "",
+      color: board?.default_ticket_color || "",
+      size: board?.default_ticket_size || undefined
+    }
     return (
       <DragDropContext onDragEnd={handleOnDragEnd}>
-        <ToolBar boardId={id} title={board.title || ""} />
+        <ToolBar boardId={id} title={board.title || ""} taskTemplate={defaultValues} />
         <Board />
       </DragDropContext>
     )
