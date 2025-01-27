@@ -58,7 +58,7 @@ const BoardBackgroundColorForm = ({ boardColor, onClose, open }: BoardBackground
               <HexColorPicker color={color} onChange={setColor} />
             </Grid>
             <Grid item xs={12}>
-              <StyledHexColorInput color={color} onChange={setColor} prefixed />
+              <StyledHexColorInput name="hexColorInput" color={color} onChange={setColor} prefixed />
             </Grid>
             <Grid item xs={12} sx={{ marginTop: 1 }}>
               <Button variant="contained" color="primary" onClick={handleColorSet}>
