@@ -1,4 +1,4 @@
-import { Download, MoreVert, EnhancedEncryption, Edit } from "@mui/icons-material"
+import { Download, MoreVert, EnhancedEncryption, Edit, Gradient } from "@mui/icons-material"
 import {
   AppBar,
   Box,
@@ -17,14 +17,15 @@ import {
 import React, { useState } from "react"
 import { useParams } from "react-router-dom"
 
-import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation } from "@/state/apiSlice"
-
+import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
 import BoardDeletionComponent from "./BoardDeletionComponent"
 import BoardPasswordChangeForm from "./BoardPasswordChangeForm"
 import BoardTitleChangeForm from "./BoardTitleChangeForm"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
 import HomeButton from "./HomeButton"
+import TaskForm from "./TaskForm"
+import { TaskTemplate } from "@/types"
 import UserCreationForm from "./UserCreationForm"
 import UserList from "./UserList"
 
@@ -99,16 +100,26 @@ export const AddUserButton: React.FC = () => {
 type BoardToolBarProps = {
   title: string
   boardId: string
+  taskTemplate: TaskTemplate
 }
 
-const BoardToolBar = ({ title, boardId }: BoardToolBarProps) => {
-  const { data: users, isSuccess } = useGetUsersByBoardIdQuery(boardId)
+interface TaskFormData {
+  taskTitle: string
+  description: string
+  cornerNote: string
+  size: number
+  color: string
+}
 
+const BoardToolBar = ({ title, boardId, taskTemplate }: BoardToolBarProps) => {
+  const { data: users, isSuccess } = useGetUsersByBoardIdQuery(boardId)
+  const { id = "default-id" } = useParams()
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const open = Boolean(anchorEl)
-
+  const [updateTaskTemplate] = useUpdateTaskTemplateMutation()
   const [passwordFormOpen, setPasswordFormOpen] = useState(false)
   const [titleFormOpen, setTitleFormOpen] = useState(false)
+  const [taskFormOpen, setTaskFormOpen] = useState(false)
 
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -137,6 +148,36 @@ const BoardToolBar = ({ title, boardId }: BoardToolBarProps) => {
 
   const handleClosePasswordForm = () => {
     setPasswordFormOpen(false)
+  }
+
+  const handleOpenTaskForm = () => {
+    setTaskFormOpen(true)
+  }
+
+  const handleCancelTaskForm = () => {
+    handleCloseTaskForm()
+  }
+
+  const handleCloseTaskForm = () => {
+    setTaskFormOpen(false)
+  }
+
+  const handleSubmitTaskFormData = async (data: TaskFormData | null) => {
+    try {
+      if (data) {
+        const templateObject = {
+          title: data.taskTitle,
+          description: data.description,
+          cornernote: data.cornerNote,
+          size: data.size,
+          color: data.color
+        }
+        await updateTaskTemplate({ boardId: id, newTaskTemplate: templateObject }).unwrap()
+        setTaskFormOpen(false)
+      }
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const handleExport = async () => {
@@ -197,6 +238,10 @@ const BoardToolBar = ({ title, boardId }: BoardToolBarProps) => {
           <EnhancedEncryption sx={{ fontSize: "1rem", mr: 1 }} />
           <Typography variant="body2">Change Board Password</Typography>
         </MenuItem>
+        <MenuItem onClick={handleOpenTaskForm} sx={{ py: 1 }}>
+          <Gradient sx={{ fontSize: "1rem", mr: 1 }} />
+          <Typography variant="body2">Edit Card Template</Typography>
+        </MenuItem>
         <MenuItem onClick={handleExportAndClose} sx={{ py: 1 }}>
           <Download sx={{ fontSize: "1rem", mr: 1 }} />
           <Typography variant="body2">Download Board CSV</Typography>
@@ -214,6 +259,18 @@ const BoardToolBar = ({ title, boardId }: BoardToolBarProps) => {
             <BoardPasswordChangeForm onClose={handleClosePasswordForm} />
           </DialogContent>
         </Dialog>
+        <Dialog open={taskFormOpen} onClose={handleCloseTaskForm}>
+          <DialogContent>
+            <TaskForm
+              formTitle={"Edit Card Template"}
+              formType={"TaskTemplate"}
+              onSubmit={handleSubmitTaskFormData}
+              onCancel={handleCancelTaskForm}
+              onClose={handleCloseTaskForm}
+              defaultValues={taskTemplate}
+            />
+          </DialogContent>
+        </Dialog>
       </Box>
     </Box>
   )
@@ -222,9 +279,10 @@ const BoardToolBar = ({ title, boardId }: BoardToolBarProps) => {
 interface ToolBarProps {
   title: string
   boardId?: string
+  taskTemplate?: TaskTemplate
 }
 
-const ToolBar = ({ title, boardId }: ToolBarProps) => {
+const ToolBar = ({ title, boardId, taskTemplate }: ToolBarProps) => {
   return (
     <AppBar
       position="fixed"
@@ -242,7 +300,7 @@ const ToolBar = ({ title, boardId }: ToolBarProps) => {
         >
           {title}
         </Typography>
-        {boardId && <BoardToolBar title={title} boardId={boardId} />}
+        {boardId && taskTemplate && <BoardToolBar title={title} boardId={boardId} taskTemplate={taskTemplate} />}
       </Toolbar>
     </AppBar>
   )
