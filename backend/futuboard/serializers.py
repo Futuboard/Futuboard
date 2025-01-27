@@ -5,7 +5,18 @@ from rest_framework import serializers
 class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
-        fields = ["boardid", "description", "title", "creation_date"]
+        fields = [
+            "boardid", 
+            "description", 
+            "title", 
+            "creation_date",
+            "default_ticket_title",
+            "default_ticket_description", 
+            "default_ticket_color",
+            "default_ticket_storypoints",
+            "default_ticket_size",
+            "default_ticket_cornernote",
+            ]
 
 
 class ColumnSerializer(serializers.ModelSerializer):
