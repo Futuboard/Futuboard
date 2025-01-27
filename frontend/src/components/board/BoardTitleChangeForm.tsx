@@ -1,4 +1,4 @@
-import { Button, Grid, TextField, Typography, Dialog, DialogContent } from "@mui/material"
+import { Button, Grid, TextField, Typography, Dialog, DialogContent, Divider } from "@mui/material"
 import { useRef, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useParams } from "react-router-dom"
@@ -47,11 +47,12 @@ const BoardTitleChangeForm = ({ title, onClose, open }: BoardTitleChangeFormProp
     <Dialog open={open} onClose={onClose}>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={1} flexDirection="column">
+          <Grid container spacing={2} flexDirection="column" width="500px">
             <Grid item>
               <Typography variant="h6">Edit Board Name</Typography>
+              <Divider />
             </Grid>
-            <Grid item>
+            <Grid item xs={12}>
               <TextField
                 inputRef={inputRef}
                 spellCheck={false}
@@ -71,13 +72,14 @@ const BoardTitleChangeForm = ({ title, onClose, open }: BoardTitleChangeFormProp
                     message: "Board name is required"
                   }
                 })}
+                sx={{ width: "100%" }}
               />
             </Grid>
-            <Grid item sx={{ marginTop: 1 }}>
+            <Grid item xs={12} display="flex" flexDirection="row" sx={{ marginTop: 1, justifyContent: "center" }}>
               <Button variant="contained" color="primary" type="submit">
                 Submit
               </Button>
-              <Button sx={{ marginLeft: 2 }} onClick={onClose}>
+              <Button sx={{ marginLeft: 2, border: 1 }} onClick={onClose}>
                 Cancel
               </Button>
             </Grid>

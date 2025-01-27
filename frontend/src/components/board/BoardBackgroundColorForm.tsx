@@ -1,4 +1,4 @@
-import { Button, Grid, Typography, Dialog, DialogContent, GlobalStyles, styled } from "@mui/material"
+import { Button, Grid, Typography, Dialog, DialogContent, GlobalStyles, styled, Divider } from "@mui/material"
 import { useEffect, useState } from "react"
 import { HexColorPicker, HexColorInput } from "react-colorful"
 import { useParams } from "react-router-dom"
@@ -11,7 +11,8 @@ const StyledHexColorInput = styled(HexColorInput)(({ theme }) => ({
   borderWidth: "1px",
   borderRadius: theme.shape.borderRadius,
   fontSize: theme.typography.body1.fontSize,
-  fontFamily: theme.typography.body1.fontFamily
+  fontFamily: theme.typography.body1.fontFamily,
+  width: "100px"
 }))
 
 interface BoardBackgroundColorFormProps {
@@ -45,25 +46,28 @@ const BoardBackgroundColorForm = ({ boardColor, onClose, open }: BoardBackground
     <Dialog open={open} onClose={handleOnClose} hideBackdrop>
       <DialogContent>
         <GlobalStyles styles={{ ":root": { backgroundColor: color || "white" } }} />
-        <Grid container spacing={2} flexDirection="column" padding={1}>
-          <Grid item>
+        <Grid container spacing={2} flexDirection="column" padding={1} width="280px">
+          <Grid item xs={12}>
             <Typography gutterBottom variant="h6">
               Change Board Color
             </Typography>
+            <Divider />
           </Grid>
-          <Grid item>
-            <HexColorPicker color={color} onChange={setColor} />
-          </Grid>
-          <Grid item>
-            <StyledHexColorInput color={color} onChange={setColor} prefixed />
-          </Grid>
-          <Grid item>
-            <Button variant="contained" color="primary" onClick={handleColorSet}>
-              Submit
-            </Button>
-            <Button sx={{ marginLeft: 2 }} onClick={handleOnClose}>
-              Cancel
-            </Button>
+          <Grid container spacing={2} display="flex" flexDirection="column" sx={{ marginTop: 1, alignItems: "center" }}>
+            <Grid item xs={12}>
+              <HexColorPicker color={color} onChange={setColor} />
+            </Grid>
+            <Grid item xs={12}>
+              <StyledHexColorInput color={color} onChange={setColor} prefixed />
+            </Grid>
+            <Grid item xs={12} sx={{ marginTop: 1 }}>
+              <Button variant="contained" color="primary" onClick={handleColorSet}>
+                Submit
+              </Button>
+              <Button sx={{ marginLeft: 2, border: 1 }} onClick={handleOnClose}>
+                Cancel
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
       </DialogContent>

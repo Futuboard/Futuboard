@@ -1,4 +1,4 @@
-import { Button, TextField, Grid, Typography, Dialog, DialogContent } from "@mui/material"
+import { Button, TextField, Grid, Typography, Dialog, DialogContent, Divider } from "@mui/material"
 import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { useParams } from "react-router-dom"
@@ -65,13 +65,14 @@ const BoardPasswordChangeForm = ({ onClose, open }: BoardPasswordChangeFormProps
     <Dialog open={open} onClose={onClose}>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={1} flexDirection="column">
+          <Grid container spacing={3} flexDirection="column" width="400px">
             <Grid item>
               <Typography gutterBottom variant="h6">
                 Enter a New Password
               </Typography>
+              <Divider />
             </Grid>
-            <Grid item marginBottom={1}>
+            <Grid item xs={12}>
               <TextField
                 inputRef={inputRef}
                 label="Old Password"
@@ -79,31 +80,34 @@ const BoardPasswordChangeForm = ({ onClose, open }: BoardPasswordChangeFormProps
                 helperText={errors.old_password?.message}
                 error={Boolean(errors.old_password)}
                 {...register("old_password")}
+                sx={{ width: "100%" }}
               />
             </Grid>
-            <Grid item marginBottom={1}>
+            <Grid item xs={12}>
               <TextField
                 label="New Password"
                 type="password"
                 helperText={errors.new_password?.message}
                 error={Boolean(errors.new_password)}
                 {...register("new_password")}
+                sx={{ width: "100%" }}
               />
             </Grid>
-            <Grid item marginBottom={2}>
+            <Grid item xs={12}>
               <TextField
                 label="Confirm Password"
                 type="password"
                 helperText={errors.confirm_password?.message}
                 error={Boolean(errors.confirm_password)}
                 {...register("confirm_password")}
+                sx={{ width: "100%" }}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} display="flex" flexDirection="row" sx={{ marginTop: 1, justifyContent: "center" }}>
               <Button variant="contained" color="primary" type="submit">
                 Submit
               </Button>
-              <Button sx={{ marginLeft: 2 }} onClick={onClose}>
+              <Button sx={{ marginLeft: 2, border: 1 }} onClick={onClose}>
                 Cancel
               </Button>
             </Grid>
