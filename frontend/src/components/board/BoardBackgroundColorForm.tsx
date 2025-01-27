@@ -7,15 +7,11 @@ import { useUpdateBoardColorMutation } from "@/state/apiSlice"
 
 const StyledHexColorInput = styled(HexColorInput)(({ theme }) => ({
   padding: theme.spacing(1),
-  border: `1px solid ${theme.palette.divider}`,
+  borderStyle: "solid",
+  borderWidth: "1px",
   borderRadius: theme.shape.borderRadius,
-  outline: "none",
   fontSize: theme.typography.body1.fontSize,
-  fontFamily: theme.typography.body1.fontFamily,
-  "&:focus": {
-    borderColor: theme.palette.primary.main,
-    boxShadow: `0 0 0 2px ${theme.palette.primary.light}`
-  }
+  fontFamily: theme.typography.body1.fontFamily
 }))
 
 interface BoardBackgroundColorFormProps {
@@ -49,7 +45,7 @@ const BoardBackgroundColorForm = ({ boardColor, onClose, open }: BoardBackground
     <Dialog open={open} onClose={handleOnClose} hideBackdrop>
       <DialogContent>
         <GlobalStyles styles={{ ":root": { backgroundColor: color || "white" } }} />
-        <Grid container spacing={1} flexDirection="column" padding={1}>
+        <Grid container spacing={2} flexDirection="column" padding={1}>
           <Grid item>
             <Typography gutterBottom variant="h6">
               Change Board Color
