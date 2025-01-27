@@ -108,7 +108,7 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
     cornerNote: defaultValues?.cornernote || "",
     description: defaultValues?.description || "",
     color: defaultValues?.color || "#ffffff",
-    size: defaultValues?.size || undefined
+    size: defaultValues?.size
   }
 
   const isTaskCreationForm = formType === "TaskCreation"
