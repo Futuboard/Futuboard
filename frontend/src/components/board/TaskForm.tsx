@@ -243,7 +243,7 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
           <Grid item container spacing={4} xs={12}>
             <Grid item xs={10}>
               <Button type="submit" color="primary" variant="contained">
-                Save Changes
+                {isTaskCreationForm ? "Submit" : "Save Changes"}
               </Button>
               <Button onClick={onCancel}>Cancel</Button>
             </Grid>
