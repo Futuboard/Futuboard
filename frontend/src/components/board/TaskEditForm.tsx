@@ -26,6 +26,8 @@ import { useDeleteTaskMutation } from "@/state/apiSlice"
 
 import { Task, Task as TaskType, User } from "../../types"
 
+import DescriptionEditField from "./DescriptionEditField"
+
 interface DeleteTaskButtonProps {
   task: Task
 }
@@ -205,14 +207,9 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
             <TextField label="Corner note" fullWidth {...register("cornerNote", {})} />
           </Grid>
           <Grid item xs={240}>
-            <TextField
-              label="Description"
-              multiline
-              rows={11}
-              fullWidth
-              {...register("description", {
-                //rows amount hardcoded due to bug with multiline textAreaAutoSize
-              })}
+            <DescriptionEditField
+              description={task.description || ""}
+              onChange={(markdown) => setValue("description", markdown)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -223,7 +220,14 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
                 aria-label="color"
                 value={selectedColor}
                 onChange={handleColorChange}
-                sx={{ bgcolor: "#c7c7c7", borderRadius: 1000, paddingLeft: 3 }}
+                sx={{
+                  bgcolor: "#F0F0F3",
+                  borderRadius: 3,
+                  paddingLeft: 3,
+                  outlineStyle: "solid",
+                  outlineColor: "#c4c4c4",
+                  outlineWidth: "1px"
+                }}
               >
                 <FormControlLabel value="#ffffff" control={<Radio style={{ color: "#ffffff" }} />} label={null} />
                 <FormControlLabel value="#ffeb3b" control={<Radio style={{ color: "#ffeb3b" }} />} label={null} />
