@@ -684,7 +684,7 @@ def test_update_ticket_template():
             "title": "New title",
             "description": "New description",
             "color": "#ffeb3b",
-            "storypoints": None,
+            "storypoints": 8,
             "size": 16,
             "cornernote": "New cornernote" 
         }),
@@ -697,7 +697,7 @@ def test_update_ticket_template():
     assert md.Board.objects.get(pk=boardid).default_ticket_cornernote == "New cornernote"
     assert md.Board.objects.get(pk=boardid).default_ticket_description == "New description"
     assert md.Board.objects.get(pk=boardid).default_ticket_size == 16
-    assert md.Board.objects.get(pk=boardid).default_ticket_storypoints == None
+    assert md.Board.objects.get(pk=boardid).default_ticket_storypoints == 8
     assert md.Board.objects.get(pk=boardid).default_ticket_title == "New title"
 
     resetDB() 
