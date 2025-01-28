@@ -1,34 +1,24 @@
 import Alert, { AlertColor } from "@mui/material/Alert"
 import LinearProgress from "@mui/material/LinearProgress"
 import { useEffect, useState } from "react"
+import { useSelector } from "react-redux"
 
 import { setNotification } from "@/state/notification"
-import { store } from "@/state/store"
+import { store, RootState } from "@/state/store"
 
 const fullNotifcationTime = 5000
 
 const Notification = () => {
-  const [notificationText, setNotificationText] = useState("")
-  const [noticationColor, setNotificationColor] = useState<AlertColor>("info")
-  const [notificationTime, setNotificationTime] = useState<number>(0)
+  const [notificationTime, setNotificationTime] = useState<number>(fullNotifcationTime)
   const [intervalId, setIntervalId] = useState<number | null>(null)
-
-  store.subscribe(() => {
-    const newText = store.getState().notification.text
-    if (newText === notificationText) {
-      return
-    }
-
-    setNotificationText(newText)
-    setNotificationColor(store.getState().notification.type as AlertColor)
-    setNotificationTime(fullNotifcationTime)
-  })
+  const notification = useSelector((state: RootState) => state.notification)
 
   const closeNotification = () => {
     store.dispatch(setNotification({ text: "", type: "info" }))
     if (intervalId) {
       clearInterval(intervalId)
     }
+    setNotificationTime(fullNotifcationTime)
   }
 
   useEffect(() => {
@@ -41,34 +31,38 @@ const Notification = () => {
   }, [notificationTime])
 
   useEffect(() => {
-    if (!notificationText) {
+    if (!notification.text) {
       return
     }
 
+    setNotificationTime(fullNotifcationTime + 500)
+
     const newInterValId = setInterval(() => {
-      setNotificationTime((oldTime) => oldTime - 20)
-    }, 20)
+      setNotificationTime((oldTime) => oldTime - 200)
+    }, 200)
+
     setIntervalId(newInterValId)
+
     return () => {
       clearInterval(newInterValId)
     }
-  }, [notificationText])
+  }, [notification])
 
-  if (!notificationText) {
+  if (!notification.text) {
     return null
   }
 
   return (
     <Alert
-      severity={noticationColor}
+      severity={notification.type as AlertColor}
       onClose={closeNotification}
       sx={{ position: "fixed", top: 65, right: 0, zIndex: 9999 }}
     >
-      {notificationText}
+      {notification.text}
       <LinearProgress
         variant="determinate"
-        color={noticationColor}
-        value={(notificationTime * 100) / fullNotifcationTime}
+        color={notification.type as AlertColor}
+        value={Math.min((notificationTime * 100) / fullNotifcationTime, 100)}
         sx={{ marginTop: 1 }}
       />
     </Alert>

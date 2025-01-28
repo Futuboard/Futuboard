@@ -1,21 +1,26 @@
 import { AlertColor } from "@mui/material/Alert"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
+import { getId } from "@/services/Utils"
+
 type NotificationState = {
   text: string
   type: string // actually AlertColor
+  id: string
 }
 
 const notificationSlice = createSlice({
   name: "notification",
   initialState: {
     text: "",
-    type: "info"
+    type: "info",
+    id: ""
   },
   reducers: {
     setNotification: (state: NotificationState, action: PayloadAction<{ text: string; type: AlertColor }>) => {
       state.text = action.payload.text
       state.type = action.payload.type
+      state.id = getId()
     }
   }
 })
