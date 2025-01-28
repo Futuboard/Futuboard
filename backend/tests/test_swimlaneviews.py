@@ -261,3 +261,51 @@ def test_update_action():
 
     # Cleanup.
     resetDB()
+
+
+@pytest.mark.django_db
+def test_deleting_action():
+    """
+    Test deleting an action by id
+    Test that the right action is deleted.
+    """
+
+    api_client = APIClient()
+
+    boardid = addBoard(uuid.uuid4()).boardid
+    columnid = addColumn(boardid, uuid.uuid4(), swimlane=True).columnid
+    swimlanecolumnid = addSwimlanecolumn(columnid, uuid.uuid4()).swimlanecolumnid
+    ticketid = addTicket(columnid, uuid.uuid4(), title="Test ticket").ticketid
+    actionid = addAction(ticketid, swimlanecolumnid, uuid.uuid4(), title="My action").actionid
+    actionid2 = addAction(ticketid, swimlanecolumnid, uuid.uuid4(), title="My action2").actionid
+
+    response = api_client.delete(reverse("update_action", args=[actionid]))
+
+    assert response.status_code == 200
+    assert md.Action.objects.all()[0].actionid == actionid2
+    assert md.Action.objects.count() == 1
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_creating_an_empty_action():
+    """
+    Test that new empty actions are rejected.
+    """
+
+    api_client = APIClient()
+
+    boardid = addBoard(uuid.uuid4()).boardid
+    columnid = addColumn(boardid, uuid.uuid4(), swimlane=True).columnid
+    swimlanecolumnid = addSwimlanecolumn(columnid, uuid.uuid4()).swimlanecolumnid
+    ticketid = addTicket(columnid, uuid.uuid4(), title="Test ticket").ticketid
+
+    response = api_client.post(
+        reverse("action_on_swimlane", args=[swimlanecolumnid, ticketid]), {"actionid": uuid.uuid4(), "title": ""}
+    )
+
+    assert response.status_code == 400
+    assert md.Action.objects.count() == 0
+
+    resetDB()
