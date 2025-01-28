@@ -13,9 +13,11 @@ import {
   Typography
 } from "@mui/material"
 import { SetStateAction, useState } from "react"
+import { useDispatch } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
 
 import { useDeleteBoardMutation, useLoginMutation } from "@/state/apiSlice"
+import { setNotification } from "@/state/notification"
 
 const BoardDeletionComponent = () => {
   const navigate = useNavigate()
@@ -23,8 +25,11 @@ const BoardDeletionComponent = () => {
   const [open, setOpen] = useState(false)
   const [password, setPassword] = useState("")
   const [showDelete, setShowDelete] = useState(false)
+  const [passwordError, setPasswordError] = useState("")
   const [tryLogin, { isLoading }] = useLoginMutation()
   const [deleteBoard] = useDeleteBoardMutation()
+
+  const dispatch = useDispatch()
 
   const handleOpenModal = () => {
     setOpen(true)
@@ -54,14 +59,14 @@ const BoardDeletionComponent = () => {
   const handleSubmitPassword = async () => {
     const loginResponse = await tryLogin({ boardId: id, password: password })
     if ("error" in loginResponse) {
-      alert("Hmm we got an error")
+      dispatch(setNotification({ text: "Error when validating password. Please try again later.", type: "error" }))
       return
     }
     const success = loginResponse.data.success
     if (success) {
       setShowDelete(true)
     } else {
-      alert("Wrong password")
+      setPasswordError("Wrong password")
     }
   }
   return (
@@ -114,6 +119,8 @@ const BoardDeletionComponent = () => {
                     type="password"
                     value={password}
                     onChange={handlePasswordChange}
+                    error={passwordError !== ""}
+                    helperText={passwordError}
                   />
                   <Button
                     variant="contained"
