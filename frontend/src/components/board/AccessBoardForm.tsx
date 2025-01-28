@@ -4,9 +4,11 @@ import Grid from "@mui/material/Grid"
 import Typography from "@mui/material/Typography"
 import React from "react"
 import { useForm } from "react-hook-form"
+import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
 
 import { useLoginMutation } from "@/state/apiSlice"
+import { setNotification } from "@/state/notification"
 
 import PasswordField from "../home/PasswordField"
 
@@ -30,13 +32,14 @@ const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id }) => {
     }
   })
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const [tryLogin] = useLoginMutation()
 
   const onSubmit = async (data: FormData) => {
     const loginResponse = await tryLogin({ boardId: id, password: data.password })
     if ("error" in loginResponse) {
-      alert("An error occurred. Please try again later.")
+      dispatch(setNotification({ text: "Error when validating password. Please try again later.", type: "error" }))
       return
     }
 

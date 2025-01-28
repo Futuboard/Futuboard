@@ -146,7 +146,12 @@ const BoardContainer: React.FC = () => {
       if (destinationType === "ticket") {
         destinationUsers = allUsers.filter((user) => user.tickets.includes(destinationId))
         if (destinationUsers.length >= 3) {
-          alert("Destination task already has 3 or more user magnets. Move not allowed.")
+          store.dispatch(
+            setNotification({
+              text: "Destination card already has 3 or more user magnets. Move not allowed.",
+              type: "info"
+            })
+          )
           return
         }
       }
@@ -154,7 +159,12 @@ const BoardContainer: React.FC = () => {
       if (destinationType === "action") {
         destinationUsers = allUsers.filter((user) => user.actions.includes(destinationId))
         if (destinationUsers.length >= 2) {
-          alert("Destination action already has 2 or more user magnets. Move not allowed.")
+          store.dispatch(
+            setNotification({
+              text: "Destination action already has 2 or more user magnets. Move not allowed.",
+              type: "info"
+            })
+          )
           return
         }
       }
@@ -162,7 +172,7 @@ const BoardContainer: React.FC = () => {
       const isUnique = !destinationUsers.some((user) => user.userid === draggedUserId)
 
       if (!isUnique && destinationId !== "user-list") {
-        alert("This member is already on the card. Move not allowed.")
+        store.dispatch(setNotification({ text: "This member is already on the card. Move not allowed.", type: "info" }))
         return
       }
 
