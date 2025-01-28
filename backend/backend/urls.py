@@ -14,7 +14,9 @@ urlpatterns = [
     path("api/boards/", boardViews.all_boards, name="all_boards"),
     path("api/boards/<uuid:board_id>/", boardViews.board_by_id, name="board_by_id"),
     path("api/boards/<uuid:board_id>/title/", boardViews.update_board_title, name="update_board_title"),
-    path("api/boards/<uuid:board_id>/ticket_template/", boardViews.update_ticket_template, name="update_ticket_template"),
+    path(
+        "api/boards/<uuid:board_id>/ticket_template/", boardViews.update_ticket_template, name="update_ticket_template"
+    ),
     path("api/boards/<uuid:board_id>/password/", boardViews.update_board_password, name="update_board_password"),
     path("api/boards/<uuid:board_id>/columns/", views.columns_on_board, name="columns_on_board"),
     path("api/boards/<uuid:board_id>/columns/<uuid:column_id>/", views.update_column, name="update_column"),

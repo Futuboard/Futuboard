@@ -131,13 +131,13 @@ def read_board_data(reader, board_title, password_hash):
         if len(row) > 0 and row[0] == "User":
             user = User.objects.create(userid=uuid.uuid4(), name=row[1], boardid=board)
         elif len(row) > 0 and row[0] == "Ticket Template":
-            board.default_ticket_title=row[1]
-            board.default_ticket_description=row[2]
-            board.default_ticket_size=row[3]
-            board.default_ticket_storypoints=row[4]
-            board.default_ticket_cornernote=row[5]
-            board.default_ticket_color=row[6]
-            board.save()      
+            board.default_ticket_title = row[1]
+            board.default_ticket_description = row[2]
+            board.default_ticket_size = row[3]
+            board.default_ticket_storypoints = row[4]
+            board.default_ticket_cornernote = row[5]
+            board.default_ticket_color = row[6]
+            board.save()
         else:
             break
     # Read the columns from the csv file

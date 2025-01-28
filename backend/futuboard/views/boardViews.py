@@ -154,7 +154,7 @@ def update_ticket_template(request, board_id):
         token = get_token_from_request(request)
         if token is None:
             return JsonResponse({"message: Access token missing"}, status=401)
-        
+
         decoded_token = decode_token(token)
 
         if decoded_token["board_id"] != str(board_id):
@@ -171,7 +171,7 @@ def update_ticket_template(request, board_id):
 
         seliazer = BoardSerializer(board)
         return JsonResponse(seliazer.data, safe=False)
-    
+
     except Board.DoesNotExist:
         raise Http404("Board does not exist")
     except jwt.ExpiredSignatureError:

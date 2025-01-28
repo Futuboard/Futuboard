@@ -4,40 +4,39 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('futuboard', '0008_remove_action_color_remove_board_creator_and_more'),
+        ("futuboard", "0009_alter_board_boardid_boardtemplate"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='board',
-            name='default_ticket_color',
+            model_name="board",
+            name="default_ticket_color",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='board',
-            name='default_ticket_cornernote',
+            model_name="board",
+            name="default_ticket_cornernote",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='board',
-            name='default_ticket_description',
+            model_name="board",
+            name="default_ticket_description",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='board',
-            name='default_ticket_size',
+            model_name="board",
+            name="default_ticket_size",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='board',
-            name='default_ticket_storypoints',
+            model_name="board",
+            name="default_ticket_storypoints",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='board',
-            name='default_ticket_title',
+            model_name="board",
+            name="default_ticket_title",
             field=models.TextField(blank=True, null=True),
         ),
     ]

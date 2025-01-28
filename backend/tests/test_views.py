@@ -671,7 +671,7 @@ def test_update_ticket_template():
     """
     api_client = APIClient()
     boardid = addBoard(uuid.uuid4(), password="password").boardid
-    
+
     # Get token for auth
     response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
     assert response.status_code == 200
@@ -680,18 +680,20 @@ def test_update_ticket_template():
 
     response = api_client.put(
         reverse("update_ticket_template", args=[boardid]),
-        data=json.dumps({
-            "title": "New title",
-            "description": "New description",
-            "color": "#ffeb3b",
-            "storypoints": 8,
-            "size": 16,
-            "cornernote": "New cornernote" 
-        }),
+        data=json.dumps(
+            {
+                "title": "New title",
+                "description": "New description",
+                "color": "#ffeb3b",
+                "storypoints": 8,
+                "size": 16,
+                "cornernote": "New cornernote",
+            }
+        ),
         content_type="application/json",
         headers={"Authorization": f"Bearer {token}"},
     )
-    
+
     assert response.status_code == 200
     assert md.Board.objects.get(pk=boardid).default_ticket_color == "#ffeb3b"
     assert md.Board.objects.get(pk=boardid).default_ticket_cornernote == "New cornernote"
@@ -700,4 +702,4 @@ def test_update_ticket_template():
     assert md.Board.objects.get(pk=boardid).default_ticket_storypoints == 8
     assert md.Board.objects.get(pk=boardid).default_ticket_title == "New title"
 
-    resetDB() 
+    resetDB()
