@@ -22,6 +22,7 @@ import {
 import React from "react"
 import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
+
 import { useDeleteTaskMutation } from "@/state/apiSlice"
 import { Task, Task as TaskType, User, TaskTemplate } from "@/types"
 
@@ -73,8 +74,8 @@ const DeleteTaskButton: React.FC<DeleteTaskButtonProps> = ({ task }) => {
 }
 
 interface TaskFormProps {
-  formTitle: String
-  formType: String
+  formTitle: string
+  formType: string
   onSubmit: (data: FormData) => void
   onCancel: () => void
   onClose: (data: FormData | null) => void
@@ -91,15 +92,6 @@ interface FormData {
 }
 
 const TaskForm: React.FC<TaskFormProps> = (props) => {
-  // Focus on the title field when the form is opened
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (isTaskCreationForm && inputRef.current) {
-      inputRef.current.focus()
-    }
-  }, [])
-
   const { formTitle, formType, onSubmit, onCancel, onClose, defaultValues } = props
 
   const initialFormValues = {
@@ -141,6 +133,15 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
   const handleFormSubmit = (data: FormData) => {
     onSubmit(data)
   }
+
+  // Focus on the title field when the form is opened
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (isTaskCreationForm && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isTaskCreationForm])
 
   return (
     <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={closeModule}>

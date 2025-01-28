@@ -18,6 +18,8 @@ import React, { useState } from "react"
 import { useParams } from "react-router-dom"
 
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
+import { TaskTemplate } from "@/types"
+
 import BoardDeletionComponent from "./BoardDeletionComponent"
 import BoardPasswordChangeForm from "./BoardPasswordChangeForm"
 import BoardTitleChangeForm from "./BoardTitleChangeForm"
@@ -25,7 +27,6 @@ import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
 import HomeButton from "./HomeButton"
 import TaskForm from "./TaskForm"
-import { TaskTemplate } from "@/types"
 import UserCreationForm from "./UserCreationForm"
 import UserList from "./UserList"
 
