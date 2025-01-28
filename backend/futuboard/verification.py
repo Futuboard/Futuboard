@@ -1,6 +1,7 @@
 import os
 from uuid import UUID
 from argon2 import PasswordHasher
+from django.http import JsonResponse
 from django.utils import timezone
 import jwt
 
@@ -48,6 +49,19 @@ def decode_token(token: str):
         raise ValueError("JWT_SECRET not set")
 
     return jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+
+
+def token_access_failed(board_id, request):
+    token = get_token_from_request(request)
+    if token is None:
+        return JsonResponse({"message": "Access token missing"}, status=401)
+
+    decoded_token = decode_token(token)
+
+    if decoded_token["board_id"] != str(board_id):
+        return JsonResponse({"message": "Access token to wrong board"}, status=405)
+
+    return None
 
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")

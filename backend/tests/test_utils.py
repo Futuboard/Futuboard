@@ -6,10 +6,11 @@ from ..futuboard.verification import hash_password
 # Utility functions
 
 
-def addBoard(title="title", password="", description=""):
+def addBoard(title="title", password="", description="", background_color="white"):
     new_board = md.Board(
         description=description,
         title=title,
+        background_color=background_color,
         creation_date=timezone.now(),
         passwordhash="" if password == "" else hash_password(password),
         salt="",

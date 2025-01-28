@@ -144,6 +144,16 @@ describe("In a board", () => {
     cy.contains("Antonio").should("not.exist")
     cy.contains("Create board")
   })
+
+  it("can change board background color", () => {
+    cy.get('[data-testid="MoreVertIcon"]').click()
+    cy.get("li").contains("Board Background Color").click()
+
+    cy.get("input[name='hexColorInput']").clear().type("7dd354")
+    cy.get("button").contains("Submit").click()
+
+    cy.get("html").should("have.css", "background-color", "rgb(125, 211, 84)")
+  })
 })
 
 describe("When using board templates", () => {
