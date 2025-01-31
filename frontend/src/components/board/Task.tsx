@@ -15,7 +15,7 @@ import { Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
 
 import { useUpdateTaskMutation } from "../../state/apiSlice"
 
-import TaskEditForm from "./TaskEditForm"
+import TaskForm from "./TaskForm"
 import UserMagnet from "./UserMagnet"
 
 const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSnapshot) => {
@@ -73,12 +73,22 @@ const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetSt
     setAnchorEl(event.currentTarget)
   }
 
-  const handleClose = () => {
+  const handleCancel = () => {
     setTaskSelected(false)
     setAnchorEl(null)
   }
 
-  const handleOnSubmit = async (data: FormData) => {
+  const handleClose = async (data: FormData | null) => {
+    if (data) {
+      if (JSON.stringify(task) === JSON.stringify(data)) {
+        handleCancel()
+        return
+      }
+      handleSubmit(data)
+    }
+  }
+
+  const handleSubmit = async (data: FormData) => {
     setTaskSelected(false)
     setAnchorEl(null)
     const taskObject = {
@@ -92,6 +102,7 @@ const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetSt
     }
     await updateTask({ task: taskObject })
   }
+
   const open = Boolean(anchorEl)
   const popOverid = open ? "popover" : undefined
   return (
@@ -116,7 +127,14 @@ const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetSt
         }}
       >
         <Paper sx={{ height: "fit-content", padding: "20px", width: "400px" }}>
-          <TaskEditForm onSubmit={handleOnSubmit} onCancel={handleClose} task={task} />
+          <TaskForm
+            formTitle={task.title}
+            formType={"TaskEdit"}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            onClose={handleClose}
+            defaultValues={task}
+          />
         </Paper>
       </Popover>
     </div>

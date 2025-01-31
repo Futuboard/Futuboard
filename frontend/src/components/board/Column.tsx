@@ -10,20 +10,21 @@ import { useSelector } from "react-redux"
 import { useParams } from "react-router"
 
 import { RootState } from "@/state/store"
-import type { Column, Task as TaskType, User } from "@/types"
+import type { Column, Task as TaskType, User, TaskTemplate } from "@/types"
 
 import { getId } from "../../services/Utils"
 import {
   boardsApi,
   useAddTaskMutation,
   useGetTaskListByColumnIdQuery,
-  useUpdateColumnMutation
+  useUpdateColumnMutation,
+  useGetBoardQuery
 } from "../../state/apiSlice"
 
 import ColumnEditForm from "./ColumnEditForm"
 import SwimlaneContainer from "./SwimlaneContainer"
 import Task from "./Task"
-import TaskCreationForm from "./TaskCreationForm"
+import TaskForm from "./TaskForm"
 
 interface FormData {
   taskTitle: string
@@ -40,19 +41,58 @@ interface CreateTaskButtonProps {
 
 const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
   const { id = "default-id" } = useParams()
-
-  const [defaultValues, setDefaultValues] = useState<FormData | null>(null)
+  const [defaultValues, setDefaultValues] = useState<TaskTemplate | null>(null)
+  const [taskTemplate, setTaskTemplate] = useState<TaskTemplate | null>(null)
 
   const [addTask] = useAddTaskMutation()
 
   const [open, setOpen] = useState(false)
 
+  const { data: board } = useGetBoardQuery(id)
+
   const handleOpenDialog = () => {
+    if ((!defaultValues && board) || JSON.stringify(defaultValues) === JSON.stringify(taskTemplate)) {
+      const taskTemplate = {
+        title: board?.default_ticket_title || "",
+        description: board?.default_ticket_description || "",
+        cornernote: board?.default_ticket_cornernote || "",
+        corners: [],
+        color: board?.default_ticket_color || "#ffffff",
+        size: board?.default_ticket_size || undefined
+      }
+      setTaskTemplate(taskTemplate)
+      setDefaultValues(taskTemplate)
+    }
     setOpen(true)
   }
+
   const handleCloseDialog = () => {
     setOpen(false)
   }
+
+  const handleClose = (data: FormData | null) => {
+    if (data) {
+      const newDefaultValues = {
+        title: data.taskTitle || "",
+        description: data.description || "",
+        cornernote: data.cornerNote || "",
+        corners: data.corners || [],
+        color: data.color || "#ffffff",
+        size: data.size ? data.size : undefined
+      }
+      if (JSON.stringify(newDefaultValues) !== JSON.stringify(taskTemplate)) {
+        setDefaultValues(newDefaultValues)
+      } else {
+        setDefaultValues(null)
+      }
+    }
+  }
+
+  const handleCancel = () => {
+    setDefaultValues(null)
+    setOpen(false)
+  }
+
   const handleSubmit = (data: FormData) => {
     //task object cant be give type Task yet- problem with caretaker types
     //the object creation should be refactored to the TaskCreationForm component
@@ -101,11 +141,13 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
         }}
       >
         <DialogContent>
-          <TaskCreationForm
+          <TaskForm
+            formTitle={"Create Card"}
+            formType={"TaskCreation"}
             onSubmit={handleSubmit}
-            onCancel={handleCloseDialog}
+            onCancel={handleCancel}
+            onClose={handleClose}
             defaultValues={defaultValues}
-            setDefaultValues={setDefaultValues}
           />
         </DialogContent>
       </Dialog>

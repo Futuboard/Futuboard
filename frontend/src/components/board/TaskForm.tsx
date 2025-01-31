@@ -20,11 +20,11 @@ import {
   Typography
 } from "@mui/material"
 import React from "react"
-import { Controller, useForm } from "react-hook-form"
+import { useEffect, useRef } from "react"
+import { useForm } from "react-hook-form"
 
 import { useDeleteTaskMutation } from "@/state/apiSlice"
-
-import { Task, Task as TaskType, User } from "../../types"
+import { Task, Task as TaskType, User, TaskTemplate } from "@/types"
 
 interface DeleteTaskButtonProps {
   task: Task
@@ -73,41 +73,46 @@ const DeleteTaskButton: React.FC<DeleteTaskButtonProps> = ({ task }) => {
   )
 }
 
-interface TaskEditFormProps {
+interface TaskFormProps {
+  formTitle: string
+  formType: string
   onSubmit: (data: FormData) => void
   onCancel: () => void
-  task: TaskType
+  onClose: (data: FormData | null) => void
+  defaultValues: TaskType | TaskTemplate | null
 }
 
 interface FormData {
   taskTitle: string
-  corners: User[]
+  caretakers: User[]
   cornerNote: string
   description: string
   color: string
   size: number
 }
 
-const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
-  const { onSubmit, onCancel, task } = props
+const TaskForm: React.FC<TaskFormProps> = (props) => {
+  const { formTitle, formType, onSubmit, onCancel, onClose, defaultValues } = props
 
   const initialFormValues = {
-    taskTitle: task.title,
-    corners: task.caretakers,
-    cornerNote: task.cornernote,
-    description: task.description,
-    color: task.color,
-    size: task.size
+    taskTitle: defaultValues?.title || "",
+    corners: defaultValues?.caretakers || [],
+    cornerNote: defaultValues?.cornernote || "",
+    description: defaultValues?.description || "",
+    color: defaultValues?.color || "#ffffff",
+    size: defaultValues?.size
   }
+
+  const isTaskCreationForm = formType === "TaskCreation"
+  const isTaskEditForm = formType === "TaskEdit"
+  const isTaskTemplateForm = formType === "TaskTemplate"
 
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
     setValue,
-    watch,
-    getValues
+    watch
   } = useForm<FormData>({
     //set initial values form the task prop
     defaultValues: initialFormValues
@@ -119,17 +124,24 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
     setValue("color", event.target.value)
   }
 
+  const watchedValues = watch()
+
   const closeModule = () => {
-    if (JSON.stringify(initialFormValues) === JSON.stringify(getValues())) {
-      onCancel()
-      return
-    }
-    handleSubmit(onSubmit)()
+    onClose(watchedValues)
   }
 
   const handleFormSubmit = (data: FormData) => {
     onSubmit(data)
   }
+
+  // Focus on the title field when the form is opened
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (isTaskCreationForm && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isTaskCreationForm])
 
   return (
     <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={closeModule}>
@@ -137,47 +149,42 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Typography noWrap gutterBottom variant="h6">
+              <Typography gutterBottom variant="h6">
                 {" "}
-                <b>{task.title}</b>
+                <b>{formTitle}</b>
               </Typography>
             </Box>
             <Divider />
           </Grid>
           <Grid item xs={12}>
-            <Controller
-              name="taskTitle"
-              control={control}
-              defaultValue={task.title}
-              rules={{
-                required: {
-                  value: true,
-                  message: "Task name is required"
+            <TextField
+              label={
+                <span>
+                  Name
+                  {!isTaskTemplateForm && <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>}
+                </span>
+              }
+              inputRef={inputRef}
+              inputProps={{ spellCheck: "false" }}
+              multiline
+              fullWidth
+              helperText={errors.taskTitle?.message}
+              error={Boolean(errors.taskTitle)}
+              {...register("taskTitle", {
+                required: !isTaskTemplateForm
+                  ? {
+                      value: true,
+                      message: "Task name is required"
+                    }
+                  : false
+              })}
+              //the multiline field starts a new line when enter is pressed which doesnt make sense for a title, thus just send the form
+              onKeyDown={(event: { key: string; preventDefault: () => void }) => {
+                if (event.key === "Enter") {
+                  event.preventDefault()
+                  handleSubmit(onSubmit)()
                 }
               }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label={
-                    <span>
-                      Name <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>
-                    </span>
-                  }
-                  multiline
-                  maxRows={3}
-                  fullWidth
-                  inputProps={{ spellCheck: "false" }}
-                  helperText={errors.taskTitle?.message}
-                  error={Boolean(errors.taskTitle)}
-                  onKeyDown={(event: { key: string; preventDefault: () => void }) => {
-                    // the multiline field starts a new line when enter is pressed which doesnt make sense for a title, thus just send the form
-                    if (event.key === "Enter") {
-                      event.preventDefault()
-                      handleSubmit(onSubmit)()
-                    }
-                  }}
-                />
-              )}
             />
           </Grid>
           <Grid item xs={12}>
@@ -236,13 +243,15 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
           <Grid item container spacing={4} xs={12}>
             <Grid item xs={10}>
               <Button type="submit" color="primary" variant="contained">
-                Save Changes
+                {isTaskCreationForm ? "Submit" : "Save Changes"}
               </Button>
               <Button onClick={onCancel}>Cancel</Button>
             </Grid>
-            <Grid item xs={1}>
-              <DeleteTaskButton task={task} />
-            </Grid>
+            {defaultValues && isTaskEditForm && (
+              <Grid item xs={1}>
+                <DeleteTaskButton task={defaultValues as Task} />
+              </Grid>
+            )}
           </Grid>
         </Grid>
       </form>
@@ -250,4 +259,4 @@ const TaskEditForm: React.FC<TaskEditFormProps> = (props) => {
   )
 }
 
-export default TaskEditForm
+export default TaskForm
