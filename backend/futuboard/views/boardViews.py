@@ -169,8 +169,8 @@ def update_ticket_template(request, board_id):
         board.default_ticket_cornernote = request.data.get("cornernote", board.default_ticket_cornernote)
         board.save()
 
-        seliazer = BoardSerializer(board)
-        return JsonResponse(seliazer.data, safe=False)
+        serializer = BoardSerializer(board)
+        return JsonResponse(serializer.data, safe=False)
 
     except Board.DoesNotExist:
         raise Http404("Board does not exist")
