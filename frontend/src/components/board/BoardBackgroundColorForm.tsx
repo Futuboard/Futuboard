@@ -45,7 +45,7 @@ const BoardBackgroundColorForm = ({ boardColor, onClose, open }: BoardBackground
   return (
     <Dialog open={open} onClose={handleOnClose} hideBackdrop>
       <DialogContent>
-        <GlobalStyles styles={{ ":root": { backgroundColor: color || "white" } }} />
+        <GlobalStyles styles={{ "#root": { backgroundColor: color || "white" } }} />
         <Grid container spacing={2} flexDirection="column" padding={1} width="280px">
           <Grid item xs={12}>
             <Typography gutterBottom variant="h6">
