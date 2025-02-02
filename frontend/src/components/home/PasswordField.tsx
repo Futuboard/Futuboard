@@ -11,16 +11,17 @@ import { UseFormRegisterReturn } from "react-hook-form"
 interface AddPasswordFieldProps {
   register: UseFormRegisterReturn
   errorText?: string
+  label?: string
 }
 
-const PasswordField: React.FC<AddPasswordFieldProps> = ({ register, errorText }) => {
+const PasswordField: React.FC<AddPasswordFieldProps> = ({ register, errorText, label = "Password" }) => {
   const [showPassword, setShowPassword] = useState(false)
 
   const handleClickShowPassword = () => setShowPassword((show) => !show)
 
   return (
     <FormControl sx={{ width: "90%" }}>
-      <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+      <InputLabel htmlFor="outlined-adornment-password">{label}</InputLabel>
       <OutlinedInput
         type={showPassword ? "Text" : "Password"}
         error={Boolean(errorText)}
@@ -32,7 +33,7 @@ const PasswordField: React.FC<AddPasswordFieldProps> = ({ register, errorText })
             </IconButton>
           </InputAdornment>
         }
-        label="Password"
+        label={label}
       />
       <Typography variant="caption" color="error">
         {errorText || ""}

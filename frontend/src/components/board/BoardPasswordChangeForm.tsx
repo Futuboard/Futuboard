@@ -1,10 +1,11 @@
-import { Button, TextField, Grid, Typography, Dialog, DialogContent, Divider } from "@mui/material"
-import { useEffect, useRef } from "react"
+import { Button, Grid, Typography, Dialog, DialogContent, Divider } from "@mui/material"
 import { useForm } from "react-hook-form"
 import { useParams } from "react-router-dom"
 
 import { useUpdateBoardPasswordMutation } from "@/state/apiSlice"
 import { PasswordChangeFormData } from "@/types"
+
+import PasswordField from "../home/PasswordField"
 
 interface BoardPasswordChangeFormProps {
   onClose: () => void
@@ -21,14 +22,6 @@ const BoardPasswordChangeForm = ({ onClose, open }: BoardPasswordChangeFormProps
     setError,
     formState: { errors }
   } = useForm<PasswordChangeFormData>()
-
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus()
-    }
-  }, [])
 
   const onSubmit = async (data: PasswordChangeFormData) => {
     if (data.new_password !== data.confirm_password) {
@@ -73,34 +66,24 @@ const BoardPasswordChangeForm = ({ onClose, open }: BoardPasswordChangeFormProps
               <Divider />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                inputRef={inputRef}
+              <PasswordField
                 label="Old Password"
-                type="password"
-                helperText={errors.old_password?.message}
-                error={Boolean(errors.old_password)}
-                {...register("old_password")}
-                sx={{ width: "100%" }}
+                errorText={errors.old_password?.message}
+                register={register("old_password")}
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <PasswordField
                 label="New Password"
-                type="password"
-                helperText={errors.new_password?.message}
-                error={Boolean(errors.new_password)}
-                {...register("new_password")}
-                sx={{ width: "100%" }}
+                errorText={errors.new_password?.message}
+                register={register("new_password")}
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <PasswordField
                 label="Confirm Password"
-                type="password"
-                helperText={errors.confirm_password?.message}
-                error={Boolean(errors.confirm_password)}
-                {...register("confirm_password")}
-                sx={{ width: "100%" }}
+                errorText={errors.confirm_password?.message}
+                register={register("confirm_password")}
               />
             </Grid>
             <Grid item xs={12} display="flex" flexDirection="row" sx={{ marginTop: 1, justifyContent: "center" }}>
