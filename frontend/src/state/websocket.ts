@@ -11,6 +11,7 @@ class WebSocketContainer {
   private boardId: string
   private onMessageHandler: (event: MessageEvent) => void
   private onResetHandler: () => void
+  private sendNotification: (message: string) => void
 
   constructor() {
     this.clientId = getId()
@@ -18,14 +19,22 @@ class WebSocketContainer {
     this.boardId = ""
     this.onMessageHandler = () => null
     this.onResetHandler = () => null
+    this.sendNotification = () => null
 
     // Automatically reconnect to the websocket if the connection is lost. Check every 10 seconds.
     setInterval(async () => {
-      if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-        this.onResetHandler()
-        const newSocket = await this.getNewWebSocket()
-        newSocket.onmessage = this.onMessageHandler
-        return newSocket
+      if (
+        !this.socket ||
+        (this.socket.readyState !== WebSocket.OPEN && this.socket.readyState !== WebSocket.CONNECTING)
+      ) {
+        this.sendNotification("Board connection interrupted. Reconnecting...")
+        try {
+          this.socket = await this.getNewWebSocket()
+          this.socket.onmessage = this.onMessageHandler
+          this.onResetHandler()
+        } catch (error) {
+          this.sendNotification("Failed to connect to the board. Please check your internet connection.")
+        }
       }
     }, 10_000)
   }
@@ -42,11 +51,15 @@ class WebSocketContainer {
   private async getNewWebSocket() {
     this.close()
 
-    return new Promise<WebSocket>((resolve) => {
+    return new Promise<WebSocket>((resolve, reject) => {
       const newSocket = new WebSocket(import.meta.env.VITE_WEBSOCKET_ADDRESS + this.boardId)
 
       newSocket.onopen = () => {
         resolve(newSocket)
+      }
+
+      newSocket.onerror = (error) => {
+        reject(error)
       }
     })
   }
@@ -81,6 +94,10 @@ class WebSocketContainer {
 
   public setResetHandler(resetHandler: () => void) {
     this.onResetHandler = resetHandler
+  }
+
+  public setSendNotificationHandler(sendNotification: (message: string) => void) {
+    this.sendNotification = sendNotification
   }
 }
 
