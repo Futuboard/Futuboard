@@ -10,7 +10,7 @@ const fullNotifcationTime = 5000
 
 const Notification = () => {
   const [notificationTime, setNotificationTime] = useState<number>(fullNotifcationTime)
-  const [intervalId, setIntervalId] = useState<number | null>(null)
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
   const notification = useSelector((state: RootState) => state.notification)
 
   const closeNotification = () => {
