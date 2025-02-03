@@ -15,7 +15,8 @@ import {
   PasswordChangeFormData,
   NewBoardFormData,
   BoardTemplate,
-  NewBoardTemplate
+  NewBoardTemplate,
+  TaskTemplate
 } from "@/types"
 
 import { getAdminPassword, getAuth, setToken } from "./auth"
@@ -155,6 +156,15 @@ export const boardsApi = createApi({
         url: `boards/${boardId}/password/`,
         method: "PUT",
         body: newPassword
+      }),
+      invalidatesTags: () => invalidateRemoteCache(["Boards"])
+    }),
+
+    updateTaskTemplate: builder.mutation<Board, { boardId: string; newTaskTemplate: TaskTemplate }>({
+      query: ({ boardId, newTaskTemplate }) => ({
+        url: `boards/${boardId}/ticket_template/`,
+        method: "PUT",
+        body: newTaskTemplate
       }),
       invalidatesTags: () => invalidateRemoteCache(["Boards"])
     }),
@@ -702,5 +712,6 @@ export const {
   usePostUserToActionMutation,
   useDeleteUserFromActionMutation,
   useDeleteUserFromTicketMutation,
-  useCheckAdminPasswordMutation
+  useCheckAdminPasswordMutation,
+  useUpdateTaskTemplateMutation
 } = boardsApi
