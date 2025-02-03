@@ -33,7 +33,7 @@ class WebSocketContainer {
           this.socket.onmessage = this.onMessageHandler
           this.onResetHandler()
         } catch (error) {
-          this.sendNotification("Failed to reconnect to the board. Please check your internet connection.")
+          this.sendNotification("Failed to connect to the board. Please check your internet connection.")
         }
       }
     }, 10_000)
