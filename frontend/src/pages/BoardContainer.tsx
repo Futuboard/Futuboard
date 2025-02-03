@@ -54,7 +54,7 @@ const BoardContainer: React.FC = () => {
         dispatch(boardsApi.util.invalidateTags(tags))
       })
       webSocketContainer.setResetHandler(() => {
-        dispatch(boardsApi.util.invalidateTags([...cacheTagTypes]))
+        dispatch(boardsApi.util.invalidateTags(cacheTagTypes.filter((item) => item !== "Boards")))
       })
       webSocketContainer.setSendNotificationHandler((message) => {
         dispatch(setNotification({ text: message, type: "info" }))
