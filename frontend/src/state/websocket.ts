@@ -27,11 +27,16 @@ class WebSocketContainer {
         !this.socket ||
         (this.socket.readyState !== WebSocket.OPEN && this.socket.readyState !== WebSocket.CONNECTING)
       ) {
-        this.onResetHandler()
-        const newSocket = await this.getNewWebSocket()
-        newSocket.onmessage = this.onMessageHandler
+        console.log("Reconnecting to board")
         this.sendNotification("Board connection interrupted. Reconnecting...")
-        return newSocket
+        try {
+          this.socket = await this.getNewWebSocket()
+          this.socket.onmessage = this.onMessageHandler
+          this.onResetHandler()
+          console.log("Connected to socket and reset")
+        } catch (error) {
+          console.error("Error while reconnecting to board", error)
+        }
       }
     }, 10_000)
   }
@@ -48,11 +53,15 @@ class WebSocketContainer {
   private async getNewWebSocket() {
     this.close()
 
-    return new Promise<WebSocket>((resolve) => {
+    return new Promise<WebSocket>((resolve, reject) => {
       const newSocket = new WebSocket(import.meta.env.VITE_WEBSOCKET_ADDRESS + this.boardId)
 
       newSocket.onopen = () => {
         resolve(newSocket)
+      }
+
+      newSocket.onerror = (error) => {
+        reject(error)
       }
     })
   }
