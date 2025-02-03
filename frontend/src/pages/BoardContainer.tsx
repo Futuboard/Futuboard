@@ -6,7 +6,9 @@ import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useParams } from "react-router-dom"
 
+import { cacheTagTypes } from "@/constants"
 import { setBoardId } from "@/state/auth"
+import { setNotification } from "@/state/notification"
 import { store } from "@/state/store"
 import { webSocketContainer } from "@/state/websocket"
 import { Action, Task, User } from "@/types"
@@ -52,7 +54,10 @@ const BoardContainer: React.FC = () => {
         dispatch(boardsApi.util.invalidateTags(tags))
       })
       webSocketContainer.setResetHandler(() => {
-        dispatch(boardsApi.util.resetApiState())
+        dispatch(boardsApi.util.invalidateTags([...cacheTagTypes]))
+      })
+      webSocketContainer.setSendNotificationHandler((message) => {
+        dispatch(setNotification({ text: message, type: "info" }))
       })
     }
     inner()
@@ -141,7 +146,12 @@ const BoardContainer: React.FC = () => {
       if (destinationType === "ticket") {
         destinationUsers = allUsers.filter((user) => user.tickets.includes(destinationId))
         if (destinationUsers.length >= 3) {
-          alert("Destination task already has 3 or more user magnets. Move not allowed.")
+          store.dispatch(
+            setNotification({
+              text: "Destination card already has 3 or more user magnets. Move not allowed.",
+              type: "info"
+            })
+          )
           return
         }
       }
@@ -149,7 +159,12 @@ const BoardContainer: React.FC = () => {
       if (destinationType === "action") {
         destinationUsers = allUsers.filter((user) => user.actions.includes(destinationId))
         if (destinationUsers.length >= 2) {
-          alert("Destination action already has 2 or more user magnets. Move not allowed.")
+          store.dispatch(
+            setNotification({
+              text: "Destination action already has 2 or more user magnets. Move not allowed.",
+              type: "info"
+            })
+          )
           return
         }
       }
@@ -157,7 +172,7 @@ const BoardContainer: React.FC = () => {
       const isUnique = !destinationUsers.some((user) => user.userid === draggedUserId)
 
       if (!isUnique && destinationId !== "user-list") {
-        alert("This member is already on the card. Move not allowed.")
+        store.dispatch(setNotification({ text: "This member is already on the card. Move not allowed.", type: "info" }))
         return
       }
 
@@ -252,10 +267,22 @@ const BoardContainer: React.FC = () => {
   }
 
   if (isLoggedIn) {
+    const defaultValues = {
+      title: board?.default_ticket_title || "",
+      description: board?.default_ticket_description || "",
+      cornernote: board?.default_ticket_cornernote || "",
+      color: board?.default_ticket_color || "",
+      size: board?.default_ticket_size || undefined
+    }
     return (
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <GlobalStyles styles={{ "#root": { backgroundColor: board.background_color || "white" } }} />
-        <ToolBar boardId={id} title={board.title || ""} boardBackgroundColor={board.background_color || "white"} />
+        <ToolBar
+          boardId={id}
+          title={board.title || ""}
+          taskTemplate={defaultValues}
+          boardBackgroundColor={board.background_color || "white"}
+        />
         <Board />
       </DragDropContext>
     )

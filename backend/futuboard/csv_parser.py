@@ -35,6 +35,17 @@ def write_board_data(writer, boardid):
     # Get userids
     for user in users:
         writer.writerow(["User", user.name])
+    writer.writerow(
+        [
+            "Ticket Template",
+            board.default_ticket_title,
+            board.default_ticket_description,
+            board.default_ticket_size,
+            board.default_ticket_storypoints,
+            board.default_ticket_cornernote,
+            board.default_ticket_color,
+        ]
+    )
     writer.writerow([])
     # Get all the columns for the board
     columns = Column.objects.filter(boardid=boardid)
@@ -120,6 +131,14 @@ def read_board_data(reader, board_title, password_hash):
         # Read users until the next object type is found
         if len(row) > 0 and row[0] == "User":
             user = User.objects.create(userid=uuid.uuid4(), name=row[1], boardid=board)
+        elif len(row) > 0 and row[0] == "Ticket Template":
+            board.default_ticket_title = row[1]
+            board.default_ticket_description = row[2]
+            board.default_ticket_size = row[3]
+            board.default_ticket_storypoints = row[4]
+            board.default_ticket_cornernote = row[5]
+            board.default_ticket_color = row[6]
+            board.save()
         else:
             break
     # Read the columns from the csv file

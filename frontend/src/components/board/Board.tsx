@@ -19,8 +19,6 @@ const Board: React.FC = () => {
   }
 
   if (isSuccess && columns.length === 0) {
-    //const boardtitle = useGetBoardQuery(id)
-    //console.log(boardtitle)
     return (
       <Box
         sx={{

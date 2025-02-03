@@ -1,3 +1,5 @@
+import { cacheTagTypes } from "@/constants"
+
 export type Board = {
   boardid: string
   title: string
@@ -5,6 +7,11 @@ export type Board = {
   password: string
   columns: Column[]
   users: User[]
+  default_ticket_title?: string
+  default_ticket_description?: string
+  default_ticket_cornernote?: string
+  default_ticket_color?: string
+  default_ticket_size?: number
 }
 
 export type Column = {
@@ -34,6 +41,8 @@ export type Task = {
 }
 
 export type NewTask = Omit<Task, "users">
+
+export type TaskTemplate = Omit<Task, "ticketid" | "columnid" | "users">
 
 export type User = {
   userid: string
@@ -90,7 +99,7 @@ export type SwimlaneColumn = {
   order: number
 }
 
-type Tag = "Boards" | "Columns" | "Ticket" | "Users" | "Action" | "ActionList" | "SwimlaneColumn" | "BoardTemplate"
+type Tag = (typeof cacheTagTypes)[number]
 
 export type CacheInvalidationTag =
   | {

@@ -31,6 +31,12 @@ class Board(models.Model):
     creation_date = models.DateTimeField()
     passwordhash = models.TextField(db_column="passwordHash")
     salt = models.TextField()
+    default_ticket_title = models.TextField(blank=True, null=True)
+    default_ticket_description = models.TextField(blank=True, null=True)
+    default_ticket_color = models.TextField(blank=True, null=True)
+    default_ticket_storypoints = models.IntegerField(blank=True, null=True)
+    default_ticket_size = models.IntegerField(blank=True, null=True)
+    default_ticket_cornernote = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = "Board"

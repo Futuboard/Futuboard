@@ -659,3 +659,47 @@ def test_password_change_with_clashing_confirm_password():
     assert verify_password("password", md.Board.objects.first().passwordhash)
 
     resetDB()
+
+
+@pytest.mark.django_db
+def test_update_ticket_template():
+    """
+    Test the update_ticket_template function in backend/futuboard/views/boardViewsViews.py
+    Has one method: PUT
+
+        PUT: Updates ticket template values
+    """
+    api_client = APIClient()
+    boardid = addBoard(uuid.uuid4(), password="password").boardid
+
+    # Get token for auth
+    response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
+    assert response.status_code == 200
+    data = response.json()
+    token = data["token"]
+
+    response = api_client.put(
+        reverse("update_ticket_template", args=[boardid]),
+        data=json.dumps(
+            {
+                "title": "New title",
+                "description": "New description",
+                "color": "#ffeb3b",
+                "storypoints": 8,
+                "size": 16,
+                "cornernote": "New cornernote",
+            }
+        ),
+        content_type="application/json",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 200
+    assert md.Board.objects.get(pk=boardid).default_ticket_color == "#ffeb3b"
+    assert md.Board.objects.get(pk=boardid).default_ticket_cornernote == "New cornernote"
+    assert md.Board.objects.get(pk=boardid).default_ticket_description == "New description"
+    assert md.Board.objects.get(pk=boardid).default_ticket_size == 16
+    assert md.Board.objects.get(pk=boardid).default_ticket_storypoints == 8
+    assert md.Board.objects.get(pk=boardid).default_ticket_title == "New title"
+
+    resetDB()
