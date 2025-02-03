@@ -27,15 +27,13 @@ class WebSocketContainer {
         !this.socket ||
         (this.socket.readyState !== WebSocket.OPEN && this.socket.readyState !== WebSocket.CONNECTING)
       ) {
-        console.log("Reconnecting to board")
         this.sendNotification("Board connection interrupted. Reconnecting...")
         try {
           this.socket = await this.getNewWebSocket()
           this.socket.onmessage = this.onMessageHandler
           this.onResetHandler()
-          console.log("Connected to socket and reset")
         } catch (error) {
-          console.error("Error while reconnecting to board", error)
+          this.sendNotification("Failed to reconnect to the board. Please check your internet connection.")
         }
       }
     }, 10_000)
