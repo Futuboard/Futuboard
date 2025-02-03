@@ -607,6 +607,14 @@ export const boardsApi = createApi({
       invalidatesTags: (result) => invalidateRemoteCache([{ type: "Action", id: result?.columnid }])
     }),
 
+    deleteAction: builder.mutation<Action, { actionid: string }>({
+      query: ({ actionid }) => ({
+        url: `actions/${actionid}/`,
+        method: "DELETE"
+      }),
+      invalidatesTags: (result) => invalidateRemoteCache([{ type: "Action", id: result?.columnid }])
+    }),
+
     // update action order
     updateActionList: builder.mutation<
       Action[],
@@ -689,6 +697,7 @@ export const {
   useGetActionsByColumnIdQuery,
   usePostActionMutation,
   useUpdateActionMutation,
+  useDeleteActionMutation,
   useUpdateActionListMutation,
   usePostUserToActionMutation,
   useDeleteUserFromActionMutation,
