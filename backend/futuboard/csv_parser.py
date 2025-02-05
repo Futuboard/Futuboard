@@ -30,7 +30,7 @@ def verify_csv_header(reader):
 def write_board_data(writer, boardid):
     # Write board data to the csv file
     board = Board.objects.get(boardid=boardid)
-    writer.writerow(["Board", board.description])
+    writer.writerow(["Board", board.description, board.background_color])
     users = User.objects.filter(boardid=boardid)
     # Get userids
     for user in users:
@@ -117,6 +117,7 @@ def read_board_data(reader, board_title, password_hash):
     board = Board.objects.create(
         title=board_title,
         description=board_data[1],
+        background_color=board_data[2] if len(board_data) > 2 else "#FFFFFF",
         passwordhash=password_hash,
         salt="",
         creation_date=timezone.now(),
@@ -211,7 +212,9 @@ def read_board_data(reader, board_title, password_hash):
                         ticketid=ticket,
                         title=row[1],
                         order=row[2],
-                        swimlanecolumnid=swimlanecolumns[int(row[3])],
+                        swimlanecolumnid=swimlanecolumns[
+                            int(row[3])
+                        ],  # This crashes application if ticket is left of all columns with swimlanes (or if ticket is not on a column with swimlanes when the fix below is implemented)
                     )
                     # Read the action users from the csv file
                     row = next(reader, None)
@@ -222,6 +225,7 @@ def read_board_data(reader, board_title, password_hash):
                         user = User.objects.get(name=row[1], boardid=board)
                         user.actions.add(action)
                         row = next(reader, None)
+            # swimlanecolumns = [] TODO: This fixes the CSV export/import action displacement bug but currently is more unstable because of how creating old actions is handled
         else:
             row = next(reader, None)
     return board

@@ -10,6 +10,7 @@ class BoardSerializer(serializers.ModelSerializer):
             "description",
             "title",
             "creation_date",
+            "background_color",
             "default_ticket_title",
             "default_ticket_description",
             "default_ticket_color",

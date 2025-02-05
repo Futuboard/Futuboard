@@ -109,7 +109,7 @@ def update_swimlanecolumn(request, swimlanecolumn_id):
 def update_action(request, action_id):
     try:
         action = Action.objects.get(pk=action_id)
-    except Ticket.DoesNotExist:
+    except Action.DoesNotExist:
         raise Http404("Action not found")
 
     if request.method == "PUT":

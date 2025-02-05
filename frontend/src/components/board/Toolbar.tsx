@@ -1,4 +1,4 @@
-import { Download, MoreVert, EnhancedEncryption, Edit, Gradient } from "@mui/icons-material"
+import { Download, MoreVert, EnhancedEncryption, Edit, Gradient, ColorLens } from "@mui/icons-material"
 import {
   AppBar,
   Box,
@@ -20,6 +20,7 @@ import { useParams } from "react-router-dom"
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
 import { TaskTemplate } from "@/types"
 
+import BoardBackgroundColorForm from "./BoardBackgroundColorForm"
 import BoardDeletionComponent from "./BoardDeletionComponent"
 import BoardPasswordChangeForm from "./BoardPasswordChangeForm"
 import BoardTitleChangeForm from "./BoardTitleChangeForm"
@@ -102,6 +103,7 @@ type BoardToolBarProps = {
   title: string
   boardId: string
   taskTemplate: TaskTemplate
+  boardBackgroundColor: string
 }
 
 interface TaskFormData {
@@ -112,7 +114,7 @@ interface TaskFormData {
   color: string
 }
 
-const BoardToolBar = ({ title, boardId, taskTemplate }: BoardToolBarProps) => {
+const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: BoardToolBarProps) => {
   const { data: users, isSuccess } = useGetUsersByBoardIdQuery(boardId)
   const { id = "default-id" } = useParams()
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
@@ -120,6 +122,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate }: BoardToolBarProps) => {
   const [updateTaskTemplate] = useUpdateTaskTemplateMutation()
   const [passwordFormOpen, setPasswordFormOpen] = useState(false)
   const [titleFormOpen, setTitleFormOpen] = useState(false)
+  const [colorFormOpen, setColorFormOpen] = useState(false)
   const [taskFormOpen, setTaskFormOpen] = useState(false)
 
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -133,34 +136,6 @@ const BoardToolBar = ({ title, boardId, taskTemplate }: BoardToolBarProps) => {
   const handleExportAndClose = () => {
     handleExport()
     handleClose()
-  }
-
-  const handleOpenTitleForm = () => {
-    setTitleFormOpen(true)
-  }
-
-  const handleCloseTitleForm = () => {
-    setTitleFormOpen(false)
-  }
-
-  const handleOpenPasswordForm = () => {
-    setPasswordFormOpen(true)
-  }
-
-  const handleClosePasswordForm = () => {
-    setPasswordFormOpen(false)
-  }
-
-  const handleOpenTaskForm = () => {
-    setTaskFormOpen(true)
-  }
-
-  const handleCancelTaskForm = () => {
-    handleCloseTaskForm()
-  }
-
-  const handleCloseTaskForm = () => {
-    setTaskFormOpen(false)
   }
 
   const handleSubmitTaskFormData = async (data: TaskFormData | null) => {
@@ -231,15 +206,19 @@ const BoardToolBar = ({ title, boardId, taskTemplate }: BoardToolBarProps) => {
           "aria-labelledby": "basic-button"
         }}
       >
-        <MenuItem onClick={handleOpenTitleForm} sx={{ py: 1 }}>
+        <MenuItem onClick={() => setTitleFormOpen(true)} sx={{ py: 1 }}>
           <Edit sx={{ fontSize: "1rem", mr: 1 }} />
           <Typography variant="body2">Edit Board Name</Typography>
         </MenuItem>
-        <MenuItem onClick={handleOpenPasswordForm} sx={{ py: 1 }}>
+        <MenuItem onClick={() => setPasswordFormOpen(true)} sx={{ py: 1 }}>
           <EnhancedEncryption sx={{ fontSize: "1rem", mr: 1 }} />
           <Typography variant="body2">Change Board Password</Typography>
         </MenuItem>
-        <MenuItem onClick={handleOpenTaskForm} sx={{ py: 1 }}>
+        <MenuItem onClick={() => setColorFormOpen(true)} sx={{ py: 1 }}>
+          <ColorLens sx={{ fontSize: "1rem", mr: 1 }} />
+          <Typography variant="body2">Board Background Color</Typography>
+        </MenuItem>
+        <MenuItem onClick={() => setTaskFormOpen(true)} sx={{ py: 1 }}>
           <Gradient sx={{ fontSize: "1rem", mr: 1 }} />
           <Typography variant="body2">Edit Card Template</Typography>
         </MenuItem>
@@ -250,24 +229,21 @@ const BoardToolBar = ({ title, boardId, taskTemplate }: BoardToolBarProps) => {
         <BoardDeletionComponent />
       </Menu>
       <Box>
-        <Dialog open={titleFormOpen} onClose={handleCloseTitleForm}>
-          <DialogContent>
-            <BoardTitleChangeForm title={title} onClose={handleCloseTitleForm} />
-          </DialogContent>
-        </Dialog>
-        <Dialog open={passwordFormOpen} onClose={handleClosePasswordForm}>
-          <DialogContent>
-            <BoardPasswordChangeForm onClose={handleClosePasswordForm} />
-          </DialogContent>
-        </Dialog>
-        <Dialog open={taskFormOpen} onClose={handleCloseTaskForm}>
+        <BoardTitleChangeForm title={title} onClose={() => setTitleFormOpen(false)} open={titleFormOpen} />
+        <BoardPasswordChangeForm onClose={() => setPasswordFormOpen(false)} open={passwordFormOpen} />
+        <BoardBackgroundColorForm
+          onClose={() => setColorFormOpen(false)}
+          open={colorFormOpen}
+          boardColor={boardBackgroundColor}
+        />
+        <Dialog open={taskFormOpen} onClose={() => setTaskFormOpen(false)}>
           <DialogContent>
             <TaskForm
               formTitle={"Edit Card Template"}
               formType={"TaskTemplate"}
               onSubmit={handleSubmitTaskFormData}
-              onCancel={handleCancelTaskForm}
-              onClose={handleCloseTaskForm}
+              onCancel={() => setTaskFormOpen(false)}
+              onClose={() => setTaskFormOpen(false)}
               defaultValues={taskTemplate}
             />
           </DialogContent>
@@ -280,10 +256,11 @@ const BoardToolBar = ({ title, boardId, taskTemplate }: BoardToolBarProps) => {
 interface ToolBarProps {
   title: string
   boardId?: string
+  boardBackgroundColor?: string
   taskTemplate?: TaskTemplate
 }
 
-const ToolBar = ({ title, boardId, taskTemplate }: ToolBarProps) => {
+const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: ToolBarProps) => {
   return (
     <AppBar
       position="fixed"
@@ -301,7 +278,14 @@ const ToolBar = ({ title, boardId, taskTemplate }: ToolBarProps) => {
         >
           {title}
         </Typography>
-        {boardId && taskTemplate && <BoardToolBar title={title} boardId={boardId} taskTemplate={taskTemplate} />}
+        {boardId && taskTemplate && (
+          <BoardToolBar
+            title={title}
+            boardId={boardId}
+            taskTemplate={taskTemplate}
+            boardBackgroundColor={boardBackgroundColor || "white"}
+          />
+        )}
       </Toolbar>
     </AppBar>
   )

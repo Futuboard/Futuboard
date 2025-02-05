@@ -3,6 +3,7 @@ import { cacheTagTypes } from "@/constants"
 export type Board = {
   boardid: string
   title: string
+  background_color: string
   password: string
   columns: Column[]
   users: User[]

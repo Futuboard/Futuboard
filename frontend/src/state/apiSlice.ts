@@ -160,6 +160,15 @@ export const boardsApi = createApi({
       invalidatesTags: () => invalidateRemoteCache(["Boards"])
     }),
 
+    updateBoardColor: builder.mutation<Board, { boardId: string; newColor: string }>({
+      query: ({ boardId, newColor }) => ({
+        url: `boards/${boardId}/`,
+        method: "PUT",
+        body: { background_color: newColor }
+      }),
+      invalidatesTags: () => invalidateRemoteCache(["Boards"])
+    }),
+
     updateTaskTemplate: builder.mutation<Board, { boardId: string; newTaskTemplate: TaskTemplate }>({
       query: ({ boardId, newTaskTemplate }) => ({
         url: `boards/${boardId}/ticket_template/`,
@@ -688,6 +697,7 @@ export const {
   useDeleteBoardMutation,
   useUpdateBoardTitleMutation,
   useUpdateBoardPasswordMutation,
+  useUpdateBoardColorMutation,
   useGetColumnsByBoardIdQuery,
   useGetTaskListByColumnIdQuery,
   useAddColumnMutation,

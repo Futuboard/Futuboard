@@ -6,7 +6,12 @@ from ..models import Board
 from ..serializers import BoardSerializer
 import rest_framework.request
 from django.utils import timezone
-from ..verification import decode_token, encode_token, get_token_from_request, hash_password, verify_password
+from ..verification import (
+    encode_token,
+    hash_password,
+    verify_password,
+    token_access_failed,
+)
 
 
 # Create your views here.
@@ -31,7 +36,7 @@ def all_boards(request: rest_framework.request.Request, format=None):
         return JsonResponse(serializer.data, safe=False)
 
 
-@api_view(["GET", "POST", "DELETE"])
+@api_view(["GET", "POST", "PUT", "DELETE"])
 def board_by_id(request, board_id):
     if request.method == "POST":
         # Get password from request
@@ -51,19 +56,31 @@ def board_by_id(request, board_id):
             return JsonResponse({"success": False})
     if request.method == "GET":
         try:
-            token = get_token_from_request(request)
-            if token is None:
-                return JsonResponse({"message": "Access token missing"}, status=401)
-
-            decoded_token = decode_token(token)
-
-            if decoded_token["board_id"] != str(board_id):
-                return JsonResponse({"message": "Access token to wrong board"}, status=405)
+            if result := token_access_failed(board_id, request):
+                return result
 
             board = Board.objects.get(pk=board_id)
             serializer = BoardSerializer(board)
             return JsonResponse(serializer.data, safe=False)
 
+        except Board.DoesNotExist:
+            raise Http404("Board does not exist")
+        except jwt.ExpiredSignatureError:
+            return JsonResponse({"message": "Access token expired"}, status=401)
+        except jwt.InvalidTokenError:
+            return JsonResponse({"message": "Access token invalid"}, status=401)
+
+    if request.method == "PUT":
+        try:
+            if result := token_access_failed(board_id, request):
+                return result
+
+            board = Board.objects.get(pk=board_id)
+            board.background_color = request.data.get("background_color", board.background_color)
+            board.save()
+
+            serializer = BoardSerializer(board)
+            return JsonResponse(serializer.data, safe=False)
         except Board.DoesNotExist:
             raise Http404("Board does not exist")
         except jwt.ExpiredSignatureError:
@@ -83,14 +100,8 @@ def board_by_id(request, board_id):
 @api_view(["PUT"])
 def update_board_title(request, board_id):
     try:
-        token = get_token_from_request(request)
-        if token is None:
-            return JsonResponse({"message": "Access token missing"}, status=401)
-
-        decoded_token = decode_token(token)
-
-        if decoded_token["board_id"] != str(board_id):
-            return JsonResponse({"message": "Access token to wrong board"}, status=405)
+        if result := token_access_failed(board_id, request):
+            return result
 
         board = Board.objects.get(pk=board_id)
         board.title = request.data.get("title", board.title)
@@ -112,14 +123,8 @@ def update_board_title(request, board_id):
 @api_view(["PUT"])
 def update_board_password(request, board_id):
     try:
-        token = get_token_from_request(request)
-        if token is None:
-            return JsonResponse({"message": "Access token missing"}, status=401)
-
-        decoded_token = decode_token(token)
-
-        if decoded_token["board_id"] != str(board_id):
-            return JsonResponse({"message": "Access token to wrong board"}, status=405)
+        if result := token_access_failed(board_id, request):
+            return result
 
         board = Board.objects.get(pk=board_id)
 
@@ -151,14 +156,8 @@ def update_board_password(request, board_id):
 @api_view(["PUT"])
 def update_ticket_template(request, board_id):
     try:
-        token = get_token_from_request(request)
-        if token is None:
-            return JsonResponse({"message: Access token missing"}, status=401)
-
-        decoded_token = decode_token(token)
-
-        if decoded_token["board_id"] != str(board_id):
-            return JsonResponse({"message": "Access token to wrong board"}, status=405)
+        if result := token_access_failed(board_id, request):
+            return result
 
         board = Board.objects.get(pk=board_id)
         board.default_ticket_title = request.data.get("title", board.default_ticket_title)
