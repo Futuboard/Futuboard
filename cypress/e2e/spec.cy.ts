@@ -152,7 +152,7 @@ describe("In a board", () => {
     cy.get("input[name='hexColorInput']").clear().type("7dd354")
     cy.get("button").contains("Submit").click()
 
-    cy.get("#root").should("have.css", "background-color", "rgb(125, 211, 84)")
+    cy.get("html").should("have.css", "background-color", "rgb(125, 211, 84)")
   })
 })
 
