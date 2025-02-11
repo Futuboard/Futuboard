@@ -1,10 +1,11 @@
+import { useEffect, useState } from "react"
+import { useDispatch } from "react-redux"
+import { useParams } from "react-router-dom"
+
 import ToolBar from "@/components/board/Toolbar"
 import CumulativeFlowDiagram from "@/components/charts/CumulativeFlowDiagram"
 import { useGetBoardQuery } from "@/state/apiSlice"
 import { setBoardId } from "@/state/auth"
-import { useEffect, useState } from "react"
-import { useDispatch } from "react-redux"
-import { useParams } from "react-router-dom"
 
 const data = [
   {
@@ -57,8 +58,7 @@ const Charts: React.FC = () => {
   const [isBoardIdSet, setIsBoardIdset] = useState(false)
 
   const id = params.id || ""
-  console.log(id)
-  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
+  const { data: board } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
 
   useEffect(() => {
     dispatch(setBoardId(id))
@@ -68,8 +68,6 @@ const Charts: React.FC = () => {
   useEffect(() => {
     document.title = board?.title ? board?.title + " - Charts" : "Futuboard"
   }, [board])
-
-  if (isLoading && !isLoggedIn) return null
 
   return (
     <div>

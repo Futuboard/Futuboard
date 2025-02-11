@@ -16,7 +16,6 @@ import {
 } from "@mui/material"
 import React, { useState } from "react"
 import { useParams } from "react-router-dom"
-import { useNavigate } from "react-router"
 
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
 import { TaskTemplate } from "@/types"
