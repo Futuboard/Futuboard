@@ -1,4 +1,4 @@
-import { Download, MoreVert, EnhancedEncryption, Edit, Gradient, ColorLens } from "@mui/icons-material"
+import { Download, MoreVert, EnhancedEncryption, Edit, Gradient, ColorLens, Analytics } from "@mui/icons-material"
 import {
   AppBar,
   Box,
@@ -16,6 +16,7 @@ import {
 } from "@mui/material"
 import React, { useState } from "react"
 import { useParams } from "react-router-dom"
+import { useNavigate } from "react-router"
 
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
 import { TaskTemplate } from "@/types"
@@ -96,6 +97,16 @@ export const AddUserButton: React.FC = () => {
         </Paper>
       </Popover>
     </div>
+  )
+}
+
+const OpenAnalyticsButton: React.FC = () => {
+  return (
+    <Tooltip title="open analytics">
+      <IconButton onClick={() => window.open(window.location.href + "/charts")}>
+        <Analytics />
+      </IconButton>
+    </Tooltip>
   )
 }
 
@@ -188,6 +199,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       <AddUserButton />
       <CopyToClipboardButton />
       <CreateColumnButton boardId={boardId} />
+      <OpenAnalyticsButton />
       <IconButton
         aria-label="more"
         aria-controls="long-menu"

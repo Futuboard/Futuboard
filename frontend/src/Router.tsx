@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 
 import Notification from "./components/board/Notification"
 import Admin from "./pages/Admin"
+import Charts from "./pages/Charts"
 
 const Router = () => {
   return (
@@ -13,6 +14,7 @@ const Router = () => {
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/board/:id" element={<BoardContainer />} />
+        <Route path="/board/:id/charts" element={<Charts />} />
       </Routes>
     </BrowserRouter>
   )
