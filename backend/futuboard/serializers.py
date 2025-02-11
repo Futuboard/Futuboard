@@ -14,7 +14,6 @@ class BoardSerializer(serializers.ModelSerializer):
             "default_ticket_title",
             "default_ticket_description",
             "default_ticket_color",
-            "default_ticket_storypoints",
             "default_ticket_size",
             "default_ticket_cornernote",
         ]
@@ -59,7 +58,6 @@ class TicketSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "color",
-            "storypoints",
             "size",
             "order",
             "creation_date",

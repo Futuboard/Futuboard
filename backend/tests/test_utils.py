@@ -42,7 +42,6 @@ def addTicket(columnId, ticketId, title="", description="", color="", size=0, co
         title=title,
         description=description,
         color=color,
-        storypoints=8,
         size=size,
         order=0,
         creation_date=timezone.now(),

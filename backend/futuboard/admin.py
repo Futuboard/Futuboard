@@ -41,7 +41,6 @@ class TicketAdmin(admin.ModelAdmin):
         (None, {"fields": ["title"]}),
         (None, {"fields": ["description"]}),
         (None, {"fields": ["color"]}),
-        (None, {"fields": ["storypoints"]}),
         (None, {"fields": ["size"]}),
         (None, {"fields": ["order"]}),
         (None, {"fields": ["creation_date"]}),

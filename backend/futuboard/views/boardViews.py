@@ -163,7 +163,6 @@ def update_ticket_template(request, board_id):
         board.default_ticket_title = request.data.get("title", board.default_ticket_title)
         board.default_ticket_description = request.data.get("description", board.default_ticket_description)
         board.default_ticket_color = request.data.get("color", board.default_ticket_color)
-        board.default_ticket_storypoints = request.data.get("storypoints", board.default_ticket_storypoints)
         board.default_ticket_size = request.data.get("size", board.default_ticket_size)
         board.default_ticket_cornernote = request.data.get("cornernote", board.default_ticket_cornernote)
         board.save()

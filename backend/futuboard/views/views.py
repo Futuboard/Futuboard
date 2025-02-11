@@ -83,7 +83,6 @@ def tickets_on_column(request, board_id, column_id):
             title=request.data["title"],
             description=request.data["description"],
             color=request.data["color"] if "color" in request.data else "white",
-            storypoints=8,
             size=int(request.data["size"]) if request.data["size"] else 0,
             order=0,
             creation_date=timezone.now(),
@@ -121,7 +120,6 @@ def update_ticket(request, column_id, ticket_id):
         ticket.title = request.data.get("title", ticket.title)
         ticket.description = request.data.get("description", ticket.description)
         ticket.color = request.data.get("color", ticket.color)
-        ticket.storypoints = request.data.get("storypoints", ticket.storypoints)
         ticket.size = request.data.get("size", ticket.size)
         ticket.cornernote = request.data.get("cornernote", ticket.cornernote)
         ticket.save()

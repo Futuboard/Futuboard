@@ -7,6 +7,7 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 import uuid
+from django.utils.timezone import now
 
 
 class Action(models.Model):
@@ -17,7 +18,7 @@ class Action(models.Model):
     )
     title = models.TextField(blank=True, null=True)
     order = models.IntegerField()
-    creation_date = models.DateTimeField(blank=True, null=True)
+    creation_date = models.DateTimeField(default=now)
 
     class Meta:
         db_table = "Action"
@@ -28,13 +29,12 @@ class Board(models.Model):
     description = models.TextField(blank=True, null=True)
     title = models.TextField()
     background_color = models.TextField(default="#ffffff")
-    creation_date = models.DateTimeField()
+    creation_date = models.DateTimeField(default=now)
     passwordhash = models.TextField(db_column="passwordHash")
     salt = models.TextField()
     default_ticket_title = models.TextField(blank=True, null=True)
     default_ticket_description = models.TextField(blank=True, null=True)
     default_ticket_color = models.TextField(blank=True, null=True)
-    default_ticket_storypoints = models.IntegerField(blank=True, null=True)
     default_ticket_size = models.IntegerField(blank=True, null=True)
     default_ticket_cornernote = models.TextField(blank=True, null=True)
 
@@ -49,7 +49,7 @@ class Column(models.Model):
     description = models.TextField(blank=True, null=True)
     title = models.TextField(blank=True, null=True)
     ordernum = models.IntegerField(db_column="orderNum")
-    creation_date = models.DateTimeField(blank=True, null=True)
+    creation_date = models.DateTimeField(default=now)
     swimlane = models.BooleanField()
     wip_limit_story = models.IntegerField(blank=True, null=True)
 
@@ -70,14 +70,13 @@ class Swimlanecolumn(models.Model):
 class Ticket(models.Model):
     ticketid = models.UUIDField(db_column="ticketID", primary_key=True)
     columnid = models.ForeignKey(Column, models.CASCADE, db_column="columnID")
-    title = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
+    title = models.TextField(default="")
+    description = models.TextField(default="")
     color = models.TextField(blank=True, null=True)
-    storypoints = models.IntegerField(blank=True, null=True)
-    size = models.IntegerField(blank=True, null=True)
+    size = models.IntegerField(default=0)
     order = models.IntegerField()
-    creation_date = models.DateTimeField(blank=True, null=True)
-    cornernote = models.TextField(db_column="cornerNote", blank=True, null=True)
+    creation_date = models.DateTimeField(default=now)
+    cornernote = models.TextField(db_column="cornerNote", default="")
 
     class Meta:
         db_table = "Ticket"
@@ -102,3 +101,25 @@ class BoardTemplate(models.Model):
 
     class Meta:
         db_table = "BoardTemplate"
+
+
+class TicketEvent(models.Model):
+    EVENT_TYPES = [
+        ("ADD", "ADD"),
+        ("DELETE", "DELETE"),
+        ("UPDATE", "UPDATE"),
+    ]
+
+    ticketeventid = models.UUIDField(db_column="ticketEventID", default=uuid.uuid4, primary_key=True)
+    # ticketid = models.ForeignKey(Ticket, models.DO_NOTHING, db_column="ticketID", blank=True, null=True)
+
+    event_time = models.DateTimeField(default=now)
+    event_type = models.CharField(choices=EVENT_TYPES, max_length=6)
+
+    # All these are the new values after the event
+    columnid = models.ForeignKey(Column, models.CASCADE, db_column="columnID")
+    title = models.TextField()
+    size = models.IntegerField()
+
+    class Meta:
+        db_table = "TicketEvent"

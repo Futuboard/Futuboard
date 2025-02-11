@@ -49,7 +49,7 @@ def write_board_data(writer, boardid):
             board.default_ticket_title,
             board.default_ticket_description,
             board.default_ticket_size,
-            board.default_ticket_storypoints,
+            0,  # Use to be useless "storypoints" field
             board.default_ticket_cornernote,
             board.default_ticket_color,
         ]
@@ -95,7 +95,7 @@ def write_board_data(writer, boardid):
                     ticket.title,
                     ticket.description,
                     ticket.color,
-                    ticket.storypoints,
+                    0,  # Use to be useless "storypoints" field
                     ticket.size,
                     ticket.order,
                     ticket.creation_date,
@@ -160,7 +160,7 @@ def read_board_data(reader, board_title, password_hash):
             board.default_ticket_title = row[1]
             board.default_ticket_description = row[2]
             board.default_ticket_size = row[3]
-            board.default_ticket_storypoints = row[4]
+            # row[4] Use to be useless "storypoints" field
             board.default_ticket_cornernote = row[5]
             board.default_ticket_color = row[6]
             board.save()
@@ -206,7 +206,7 @@ def read_board_data(reader, board_title, password_hash):
                     title=row[1],
                     description=row[2],
                     color=row[3],
-                    storypoints=row[4],
+                    # row[4] Use to be useless "storypoints" field
                     size=row[5],
                     order=row[6],
                     creation_date=row[7],
