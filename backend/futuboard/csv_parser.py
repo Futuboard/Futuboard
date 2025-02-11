@@ -9,6 +9,13 @@ The csv file can be used to backup and restore board data.
 """
 
 
+def nonefy(row):
+    # Replace empty strings with None
+    for i in range(len(row)):
+        if row[i] == "":
+            row[i] = None
+
+
 def write_csv_header(writer):
     """
     Write the header to the csv file, this is used to verify that the csv file is a valid board data file
@@ -95,7 +102,17 @@ def write_board_data(writer, boardid):
             actions = Action.objects.filter(ticketid=ticket.ticketid)
             # Write all the actions in the swimlanecolumn to the csv file
             for action in actions:
-                writer.writerow(["Action", action.title, action.order, action.swimlanecolumnid.ordernum])
+                column_ordernum = action.swimlanecolumnid.columnid.ordernum
+
+                writer.writerow(
+                    [
+                        "Action",
+                        action.title,
+                        action.order,
+                        action.swimlanecolumnid.ordernum,
+                        column_ordernum,
+                    ]
+                )
                 # Get users with actionid
                 users = User.objects.filter(actions__actionid=action.actionid)
                 for user in users:
@@ -113,7 +130,6 @@ def read_board_data(reader, board_title, password_hash):
     # Get the board data from the csv file, skip the empty line    board_id = uuid.uuid4()
     next(reader)
     board_data = next(reader)
-    swimlanecolumns = []
     board = Board.objects.create(
         title=board_title,
         description=board_data[1],
@@ -125,9 +141,7 @@ def read_board_data(reader, board_title, password_hash):
     # Read board users and template ticket from the csv file
     for row in reader:
         # Replace empty strings with None
-        for i in range(len(row)):
-            if row[i] == "":
-                row[i] = None
+        nonefy(row)
         # Read users until the next object type is found
         if len(row) > 0 and row[0] == "User":
             User.objects.create(userid=uuid.uuid4(), name=row[1], boardid=board)
@@ -141,21 +155,9 @@ def read_board_data(reader, board_title, password_hash):
             board.save()
         else:
             break
-    # Find all swimlanes from the csv file
-    """ for row in reader:
-        # Replace empty strings with None
-        for i in range(len(row)):
-            if row[i] == "":
-                row[i] = None
-        # Read columns
-        if len(row) > 0 and row[0] == "Column" and row[5] == "true":
-            # swimlane = Swimlanecolumn.objects.create(
-            #    swimlanecolumnid=uuid.uuid4(), columnid=column, title=row[1], ordernum=row[2]
-            # )
-            # swimlanecolumns.append(swimlane)
-            pass
-        else:
-            break """
+
+    actions = []
+
     # Read the columns from the csv file
     row = next(reader, None)
     while row is not None:
@@ -181,21 +183,14 @@ def read_board_data(reader, board_title, password_hash):
             # Read the swimlanecolumns from the csv file
             if column.swimlane == "True":
                 while len(row) > 0 and row[0] == "Swimlanecolumn":
-                    for i in range(len(row)):
-                        if row[i] == "":
-                            row[i] = None
-                    swimlane = Swimlanecolumn.objects.create(
+                    nonefy(row)
+                    Swimlanecolumn.objects.create(
                         swimlanecolumnid=uuid.uuid4(), columnid=column, title=row[1], ordernum=row[2]
                     )
-                    swimlanecolumns.append(swimlane)
                     row = next(reader, None)
-            # Sort the swimlanecolumns by ordernum in ascending order
-            swimlanecolumns.sort(key=lambda x: x.ordernum)
             while len(row) > 0 and row[0] == "Ticket":
                 # Replace empty strings with None
-                for i in range(len(row)):
-                    if row[i] == "":
-                        row[i] = None
+                nonefy(row)
                 ticket = Ticket.objects.create(
                     ticketid=uuid.uuid4(),
                     columnid=column,
@@ -211,36 +206,41 @@ def read_board_data(reader, board_title, password_hash):
                 # Read the ticket users from the csv file
                 row = next(reader, None)
                 while len(row) > 0 and row[0] == "User":
-                    for i in range(len(row)):
-                        if row[i] == "":
-                            row[i] = None
+                    nonefy(row)
                     user = User.objects.get(name=row[1], boardid=board)
                     user.tickets.add(ticket)
                     row = next(reader, None)
                 # Read the actions from the csv file
                 while len(row) > 0 and row[0] == "Action":
-                    for i in range(len(row)):
-                        if row[i] == "":
-                            row[i] = None
-                    action = Action.objects.create(
-                        actionid=uuid.uuid4(),
-                        ticketid=ticket,
-                        title=row[1],
-                        order=row[2],
-                        swimlanecolumnid=swimlanecolumns[
-                            int(row[3])
-                        ],  # This crashes application if ticket is left of all columns with swimlanes (or if ticket is not on a column with swimlanes when the fix below is implemented)
-                    )
-                    # Read the action users from the csv file
+                    nonefy(row)
+                    action_row = row
+                    user_rows = []
                     row = next(reader, None)
                     while len(row) > 0 and row[0] == "User":
-                        for i in range(len(row)):
-                            if row[i] == "":
-                                row[i] = None
-                        user = User.objects.get(name=row[1], boardid=board)
-                        user.actions.add(action)
+                        nonefy(row)
+                        user_rows.append(row)
                         row = next(reader, None)
-            # swimlanecolumns = [] TODO: This fixes the CSV export/import action displacement bug but currently is more unstable because of how creating old actions is handled
+
+                    if len(row) == 5:
+                        actions.append((action_row, ticket, user_rows))
         else:
             row = next(reader, None)
+
+    # Assign actions to swimlanes
+    for action in actions:
+        column = Column.objects.filter(ordernum=action[0][4], boardid=board).get()
+        swimlanecolumn = Swimlanecolumn.objects.filter(columnid=column, ordernum=action[0][3]).get()
+
+        new_action = Action.objects.create(
+            actionid=uuid.uuid4(),
+            ticketid=action[1],
+            title=action[0][1],
+            order=action[0][2],
+            swimlanecolumnid=swimlanecolumn,
+        )
+
+        for user_row in action[2]:
+            user = User.objects.get(name=user_row[1], boardid=board)
+            user.actions.add(new_action)
+
     return board
