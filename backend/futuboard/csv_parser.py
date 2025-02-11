@@ -122,7 +122,7 @@ def read_board_data(reader, board_title, password_hash):
         salt="",
         creation_date=timezone.now(),
     )
-    # Read the board users from the csv file
+    # Read board users and template ticket from the csv file
     for row in reader:
         # Replace empty strings with None
         for i in range(len(row)):
@@ -130,7 +130,7 @@ def read_board_data(reader, board_title, password_hash):
                 row[i] = None
         # Read users until the next object type is found
         if len(row) > 0 and row[0] == "User":
-            user = User.objects.create(userid=uuid.uuid4(), name=row[1], boardid=board)
+            User.objects.create(userid=uuid.uuid4(), name=row[1], boardid=board)
         elif len(row) > 0 and row[0] == "Ticket Template":
             board.default_ticket_title = row[1]
             board.default_ticket_description = row[2]
@@ -141,6 +141,21 @@ def read_board_data(reader, board_title, password_hash):
             board.save()
         else:
             break
+    # Find all swimlanes from the csv file
+    """ for row in reader:
+        # Replace empty strings with None
+        for i in range(len(row)):
+            if row[i] == "":
+                row[i] = None
+        # Read columns
+        if len(row) > 0 and row[0] == "Column" and row[5] == "true":
+            # swimlane = Swimlanecolumn.objects.create(
+            #    swimlanecolumnid=uuid.uuid4(), columnid=column, title=row[1], ordernum=row[2]
+            # )
+            # swimlanecolumns.append(swimlane)
+            pass
+        else:
+            break """
     # Read the columns from the csv file
     row = next(reader, None)
     while row is not None:
