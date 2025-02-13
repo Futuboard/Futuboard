@@ -22,6 +22,12 @@ def events(request: rest_framework.request.Request, board_id):
 @api_view(["GET"])
 def cumulative_flow(request: rest_framework.request.Request, board_id):
     if request.method == "GET":
+        possible_time_units = ["minute", "hour", "day", "week", "month", "year"]
+        time_unit = request.query_params.get("time_unit", "week")
+
+        if time_unit not in possible_time_units:
+            return JsonResponse({"error": "Invalid time unit"}, status=400)
+
         columns = Column.objects.filter(boardid=board_id)
         ticket_events = (
             TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
@@ -30,20 +36,46 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
         if len(ticket_events) == 0:
             return JsonResponse({}, safe=False)
 
-        time_unit = "minute"
         start_time = ticket_events.first().event_time  # type: ignore
         end_time = ticket_events.last().event_time  # type: ignore
 
+        time_delta = timedelta(minutes=1)
+        if time_unit == "hour":
+            time_delta = timedelta(hours=1)
+        elif time_unit == "day":
+            time_delta = timedelta(days=1)
+        elif time_unit == "week":
+            time_delta = timedelta(weeks=1)
+        elif time_unit == "month":
+            time_delta = timedelta(days=30)
+        elif time_unit == "year":
+            time_delta = timedelta(days=365)
+
         event_dict = {}
 
-        if time_unit == "minute":
-            start_time = start_time.replace(second=0, microsecond=0)
-            end_time = end_time.replace(second=0, microsecond=0) + timedelta(minutes=1)
-            for event in ticket_events:
-                event_time = event.event_time.replace(second=0, microsecond=0)
-                timestamp = event_time.isoformat()
-                if event_dict.get(timestamp) is None:
-                    event_dict[timestamp] = []
+        def round_time(datetime, up=False):
+            if time_unit == "minute":
+                return datetime.replace(second=0, microsecond=0)
+            elif time_unit == "hour":
+                return datetime.replace(minute=0, second=0, microsecond=0)
+            elif time_unit == "day":
+                return datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+            elif time_unit == "week":
+                return datetime.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=datetime.weekday())
+            elif time_unit == "month":
+                return datetime.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            elif time_unit == "year":
+                return datetime.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+            else:
+                raise ValueError("Invalid time unit")
+
+        start_time = round_time(start_time)
+        end_time = round_time(end_time)
+        for event in ticket_events:
+            event_time = round_time(event.event_time)
+            timestamp = event_time.isoformat()
+            if event_dict.get(timestamp) is None:
+                event_dict[timestamp] = []
 
                 event_dict[timestamp].append(event)
 
@@ -94,6 +126,6 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
                         setSize(timestamp, event.new_columnid.columnid, event.new_size - event.old_size)
 
             previous_timestamp = timestamp
-            time += timedelta(minutes=1)
+            time += time_delta
 
         return JsonResponse(size_at_time, safe=False)

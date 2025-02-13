@@ -10,8 +10,8 @@ from .test_utils import addBoard, addColumn, resetDB
 
 def create_board_and_columns():
     boardid = addBoard().boardid
-    column_id_1 = addColumn(boardid, uuid.uuid4()).columnid
-    column_id_2 = addColumn(boardid, uuid.uuid4()).columnid
+    column_id_1 = addColumn(boardid, uuid.uuid4(), "Column 1").columnid
+    column_id_2 = addColumn(boardid, uuid.uuid4(), "Column 2").columnid
     return boardid, column_id_1, column_id_2
 
 
@@ -210,8 +210,8 @@ def test_ticket_delete_event():
     creation_time = datetime(2024, 1, 1)
     ticket = create_ticket_at_time(boardid, column_id, creation_time)
 
-    edit_time = datetime(2024, 1, 2)
-    delete_ticket_at_time(column_id, edit_time, ticket["ticketid"])
+    delete_time = datetime(2024, 1, 2)
+    delete_ticket_at_time(column_id, delete_time, ticket["ticketid"])
 
     response = api_client.get(reverse("events", args=[boardid]))
     assert response.status_code == 200
@@ -222,7 +222,7 @@ def test_ticket_delete_event():
     assert data[1] == {
         "ticketeventid": data[1]["ticketeventid"],
         "ticketid": ticket["ticketid"],
-        "event_time": edit_time.isoformat() + "Z",
+        "event_time": delete_time.isoformat() + "Z",
         "event_type": "DELETE",
         "old_columnid": str(column_id),
         "new_columnid": None,
@@ -230,5 +230,42 @@ def test_ticket_delete_event():
         "new_size": 0,
         "title": "test ticket",
     }
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_cumulative_flow():
+    """
+    Test that cumulative flow chart data is returned correctly
+    """
+    api_client = APIClient()
+
+    boardid, column_id, column_id_2 = create_board_and_columns()
+
+    creation_time_1 = datetime(2024, 1, 1)
+    ticket = create_ticket_at_time(boardid, column_id, creation_time_1)
+
+    move_time = datetime(2024, 1, 2)
+    move_ticket_at_time(boardid, column_id_2, move_time, ticket["ticketid"])
+
+    edit_time = datetime(2024, 1, 3)
+    new_ticket = ticket.copy()
+    new_ticket["title"] = "edited test ticket"
+    new_ticket["size"] = 10
+    edit_ticket_at_time(column_id_2, edit_time, new_ticket)
+
+    delete_time = datetime(2024, 1, 4)
+    delete_ticket_at_time(column_id_2, delete_time, ticket["ticketid"])
+
+    url = reverse("cumulative_flow", args=[boardid])
+    url += "?time_unit=day"
+
+    response = api_client.get(url)
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) == 4
 
     resetDB()
