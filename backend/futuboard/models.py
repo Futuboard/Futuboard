@@ -104,22 +104,36 @@ class BoardTemplate(models.Model):
 
 
 class TicketEvent(models.Model):
+    CREATE = "CREATE"
+    DELETE = "DELETE"
+    UPDATE = "UPDATE"
+    MOVE = "MOVE"
     EVENT_TYPES = [
-        ("ADD", "ADD"),
-        ("DELETE", "DELETE"),
-        ("UPDATE", "UPDATE"),
+        (CREATE, "CREATE"),
+        (DELETE, "DELETE"),
+        (UPDATE, "UPDATE"),
+        (MOVE, "MOVE"),
     ]
 
     ticketeventid = models.UUIDField(db_column="ticketEventID", default=uuid.uuid4, primary_key=True)
-    # ticketid = models.ForeignKey(Ticket, models.DO_NOTHING, db_column="ticketID", blank=True, null=True)
+
+    # Can't enforce foreign key integrity, because the ticket might have been deleted
+    ticketid = models.ForeignKey(Ticket, models.DO_NOTHING, db_column="ticketID", db_constraint=False)
 
     event_time = models.DateTimeField(default=now)
     event_type = models.CharField(choices=EVENT_TYPES, max_length=6)
 
     # All these are the new values after the event
-    columnid = models.ForeignKey(Column, models.CASCADE, db_column="columnID")
+    old_columnid = models.ForeignKey(
+        Column, models.DO_NOTHING, db_column="oldColumnId", null=True, related_name="old_columnid"
+    )
+    new_columnid = models.ForeignKey(
+        Column, models.DO_NOTHING, db_column="newColumnId", null=True, related_name="new_columnid"
+    )
+    old_size = models.IntegerField()
+    new_size = models.IntegerField()
+
     title = models.TextField()
-    size = models.IntegerField()
 
     class Meta:
         db_table = "TicketEvent"

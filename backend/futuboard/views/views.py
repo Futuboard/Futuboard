@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from django.http import HttpResponse, JsonResponse
 
 from ..verification import is_admin_password_correct
-from ..models import Board, Column, Ticket, User, Swimlanecolumn
+from ..models import Board, Column, Ticket, TicketEvent, User, Swimlanecolumn
 from ..serializers import ColumnSerializer, TicketSerializer, UserSerializer
 from django.utils import timezone
 
@@ -61,9 +61,20 @@ def tickets_on_column(request, board_id, column_id):
             # if ticket has a columnid that is not the same as the columnid from the ticket in the database, change it
             for ticket in tickets_data:
                 ticket_from_database = Ticket.objects.get(ticketid=ticket["ticketid"])
-                if ticket_from_database.columnid != Column.objects.get(pk=column_id):
-                    ticket_from_database.columnid = Column.objects.get(pk=column_id)
+                column = Column.objects.get(pk=column_id)
+                if ticket_from_database.columnid != column:
+                    ticket_from_database.columnid = column
                     ticket_from_database.save()
+                    ticket_move_event = TicketEvent(
+                        ticketid=ticket_from_database,
+                        event_type=TicketEvent.MOVE,
+                        old_columnid=ticket_from_database.columnid,
+                        new_columnid=column,
+                        old_size=ticket_from_database.size,
+                        new_size=ticket_from_database.size,
+                        title=ticket_from_database.title,
+                    )
+                    ticket_move_event.save()
 
             # update order of tickets
             for index, ticket_data in enumerate(tickets_data):
@@ -77,9 +88,10 @@ def tickets_on_column(request, board_id, column_id):
             raise Http404("Task does not exist")
 
     if request.method == "POST":
+        column = Column.objects.get(pk=column_id)
         new_ticket = Ticket(
             ticketid=request.data["ticketid"],
-            columnid=Column.objects.get(pk=column_id),
+            columnid=column,
             title=request.data["title"],
             description=request.data["description"],
             color=request.data["color"] if "color" in request.data else "white",
@@ -95,6 +107,17 @@ def tickets_on_column(request, board_id, column_id):
             ticket.save()
 
         new_ticket.save()
+
+        ticket_creation_event = TicketEvent(
+            ticketid=new_ticket,
+            event_type=TicketEvent.CREATE,
+            old_columnid=None,
+            new_columnid=column,
+            old_size=0,
+            new_size=new_ticket.size,
+            title=new_ticket.title,
+        )
+        ticket_creation_event.save()
 
         serializer = TicketSerializer(new_ticket)
         return JsonResponse(serializer.data, safe=False)
@@ -113,16 +136,39 @@ def update_ticket(request, column_id, ticket_id):
         raise Http404("Ticket not found")
 
     if request.method == "DELETE":
+        ticket_delete_event = TicketEvent(
+            ticketid=ticket,
+            event_type=TicketEvent.DELETE,
+            old_columnid=ticket.columnid,
+            new_columnid=None,
+            old_size=ticket.size,
+            new_size=0,
+            title=ticket.title,
+        )
+        ticket_delete_event.save()
         ticket.delete()
         return JsonResponse({"message": "Ticket deleted successfully"}, status=200)
 
     if request.method == "PUT":
+        old_size = ticket.size
+
         ticket.title = request.data.get("title", ticket.title)
         ticket.description = request.data.get("description", ticket.description)
         ticket.color = request.data.get("color", ticket.color)
         ticket.size = request.data.get("size", ticket.size)
         ticket.cornernote = request.data.get("cornernote", ticket.cornernote)
         ticket.save()
+
+        ticket_update_event = TicketEvent(
+            ticketid=ticket,
+            event_type=TicketEvent.UPDATE,
+            old_columnid=ticket.columnid,
+            new_columnid=ticket.columnid,
+            old_size=old_size,
+            new_size=ticket.size,
+            title=ticket.title,
+        )
+        ticket_update_event.save()
 
         serializer = TicketSerializer(ticket)
         return JsonResponse(serializer.data, safe=False)

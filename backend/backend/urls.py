@@ -1,6 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
-from futuboard.views import views, swimlaneViews, boardViews, csv_views, boardTemplateViews
+from futuboard.views import views, swimlaneViews, boardViews, csv_views, boardTemplateViews, chartViews
 from django.contrib import admin
 
 router = routers.DefaultRouter()
@@ -59,4 +59,6 @@ urlpatterns = [
         name="create_board_from_template",
     ),
     path("api/checkadminpassword/", views.check_admin_password, name="check_admin_password"),
+    path("api/events/<uuid:board_id>/", chartViews.events, name="events"),  # Endpoint for debugging
+    path("api/charts/<uuid:board_id>/cumulativeflow", chartViews.cumulative_flow, name="cumulative_flow"),
 ]
