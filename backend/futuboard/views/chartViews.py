@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from ..models import Column, TicketEvent
 from ..serializers import TicketEventSerializer
 import rest_framework.request
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 @api_view(["GET"])
@@ -25,19 +25,31 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
         possible_time_units = ["minute", "hour", "day", "week", "month", "year"]
         time_unit = request.query_params.get("time_unit", "week")
 
+        start_time = request.query_params.get("start_time")
+        if start_time is None:
+            start_time = datetime.now() - timedelta(days=365)
+        else:
+            start_time = datetime.fromisoformat(start_time)
+
+        end_time = request.query_params.get("end_time")
+        if end_time is None:
+            end_time = datetime.now()
+        else:
+            end_time = datetime.fromisoformat(end_time)
+
         if time_unit not in possible_time_units:
             return JsonResponse({"error": "Invalid time unit"}, status=400)
 
         columns = Column.objects.filter(boardid=board_id)
         ticket_events = (
-            TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
+            TicketEvent.objects.filter(old_columnid__in=columns, event_time__gte=start_time, event_time__lte=end_time)
+            | TicketEvent.objects.filter(
+                new_columnid__in=columns, event_time__gte=start_time, event_time__lte=end_time
+            )
         ).order_by("event_time")
 
         if len(ticket_events) == 0:
             return JsonResponse({}, safe=False)
-
-        start_time = ticket_events.first().event_time  # type: ignore
-        end_time = ticket_events.last().event_time  # type: ignore
 
         time_delta = timedelta(minutes=1)
         if time_unit == "hour":
@@ -80,7 +92,6 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
                 event_dict[timestamp].append(event)
 
         column_names = {}
-
         for column in columns:
             column_name = column.title
             number = 1
@@ -91,7 +102,6 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
 
             column_names[str(column.columnid)] = column_name
 
-        time = start_time
         empty_column_dict = {}
         for column in columns:
             column_name = column_names[str(column.columnid)]
@@ -103,6 +113,7 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
             column_name = column_names[str(columnid)]
             size_at_time[timestamp][column_name] += change
 
+        time = start_time
         previous_timestamp = None
         while time <= end_time:
             timestamp = time.isoformat()

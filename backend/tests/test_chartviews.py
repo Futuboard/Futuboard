@@ -259,7 +259,7 @@ def test_cumulative_flow():
     delete_ticket_at_time(column_id_2, delete_time, ticket["ticketid"])
 
     url = reverse("cumulative_flow", args=[boardid])
-    url += "?time_unit=day"
+    url += "?time_unit=day&start_time=2024-01-01&end_time=2024-01-04"
 
     response = api_client.get(url)
     assert response.status_code == 200
@@ -267,5 +267,12 @@ def test_cumulative_flow():
     data = response.json()
 
     assert len(data) == 4
+
+    assert data == {
+        "2024-01-01T00:00:00": {"Column 1": 5, "Column 2": 0},
+        "2024-01-02T00:00:00": {"Column 1": 0, "Column 2": 5},
+        "2024-01-03T00:00:00": {"Column 1": 0, "Column 2": 10},
+        "2024-01-04T00:00:00": {"Column 1": 0, "Column 2": 0},
+    }
 
     resetDB()
