@@ -47,7 +47,7 @@ class Column(models.Model):
     boardid = models.ForeignKey(Board, models.CASCADE, db_column="boardID")
     wip_limit = models.IntegerField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    title = models.TextField(blank=True, null=True)
+    title = models.TextField(default="")
     ordernum = models.IntegerField(db_column="orderNum")
     creation_date = models.DateTimeField(default=now)
     swimlane = models.BooleanField()

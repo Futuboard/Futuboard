@@ -63,12 +63,13 @@ def tickets_on_column(request, board_id, column_id):
                 ticket_from_database = Ticket.objects.get(ticketid=ticket["ticketid"])
                 column = Column.objects.get(pk=column_id)
                 if ticket_from_database.columnid != column:
+                    old_column = ticket_from_database.columnid
                     ticket_from_database.columnid = column
                     ticket_from_database.save()
                     ticket_move_event = TicketEvent(
                         ticketid=ticket_from_database,
                         event_type=TicketEvent.MOVE,
-                        old_columnid=ticket_from_database.columnid,
+                        old_columnid=old_column,
                         new_columnid=column,
                         old_size=ticket_from_database.size,
                         new_size=ticket_from_database.size,
