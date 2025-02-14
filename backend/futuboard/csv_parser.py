@@ -39,6 +39,7 @@ def write_board_data(writer, boardid):
     board = Board.objects.get(boardid=boardid)
     writer.writerow(["Board", board.description, board.background_color])
     users = User.objects.filter(boardid=boardid)
+
     # Get userids
     for user in users:
         writer.writerow(["User", user.name])
@@ -54,10 +55,13 @@ def write_board_data(writer, boardid):
         ]
     )
     writer.writerow([])
+
     # Get all the columns for the board
     columns = Column.objects.filter(boardid=boardid)
+
     # Write columns with swimlanecolumns first order by swimlane True first
     columns = sorted(columns, key=lambda column: column.swimlane, reverse=True)
+
     # Write the all the columns to the csv file
     for column in columns:
         # Write the column to the csv file
@@ -71,14 +75,18 @@ def write_board_data(writer, boardid):
                 column.swimlane,
             ]
         )
+
         if column.swimlane:
             # Get all the swimlanecolumns for the column
             swimlanecolumns = Swimlanecolumn.objects.filter(columnid=column.columnid)
+
             # Write all the swimlanecolumns to the csv file
             for swimlanecolumn in swimlanecolumns:
                 writer.writerow(["Swimlanecolumn", swimlanecolumn.title, swimlanecolumn.ordernum])
+
         # Get all the tickets for the column
         tickets = Ticket.objects.filter(columnid=column.columnid)
+
         # Write all the tickets in the column to the csv file
         for ticket in tickets:
             writer.writerow(
@@ -94,16 +102,18 @@ def write_board_data(writer, boardid):
                     ticket.cornernote,
                 ]
             )
+
             # Get users with ticketid
             users = User.objects.filter(tickets__ticketid=ticket.ticketid)
             for user in users:
                 writer.writerow(["User", user.name])
+
             # Get all the actions for the swimlanecolumn
             actions = Action.objects.filter(ticketid=ticket.ticketid)
+
             # Write all the actions in the swimlanecolumn to the csv file
             for action in actions:
                 column_ordernum = action.swimlanecolumnid.columnid.ordernum
-
                 writer.writerow(
                     [
                         "Action",
@@ -117,6 +127,7 @@ def write_board_data(writer, boardid):
                 users = User.objects.filter(actions__actionid=action.actionid)
                 for user in users:
                     writer.writerow(["User", user.name])
+
         # Split the columns in the csv file with an empty line
         writer.writerow([])
     return writer
@@ -138,10 +149,10 @@ def read_board_data(reader, board_title, password_hash):
         salt="",
         creation_date=timezone.now(),
     )
-    # Read board users and template ticket from the csv file
+
+    # Read board users and the template ticket from the csv file
     for row in reader:
-        # Replace empty strings with None
-        nonefy(row)
+        nonefy(row)  # Replace empty strings with None
         # Read users until the next object type is found
         if len(row) > 0 and row[0] == "User":
             User.objects.create(userid=uuid.uuid4(), name=row[1], boardid=board)
@@ -166,10 +177,7 @@ def read_board_data(reader, board_title, password_hash):
             row = next(reader, None)
             continue
         if row[0] == "Column":
-            # Replace empty strings with None
-            for i in range(len(row)):
-                if row[i] == "":
-                    row[i] = None
+            nonefy(row)  # Replace empty strings with None
             column = Column.objects.create(
                 columnid=uuid.uuid4(),
                 boardid=board,
@@ -180,17 +188,18 @@ def read_board_data(reader, board_title, password_hash):
                 swimlane=row[5],
             )
             row = next(reader, None)
+
             # Read the swimlanecolumns from the csv file
             if column.swimlane == "True":
                 while len(row) > 0 and row[0] == "Swimlanecolumn":
-                    nonefy(row)
+                    nonefy(row)  # Replace empty strings with None
                     Swimlanecolumn.objects.create(
                         swimlanecolumnid=uuid.uuid4(), columnid=column, title=row[1], ordernum=row[2]
                     )
                     row = next(reader, None)
+
             while len(row) > 0 and row[0] == "Ticket":
-                # Replace empty strings with None
-                nonefy(row)
+                nonefy(row)  # Replace empty strings with None
                 ticket = Ticket.objects.create(
                     ticketid=uuid.uuid4(),
                     columnid=column,
@@ -203,6 +212,7 @@ def read_board_data(reader, board_title, password_hash):
                     creation_date=row[7],
                     cornernote=row[8],
                 )
+
                 # Read the ticket users from the csv file
                 row = next(reader, None)
                 while len(row) > 0 and row[0] == "User":
@@ -210,28 +220,34 @@ def read_board_data(reader, board_title, password_hash):
                     user = User.objects.get(name=row[1], boardid=board)
                     user.tickets.add(ticket)
                     row = next(reader, None)
+
                 # Read the actions from the csv file
                 while len(row) > 0 and row[0] == "Action":
                     nonefy(row)
                     action_row = row
                     user_rows = []
                     row = next(reader, None)
+
+                    # Read the users on actions
                     while len(row) > 0 and row[0] == "User":
                         nonefy(row)
                         user_rows.append(row)
                         row = next(reader, None)
 
-                    if len(row) == 5:
+                    if len(action_row) == 5:
                         actions.append((action_row, ticket, user_rows))
         else:
             row = next(reader, None)
 
-    # Assign actions to swimlanes
+    # Create actions to swimlanes
     for action in actions:
-        column = Column.objects.filter(ordernum=action[0][4], boardid=board).get()
-        swimlanecolumn = Swimlanecolumn.objects.filter(columnid=column, ordernum=action[0][3]).get()
+        column_ordernum = action[0][4]
+        column = Column.objects.filter(ordernum=column_ordernum, boardid=board).get()
 
-        new_action = Action.objects.create(
+        swimlanecolumn_ordernum = action[0][3]
+        swimlanecolumn = Swimlanecolumn.objects.filter(columnid=column, ordernum=swimlanecolumn_ordernum).get()
+
+        created_action = Action.objects.create(
             actionid=uuid.uuid4(),
             ticketid=action[1],
             title=action[0][1],
@@ -239,8 +255,9 @@ def read_board_data(reader, board_title, password_hash):
             swimlanecolumnid=swimlanecolumn,
         )
 
-        for user_row in action[2]:
+        users_on_action = action[2]
+        for user_row in users_on_action:
             user = User.objects.get(name=user_row[1], boardid=board)
-            user.actions.add(new_action)
+            user.actions.add(created_action)
 
     return board

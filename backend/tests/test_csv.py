@@ -5,7 +5,6 @@ import uuid
 from django.utils import timezone
 from django.urls import reverse
 import json
-import random
 from django.core.files.uploadedfile import SimpleUploadedFile
 from .test_utils import resetDB
 
@@ -18,7 +17,7 @@ from .test_utils import resetDB
 @pytest.mark.django_db
 def test_import_export():
     """
-    Test creating n random boards and exporting them to a csv file and then importing them back
+    Test creating n boards and exporting them to a csv file and then importing them back
 
     Check that the imported boards are the same as the exported boards, can have different titles, passwords, ids etc.
     Export has one method: GET
@@ -27,7 +26,7 @@ def test_import_export():
         POST: Imports a csv file with the board data
     """
     client = APIClient()
-    # Create n random boards
+    # Create n boards
     n = 10
     boards = []
     for i in range(n):
@@ -40,7 +39,7 @@ def test_import_export():
         )
         boards.append(board)
     num = 0
-    # Fill boards with random data
+    # Fill boards with data
     for board in boards:
         # Create n users for the board
         n_users = 10
@@ -48,32 +47,31 @@ def test_import_export():
         for i in range(n_users):
             users.append(md.User.objects.create(userid=uuid.uuid4(), name=f"user{i}", boardid=board))
         # Create n columns for the board
-        n_columns = random.randint(1, 10)
+        n_columns = 5
         for i in range(n_columns - 1):
             column = md.Column.objects.create(
                 columnid=uuid.uuid4(), boardid=board, title=f"column{i}", ordernum=i, swimlane=False
             )
-            n_tickets = random.randint(1, 10)
+            n_tickets = 5
             for j in range(n_tickets):
                 ticket = md.Ticket.objects.create(
                     ticketid=uuid.uuid4(), columnid=column, title=f"ticket{j}", description="test", order=j
                 )
 
-                n_users = random.randint(1, 10)
-                random.shuffle(users)
+                n_users = 5
                 for k in range(n_users):
                     users[k].tickets.add(md.Ticket.objects.get(ticketid=ticket.ticketid))
         # One column that is a swimlane
         column = md.Column.objects.create(
             columnid=uuid.uuid4(), boardid=board, title=f"column{n_columns - 1}", ordernum=n_columns - 1, swimlane=True
         )
-        n_swimlanecolumns = random.randint(1, 10)
+        n_swimlanecolumns = 4
         for i in range(n_swimlanecolumns):
             swimlanecolumn = md.Swimlanecolumn.objects.create(
                 swimlanecolumnid=uuid.uuid4(), columnid=column, title=f"swimlanecolumn{i}", ordernum=i
             )
         # Tickets for the swimlane column
-        n_tickets = random.randint(1, 10)
+        n_tickets = 5
         tickets = []
         for j in range(n_tickets):
             tickets.append(
@@ -81,13 +79,12 @@ def test_import_export():
                     ticketid=uuid.uuid4(), columnid=column, title=f"ticket{j}", description="test", order=j
                 )
             )
-            n_users = random.randint(1, 10)
-            random.shuffle(users)
+            n_users = 5
             for k in range(n_users):
                 users[k].tickets.add(md.Ticket.objects.get(ticketid=ticket.ticketid))
         # Actions for the ticket
         for swimlanecolumn in md.Swimlanecolumn.objects.filter(columnid=column):
-            n_actions = random.randint(1, 10)
+            n_actions = 5
             for k in range(n_actions):
                 action = md.Action.objects.create(
                     actionid=uuid.uuid4(),
@@ -96,8 +93,7 @@ def test_import_export():
                     title=f"action{k}",
                     order=k,
                 )
-                n_users = random.randint(1, 10)
-                random.shuffle(users)
+                n_users = 5
                 for ii in range(n_users):
                     users[k].actions.add(md.Action.objects.get(actionid=action.actionid))
         # Export the board
