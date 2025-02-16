@@ -274,14 +274,19 @@ def test_cumulative_flow_default_params():
 
     data = response.json()
 
-    assert len(data) == 53
+    assert len(data) == 31
 
-    date = datetime(2023, 1, 2)
+    date = datetime(2023, 12, 5)
     right_data = {}
 
-    for i in range(53):
-        right_data[date.isoformat()] = {"Column 1": 0, "Column 2": 0} if i < 52 else {"Column 1": 0, "Column 2": 5}
-        date += timedelta(days=7)
+    for i in range(27):
+        right_data[date.isoformat()] = {"Column 1": 0, "Column 2": 0}
+        date += timedelta(days=1)
+
+    right_data["2024-01-01T00:00:00"] = {"Column 1": 5, "Column 2": 0}
+    right_data["2024-01-02T00:00:00"] = {"Column 1": 0, "Column 2": 10}
+    right_data["2024-01-03T00:00:00"] = {"Column 1": 0, "Column 2": 15}
+    right_data["2024-01-04T00:00:00"] = {"Column 1": 0, "Column 2": 5}
 
     assert data == right_data
 

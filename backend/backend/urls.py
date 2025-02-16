@@ -60,5 +60,7 @@ urlpatterns = [
     ),
     path("api/checkadminpassword/", views.check_admin_password, name="check_admin_password"),
     path("api/events/<uuid:board_id>/", chartViews.events, name="events"),  # Endpoint for debugging
-    path("api/charts/<uuid:board_id>/cumulativeflow", chartViews.cumulative_flow, name="cumulative_flow"),
+    path(
+        "api/charts/<uuid:board_id>/cumulativeflow", chartViews.cumulative_flow, name="cumulative_flow"
+    ),  # Also has url parameters, e.g. ?time_unit=day&start_time=2021-01-01&end_time=2021-01-10
 ]

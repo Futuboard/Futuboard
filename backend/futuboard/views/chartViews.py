@@ -26,7 +26,7 @@ DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 def cumulative_flow(request: rest_framework.request.Request, board_id):
     if request.method == "GET":
         possible_time_units = ["minute", "hour", "day", "week", "month", "year"]
-        time_unit = request.query_params.get("time_unit", "week")
+        time_unit = request.query_params.get("time_unit", "day")  # Default to day
 
         if time_unit not in possible_time_units:
             return JsonResponse({"error": "Invalid time unit"}, status=400)
@@ -61,7 +61,7 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
 
         start_time = request.query_params.get("start_time")
         if start_time is None:
-            start_time = datetime.now() - timedelta(days=365)
+            start_time = datetime.now() - timedelta(days=30)  # Default to last 30 days
         else:
             start_time = datetime.fromisoformat(start_time)
 
