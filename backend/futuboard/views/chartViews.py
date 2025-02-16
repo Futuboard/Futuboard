@@ -28,22 +28,22 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
         possible_time_units = ["minute", "hour", "day", "week", "month", "year"]
         time_unit = request.query_params.get("time_unit", "week")
 
-        start_time = request.query_params.get("start_time")
-        if start_time is None:
-            start_time = datetime.now() - timedelta(days=365)
-        else:
-            start_time = datetime.fromisoformat(start_time)
-
-        end_time = request.query_params.get("end_time")
-        if end_time is None:
-            end_time = datetime.now()
-        else:
-            end_time = datetime.fromisoformat(end_time)
-
         if time_unit not in possible_time_units:
             return JsonResponse({"error": "Invalid time unit"}, status=400)
 
-        def round_time(datetime, up=False):
+        time_delta = timedelta(minutes=1)
+        if time_unit == "hour":
+            time_delta = timedelta(hours=1)
+        elif time_unit == "day":
+            time_delta = timedelta(days=1)
+        elif time_unit == "week":
+            time_delta = timedelta(weeks=1)
+        elif time_unit == "month":
+            time_delta = timedelta(days=30)
+        elif time_unit == "year":
+            time_delta = timedelta(days=365)
+
+        def round_time(datetime):
             if time_unit == "minute":
                 return datetime.replace(second=0, microsecond=0)
             elif time_unit == "hour":
@@ -59,33 +59,35 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
             else:
                 raise ValueError("Invalid time unit")
 
+        start_time = request.query_params.get("start_time")
+        if start_time is None:
+            start_time = datetime.now() - timedelta(days=365)
+        else:
+            start_time = datetime.fromisoformat(start_time)
+
         start_time = round_time(start_time)
+
+        end_time = request.query_params.get("end_time")
+        if end_time is None:
+            end_time = datetime.now()
+        else:
+            end_time = datetime.fromisoformat(end_time)
+
         end_time = round_time(end_time)
+        inclusive_end_time = end_time + time_delta
 
         columns = Column.objects.filter(boardid=board_id)
         ticket_events = (
             TicketEvent.objects.filter(
-                old_columnid__in=columns
-            )  # , event_time__gte=start_time, event_time__lte=end_time)
+                old_columnid__in=columns, event_time__gte=start_time, event_time__lte=inclusive_end_time
+            )
             | TicketEvent.objects.filter(
-                new_columnid__in=columns
-            )  # , event_time__gte=start_time, event_time__lte=end_time)
+                new_columnid__in=columns, event_time__gte=start_time, event_time__lte=inclusive_end_time
+            )
         ).order_by("event_time")
 
         if len(ticket_events) == 0:
             return JsonResponse({}, safe=False)
-
-        time_delta = timedelta(minutes=1)
-        if time_unit == "hour":
-            time_delta = timedelta(hours=1)
-        elif time_unit == "day":
-            time_delta = timedelta(days=1)
-        elif time_unit == "week":
-            time_delta = timedelta(weeks=1)
-        elif time_unit == "month":
-            time_delta = timedelta(days=30)
-        elif time_unit == "year":
-            time_delta = timedelta(days=365)
 
         event_dict = {}
 
@@ -93,8 +95,8 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
             event_time = round_time(event.event_time)
             timestamp = event_time.strftime(DATE_TIME_FORMAT)
             if event_dict.get(timestamp) is None:
-                event_dict[timestamp] = []
-
+                event_dict[timestamp] = [event]
+            else:
                 event_dict[timestamp].append(event)
 
         column_names = {}

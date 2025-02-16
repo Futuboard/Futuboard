@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import uuid
 from freezegun import freeze_time
@@ -87,6 +87,30 @@ def delete_ticket_at_time(column_id, edit_time, ticket_id):
     data = response.json()
 
     return data
+
+
+def create_board_with_events():
+    boardid, column_id, column_id_2 = create_board_and_columns()
+
+    creation_time_1 = datetime(2024, 1, 1)
+    ticket_1 = create_ticket_at_time(boardid, column_id, creation_time_1)
+
+    creation_time_2 = datetime(2024, 1, 2)
+    create_ticket_at_time(boardid, column_id_2, creation_time_2)
+
+    move_time = datetime(2024, 1, 2)
+    move_ticket_at_time(boardid, column_id_2, move_time, ticket_1["ticketid"])
+
+    edit_time = datetime(2024, 1, 3)
+    new_ticket = ticket_1.copy()
+    new_ticket["title"] = "edited test ticket"
+    new_ticket["size"] = 10
+    edit_ticket_at_time(column_id_2, edit_time, new_ticket)
+
+    delete_time = datetime(2024, 1, 4)
+    delete_ticket_at_time(column_id_2, delete_time, ticket_1["ticketid"])
+
+    return boardid
 
 
 @pytest.mark.django_db
@@ -234,29 +258,43 @@ def test_ticket_delete_event():
     resetDB()
 
 
+@freeze_time("2024-01-04")
 @pytest.mark.django_db
-def test_cumulative_flow():
+def test_cumulative_flow_default_params():
+    """
+    Test that cumulative flow chart data is returned correctly with default parameters
+    """
+    api_client = APIClient()
+    boardid = create_board_with_events()
+
+    url = reverse("cumulative_flow", args=[boardid])
+
+    response = api_client.get(url)
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) == 53
+
+    date = datetime(2023, 1, 2)
+    right_data = {}
+
+    for i in range(53):
+        right_data[date.isoformat()] = {"Column 1": 0, "Column 2": 0} if i < 52 else {"Column 1": 0, "Column 2": 5}
+        date += timedelta(days=7)
+
+    assert data == right_data
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_cumulative_flow_with_params():
     """
     Test that cumulative flow chart data is returned correctly
     """
     api_client = APIClient()
-
-    boardid, column_id, column_id_2 = create_board_and_columns()
-
-    creation_time_1 = datetime(2024, 1, 1)
-    ticket = create_ticket_at_time(boardid, column_id, creation_time_1)
-
-    move_time = datetime(2024, 1, 2)
-    move_ticket_at_time(boardid, column_id_2, move_time, ticket["ticketid"])
-
-    edit_time = datetime(2024, 1, 3)
-    new_ticket = ticket.copy()
-    new_ticket["title"] = "edited test ticket"
-    new_ticket["size"] = 10
-    edit_ticket_at_time(column_id_2, edit_time, new_ticket)
-
-    delete_time = datetime(2024, 1, 4)
-    delete_ticket_at_time(column_id_2, delete_time, ticket["ticketid"])
+    boardid = create_board_with_events()
 
     url = reverse("cumulative_flow", args=[boardid])
     url += "?time_unit=day&start_time=2024-01-01&end_time=2024-01-04"
@@ -270,9 +308,9 @@ def test_cumulative_flow():
 
     assert data == {
         "2024-01-01T00:00:00": {"Column 1": 5, "Column 2": 0},
-        "2024-01-02T00:00:00": {"Column 1": 0, "Column 2": 5},
-        "2024-01-03T00:00:00": {"Column 1": 0, "Column 2": 10},
-        "2024-01-04T00:00:00": {"Column 1": 0, "Column 2": 0},
+        "2024-01-02T00:00:00": {"Column 1": 0, "Column 2": 10},
+        "2024-01-03T00:00:00": {"Column 1": 0, "Column 2": 15},
+        "2024-01-04T00:00:00": {"Column 1": 0, "Column 2": 5},
     }
 
     resetDB()
