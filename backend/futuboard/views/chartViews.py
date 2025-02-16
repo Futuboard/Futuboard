@@ -19,6 +19,9 @@ def events(request: rest_framework.request.Request, board_id):
         return JsonResponse(serializer.data, safe=False)
 
 
+DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
+
+
 @api_view(["GET"])
 def cumulative_flow(request: rest_framework.request.Request, board_id):
     if request.method == "GET":
@@ -40,12 +43,33 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
         if time_unit not in possible_time_units:
             return JsonResponse({"error": "Invalid time unit"}, status=400)
 
+        def round_time(datetime, up=False):
+            if time_unit == "minute":
+                return datetime.replace(second=0, microsecond=0)
+            elif time_unit == "hour":
+                return datetime.replace(minute=0, second=0, microsecond=0)
+            elif time_unit == "day":
+                return datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+            elif time_unit == "week":
+                return datetime.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=datetime.weekday())
+            elif time_unit == "month":
+                return datetime.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            elif time_unit == "year":
+                return datetime.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+            else:
+                raise ValueError("Invalid time unit")
+
+        start_time = round_time(start_time)
+        end_time = round_time(end_time)
+
         columns = Column.objects.filter(boardid=board_id)
         ticket_events = (
-            TicketEvent.objects.filter(old_columnid__in=columns, event_time__gte=start_time, event_time__lte=end_time)
+            TicketEvent.objects.filter(
+                old_columnid__in=columns
+            )  # , event_time__gte=start_time, event_time__lte=end_time)
             | TicketEvent.objects.filter(
-                new_columnid__in=columns, event_time__gte=start_time, event_time__lte=end_time
-            )
+                new_columnid__in=columns
+            )  # , event_time__gte=start_time, event_time__lte=end_time)
         ).order_by("event_time")
 
         if len(ticket_events) == 0:
@@ -65,27 +89,9 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
 
         event_dict = {}
 
-        def round_time(datetime, up=False):
-            if time_unit == "minute":
-                return datetime.replace(second=0, microsecond=0)
-            elif time_unit == "hour":
-                return datetime.replace(minute=0, second=0, microsecond=0)
-            elif time_unit == "day":
-                return datetime.replace(hour=0, minute=0, second=0, microsecond=0)
-            elif time_unit == "week":
-                return datetime.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=datetime.weekday())
-            elif time_unit == "month":
-                return datetime.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-            elif time_unit == "year":
-                return datetime.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-            else:
-                raise ValueError("Invalid time unit")
-
-        start_time = round_time(start_time)
-        end_time = round_time(end_time)
         for event in ticket_events:
             event_time = round_time(event.event_time)
-            timestamp = event_time.isoformat()
+            timestamp = event_time.strftime(DATE_TIME_FORMAT)
             if event_dict.get(timestamp) is None:
                 event_dict[timestamp] = []
 
@@ -116,13 +122,13 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
         time = start_time
         previous_timestamp = None
         while time <= end_time:
-            timestamp = time.isoformat()
+            timestamp = time.strftime(DATE_TIME_FORMAT)
             if previous_timestamp is not None:
                 size_at_time[timestamp] = size_at_time[previous_timestamp].copy()
             else:
                 size_at_time[timestamp] = empty_column_dict.copy()
 
-            events_at_time = event_dict.get(time.isoformat())
+            events_at_time = event_dict.get(timestamp)
 
             if events_at_time is not None:
                 for event in events_at_time:
