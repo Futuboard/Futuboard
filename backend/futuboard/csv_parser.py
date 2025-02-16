@@ -203,14 +203,14 @@ def read_board_data(reader, board_title, password_hash):
                 ticket = Ticket.objects.create(
                     ticketid=uuid.uuid4(),
                     columnid=column,
-                    title=row[1],
-                    description=row[2],
+                    title=row[1] or "",
+                    description=row[2] or "",
                     color=row[3],
                     # row[4] Used to be useless "storypoints" field
                     size=row[5],
                     order=row[6],
                     creation_date=row[7],
-                    cornernote=row[8] if row[8] is not None else "",
+                    cornernote=row[8] or "",
                 )
 
                 # Read the ticket users from the csv file
