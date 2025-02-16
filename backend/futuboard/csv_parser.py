@@ -206,11 +206,11 @@ def read_board_data(reader, board_title, password_hash):
                     title=row[1],
                     description=row[2],
                     color=row[3],
-                    # row[4] Use to be useless "storypoints" field
+                    # row[4] Used to be useless "storypoints" field
                     size=row[5],
                     order=row[6],
                     creation_date=row[7],
-                    cornernote=row[8],
+                    cornernote=row[8] if row[8] is not None else "",
                 )
 
                 # Read the ticket users from the csv file

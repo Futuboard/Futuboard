@@ -95,7 +95,9 @@ class User(models.Model):
 
 class BoardTemplate(models.Model):
     boardtemplateid = models.UUIDField(db_column="boardTemplateID", default=uuid.uuid4, primary_key=True)
-    boardid = models.ForeignKey(Board, models.DO_NOTHING, db_column="boardID")
+    boardid = models.ForeignKey(
+        Board, models.CASCADE, db_column="boardID"
+    )  # If board is deleted, templates referecing it are also deleted
     title = models.TextField()
     description = models.TextField()
 
@@ -124,11 +126,12 @@ class TicketEvent(models.Model):
     event_type = models.CharField(choices=EVENT_TYPES, max_length=6)
 
     # All these are the new values after the event
+    # If column is deleted, all events related to that column are also deleted. This also happens when a board is deleted
     old_columnid = models.ForeignKey(
-        Column, models.DO_NOTHING, db_column="oldColumnId", null=True, related_name="old_columnid"
+        Column, models.CASCADE, db_column="oldColumnId", null=True, related_name="old_columnid"
     )
     new_columnid = models.ForeignKey(
-        Column, models.DO_NOTHING, db_column="newColumnId", null=True, related_name="new_columnid"
+        Column, models.CASCADE, db_column="newColumnId", null=True, related_name="new_columnid"
     )
     old_size = models.IntegerField()
     new_size = models.IntegerField()
