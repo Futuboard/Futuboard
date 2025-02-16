@@ -7,75 +7,109 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('futuboard', '0011_board_background_color'),
+        ("futuboard", "0011_board_background_color"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='board',
-            name='default_ticket_storypoints',
+            model_name="board",
+            name="default_ticket_storypoints",
         ),
         migrations.RemoveField(
-            model_name='ticket',
-            name='storypoints',
+            model_name="ticket",
+            name="storypoints",
         ),
         migrations.AlterField(
-            model_name='action',
-            name='creation_date',
+            model_name="action",
+            name="creation_date",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
         migrations.AlterField(
-            model_name='board',
-            name='creation_date',
+            model_name="board",
+            name="creation_date",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
         migrations.AlterField(
-            model_name='column',
-            name='creation_date',
+            model_name="column",
+            name="creation_date",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
         migrations.AlterField(
-            model_name='ticket',
-            name='cornernote',
-            field=models.TextField(db_column='cornerNote', default=''),
+            model_name="ticket",
+            name="cornernote",
+            field=models.TextField(db_column="cornerNote", default=""),
         ),
         migrations.AlterField(
-            model_name='ticket',
-            name='creation_date',
+            model_name="ticket",
+            name="creation_date",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
         migrations.AlterField(
-            model_name='ticket',
-            name='description',
-            field=models.TextField(default=''),
+            model_name="ticket",
+            name="description",
+            field=models.TextField(default=""),
         ),
         migrations.AlterField(
-            model_name='ticket',
-            name='size',
+            model_name="ticket",
+            name="size",
             field=models.IntegerField(default=0),
         ),
         migrations.AlterField(
-            model_name='ticket',
-            name='title',
-            field=models.TextField(default=''),
+            model_name="ticket",
+            name="title",
+            field=models.TextField(default=""),
         ),
         migrations.CreateModel(
-            name='TicketEvent',
+            name="TicketEvent",
             fields=[
-                ('ticketeventid', models.UUIDField(db_column='ticketEventID', default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('event_time', models.DateTimeField(default=django.utils.timezone.now)),
-                ('event_type', models.CharField(choices=[('CREATE', 'CREATE'), ('DELETE', 'DELETE'), ('UPDATE', 'UPDATE'), ('MOVE', 'MOVE')], max_length=6)),
-                ('old_size', models.IntegerField()),
-                ('new_size', models.IntegerField()),
-                ('title', models.TextField()),
-                ('new_columnid', models.ForeignKey(db_column='newColumnId', null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='new_columnid', to='futuboard.column')),
-                ('old_columnid', models.ForeignKey(db_column='oldColumnId', null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='old_columnid', to='futuboard.column')),
-                ('ticketid', models.ForeignKey(db_column='ticketID', db_constraint=False, on_delete=django.db.models.deletion.DO_NOTHING, to='futuboard.ticket')),
+                (
+                    "ticketeventid",
+                    models.UUIDField(db_column="ticketEventID", default=uuid.uuid4, primary_key=True, serialize=False),
+                ),
+                ("event_time", models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "event_type",
+                    models.CharField(
+                        choices=[("CREATE", "CREATE"), ("DELETE", "DELETE"), ("UPDATE", "UPDATE"), ("MOVE", "MOVE")],
+                        max_length=6,
+                    ),
+                ),
+                ("old_size", models.IntegerField()),
+                ("new_size", models.IntegerField()),
+                ("title", models.TextField()),
+                (
+                    "new_columnid",
+                    models.ForeignKey(
+                        db_column="newColumnId",
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="new_columnid",
+                        to="futuboard.column",
+                    ),
+                ),
+                (
+                    "old_columnid",
+                    models.ForeignKey(
+                        db_column="oldColumnId",
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="old_columnid",
+                        to="futuboard.column",
+                    ),
+                ),
+                (
+                    "ticketid",
+                    models.ForeignKey(
+                        db_column="ticketID",
+                        db_constraint=False,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="futuboard.ticket",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'TicketEvent',
+                "db_table": "TicketEvent",
             },
         ),
     ]

@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('futuboard', '0012_remove_board_default_ticket_storypoints_and_more'),
+        ("futuboard", "0012_remove_board_default_ticket_storypoints_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='column',
-            name='title',
-            field=models.TextField(default=''),
+            model_name="column",
+            name="title",
+            field=models.TextField(default=""),
         ),
     ]
