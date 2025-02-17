@@ -24,6 +24,7 @@ from rest_framework.decorators import api_view
 from ..verification import hash_password
 from django.http import JsonResponse
 import json
+from django.db import models
 
 
 @api_view(["GET"])
@@ -120,22 +121,14 @@ def replace_ids(data_dict, key, new_ids):
             replace_ids(value, i, new_ids)
 
 
-def create(object, data):
-    if data.get("boardid") and object != Board:
-        data["boardid"] = Board.objects.get(boardid=data["boardid"])
-    if data.get("columnid") and object != Column:
-        data["columnid"] = Column.objects.get(columnid=data["columnid"])
-    if data.get("ticketid") and object != Ticket:
-        data["ticketid"] = Ticket.objects.get(ticketid=data["ticketid"])
-    if data.get("swimlanecolumnid") and object != Swimlanecolumn:
-        data["swimlanecolumnid"] = Swimlanecolumn.objects.get(swimlanecolumnid=data["swimlanecolumnid"])
-    if data.get("old_columnid"):
-        data["old_columnid"] = Column.objects.get(columnid=data["old_columnid"])
-    if data.get("new_columnid"):
-        data["new_columnid"] = Column.objects.get(columnid=data["new_columnid"])
+def create(model, data):
+    # Replace foreign keys with actual objects
+    foreign_keys = [(f.name, f.related_model) for f in model._meta.get_fields() if isinstance(f, models.ForeignKey)]
+    for field, foreign_key_model in foreign_keys:
+        if field in data and data[field]:
+            data[field] = foreign_key_model.objects.get(pk=data[field])
 
-    new_db_obj = object.objects.create(**data)
-    return new_db_obj
+    return model.objects.create(**data)
 
 
 @api_view(["POST"])
