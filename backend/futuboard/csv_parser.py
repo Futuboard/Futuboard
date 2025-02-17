@@ -9,6 +9,13 @@ The csv file can be used to backup and restore board data.
 """
 
 
+def replace_empty_strings_with_none(row):
+    # Replace empty strings with None
+    for i in range(len(row)):
+        if row[i] == "":
+            row[i] = None
+
+
 def write_csv_header(writer):
     """
     Write the header to the csv file, this is used to verify that the csv file is a valid board data file
@@ -32,6 +39,7 @@ def write_board_data(writer, boardid):
     board = Board.objects.get(boardid=boardid)
     writer.writerow(["Board", board.description, board.background_color])
     users = User.objects.filter(boardid=boardid)
+
     # Get userids
     for user in users:
         writer.writerow(["User", user.name])
@@ -47,10 +55,13 @@ def write_board_data(writer, boardid):
         ]
     )
     writer.writerow([])
+
     # Get all the columns for the board
     columns = Column.objects.filter(boardid=boardid)
+
     # Write columns with swimlanecolumns first order by swimlane True first
     columns = sorted(columns, key=lambda column: column.swimlane, reverse=True)
+
     # Write the all the columns to the csv file
     for column in columns:
         # Write the column to the csv file
@@ -64,14 +75,18 @@ def write_board_data(writer, boardid):
                 column.swimlane,
             ]
         )
+
         if column.swimlane:
             # Get all the swimlanecolumns for the column
             swimlanecolumns = Swimlanecolumn.objects.filter(columnid=column.columnid)
+
             # Write all the swimlanecolumns to the csv file
             for swimlanecolumn in swimlanecolumns:
                 writer.writerow(["Swimlanecolumn", swimlanecolumn.title, swimlanecolumn.ordernum])
+
         # Get all the tickets for the column
         tickets = Ticket.objects.filter(columnid=column.columnid)
+
         # Write all the tickets in the column to the csv file
         for ticket in tickets:
             writer.writerow(
@@ -87,19 +102,32 @@ def write_board_data(writer, boardid):
                     ticket.cornernote,
                 ]
             )
+
             # Get users with ticketid
             users = User.objects.filter(tickets__ticketid=ticket.ticketid)
             for user in users:
                 writer.writerow(["User", user.name])
+
             # Get all the actions for the swimlanecolumn
             actions = Action.objects.filter(ticketid=ticket.ticketid)
+
             # Write all the actions in the swimlanecolumn to the csv file
             for action in actions:
-                writer.writerow(["Action", action.title, action.order, action.swimlanecolumnid.ordernum])
+                column_ordernum = action.swimlanecolumnid.columnid.ordernum
+                writer.writerow(
+                    [
+                        "Action",
+                        action.title,
+                        action.order,
+                        action.swimlanecolumnid.ordernum,
+                        column_ordernum,
+                    ]
+                )
                 # Get users with actionid
                 users = User.objects.filter(actions__actionid=action.actionid)
                 for user in users:
                     writer.writerow(["User", user.name])
+
         # Split the columns in the csv file with an empty line
         writer.writerow([])
     return writer
@@ -113,7 +141,6 @@ def read_board_data(reader, board_title, password_hash):
     # Get the board data from the csv file, skip the empty line    board_id = uuid.uuid4()
     next(reader)
     board_data = next(reader)
-    swimlanecolumns = []
     board = Board.objects.create(
         title=board_title,
         description=board_data[1],
@@ -122,15 +149,13 @@ def read_board_data(reader, board_title, password_hash):
         salt="",
         creation_date=timezone.now(),
     )
-    # Read the board users from the csv file
+
+    # Read board users and the template ticket from the csv file
     for row in reader:
-        # Replace empty strings with None
-        for i in range(len(row)):
-            if row[i] == "":
-                row[i] = None
+        replace_empty_strings_with_none(row)  # Replace empty strings with None
         # Read users until the next object type is found
         if len(row) > 0 and row[0] == "User":
-            user = User.objects.create(userid=uuid.uuid4(), name=row[1], boardid=board)
+            User.objects.create(userid=uuid.uuid4(), name=row[1], boardid=board)
         elif len(row) > 0 and row[0] == "Ticket Template":
             board.default_ticket_title = row[1]
             board.default_ticket_description = row[2]
@@ -141,6 +166,9 @@ def read_board_data(reader, board_title, password_hash):
             board.save()
         else:
             break
+
+    actions = []
+
     # Read the columns from the csv file
     row = next(reader, None)
     while row is not None:
@@ -149,10 +177,7 @@ def read_board_data(reader, board_title, password_hash):
             row = next(reader, None)
             continue
         if row[0] == "Column":
-            # Replace empty strings with None
-            for i in range(len(row)):
-                if row[i] == "":
-                    row[i] = None
+            replace_empty_strings_with_none(row)  # Replace empty strings with None
             column = Column.objects.create(
                 columnid=uuid.uuid4(),
                 boardid=board,
@@ -163,24 +188,18 @@ def read_board_data(reader, board_title, password_hash):
                 swimlane=row[5],
             )
             row = next(reader, None)
+
             # Read the swimlanecolumns from the csv file
             if column.swimlane == "True":
                 while len(row) > 0 and row[0] == "Swimlanecolumn":
-                    for i in range(len(row)):
-                        if row[i] == "":
-                            row[i] = None
-                    swimlane = Swimlanecolumn.objects.create(
+                    replace_empty_strings_with_none(row)  # Replace empty strings with None
+                    Swimlanecolumn.objects.create(
                         swimlanecolumnid=uuid.uuid4(), columnid=column, title=row[1], ordernum=row[2]
                     )
-                    swimlanecolumns.append(swimlane)
                     row = next(reader, None)
-            # Sort the swimlanecolumns by ordernum in ascending order
-            swimlanecolumns.sort(key=lambda x: x.ordernum)
+
             while len(row) > 0 and row[0] == "Ticket":
-                # Replace empty strings with None
-                for i in range(len(row)):
-                    if row[i] == "":
-                        row[i] = None
+                replace_empty_strings_with_none(row)  # Replace empty strings with None
                 ticket = Ticket.objects.create(
                     ticketid=uuid.uuid4(),
                     columnid=column,
@@ -193,39 +212,52 @@ def read_board_data(reader, board_title, password_hash):
                     creation_date=row[7],
                     cornernote=row[8],
                 )
+
                 # Read the ticket users from the csv file
                 row = next(reader, None)
                 while len(row) > 0 and row[0] == "User":
-                    for i in range(len(row)):
-                        if row[i] == "":
-                            row[i] = None
+                    replace_empty_strings_with_none(row)
                     user = User.objects.get(name=row[1], boardid=board)
                     user.tickets.add(ticket)
                     row = next(reader, None)
+
                 # Read the actions from the csv file
                 while len(row) > 0 and row[0] == "Action":
-                    for i in range(len(row)):
-                        if row[i] == "":
-                            row[i] = None
-                    action = Action.objects.create(
-                        actionid=uuid.uuid4(),
-                        ticketid=ticket,
-                        title=row[1],
-                        order=row[2],
-                        swimlanecolumnid=swimlanecolumns[
-                            int(row[3])
-                        ],  # This crashes application if ticket is left of all columns with swimlanes (or if ticket is not on a column with swimlanes when the fix below is implemented)
-                    )
-                    # Read the action users from the csv file
+                    replace_empty_strings_with_none(row)
+                    action_row = row
+                    user_rows = []
                     row = next(reader, None)
+
+                    # Read the users on actions
                     while len(row) > 0 and row[0] == "User":
-                        for i in range(len(row)):
-                            if row[i] == "":
-                                row[i] = None
-                        user = User.objects.get(name=row[1], boardid=board)
-                        user.actions.add(action)
+                        replace_empty_strings_with_none(row)
+                        user_rows.append(row)
                         row = next(reader, None)
-            # swimlanecolumns = [] TODO: This fixes the CSV export/import action displacement bug but currently is more unstable because of how creating old actions is handled
+
+                    if len(action_row) == 5:
+                        actions.append((action_row, ticket, user_rows))
         else:
             row = next(reader, None)
+
+    # Create actions to swimlanes
+    for action in actions:
+        column_ordernum = action[0][4]
+        column = Column.objects.filter(ordernum=column_ordernum, boardid=board).get()
+
+        swimlanecolumn_ordernum = action[0][3]
+        swimlanecolumn = Swimlanecolumn.objects.filter(columnid=column, ordernum=swimlanecolumn_ordernum).get()
+
+        created_action = Action.objects.create(
+            actionid=uuid.uuid4(),
+            ticketid=action[1],
+            title=action[0][1],
+            order=action[0][2],
+            swimlanecolumnid=swimlanecolumn,
+        )
+
+        users_on_action = action[2]
+        for user_row in users_on_action:
+            user = User.objects.get(name=user_row[1], boardid=board)
+            user.actions.add(created_action)
+
     return board
