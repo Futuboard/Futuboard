@@ -74,16 +74,10 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
             end_time = datetime.fromisoformat(end_time)
 
         end_time = round_time(end_time)
-        inclusive_end_time = end_time + time_delta
 
         columns = Column.objects.filter(boardid=board_id)
         ticket_events = (
-            TicketEvent.objects.filter(
-                old_columnid__in=columns, event_time__gte=start_time, event_time__lte=inclusive_end_time
-            )
-            | TicketEvent.objects.filter(
-                new_columnid__in=columns, event_time__gte=start_time, event_time__lte=inclusive_end_time
-            )
+            TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
         ).order_by("event_time")
 
         if len(ticket_events) == 0:
@@ -121,7 +115,13 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
             column_name = column_names[str(columnid)]
             size_at_time[timestamp][column_name] += change
 
+        earliest_event_time = round_time(ticket_events[0].event_time.replace(tzinfo=None))
         time = start_time
+        can_have_events_before_start_time = earliest_event_time < start_time
+        if can_have_events_before_start_time:
+            # Have to start from the earliest event time, not the start time, because otherwise we miss events and the result is wrong
+            time = earliest_event_time
+
         previous_timestamp = None
         while time <= end_time:
             timestamp = time.strftime(DATE_TIME_FORMAT)
@@ -146,5 +146,11 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
 
             previous_timestamp = timestamp
             time += time_delta
+
+        if can_have_events_before_start_time:
+            # Remove events that happened before the start time
+            for timestamp in list(size_at_time.keys()):
+                if datetime.fromisoformat(timestamp) < start_time:
+                    del size_at_time[timestamp]
 
         return JsonResponse(size_at_time, safe=False)
