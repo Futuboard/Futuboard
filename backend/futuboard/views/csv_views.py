@@ -2,9 +2,21 @@
 Views to import and export CSV files of board data
 """
 
+from datetime import datetime
+import uuid
 from django.http import HttpResponse
 
-from ..serializers import BoardSerializer
+from ..models import Action, Board, Column, Swimlanecolumn, Ticket, TicketEvent, User
+
+from ..serializers import (
+    BoardSerializer,
+    SwimlaneColumnSerializer,
+    TicketSerializer,
+    UserSerializer,
+    ColumnSerializer,
+    ActionSerializer,
+    TicketEventSerializer,
+)
 from ..csv_parser import write_csv_header, write_board_data, verify_csv_header, read_board_data
 import csv
 import io
@@ -52,3 +64,118 @@ def import_board_data(request):
         return JsonResponse(serializer.data, safe=False)
 
     return HttpResponse("Invalid request", status=400)
+
+
+def export_board_data_json(request, board_id):
+    board = Board.objects.get(boardid=board_id)
+    users = User.objects.filter(boardid=board_id)
+    columns = Column.objects.filter(boardid=board_id)
+    swimlanecolumns = Swimlanecolumn.objects.filter(columnid__in=columns)
+    tickets = Ticket.objects.filter(columnid__in=columns)
+    actions = Action.objects.filter(ticketid__in=tickets)
+    ticketEvents = TicketEvent.objects.filter(ticketid__in=tickets)
+
+    json_data = {}
+    json_data["board"] = BoardSerializer(board).data
+    json_data["users"] = UserSerializer(users, many=True).data
+    json_data["columns"] = ColumnSerializer(columns, many=True).data
+    json_data["swimlanecolumns"] = SwimlaneColumnSerializer(swimlanecolumns, many=True).data
+    json_data["tickets"] = TicketSerializer(tickets, many=True).data
+    json_data["actions"] = ActionSerializer(actions, many=True).data
+    json_data["ticketEvents"] = TicketEventSerializer(ticketEvents, many=True).data
+
+    response = JsonResponse(json_data, safe=False)
+    filename = board.title + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    response["Content-Disposition"] = 'attachment; filename="' + filename + '.json"'
+
+    return response
+
+
+def is_valid_uuid(val):
+    try:
+        uuid.UUID(str(val))
+        return True
+    except ValueError:
+        return False
+
+
+# Recursively replace all UUIDs in a dictionary with new UUIDs
+def replace_ids(data_dict, key, new_ids):
+    value = data_dict[key]
+    is_string = isinstance(value, str)
+    if is_string and is_valid_uuid(value):
+        if value in new_ids:
+            data_dict[key] = new_ids[value]
+        else:
+            new_id = str(uuid.uuid4())
+            new_ids[value] = new_id
+            data_dict[key] = new_id
+
+    elif isinstance(value, dict):
+        for innerkey in value:
+            replace_ids(value, innerkey, new_ids)
+
+    elif isinstance(value, list):
+        for i in range(len(value)):
+            replace_ids(value, i, new_ids)
+
+
+@api_view(["POST"])
+def import_board_data_json(request):
+    data = dict(request.data)
+    new_ids = {}
+
+    for key in data:
+        replace_ids(data, key, new_ids)
+
+    new_board = Board.objects.create(**data["board"])
+
+    for column in data["columns"]:
+        column["boardid"] = new_board
+        Column.objects.create(**column)
+
+    for swimlanecolumn in data["swimlanecolumns"]:
+        swimlanecolumn["columnid"] = Column.objects.get(columnid=swimlanecolumn["columnid"])
+        Swimlanecolumn.objects.create(**swimlanecolumn)
+
+    for ticket in data["tickets"]:
+        del ticket["users"]
+        ticket["columnid"] = Column.objects.get(columnid=ticket["columnid"])
+        Ticket.objects.create(**ticket)
+
+    for action in data["actions"]:
+        del action["users"]
+        action["ticketid"] = Ticket.objects.get(ticketid=action["ticketid"])
+        action["swimlanecolumnid"] = Swimlanecolumn.objects.get(swimlanecolumnid=action["swimlanecolumnid"])
+        Action.objects.create(**action)
+
+    for user in data["users"]:
+        actions = user["actions"]
+        tickets = user["tickets"]
+        del user["actions"]
+        del user["tickets"]
+
+        user["boardid"] = new_board
+
+        user_in_db = User.objects.create(**user)
+
+        for action in actions:
+            user_in_db.actions.add(action)
+
+        for ticket in tickets:
+            user_in_db.tickets.add(ticket)
+
+    for ticketEvent in data["ticketEvents"]:
+        ticketEvent["ticketid"] = Ticket.objects.get(ticketid=ticketEvent["ticketid"])
+
+        if ticketEvent["old_columnid"]:
+            ticketEvent["old_columnid"] = Column.objects.get(columnid=ticketEvent["old_columnid"])
+
+        if ticketEvent["new_columnid"]:
+            ticketEvent["new_columnid"] = Column.objects.get(columnid=ticketEvent["new_columnid"])
+
+        TicketEvent.objects.create(**ticketEvent)
+
+    serializer = BoardSerializer(new_board)
+
+    return JsonResponse(serializer.data, safe=False)
