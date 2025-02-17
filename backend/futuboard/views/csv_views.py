@@ -120,6 +120,24 @@ def replace_ids(data_dict, key, new_ids):
             replace_ids(value, i, new_ids)
 
 
+def create(object, data):
+    if data.get("boardid") and object != Board:
+        data["boardid"] = Board.objects.get(boardid=data["boardid"])
+    if data.get("columnid") and object != Column:
+        data["columnid"] = Column.objects.get(columnid=data["columnid"])
+    if data.get("ticketid") and object != Ticket:
+        data["ticketid"] = Ticket.objects.get(ticketid=data["ticketid"])
+    if data.get("swimlanecolumnid") and object != Swimlanecolumn:
+        data["swimlanecolumnid"] = Swimlanecolumn.objects.get(swimlanecolumnid=data["swimlanecolumnid"])
+    if data.get("old_columnid"):
+        data["old_columnid"] = Column.objects.get(columnid=data["old_columnid"])
+    if data.get("new_columnid"):
+        data["new_columnid"] = Column.objects.get(columnid=data["new_columnid"])
+
+    new_db_obj = object.objects.create(**data)
+    return new_db_obj
+
+
 @api_view(["POST"])
 def import_board_data_json(request):
     data = dict(request.data)
@@ -131,23 +149,21 @@ def import_board_data_json(request):
     new_board = Board.objects.create(**data["board"])
 
     for column in data["columns"]:
-        column["boardid"] = new_board
-        Column.objects.create(**column)
+        create(Column, column)
 
     for swimlanecolumn in data["swimlanecolumns"]:
-        swimlanecolumn["columnid"] = Column.objects.get(columnid=swimlanecolumn["columnid"])
-        Swimlanecolumn.objects.create(**swimlanecolumn)
+        create(Swimlanecolumn, swimlanecolumn)
 
     for ticket in data["tickets"]:
-        del ticket["users"]
-        ticket["columnid"] = Column.objects.get(columnid=ticket["columnid"])
-        Ticket.objects.create(**ticket)
+        del ticket["users"]  # Not actually stored in ticket, just put here by serializer
+        create(Ticket, ticket)
 
     for action in data["actions"]:
-        del action["users"]
-        action["ticketid"] = Ticket.objects.get(ticketid=action["ticketid"])
-        action["swimlanecolumnid"] = Swimlanecolumn.objects.get(swimlanecolumnid=action["swimlanecolumnid"])
-        Action.objects.create(**action)
+        del action["users"]  # Not actually stored in action, just put here by serializer
+        create(Action, action)
+
+    for ticketEvent in data["ticketEvents"]:
+        create(TicketEvent, ticketEvent)
 
     for user in data["users"]:
         actions = user["actions"]
@@ -155,9 +171,7 @@ def import_board_data_json(request):
         del user["actions"]
         del user["tickets"]
 
-        user["boardid"] = new_board
-
-        user_in_db = User.objects.create(**user)
+        user_in_db = create(User, user)
 
         for action in actions:
             user_in_db.actions.add(action)
@@ -165,17 +179,5 @@ def import_board_data_json(request):
         for ticket in tickets:
             user_in_db.tickets.add(ticket)
 
-    for ticketEvent in data["ticketEvents"]:
-        ticketEvent["ticketid"] = Ticket.objects.get(ticketid=ticketEvent["ticketid"])
-
-        if ticketEvent["old_columnid"]:
-            ticketEvent["old_columnid"] = Column.objects.get(columnid=ticketEvent["old_columnid"])
-
-        if ticketEvent["new_columnid"]:
-            ticketEvent["new_columnid"] = Column.objects.get(columnid=ticketEvent["new_columnid"])
-
-        TicketEvent.objects.create(**ticketEvent)
-
     serializer = BoardSerializer(new_board)
-
     return JsonResponse(serializer.data, safe=False)
