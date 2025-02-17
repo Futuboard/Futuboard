@@ -63,4 +63,6 @@ urlpatterns = [
     path(
         "api/charts/<uuid:board_id>/cumulativeflow", chartViews.cumulative_flow, name="cumulative_flow"
     ),  # Also has url parameters, e.g. ?time_unit=day&start_time=2021-01-01&end_time=2021-01-10
+    path("api/json/<uuid:board_id>/", csv_views.export_board_data_json, name="export_board_data_json"),
+    path("api/json_import/", csv_views.import_board_data_json, name="import_board_data_json"),
 ]
