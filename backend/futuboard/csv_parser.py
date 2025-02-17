@@ -9,7 +9,7 @@ The csv file can be used to backup and restore board data.
 """
 
 
-def nonefy(row):
+def replace_empty_strings_with_none(row):
     # Replace empty strings with None
     for i in range(len(row)):
         if row[i] == "":
@@ -152,7 +152,7 @@ def read_board_data(reader, board_title, password_hash):
 
     # Read board users and the template ticket from the csv file
     for row in reader:
-        nonefy(row)  # Replace empty strings with None
+        replace_empty_strings_with_none(row)  # Replace empty strings with None
         # Read users until the next object type is found
         if len(row) > 0 and row[0] == "User":
             User.objects.create(userid=uuid.uuid4(), name=row[1], boardid=board)
@@ -177,7 +177,7 @@ def read_board_data(reader, board_title, password_hash):
             row = next(reader, None)
             continue
         if row[0] == "Column":
-            nonefy(row)  # Replace empty strings with None
+            replace_empty_strings_with_none(row)  # Replace empty strings with None
             column = Column.objects.create(
                 columnid=uuid.uuid4(),
                 boardid=board,
@@ -192,14 +192,14 @@ def read_board_data(reader, board_title, password_hash):
             # Read the swimlanecolumns from the csv file
             if column.swimlane == "True":
                 while len(row) > 0 and row[0] == "Swimlanecolumn":
-                    nonefy(row)  # Replace empty strings with None
+                    replace_empty_strings_with_none(row)  # Replace empty strings with None
                     Swimlanecolumn.objects.create(
                         swimlanecolumnid=uuid.uuid4(), columnid=column, title=row[1], ordernum=row[2]
                     )
                     row = next(reader, None)
 
             while len(row) > 0 and row[0] == "Ticket":
-                nonefy(row)  # Replace empty strings with None
+                replace_empty_strings_with_none(row)  # Replace empty strings with None
                 ticket = Ticket.objects.create(
                     ticketid=uuid.uuid4(),
                     columnid=column,
@@ -216,21 +216,21 @@ def read_board_data(reader, board_title, password_hash):
                 # Read the ticket users from the csv file
                 row = next(reader, None)
                 while len(row) > 0 and row[0] == "User":
-                    nonefy(row)
+                    replace_empty_strings_with_none(row)
                     user = User.objects.get(name=row[1], boardid=board)
                     user.tickets.add(ticket)
                     row = next(reader, None)
 
                 # Read the actions from the csv file
                 while len(row) > 0 and row[0] == "Action":
-                    nonefy(row)
+                    replace_empty_strings_with_none(row)
                     action_row = row
                     user_rows = []
                     row = next(reader, None)
 
                     # Read the users on actions
                     while len(row) > 0 and row[0] == "User":
-                        nonefy(row)
+                        replace_empty_strings_with_none(row)
                         user_rows.append(row)
                         row = next(reader, None)
 
