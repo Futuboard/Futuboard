@@ -150,7 +150,6 @@ def test_import_export():
                 assert imported_ticket.title == ticket.title
                 assert imported_ticket.description == ticket.description
                 assert imported_ticket.color == ticket.color
-                assert imported_ticket.storypoints == ticket.storypoints
                 assert imported_ticket.size == ticket.size
                 assert imported_ticket.order == ticket.order
                 assert imported_ticket.creation_date == ticket.creation_date

@@ -1,5 +1,5 @@
 import uuid
-from futuboard.models import Board, Column, Ticket, User, Swimlanecolumn, Action
+from futuboard.models import Board, Column, Ticket, TicketEvent, User, Swimlanecolumn, Action
 from django.utils import timezone
 
 """
@@ -49,7 +49,7 @@ def write_board_data(writer, boardid):
             board.default_ticket_title,
             board.default_ticket_description,
             board.default_ticket_size,
-            board.default_ticket_storypoints,
+            0,  # Used to be useless "storypoints" field
             board.default_ticket_cornernote,
             board.default_ticket_color,
         ]
@@ -95,7 +95,7 @@ def write_board_data(writer, boardid):
                     ticket.title,
                     ticket.description,
                     ticket.color,
-                    ticket.storypoints,
+                    0,  # Used to be useless "storypoints" field
                     ticket.size,
                     ticket.order,
                     ticket.creation_date,
@@ -160,7 +160,7 @@ def read_board_data(reader, board_title, password_hash):
             board.default_ticket_title = row[1]
             board.default_ticket_description = row[2]
             board.default_ticket_size = row[3]
-            board.default_ticket_storypoints = row[4]
+            # row[4] Used to be useless "storypoints" field
             board.default_ticket_cornernote = row[5]
             board.default_ticket_color = row[6]
             board.save()
@@ -203,14 +203,25 @@ def read_board_data(reader, board_title, password_hash):
                 ticket = Ticket.objects.create(
                     ticketid=uuid.uuid4(),
                     columnid=column,
-                    title=row[1],
-                    description=row[2],
+                    title=row[1] or "",
+                    description=row[2] or "",
                     color=row[3],
-                    storypoints=row[4],
+                    # row[4] Used to be useless "storypoints" field
                     size=row[5],
                     order=row[6],
                     creation_date=row[7],
-                    cornernote=row[8],
+                    cornernote=row[8] or "",
+                )
+
+                TicketEvent.objects.create(
+                    ticketid=ticket,
+                    event_type="CREATE",
+                    event_time=ticket.creation_date,
+                    old_size=0,
+                    new_size=ticket.size,
+                    old_columnid=None,
+                    new_columnid=column,
+                    title=ticket.title,
                 )
 
                 # Read the ticket users from the csv file

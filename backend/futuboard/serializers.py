@@ -1,4 +1,4 @@
-from .models import Board, BoardTemplate, Column, Ticket, User, Swimlanecolumn, Action
+from .models import Board, BoardTemplate, Column, Ticket, TicketEvent, User, Swimlanecolumn, Action
 from rest_framework import serializers
 
 
@@ -14,7 +14,6 @@ class BoardSerializer(serializers.ModelSerializer):
             "default_ticket_title",
             "default_ticket_description",
             "default_ticket_color",
-            "default_ticket_storypoints",
             "default_ticket_size",
             "default_ticket_cornernote",
         ]
@@ -59,7 +58,6 @@ class TicketSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "color",
-            "storypoints",
             "size",
             "order",
             "creation_date",
@@ -86,3 +84,19 @@ class BoardTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoardTemplate
         fields = ["boardtemplateid", "boardid", "title", "description"]
+
+
+class TicketEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TicketEvent
+        fields = [
+            "ticketeventid",
+            "ticketid",
+            "event_time",
+            "event_type",
+            "old_columnid",
+            "new_columnid",
+            "old_size",
+            "new_size",
+            "title",
+        ]
