@@ -152,6 +152,7 @@ def update_ticket(request, column_id, ticket_id):
 
     if request.method == "PUT":
         old_size = ticket.size
+        old_title = ticket.title
 
         ticket.title = request.data.get("title", ticket.title)
         ticket.description = request.data.get("description", ticket.description)
@@ -160,16 +161,17 @@ def update_ticket(request, column_id, ticket_id):
         ticket.cornernote = request.data.get("cornernote", ticket.cornernote)
         ticket.save()
 
-        ticket_update_event = TicketEvent(
-            ticketid=ticket,
-            event_type=TicketEvent.UPDATE,
-            old_columnid=ticket.columnid,
-            new_columnid=ticket.columnid,
-            old_size=old_size,
-            new_size=ticket.size,
-            title=ticket.title,
-        )
-        ticket_update_event.save()
+        if old_size != ticket.size or old_title != ticket.title:
+            ticket_update_event = TicketEvent(
+                ticketid=ticket,
+                event_type=TicketEvent.UPDATE,
+                old_columnid=ticket.columnid,
+                new_columnid=ticket.columnid,
+                old_size=old_size,
+                new_size=ticket.size,
+                title=ticket.title,
+            )
+            ticket_update_event.save()
 
         serializer = TicketSerializer(ticket)
         return JsonResponse(serializer.data, safe=False)
