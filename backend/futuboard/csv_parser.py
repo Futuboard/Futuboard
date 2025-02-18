@@ -1,5 +1,5 @@
 import uuid
-from futuboard.models import Board, Column, Ticket, User, Swimlanecolumn, Action
+from futuboard.models import Board, Column, Ticket, TicketEvent, User, Swimlanecolumn, Action
 from django.utils import timezone
 
 """
@@ -211,6 +211,17 @@ def read_board_data(reader, board_title, password_hash):
                     order=row[6],
                     creation_date=row[7],
                     cornernote=row[8] or "",
+                )
+
+                TicketEvent.objects.create(
+                    ticketid=ticket,
+                    event_type="CREATE",
+                    event_time=ticket.creation_date,
+                    old_size=0,
+                    new_size=ticket.size,
+                    old_columnid=None,
+                    new_columnid=column,
+                    title=ticket.title,
                 )
 
                 # Read the ticket users from the csv file
