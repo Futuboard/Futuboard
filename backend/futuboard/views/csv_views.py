@@ -122,13 +122,40 @@ def replace_ids(data_dict, key, new_ids):
 
 
 def create(model, data):
-    # Replace foreign keys with actual objects
-    foreign_keys = [(f.name, f.related_model) for f in model._meta.get_fields() if isinstance(f, models.ForeignKey)]
-    for field, foreign_key_model in foreign_keys:
-        if field in data and data[field]:
-            data[field] = foreign_key_model.objects.get(pk=data[field])
+    fields = model._meta.get_fields()
 
-    return model.objects.create(**data)
+    # Remove fields that are not in the model
+    field_names = [f.name for f in fields]
+    fields_to_remove = []  # Can't remove items from a dictionary while iterating over it
+    for key in data:
+        if key not in field_names:
+            fields_to_remove.append(key)
+
+    for key in fields_to_remove:
+        del data[key]
+
+    many_to_many_values = {}
+
+    for field in fields:
+        # Replace foreign keys with actual objects
+        if isinstance(field, models.ForeignKey):
+            if field.name in data and data[field.name]:
+                data[field.name] = field.related_model.objects.get(pk=data[field.name])
+
+        # Save data from many-to-many fields for later
+        if isinstance(field, models.ManyToManyField):
+            if field.name in data:
+                many_to_many_values[field.name] = data[field.name]
+                del data[field.name]
+
+    new_object = model.objects.create(**data)
+
+    # Add many-to-many values
+    for field_name, values in many_to_many_values.items():
+        for value in values:
+            getattr(new_object, field_name).add(value)  # Same as user.tickets.add(ticket)
+
+    return new_object
 
 
 @api_view(["POST"])
@@ -139,7 +166,7 @@ def import_board_data_json(request):
     for key in data:
         replace_ids(data, key, new_ids)
 
-    new_board = Board.objects.create(**data["board"])
+    new_board = create(Board, data["board"])
 
     for column in data["columns"]:
         create(Column, column)
@@ -148,29 +175,16 @@ def import_board_data_json(request):
         create(Swimlanecolumn, swimlanecolumn)
 
     for ticket in data["tickets"]:
-        del ticket["users"]  # Not actually stored in ticket, just put here by serializer
         create(Ticket, ticket)
 
     for action in data["actions"]:
-        del action["users"]  # Not actually stored in action, just put here by serializer
         create(Action, action)
 
     for ticketEvent in data["ticketEvents"]:
         create(TicketEvent, ticketEvent)
 
     for user in data["users"]:
-        actions = user["actions"]
-        tickets = user["tickets"]
-        del user["actions"]
-        del user["tickets"]
-
-        user_in_db = create(User, user)
-
-        for action in actions:
-            user_in_db.actions.add(action)
-
-        for ticket in tickets:
-            user_in_db.tickets.add(ticket)
+        create(User, user)
 
     serializer = BoardSerializer(new_board)
     return JsonResponse(serializer.data, safe=False)
