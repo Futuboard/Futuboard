@@ -15,7 +15,7 @@ import {
   Typography
 } from "@mui/material"
 import React, { useState } from "react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
 import { TaskTemplate } from "@/types"
@@ -99,12 +99,18 @@ export const AddUserButton: React.FC = () => {
   )
 }
 
-const OpenAnalyticsButton: React.FC = () => {
+interface OpenAnalyticsButtonProps {
+  boardId: String
+}
+
+const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) => {
   return (
     <Tooltip title="open analytics">
-      <IconButton onClick={() => window.open(window.location.href + "/charts")}>
-        <Analytics />
-      </IconButton>
+      <Link to={"/board/" + boardId + "/charts"}>
+        <IconButton>
+          <Analytics />
+        </IconButton>
+      </Link>
     </Tooltip>
   )
 }
@@ -198,7 +204,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       <AddUserButton />
       <CopyToClipboardButton />
       <CreateColumnButton boardId={boardId} />
-      <OpenAnalyticsButton />
+      <OpenAnalyticsButton boardId={boardId} />
       <IconButton
         aria-label="more"
         aria-controls="long-menu"

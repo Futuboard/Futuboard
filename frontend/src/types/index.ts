@@ -116,3 +116,7 @@ export type BoardTemplate = {
 }
 
 export type NewBoardTemplate = Omit<BoardTemplate, "boardtemplateid">
+
+export type ChartData = {
+  [key: string]: { [key: string]: number }
+}
