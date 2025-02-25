@@ -16,7 +16,8 @@ import {
   NewBoardFormData,
   BoardTemplate,
   NewBoardTemplate,
-  TaskTemplate
+  TaskTemplate,
+  ChartData
 } from "@/types"
 
 import { getAdminPassword, getAuth, setToken } from "./auth"
@@ -681,6 +682,16 @@ export const boardsApi = createApi({
         method: "POST",
         body: { password }
       })
+    }),
+    getCumulativeFlowDiagramData: builder.query<
+      ChartData,
+      { boardId: string; timeUnit: string; start: string; end: string }
+    >({
+      query: ({ boardId, timeUnit = "day", start, end }) => ({
+        url: `charts/${boardId}/cumulativeflow`,
+        method: "GET",
+        params: { time_unit: timeUnit, start_time: start, end_time: end }
+      })
     })
   })
 })
@@ -723,5 +734,6 @@ export const {
   useDeleteUserFromActionMutation,
   useDeleteUserFromTicketMutation,
   useCheckAdminPasswordMutation,
-  useUpdateTaskTemplateMutation
+  useUpdateTaskTemplateMutation,
+  useGetCumulativeFlowDiagramDataQuery
 } = boardsApi
