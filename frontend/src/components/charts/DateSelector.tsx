@@ -19,22 +19,22 @@ const DateSelector: React.FC<DateSelectorProps> = ({ onSubmitStart, onSubmitEnd,
 
   const open = Boolean(anchorEl)
 
+  const [startDate, setStartDate] = useState(dayjs().subtract(30, "day"))
+  const [endDate, setEndDate] = useState(dayjs())
+  const [timeUnit, setTimeUnit] = useState("day")
+
   const onSubmit = () => {
     onSubmitStart(startDate.format("YYYY-MM-DD"))
     onSubmitEnd(endDate.format("YYYY-MM-DD"))
     onSubmitTimeUnit(timeUnit)
   }
 
-  const [startDate, setStartDate] = useState(dayjs().subtract(30, "day"))
-  const [endDate, setEndDate] = useState(dayjs())
-  const [timeUnit, setTimeUnit] = useState("day")
-
-  const timeUnitOptions = ["minute", "hour", "day", "week", "month", "year"]
+  const timeUnitOptions = ["day", "week", "month", "year"]
 
   return (
     <div>
       <Button variant="outlined" onClick={(event) => setAnchorEl(event.currentTarget)} endIcon={<CalendarMonthIcon />}>
-        {startDate.format("MM.DD.YYYY")} - {endDate.format("MM.DD.YYYY")}
+        {startDate.format("DD.MM.YYYY")} - {endDate.format("MM.DD.YYYY")}
       </Button>
       <Popover
         open={open}
@@ -42,10 +42,11 @@ const DateSelector: React.FC<DateSelectorProps> = ({ onSubmitStart, onSubmitEnd,
         onClose={handleClose}
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: "left"
+          horizontal: "center"
         }}
+        transformOrigin={{ vertical: 0, horizontal: 400 }}
       >
-        <Grid container alignItems="center" justifyContent="space-evenly">
+        <Grid container sx={{ alignItems: "center", justifyContent: "space-evenly", width: 800 }}>
           <Grid item xs={5}>
             <DateCalendar
               value={startDate}

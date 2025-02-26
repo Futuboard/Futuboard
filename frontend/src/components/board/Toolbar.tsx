@@ -1,4 +1,13 @@
-import { Download, MoreVert, EnhancedEncryption, Edit, Gradient, ColorLens, Analytics } from "@mui/icons-material"
+import {
+  Download,
+  MoreVert,
+  EnhancedEncryption,
+  Edit,
+  Gradient,
+  ColorLens,
+  Analytics,
+  ViewWeek
+} from "@mui/icons-material"
 import {
   AppBar,
   Box,
@@ -270,14 +279,33 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   )
 }
 
+interface chartToolBarProps {
+  boardId: string
+}
+
+const ChartToolbar: React.FC<chartToolBarProps> = ({ boardId }) => {
+  return (
+    <Box display="flex" alignItems="center" justifyContent="flex-end" sx={{ minWidth: 0, flexGrow: 1 }}>
+      <Tooltip title="Open board">
+        <Link to={`/board/${boardId}`}>
+          <IconButton>
+            <ViewWeek />
+          </IconButton>
+        </Link>
+      </Tooltip>
+    </Box>
+  )
+}
+
 interface ToolBarProps {
   title: string
   boardId?: string
   boardBackgroundColor?: string
   taskTemplate?: TaskTemplate
+  chartToolbar?: boolean
 }
 
-const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: ToolBarProps) => {
+const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor, chartToolbar }: ToolBarProps) => {
   return (
     <AppBar
       position="fixed"
@@ -303,6 +331,7 @@ const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: ToolBar
             boardBackgroundColor={boardBackgroundColor || "white"}
           />
         )}
+        {boardId && chartToolbar && <ChartToolbar boardId={boardId} />}
       </Toolbar>
     </AppBar>
   )
