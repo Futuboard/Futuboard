@@ -1,65 +1,60 @@
 import { ChartData } from "@/types"
-import { Button, Paper } from "@mui/material"
-import { DatePicker } from "@mui/x-date-pickers"
+import { Grid, Paper } from "@mui/material"
 import dayjs from "dayjs"
-import { useState } from "react"
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import DateSelector from "./DateSelector"
 
 interface CumulativeFlowDiagramProps {
   data: ChartData
   changeStart: (startDate: string) => void
   changeEnd: (endDate: string) => void
+  changeTimeUnit: (timeUnit: string) => void
 }
 
-const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ data, changeStart, changeEnd }) => {
-  if (Object.values(data).length == 0) {
-    return null
-  }
-
-  const [startDate, setStartDate] = useState(dayjs().subtract(30, "day"))
-  const [endDate, setEndDate] = useState(dayjs())
-
+const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({
+  data,
+  changeStart,
+  changeEnd,
+  changeTimeUnit
+}) => {
   const dataAsArray = Object.entries(data).map(([key, value]) => ({ name: dayjs(key).format("DD.MM.YYYY"), ...value }))
 
   const columnNames = Object.keys(Object.values(data)[0])
 
-  const onSubmit = () => {
-    changeStart(startDate.format("YYYY-MM-DD"))
-    changeEnd(endDate.format("YYYY-MM-DD"))
-  }
-
   return (
-    <Paper sx={{ paddingTop: 10, width: 500 }}>
-      <AreaChart
-        width={500}
-        height={400}
-        data={dataAsArray}
-        margin={{
-          top: 10,
-          right: 30,
-          left: 0,
-          bottom: 0
-        }}
-      >
-        <defs></defs>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        {columnNames.map((name) => {
-          return (
-            <Area
-              type="linear"
-              dataKey={name}
-              stackId="1"
-              fill={"#" + ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, "0")}
-            />
-          )
-        })}
-      </AreaChart>
-      <DatePicker defaultValue={startDate} onChange={(date) => setStartDate(date || startDate)} />
-      <DatePicker defaultValue={endDate} onChange={(date) => setEndDate(date || endDate)} />
-      <Button onClick={onSubmit}>Get</Button>
+    <Paper>
+      <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ padding: 1, marginTop: 10 }}>
+        <Grid item sx={{ width: 800, height: 800 }}>
+          <ResponsiveContainer width="100%" height="95%">
+            <AreaChart
+              data={dataAsArray}
+              margin={{
+                top: 10,
+                right: 30,
+                left: 0,
+                bottom: 0
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip wrapperStyle={{ width: "200px" }} />
+              {columnNames.map((name) => (
+                <Area
+                  type="linear"
+                  key={name}
+                  dataKey={name}
+                  stackId="1"
+                  fill={"#" + ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, "0")}
+                />
+              ))}
+            </AreaChart>
+          </ResponsiveContainer>
+        </Grid>
+        <Grid item>
+          <DateSelector onSubmitStart={changeStart} onSubmitEnd={changeEnd} onSubmitTimeUnit={changeTimeUnit} />
+        </Grid>
+      </Grid>
     </Paper>
   )
 }
