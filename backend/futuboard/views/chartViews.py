@@ -11,7 +11,7 @@ from datetime import timedelta, datetime
 @api_view(["GET"])
 def events(request: rest_framework.request.Request, board_id):
     if request.method == "GET":
-        columns = Column.objects.filter(boardid=board_id)
+        columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
         query_set = (
             TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
         ).order_by("event_time")
@@ -75,7 +75,7 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
 
         end_time = round_time(end_time)
 
-        columns = Column.objects.filter(boardid=board_id)
+        columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
         ticket_events = (
             TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
         ).order_by("event_time")
@@ -94,11 +94,14 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
                 event_dict[timestamp].append(event)
 
         column_names = {}
+
         for column in columns:
             column_name = column.title
             number = 1
+
             # Handle duplicate column names
-            while column_name in column_names.values():
+            # If column is named "name", it needs to be renamed, because "name"-field is used for the name of the datapoint, i.e. the timestamp
+            while column_name in column_names.values() or column_name == "name":
                 number += 1
                 column_name = column.title + " (" + str(number) + ")"
 
@@ -109,11 +112,11 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
             column_name = column_names[str(column.columnid)]
             empty_column_dict[column_name] = 0
 
-        size_at_time = {}
+        final_data = []
 
-        def setSize(timestamp, columnid, change):
+        def setSize(column_sizes, columnid, change):
             column_name = column_names[str(columnid)]
-            size_at_time[timestamp][column_name] += change
+            column_sizes[column_name] += change
 
         earliest_event_time = round_time(ticket_events[0].event_time.replace(tzinfo=None))
         time = start_time
@@ -122,35 +125,36 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
             # Have to start from the earliest event time, not the start time, because otherwise we miss events and the result is wrong
             time = earliest_event_time
 
-        previous_timestamp = None
+        previous_column_sizes = None
         while time <= end_time:
             timestamp = time.strftime(DATE_TIME_FORMAT)
-            if previous_timestamp is not None:
-                size_at_time[timestamp] = size_at_time[previous_timestamp].copy()
-            else:
-                size_at_time[timestamp] = empty_column_dict.copy()
+            column_sizes = previous_column_sizes or empty_column_dict.copy()
+            column_sizes["name"] = timestamp
 
             events_at_time = event_dict.get(timestamp)
 
             if events_at_time is not None:
                 for event in events_at_time:
                     if event.event_type == TicketEvent.CREATE:
-                        setSize(timestamp, event.new_columnid.columnid, event.new_size)
+                        setSize(column_sizes, event.new_columnid.columnid, event.new_size)
                     elif event.event_type == TicketEvent.DELETE:
-                        setSize(timestamp, event.old_columnid.columnid, -event.old_size)
+                        setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
                     elif event.event_type == TicketEvent.MOVE:
-                        setSize(timestamp, event.old_columnid.columnid, -event.old_size)
-                        setSize(timestamp, event.new_columnid.columnid, event.new_size)
+                        setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
+                        setSize(column_sizes, event.new_columnid.columnid, event.new_size)
                     elif event.event_type == TicketEvent.UPDATE:
-                        setSize(timestamp, event.new_columnid.columnid, event.new_size - event.old_size)
+                        setSize(column_sizes, event.new_columnid.columnid, event.new_size - event.old_size)
 
-            previous_timestamp = timestamp
+            previous_column_sizes = column_sizes.copy()
             time += time_delta
+            final_data.append(column_sizes)
 
         if can_have_events_before_start_time:
-            # Remove events that happened before the start time
-            for timestamp in list(size_at_time.keys()):
-                if datetime.fromisoformat(timestamp) < start_time:
-                    del size_at_time[timestamp]
+            # Only keep events after/on the start time
+            final_data = [
+                column_sizes
+                for column_sizes in final_data
+                if datetime.fromisoformat(column_sizes["name"]) >= start_time
+            ]
 
-        return JsonResponse(size_at_time, safe=False)
+        return JsonResponse({"columns": list(column_names.values()), "data": final_data}, safe=False)
