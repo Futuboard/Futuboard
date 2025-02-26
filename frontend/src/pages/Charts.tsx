@@ -7,6 +7,7 @@ import CumulativeFlowDiagram from "@/components/charts/CumulativeFlowDiagram"
 import { useGetBoardQuery, useGetCumulativeFlowDiagramDataQuery } from "@/state/apiSlice"
 import { setBoardId } from "@/state/auth"
 import dayjs from "dayjs"
+import { Grid, Skeleton } from "@mui/material"
 
 const Charts: React.FC = () => {
   const dispatch = useDispatch()
@@ -15,13 +16,14 @@ const Charts: React.FC = () => {
 
   const [start, setStart] = useState(dayjs().subtract(30, "day").format("YYYY-MM-DD"))
   const [end, setEnd] = useState(dayjs().format("YYYY-MM-DD"))
+  const [timeUnit, setTimeUnit] = useState("day")
 
   const id = params.id || ""
   const { data: board } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
 
   const { data: cmfData } = useGetCumulativeFlowDiagramDataQuery({
     boardId: id,
-    timeUnit: "day",
+    timeUnit: timeUnit,
     start: start,
     end: end
   })
@@ -32,7 +34,7 @@ const Charts: React.FC = () => {
   }, [id])
 
   useEffect(() => {
-    document.title = board?.title ? board?.title + " - Charts" : "Futuboard"
+    document.title = board?.title ? "Charts - " + board?.title : "Futuboard"
   }, [board])
 
   useEffect(() => {
@@ -41,8 +43,15 @@ const Charts: React.FC = () => {
 
   return (
     <div>
-      <ToolBar title={`${board?.title} - Charts`} />
-      <CumulativeFlowDiagram data={cmfData || {}} changeStart={setStart} changeEnd={setEnd} />
+      <ToolBar title={`Charts - ${board?.title}`} />
+      <Grid container justifyContent="center" alignItems="center">
+        <CumulativeFlowDiagram
+          data={cmfData || {}}
+          changeStart={setStart}
+          changeEnd={setEnd}
+          changeTimeUnit={setTimeUnit}
+        />
+      </Grid>
     </div>
   )
 }

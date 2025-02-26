@@ -687,7 +687,7 @@ export const boardsApi = createApi({
       ChartData,
       { boardId: string; timeUnit: string; start: string; end: string }
     >({
-      query: ({ boardId, timeUnit = "day", start, end }) => ({
+      query: ({ boardId, timeUnit, start, end }) => ({
         url: `charts/${boardId}/cumulativeflow`,
         method: "GET",
         params: { time_unit: timeUnit, start_time: start, end_time: end }
