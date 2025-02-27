@@ -1,8 +1,8 @@
-Cypress.Commands.add("createBoard", () => {
+Cypress.Commands.add("createBoard", ({ title, password }) => {
   cy.get("button").contains("Create board").click()
   cy.get(".MuiDialog-root").should("be.visible")
-  cy.get(".MuiDialog-root").find("label").contains("Name").parent().find("input").type("Project Alpha")
-  cy.get(".MuiDialog-root").find("label").contains("Password").parent().find("input").type("alpha123")
+  cy.get(".MuiDialog-root").find("label").contains("Name").parent().find("input").type(title)
+  password && cy.get(".MuiDialog-root").find("label").contains("Password").parent().find("input").type(password)
   cy.get(".MuiDialog-root").contains("button", "Submit").click()
 })
 
@@ -12,33 +12,41 @@ Cypress.Commands.add("loginToBoard", (password) => {
   cy.get("form").submit()
 })
 
-Cypress.Commands.add("createColumn", ({ title }) => {
+Cypress.Commands.add("createColumn", ({ title, swimlane = false }) => {
   cy.get('button[aria-label="add column"]').click()
-  // FInd input with name columnTitle
   cy.get(".MuiDialog-root").find('input[name="columnTitle"]').type(title)
+  swimlane && cy.get(".MuiDialog-root").find('input[type="checkbox"]').click()
   cy.get(".MuiDialog-root").contains("button", "Submit").click()
 })
 
 Cypress.Commands.add("createTask", ({ title, size, description, cornerNote }) => {
-  cy.get('button[aria-label="add task"]').first().click()
+  cy.get('button[aria-label="add task"]').last().click({ force: true })
   cy.get('textarea[name="taskTitle"]').type(title)
-  cy.get('input[name="size"]').type(size)
-  cy.get(".description").type(description)
-  cy.get('input[name="cornerNote"]').type(cornerNote)
+  size && cy.get('input[name="size"]').type(size)
+  description && cy.get(".description").type(description)
+  cornerNote && cy.get('input[name="cornerNote"]').type(cornerNote)
   cy.get("button").contains("Submit").click()
 })
 
 Cypress.Commands.add("editTask", ({ title, size, description, cornerNote }) => {
   cy.get('[data-testid="EditNoteIcon"]').click()
-  cy.get('textarea[name="taskTitle"]').clear().type(title)
-  cy.get('input[name="size"]').clear().type(size)
-  cy.get(".description").type("{ctrl+a}+{del}").type(description)
-  cy.get('input[name="cornerNote"]').clear().type(cornerNote)
+  title && cy.get('textarea[name="taskTitle"]').clear().type(title)
+  size && cy.get('input[name="size"]').clear().type(size)
+  description && cy.get(".description").type("{ctrl+a}+{del}").type(description)
+  cornerNote && cy.get('input[name="cornerNote"]').clear().type(cornerNote)
   cy.get("button").contains("Save Changes").click()
 })
 
 Cypress.Commands.add("createUser", ({ name, buttonIndex }) => {
-  cy.get('button[aria-label="Add User"]').eq(buttonIndex).click()
+  cy.get('button[aria-label="add user"]').eq(buttonIndex).click()
   cy.get('input[name="name"]').clear().type(name)
   cy.get("button").contains("Submit").click()
+})
+
+Cypress.Commands.add("createAction", ({ title }) => {
+  cy.get('button[aria-label="expand swimlane"]').last().click({ force: true })
+  cy.get('button[aria-label="add action"]').last().click({ force: true })
+  cy.get('input[name="actionTitle"]').type(title)
+  cy.get('button[aria-label="submit action"]').click()
+  cy.get('button[aria-label="cancel action"]').click()
 })

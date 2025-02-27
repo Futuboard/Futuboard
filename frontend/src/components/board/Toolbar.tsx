@@ -60,7 +60,7 @@ export const AddUserButton: React.FC = () => {
   return (
     <div>
       <Tooltip title="Add User">
-        <IconButton onClick={handleClick}>
+        <IconButton onClick={handleClick} aria-label="add user">
           <svg
             style={{ width: "1.5rem", height: "1.5rem", color: "#2D3748" }}
             aria-hidden="true"

@@ -81,7 +81,7 @@ const CreateActionButton: React.FC<{ taskId: string; swimlanecolumnid: string; c
 
   return (
     <div>
-      <IconButton sx={{ marginTop: "10px" }} size={"small"} onClick={handleClick}>
+      <IconButton sx={{ marginTop: "10px" }} size={"small"} onClick={handleClick} aria-label="add action">
         <Add sx={{ fontSize: "15px" }} />
       </IconButton>
       <Popover

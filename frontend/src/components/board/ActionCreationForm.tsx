@@ -66,10 +66,12 @@ const ActionEditForm: React.FC<AddActionCreationFormProps> = (props) => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Button type="submit" color="primary" variant="contained">
+          <Button type="submit" color="primary" variant="contained" aria-label="submit action">
             Submit
           </Button>
-          <Button onClick={onCancel}>Cancel</Button>
+          <Button onClick={onCancel} aria-label="cancel action">
+            Cancel
+          </Button>
         </Grid>
       </Grid>
     </form>
