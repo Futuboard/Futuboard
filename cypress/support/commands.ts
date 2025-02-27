@@ -19,8 +19,8 @@ Cypress.Commands.add("createColumn", ({ title, swimlane = false }) => {
   cy.get(".MuiDialog-root").contains("button", "Submit").click()
 })
 
-Cypress.Commands.add("createTask", ({ title, size, description, cornerNote }) => {
-  cy.get('button[aria-label="add task"]').last().click({ force: true })
+Cypress.Commands.add("createTask", ({ title, size, description, cornerNote }, columnIndex = 0) => {
+  cy.get('button[aria-label="add task"]').eq(columnIndex).click({ force: true })
   cy.get('textarea[name="taskTitle"]').type(title)
   size && cy.get('input[name="size"]').type(size)
   description && cy.get(".description").type(description)
@@ -43,10 +43,29 @@ Cypress.Commands.add("createUser", ({ name, buttonIndex }) => {
   cy.get("button").contains("Submit").click()
 })
 
-Cypress.Commands.add("createAction", ({ title }) => {
-  cy.get('button[aria-label="expand swimlane"]').last().click({ force: true })
-  cy.get('button[aria-label="add action"]').last().click({ force: true })
+Cypress.Commands.add("createAction", ({ title }, columnIndex) => {
+  cy.get('button[aria-label="expand swimlane"]').eq(columnIndex).click({ force: true })
+  cy.get('button[aria-label="add action"]').eq(columnIndex).click()
   cy.get('input[name="actionTitle"]').type(title)
   cy.get('button[aria-label="submit action"]').click()
   cy.get('button[aria-label="cancel action"]').click()
+})
+
+Cypress.Commands.add("drag", (dragSelector, dropSelector) => {
+  cy.get(dragSelector).should("exist").get(dropSelector).should("exist")
+
+  const draggable = Cypress.$(dragSelector)[0]
+  const droppable = Cypress.$(dropSelector)[0]
+
+  const coords = droppable.getBoundingClientRect()
+  draggable.dispatchEvent(<any>new MouseEvent("mousedown"))
+  draggable.dispatchEvent(<any>new MouseEvent("mousemove", { clientX: 10, clientY: 0 }))
+  draggable.dispatchEvent(
+    <any>new MouseEvent("mousemove", {
+      clientX: coords.left + 10,
+      clientY: coords.top + 10
+    })
+  )
+  draggable.dispatchEvent(new MouseEvent("mouseup"))
+  return cy.get(dropSelector)
 })

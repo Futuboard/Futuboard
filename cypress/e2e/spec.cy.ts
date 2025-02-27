@@ -30,6 +30,88 @@ const otherTask = {
   description: "Analyze competitor websites for features and design",
   cornerNote: "Normal"
 }
+describe("When exporting and importing a board", () => {
+  it("can export and import a board with correct action placement", () => {
+    const board = { title: "Action Test Export Board" }
+    cy.createBoard(board)
+    cy.createColumn({ title: "col1", swimlane: true })
+    cy.createTask(
+      {
+        title: "card1",
+        size: "4",
+        description: "This will have actions starting with a"
+      },
+      0
+    )
+    cy.createAction({ title: "a1" }, 0)
+
+    cy.drag('div[title="a1"]', '[data-testid="action-list-1"]').should("contain", "a1")
+
+    cy.createColumn({ title: "col2", swimlane: true })
+    cy.createTask(
+      {
+        title: "card2",
+        size: "4",
+        description: "This will have actions starting with b"
+      },
+      1
+    )
+    cy.createAction({ title: "b1" }, 1)
+
+    cy.get('[data-testid="MoreVertIcon"]').click()
+    cy.get('[data-testid="DownloadIcon"]').click()
+
+    const date = new Date()
+    const fileName = `${board.title}-${date.toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/[^a-zA-Z0-9]/g, "_")}.csv`
+    const filePath = `downloads/${fileName}`
+
+    cy.readFile(filePath).should("exist")
+
+    cy.get("button[aria-label='Home']").click()
+
+    cy.contains("Create board").click()
+
+    cy.get("input[name='title']").type("Action Test Import Board")
+    cy.get("input[type='file']").selectFile(filePath, { force: true })
+    cy.get("button").contains("Submit").click()
+  })
+  it("can export and import a board", () => {
+    cy.createBoard(defaultBoard)
+    cy.loginToBoard("alpha123")
+    cy.createColumn(defaultColumn)
+    cy.createTask(defaultTask)
+    cy.createTask(otherTask)
+    cy.createColumn(otherColumn)
+    cy.createUser({ name: "Antonio", buttonIndex: 0 })
+    cy.createUser({ name: "Samuli", buttonIndex: 0 })
+
+    cy.get('[data-testid="MoreVertIcon"]').click()
+    cy.get('[data-testid="DownloadIcon"]').click()
+
+    const date = new Date()
+    const fileName = `${defaultBoard.title}-${date.toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/[^a-zA-Z0-9]/g, "_")}.csv`
+    const filePath = `downloads/${fileName}`
+
+    cy.readFile(filePath).should("exist")
+
+    cy.get("button[aria-label='Home']").click()
+
+    cy.contains("Create board").click()
+
+    cy.get("input[name='title']").type("Imported Test Board")
+    cy.get("input[name='password']").type("password")
+    cy.get("input[type='file']").selectFile(filePath, { force: true })
+    cy.get("button").contains("Submit").click()
+
+    cy.loginToBoard("password")
+
+    cy.contains("Imported Test Board")
+    cy.contains(defaultTask.title)
+    cy.contains(otherTask.title)
+    cy.contains("Antonio")
+    cy.contains("Samuli")
+  })
+})
 
 describe("At the Futuboard home page", () => {
   it("has the correct title", () => {
@@ -125,81 +207,6 @@ describe("In a board", () => {
     cy.get("button").contains("Submit").click()
 
     cy.get("html").should("have.css", "background-color", "rgb(125, 211, 84)")
-  })
-})
-
-describe("When exporting and importing a board", () => {
-  it("can export and import a board", () => {
-    cy.createBoard(defaultBoard)
-    cy.loginToBoard("alpha123")
-    cy.createColumn(defaultColumn)
-    cy.createTask(defaultTask)
-    cy.createTask(otherTask)
-    cy.createColumn(otherColumn)
-    cy.createUser({ name: "Antonio", buttonIndex: 0 })
-    cy.createUser({ name: "Samuli", buttonIndex: 0 })
-
-    cy.get('[data-testid="MoreVertIcon"]').click()
-    cy.get('[data-testid="DownloadIcon"]').click()
-
-    const date = new Date()
-    const fileName = `${defaultBoard.title}-${date.toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/[^a-zA-Z0-9]/g, "_")}.csv`
-    const filePath = `downloads/${fileName}`
-
-    cy.readFile(filePath).should("exist")
-
-    cy.get("button[aria-label='Home']").click()
-
-    cy.contains("Create board").click()
-
-    cy.get("input[name='title']").type("Imported Test Board")
-    cy.get("input[name='password']").type("password")
-    cy.get("input[type='file']").selectFile(filePath, { force: true })
-    cy.get("button").contains("Submit").click()
-
-    cy.loginToBoard("password")
-
-    cy.contains("Imported Test Board")
-    cy.contains(defaultTask.title)
-    cy.contains(otherTask.title)
-    cy.contains("Antonio")
-    cy.contains("Samuli")
-  })
-
-  it("can export and import a board with correct action placement", () => {
-    const board = { title: "Action Test Export Board" }
-    cy.createBoard(board)
-    cy.createColumn({ title: "col1", swimlane: true })
-    cy.createTask({
-      title: "card1",
-      size: "4",
-      description: "This will have actions starting with a"
-    })
-    cy.createAction({ title: "a1" })
-    cy.createColumn({ title: "col2", swimlane: true })
-    cy.createTask({
-      title: "card2",
-      size: "4",
-      description: "This will have actions starting with b"
-    })
-    cy.createAction({ title: "b1" })
-
-    cy.get('[data-testid="MoreVertIcon"]').click()
-    cy.get('[data-testid="DownloadIcon"]').click()
-
-    const date = new Date()
-    const fileName = `${board.title}-${date.toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/[^a-zA-Z0-9]/g, "_")}.csv`
-    const filePath = `downloads/${fileName}`
-
-    cy.readFile(filePath).should("exist")
-
-    cy.get("button[aria-label='Home']").click()
-
-    cy.contains("Create board").click()
-
-    cy.get("input[name='title']").type("Action Test Import Board")
-    cy.get("input[type='file']").selectFile(filePath, { force: true })
-    cy.get("button").contains("Submit").click()
   })
 })
 

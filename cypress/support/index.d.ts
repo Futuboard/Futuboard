@@ -25,7 +25,10 @@ declare namespace Cypress {
      * @example
      * cy.createTask({ title: 'Test Task', size: 5, description: 'Test Description', cornerNote: 'Normal' })
      */
-    createTask(task: { title: string; size?: string; description?: string; cornerNote?: string }): Chainable<any>
+    createTask(
+      task: { title: string; size?: string; description?: string; cornerNote?: string },
+      columnIndex?: number
+    ): Chainable<any>
     /**
      * Edits a task
      * @example
@@ -43,6 +46,12 @@ declare namespace Cypress {
      * @example
      * cy.createAction({ title: 'Test Action' })
      */
-    createAction(action: { title: string }): Chainable<any>
+    createAction(action: { title: string }, columnIndex: number): Chainable<any>
+    /**
+     * Drag a draggable from dragSelector to dropSelector
+     * @example
+     * cy.drag()
+     */
+    drag(dragSelector: string, dropSelector: string): Chainable<any>
   }
 }

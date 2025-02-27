@@ -36,6 +36,7 @@ const SwimlaneActionList: React.FC<SwimlaneActionListProps> = ({ taskId, swimlan
               backgroundColor: snapshot.isDraggingOver ? "rgba(22, 95, 199, 0.1)" : "#E5DB0",
               overflowX: "hidden"
             }}
+            data-testid={`action-list-${swimlanecolumn.ordernum}`}
           >
             {actionList &&
               actionList.map((action, index) => <Action key={action.actionid} action={action} index={index} />)}
