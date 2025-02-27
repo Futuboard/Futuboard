@@ -109,7 +109,7 @@ export const AddUserButton: React.FC = () => {
 }
 
 interface OpenAnalyticsButtonProps {
-  boardId: String
+  boardId: string
 }
 
 const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) => {

@@ -1,31 +1,44 @@
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth"
 import { Button, Grid, MenuItem, Popover, Select } from "@mui/material"
 import { DateCalendar } from "@mui/x-date-pickers"
-import { useState } from "react"
 import dayjs from "dayjs"
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth"
+import { useState } from "react"
 
 interface DateSelectorProps {
-  onSubmitStart: (startDate: string) => void
-  onSubmitEnd: (endDate: string) => void
+  startValue: dayjs.Dayjs
+  endValue: dayjs.Dayjs
+  timeUnitValue: string
+  onSubmitStart: (startDate: dayjs.Dayjs) => void
+  onSubmitEnd: (endDate: dayjs.Dayjs) => void
   onSubmitTimeUnit: (timeUnit: string) => void
 }
 
-const DateSelector: React.FC<DateSelectorProps> = ({ onSubmitStart, onSubmitEnd, onSubmitTimeUnit }) => {
+const DateSelector: React.FC<DateSelectorProps> = ({
+  startValue,
+  endValue,
+  timeUnitValue,
+  onSubmitStart,
+  onSubmitEnd,
+  onSubmitTimeUnit
+}) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+
+  const [startDate, setStartDate] = useState(startValue)
+  const [endDate, setEndDate] = useState(endValue)
+  const [timeUnit, setTimeUnit] = useState(timeUnitValue)
 
   const handleClose = () => {
     setAnchorEl(null)
+    setStartDate(startValue)
+    setEndDate(endValue)
+    setTimeUnit(timeUnitValue)
   }
 
   const open = Boolean(anchorEl)
 
-  const [startDate, setStartDate] = useState(dayjs().subtract(30, "day"))
-  const [endDate, setEndDate] = useState(dayjs())
-  const [timeUnit, setTimeUnit] = useState("day")
-
   const onSubmit = () => {
-    onSubmitStart(startDate.format("YYYY-MM-DD"))
-    onSubmitEnd(endDate.format("YYYY-MM-DD"))
+    onSubmitStart(startDate)
+    onSubmitEnd(endDate)
     onSubmitTimeUnit(timeUnit)
   }
 
@@ -34,7 +47,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ onSubmitStart, onSubmitEnd,
   return (
     <div>
       <Button variant="outlined" onClick={(event) => setAnchorEl(event.currentTarget)} endIcon={<CalendarMonthIcon />}>
-        {startDate.format("DD.MM.YYYY")} - {endDate.format("MM.DD.YYYY")}
+        {startValue.format("DD.MM.YYYY")} - {endValue.format("DD.MM.YYYY")}
       </Button>
       <Popover
         open={open}

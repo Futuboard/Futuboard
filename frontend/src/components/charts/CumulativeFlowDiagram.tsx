@@ -1,24 +1,26 @@
 import { Grid, Paper, rgbToHex } from "@mui/material"
 import dayjs from "dayjs"
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import DateSelector from "./DateSelector"
 import { useState } from "react"
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+
 import { useGetCumulativeFlowDiagramDataQuery } from "@/state/apiSlice"
+
+import DateSelector from "./DateSelector"
 
 interface CumulativeFlowDiagramProps {
   boardId: string
 }
 
 const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }) => {
-  const [start, setStart] = useState(dayjs().subtract(30, "day").format("YYYY-MM-DD"))
-  const [end, setEnd] = useState(dayjs().format("YYYY-MM-DD"))
+  const [start, setStart] = useState(dayjs().subtract(30, "day"))
+  const [end, setEnd] = useState(dayjs())
   const [timeUnit, setTimeUnit] = useState("day")
 
   const { data: data } = useGetCumulativeFlowDiagramDataQuery({
     boardId: boardId,
     timeUnit: timeUnit,
-    start: start,
-    end: end
+    start: start.format("YYYY-MM-DD"),
+    end: end.format("YYYY-MM-DD")
   })
 
   if (!data) {
@@ -32,7 +34,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
   const gradient: string[] = []
   const length = data.columns.length
 
-  for (var i = 0; i < length; i++) {
+  for (let i = 0; i < length; i++) {
     const red = Math.round(255 - i * (255 / length))
     const blue = Math.round(i * (255 / length))
     gradient.push(rgbToHex(`rgb(${red},0,${blue})`))
@@ -40,16 +42,13 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
 
   return (
     <Paper>
-      <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ padding: 1, marginTop: 10 }}>
-        <Grid item sx={{ width: 800, height: 800 }}>
+      <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ padding: 2 }}>
+        <Grid item sx={{ width: "30vw", height: "30vw" }}>
           <ResponsiveContainer width="100%" height="95%">
             <AreaChart
               data={data?.data}
               margin={{
-                top: 10,
-                right: 30,
-                left: 0,
-                bottom: 0
+                right: 40
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
@@ -63,7 +62,14 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
           </ResponsiveContainer>
         </Grid>
         <Grid item>
-          <DateSelector onSubmitStart={setStart} onSubmitEnd={setEnd} onSubmitTimeUnit={setTimeUnit} />
+          <DateSelector
+            startValue={start}
+            endValue={end}
+            timeUnitValue={timeUnit}
+            onSubmitStart={setStart}
+            onSubmitEnd={setEnd}
+            onSubmitTimeUnit={setTimeUnit}
+          />
         </Grid>
       </Grid>
     </Paper>
