@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Box, GlobalStyles } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useParams } from "react-router-dom"
@@ -25,8 +25,11 @@ const Charts: React.FC = () => {
     document.title = board?.title ? "Charts - " + board?.title : "Futuboard"
   }, [board])
 
+  if (!board) return null
+
   return (
     <div>
+      <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
       <ToolBar boardId={id} title={`Charts - ${board?.title}`} chartToolbar={true} />
       <Box
         sx={{

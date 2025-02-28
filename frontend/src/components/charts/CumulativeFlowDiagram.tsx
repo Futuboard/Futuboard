@@ -1,4 +1,4 @@
-import { Grid, Paper, rgbToHex } from "@mui/material"
+import { Grid, Paper, rgbToHex, Typography } from "@mui/material"
 import dayjs from "dayjs"
 import { useState } from "react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
@@ -28,7 +28,11 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
   }
 
   const tickFormatter = (tick: string) => {
-    return dayjs(tick).format("DD.MM.YYYY")
+    if (timeUnit == "month") {
+      return dayjs(tick).format("MM.YYYY")
+    } else if (timeUnit == "year") {
+      return dayjs(tick).format("YYYY")
+    } else return dayjs(tick).format("DD.MM.YYYY")
   }
 
   const gradient: string[] = []
@@ -42,7 +46,10 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
 
   return (
     <Paper>
-      <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ padding: 2 }}>
+      <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ padding: 2 }} spacing={1}>
+        <Grid item>
+          <Typography variant="h6">Cumulative Flow Diagram</Typography>
+        </Grid>
         <Grid item sx={{ width: "30vw", height: "30vw" }}>
           <ResponsiveContainer width="100%" height="95%">
             <AreaChart
@@ -54,9 +61,16 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" tickFormatter={tickFormatter} />
               <YAxis type="number" domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]} />
-              <Tooltip wrapperStyle={{ width: "200px" }} labelFormatter={tickFormatter} />
+              <Tooltip labelFormatter={tickFormatter} itemStyle={{ color: "black" }} />
               {data?.columns.map((name, index) => (
-                <Area type="linear" key={name} dataKey={name} stackId="1" fill={gradient[index]} />
+                <Area
+                  type="linear"
+                  key={name}
+                  dataKey={name}
+                  stackId="1"
+                  stroke={gradient[index + 2] || "#040042"}
+                  fill={gradient[index]}
+                />
               ))}
             </AreaChart>
           </ResponsiveContainer>

@@ -44,6 +44,14 @@ const DateSelector: React.FC<DateSelectorProps> = ({
 
   const timeUnitOptions = ["day", "week", "month", "year"]
 
+  const getCalendarView = () => {
+    if (timeUnit == "month" || timeUnit == "year") {
+      return timeUnit
+    } else {
+      return "day"
+    }
+  }
+
   return (
     <div>
       <Button variant="outlined" onClick={(event) => setAnchorEl(event.currentTarget)} endIcon={<CalendarMonthIcon />}>
@@ -62,14 +70,24 @@ const DateSelector: React.FC<DateSelectorProps> = ({
         <Grid container sx={{ alignItems: "center", justifyContent: "space-evenly", width: 800 }}>
           <Grid item xs={5}>
             <DateCalendar
+              view={getCalendarView()}
               value={startDate}
-              onChange={(date) => setStartDate(date || startDate)}
-              maxDate={endDate}
+              onChange={(date: dayjs.Dayjs) => {
+                if (date.isAfter(endDate.subtract(1, "d"))) {
+                  setEndDate(date.add(1, "day"))
+                }
+                setStartDate(date || startDate)
+              }}
               disableHighlightToday={true}
             />
           </Grid>
           <Grid item xs={5}>
-            <DateCalendar value={endDate} onChange={(date) => setEndDate(date || endDate)} minDate={startDate} />
+            <DateCalendar
+              view={getCalendarView()}
+              value={endDate}
+              onChange={(date) => setEndDate(date || endDate)}
+              minDate={startDate.add(1, "day")}
+            />
           </Grid>
           <Grid item xs height="300px" container direction="column" justifyContent="space-between">
             <Grid item xs={6}>
