@@ -50,22 +50,3 @@ Cypress.Commands.add("createAction", ({ title }, columnIndex) => {
   cy.get('button[aria-label="submit action"]').click()
   cy.get('button[aria-label="cancel action"]').click()
 })
-
-Cypress.Commands.add("drag", (dragSelector, dropSelector) => {
-  cy.get(dragSelector).should("exist").get(dropSelector).should("exist")
-
-  const draggable = Cypress.$(dragSelector)[0]
-  const droppable = Cypress.$(dropSelector)[0]
-
-  const coords = droppable.getBoundingClientRect()
-  draggable.dispatchEvent(<any>new MouseEvent("mousedown"))
-  draggable.dispatchEvent(<any>new MouseEvent("mousemove", { clientX: 10, clientY: 0 }))
-  draggable.dispatchEvent(
-    <any>new MouseEvent("mousemove", {
-      clientX: coords.left + 10,
-      clientY: coords.top + 10
-    })
-  )
-  draggable.dispatchEvent(new MouseEvent("mouseup"))
-  return cy.get(dropSelector)
-})
