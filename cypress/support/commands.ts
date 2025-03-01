@@ -22,7 +22,7 @@ Cypress.Commands.add("createColumn", ({ title, swimlane = false }) => {
 Cypress.Commands.add("createTask", ({ title, size, description, cornerNote }, columnIndex = 0) => {
   cy.get('button[aria-label="add task"]').eq(columnIndex).click({ force: true })
   cy.get('textarea[name="taskTitle"]').type(title)
-  size && cy.get('input[name="size"]').scrollIntoView().type(size)
+  size && cy.get('input[name="size"]').type(size)
   description && cy.get(".description").type(description)
   cornerNote && cy.get('input[name="cornerNote"]').type(cornerNote)
   cy.get("button").contains("Submit").click()
