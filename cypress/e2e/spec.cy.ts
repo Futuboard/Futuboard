@@ -24,6 +24,14 @@ const otherTask = {
   cornerNote: "Normal"
 }
 
+const taskTemplate = {
+  title: "New task",
+  size: "4",
+  description: "Completing this task requires...",
+  cornerNote: "Low priority",
+  color: "#8bc34a"
+}
+
 describe("At the Futuboard home page", () => {
   it("has the correct title", () => {
     cy.get(".MuiTypography-root").should("contain", "Futuboard")
@@ -153,6 +161,27 @@ describe("In a board", () => {
     cy.get("button").contains("Submit").click()
 
     cy.get("html").should("have.css", "background-color", "rgb(125, 211, 84)")
+  })
+
+  it("can edit task template", () => {
+    cy.createColumn(defaultColumn)
+
+    cy.get('button[aria-label="add task"]').first().click()
+    cy.get('textarea[name="taskTitle"]').should("be.empty")
+    cy.get(".description").should("not.have.text")
+    cy.get('input[name="size"').should("be.empty")
+    cy.get('input[name="cornerNote"').should("be.empty")
+    cy.get('input[type="radio"][value="#ffffff"]').should("be.checked")
+    cy.get("button").contains("Cancel").click()
+
+    cy.editTaskTemplate(taskTemplate)
+
+    cy.get('button[aria-label="add task"]').first().click()
+    cy.get('textarea[name="taskTitle"]').should("have.value", taskTemplate.title)
+    cy.get(".description").should("have.text", taskTemplate.description)
+    cy.get('input[name="size"').should("have.value", taskTemplate.size)
+    cy.get('input[name="cornerNote"').should("have.value", taskTemplate.cornerNote)
+    cy.get(`input[type="radio"][value="${taskTemplate.color}"]`).should("be.checked")
   })
 })
 
