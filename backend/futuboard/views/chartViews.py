@@ -59,9 +59,19 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
             else:
                 raise ValueError("Invalid time unit")
 
+        columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
+        ticket_events = (
+            TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
+        ).order_by("event_time")
+
+        earliest_event_time = round_time(ticket_events[0].event_time.replace(tzinfo=None))
+
+        if len(ticket_events) == 0:
+            return JsonResponse({}, safe=False)
+
         start_time = request.query_params.get("start_time")
         if start_time is None:
-            start_time = datetime.now() - timedelta(days=30)  # Default to last 30 days
+            start_time = earliest_event_time
         else:
             start_time = datetime.fromisoformat(start_time)
 
@@ -74,14 +84,6 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
             end_time = datetime.fromisoformat(end_time)
 
         end_time = round_time(end_time)
-
-        columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
-        ticket_events = (
-            TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
-        ).order_by("event_time")
-
-        if len(ticket_events) == 0:
-            return JsonResponse({}, safe=False)
 
         event_dict = {}
 
@@ -118,7 +120,6 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
             column_name = column_names[str(columnid)]
             column_sizes[column_name] += change
 
-        earliest_event_time = round_time(ticket_events[0].event_time.replace(tzinfo=None))
         time = start_time
         can_have_events_before_start_time = earliest_event_time < start_time
         if can_have_events_before_start_time:

@@ -224,7 +224,11 @@ export const boardsApi = createApi({
         method: "POST",
         body: task
       }),
-      invalidatesTags: (_result, _error, { columnId }) => invalidateRemoteCache([{ type: "Columns", id: columnId }])
+      invalidatesTags: (_result, _error, { columnId }) =>
+        invalidateRemoteCache([
+          { type: "Columns", id: columnId },
+          { type: "Ticket", id: "LIST" }
+        ])
     }),
 
     updateTask: builder.mutation<Task, { task: NewTask }>({
@@ -233,7 +237,11 @@ export const boardsApi = createApi({
         method: "PUT",
         body: task
       }),
-      invalidatesTags: (_result, _error, { task }) => invalidateRemoteCache([{ type: "Ticket", id: task.ticketid }])
+      invalidatesTags: (_result, _error, { task }) =>
+        invalidateRemoteCache([
+          { type: "Ticket", id: task.ticketid },
+          { type: "Ticket", id: "LIST" }
+        ])
     }),
 
     deleteTask: builder.mutation<Task, { task: Task }>({
@@ -241,7 +249,11 @@ export const boardsApi = createApi({
         url: `columns/${task.columnid}/tickets/${task.ticketid}/`,
         method: "DELETE"
       }),
-      invalidatesTags: (_result, _error, { task }) => invalidateRemoteCache([{ type: "Ticket", id: task.ticketid }])
+      invalidatesTags: (_result, _error, { task }) =>
+        invalidateRemoteCache([
+          { type: "Ticket", id: task.ticketid },
+          { type: "Ticket", id: "LIST" }
+        ])
     }),
 
     updateColumn: builder.mutation<Column, { column: Column; ticketIds?: string[] }>({
@@ -691,7 +703,11 @@ export const boardsApi = createApi({
         url: `charts/${boardId}/cumulativeflow`,
         method: "GET",
         params: { time_unit: timeUnit, start_time: start, end_time: end }
-      })
+      }),
+      providesTags: [
+        { type: "Columns", id: "LIST" },
+        { type: "Ticket", id: "LIST" }
+      ]
     })
   })
 })

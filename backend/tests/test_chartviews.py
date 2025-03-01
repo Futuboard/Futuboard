@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 import uuid
 from freezegun import freeze_time
@@ -276,19 +276,14 @@ def test_cumulative_flow_default_params():
     data = json_data["data"]
     column_names = json_data["columns"]
 
-    assert len(data) == 31
+    assert len(data) == 4
 
-    date = datetime(2023, 12, 5)
-    right_data = []
-
-    for i in range(27):
-        right_data.append({"name": date.isoformat(), "Column 1": 0, "Column 2": 0})
-        date += timedelta(days=1)
-
-    right_data.append({"name": "2024-01-01T00:00:00", "Column 1": 5, "Column 2": 0})
-    right_data.append({"name": "2024-01-02T00:00:00", "Column 1": 0, "Column 2": 10})
-    right_data.append({"name": "2024-01-03T00:00:00", "Column 1": 0, "Column 2": 15})
-    right_data.append({"name": "2024-01-04T00:00:00", "Column 1": 0, "Column 2": 5})
+    right_data = [
+        {"name": "2024-01-01T00:00:00", "Column 1": 5, "Column 2": 0},
+        {"name": "2024-01-02T00:00:00", "Column 1": 0, "Column 2": 10},
+        {"name": "2024-01-03T00:00:00", "Column 1": 0, "Column 2": 15},
+        {"name": "2024-01-04T00:00:00", "Column 1": 0, "Column 2": 5},
+    ]
 
     assert data == right_data
 
