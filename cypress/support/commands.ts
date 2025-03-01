@@ -42,3 +42,15 @@ Cypress.Commands.add("createUser", ({ name, buttonIndex }) => {
   cy.get('input[name="name"]').clear().type(name)
   cy.get("button").contains("Submit").click()
 })
+
+Cypress.Commands.add("editTaskTemplate", ({ title, size, description, cornerNote, color }) => {
+  cy.get('[data-testid="MoreVertIcon"]').click()
+  cy.get("li").contains("Edit Card Template").click()
+  cy.get('textarea[name="taskTitle"]').type(title)
+  cy.get('input[name="size"]').type(size)
+  cy.get(".description").type(description)
+  cy.get('input[name="cornerNote"]').type(cornerNote)
+  cy.get(`input[type="radio"][value="${color}"]`).check()
+  cy.get("button").contains("Save Changes").click()
+  cy.get(".MuiBackdrop-root").first().click()
+})

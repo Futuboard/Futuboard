@@ -38,5 +38,17 @@ declare namespace Cypress {
      * cy.editUser({ name: 'Test User', buttonIndex: 0 })
      */
     createUser(user: { name: string; buttonIndex: 0 | 1 }): Chainable<any>
+    /**
+     * Edits a task template
+     * @example
+     * cy.editTaskTemplate({ title: 'Example', size: 5, description: "Test description", cornerNote: "Normal", color: "#ffffff" })
+     */
+    editTaskTemplate(taskTemplate: {
+      title: string
+      size: string
+      description: string
+      cornerNote: string
+      color: string
+    }): Chainable<any>
   }
 }
