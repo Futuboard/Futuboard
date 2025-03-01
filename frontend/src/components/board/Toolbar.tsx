@@ -11,6 +11,7 @@ import {
 import {
   AppBar,
   Box,
+  Button,
   Dialog,
   DialogContent,
   Divider,
@@ -286,13 +287,11 @@ interface chartToolBarProps {
 const ChartToolbar: React.FC<chartToolBarProps> = ({ boardId }) => {
   return (
     <Box display="flex" alignItems="center" justifyContent="flex-end" sx={{ minWidth: 0, flexGrow: 1 }}>
-      <Tooltip title="Open board">
-        <Link to={`/board/${boardId}`}>
-          <IconButton>
-            <ViewWeek />
-          </IconButton>
-        </Link>
-      </Tooltip>
+      <Link to={`/board/${boardId}`}>
+        <Button variant="contained" endIcon={<ViewWeek />}>
+          Open Board
+        </Button>
+      </Link>
     </Box>
   )
 }

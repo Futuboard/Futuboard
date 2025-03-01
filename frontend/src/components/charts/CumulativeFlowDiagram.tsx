@@ -4,6 +4,7 @@ import { useState } from "react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
 import { useGetCumulativeFlowDiagramDataQuery } from "@/state/apiSlice"
+import { timeUnitOptions } from "@/types"
 
 import DateSelector from "./DateSelector"
 
@@ -12,19 +13,19 @@ interface CumulativeFlowDiagramProps {
 }
 
 const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }) => {
-  const [start, setStart] = useState(dayjs().subtract(30, "day"))
-  const [end, setEnd] = useState(dayjs())
-  const [timeUnit, setTimeUnit] = useState("day")
+  const [start, setStart] = useState<dayjs.Dayjs | undefined>(dayjs().subtract(30, "day"))
+  const [end, setEnd] = useState<dayjs.Dayjs | undefined>(dayjs())
+  const [timeUnit, setTimeUnit] = useState<timeUnitOptions>("day")
 
   const { data: data } = useGetCumulativeFlowDiagramDataQuery({
     boardId: boardId,
     timeUnit: timeUnit,
-    start: start.format("YYYY-MM-DD"),
-    end: end.format("YYYY-MM-DD")
+    start: start?.format("YYYY-MM-DD"),
+    end: end?.format("YYYY-MM-DD")
   })
 
-  if (!data) {
-    return null
+  if (!data?.columns) {
+    return <Paper sx={{ textAlign: "center", typography: "h5", padding: 10 }}>No data</Paper>
   }
 
   const tickFormatter = (tick: string) => {
@@ -48,9 +49,9 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
     <Paper>
       <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ padding: 2 }} spacing={1}>
         <Grid item>
-          <Typography variant="h6">Cumulative Flow Diagram</Typography>
+          <Typography variant="h6">Cumulative Flow</Typography>
         </Grid>
-        <Grid item sx={{ width: "30vw", height: "30vw" }}>
+        <Grid item sx={{ width: "1100px", height: "700px" }}>
           <ResponsiveContainer width="100%" height="95%">
             <AreaChart
               data={data?.data}
@@ -83,6 +84,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
             onSubmitStart={setStart}
             onSubmitEnd={setEnd}
             onSubmitTimeUnit={setTimeUnit}
+            shortcutValue="month"
           />
         </Grid>
       </Grid>

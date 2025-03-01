@@ -697,7 +697,7 @@ export const boardsApi = createApi({
     }),
     getCumulativeFlowDiagramData: builder.query<
       ChartData,
-      { boardId: string; timeUnit: string; start: string; end: string }
+      { boardId: string; timeUnit?: string; start?: string; end?: string }
     >({
       query: ({ boardId, timeUnit, start, end }) => ({
         url: `charts/${boardId}/cumulativeflow`,

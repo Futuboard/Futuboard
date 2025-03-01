@@ -121,3 +121,5 @@ export type ChartData = {
   columns: string[]
   data: { [key: string]: number }[]
 }
+
+export type timeUnitOptions = "minute" | "hour" | "day" | "week" | "month" | "year"

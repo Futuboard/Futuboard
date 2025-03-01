@@ -3,18 +3,21 @@ import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useParams } from "react-router-dom"
 
+import AccessBoardForm from "@/components/board/AccessBoardForm"
 import ToolBar from "@/components/board/Toolbar"
 import CumulativeFlowDiagram from "@/components/charts/CumulativeFlowDiagram"
-import { useGetBoardQuery } from "@/state/apiSlice"
+import { useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
 import { setBoardId } from "@/state/auth"
 
 const Charts: React.FC = () => {
   const dispatch = useDispatch()
   const params = useParams()
   const [isBoardIdSet, setIsBoardIdset] = useState(false)
+  const [tryLogin] = useLoginMutation()
+  const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
 
   const id = params.id || ""
-  const { data: board } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
+  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
 
   useEffect(() => {
     dispatch(setBoardId(id))
@@ -22,10 +25,39 @@ const Charts: React.FC = () => {
   }, [id, dispatch])
 
   useEffect(() => {
+    if (!id) return
+    const inner = async () => {
+      await tryLogin({ boardId: id, password: "" })
+      setHasTriedEmptyPasswordLogin(true)
+    }
+    inner()
+  }, [id, tryLogin])
+
+  useEffect(() => {
     document.title = board?.title ? "Charts - " + board?.title : "Futuboard"
   }, [board])
 
-  if (!board) return null
+  if (isLoading || !hasTriedEmptyPasswordLogin) {
+    return null
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh"
+          }}
+        >
+          <AccessBoardForm id={id} />
+        </Box>
+      </>
+    )
+  }
 
   return (
     <div>
