@@ -13,15 +13,16 @@ interface CumulativeFlowDiagramProps {
 }
 
 const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }) => {
-  const [start, setStart] = useState<dayjs.Dayjs | undefined>(dayjs().subtract(30, "day"))
-  const [end, setEnd] = useState<dayjs.Dayjs | undefined>(dayjs())
-  const [timeUnit, setTimeUnit] = useState<timeUnitOptions>("day")
-
+  const [queryparams, setQueryparams] = useState<{
+    start: dayjs.Dayjs | undefined
+    end: dayjs.Dayjs | undefined
+    timeUnit: timeUnitOptions
+  }>({ start: dayjs().subtract(30, "day"), end: dayjs(), timeUnit: "day" })
   const { data: data } = useGetCumulativeFlowDiagramDataQuery({
     boardId: boardId,
-    timeUnit: timeUnit,
-    start: start?.format("YYYY-MM-DD"),
-    end: end?.format("YYYY-MM-DD")
+    timeUnit: queryparams.timeUnit,
+    start: queryparams.start?.format("YYYY-MM-DD"),
+    end: queryparams.end?.format("YYYY-MM-DD")
   })
 
   if (!data?.columns) {
@@ -29,11 +30,19 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
   }
 
   const tickFormatter = (tick: string) => {
-    if (timeUnit == "month") {
+    if (queryparams.timeUnit == "month") {
       return dayjs(tick).format("MM.YYYY")
-    } else if (timeUnit == "year") {
+    } else if (queryparams.timeUnit == "year") {
       return dayjs(tick).format("YYYY")
     } else return dayjs(tick).format("DD.MM.YYYY")
+  }
+
+  const handleSubmit = (start: dayjs.Dayjs | undefined, end: dayjs.Dayjs | undefined, timeUnit: timeUnitOptions) => {
+    setQueryparams({
+      start: start,
+      end: end,
+      timeUnit: timeUnit
+    })
   }
 
   const gradient: string[] = []
@@ -78,12 +87,10 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
         </Grid>
         <Grid item>
           <DateSelector
-            startValue={start}
-            endValue={end}
-            timeUnitValue={timeUnit}
-            onSubmitStart={setStart}
-            onSubmitEnd={setEnd}
-            onSubmitTimeUnit={setTimeUnit}
+            startValue={queryparams.start}
+            endValue={queryparams.end}
+            timeUnitValue={queryparams.timeUnit}
+            onChange={handleSubmit}
             shortcutValue="month"
           />
         </Grid>

@@ -11,19 +11,15 @@ interface DateSelectorProps {
   endValue: dayjs.Dayjs | undefined
   timeUnitValue: timeUnitOptions
   shortcutValue?: string
-  onSubmitStart: (startDate: dayjs.Dayjs | undefined) => void
-  onSubmitEnd: (endDate: dayjs.Dayjs | undefined) => void
-  onSubmitTimeUnit: (timeUnit: timeUnitOptions) => void
+  onChange: (startDate: dayjs.Dayjs | undefined, endDate: dayjs.Dayjs | undefined, timeUnit: timeUnitOptions) => void
 }
 
 const DateSelector: React.FC<DateSelectorProps> = ({
   startValue,
   endValue,
   timeUnitValue,
-  onSubmitStart,
   shortcutValue,
-  onSubmitEnd,
-  onSubmitTimeUnit
+  onChange
 }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
@@ -31,53 +27,38 @@ const DateSelector: React.FC<DateSelectorProps> = ({
 
   const shortcutOptions = ["week", "month", "3 months", "6 months", "year", "max"]
 
-  const [startDate, setStartDate] = useState<dayjs.Dayjs | undefined>(startValue)
-  const [endDate, setEndDate] = useState<dayjs.Dayjs | undefined>(endValue)
-  const [timeUnit, setTimeUnit] = useState<timeUnitOptions>(timeUnitValue)
   const [shortcut, setShortcut] = useState(shortcutValue)
-
-  const handleClose = () => {
-    setAnchorEl(null)
-    setStartDate(startValue)
-    setEndDate(endValue)
-    setTimeUnit(timeUnitValue)
-  }
 
   const open = Boolean(anchorEl)
 
-  const onSubmit = () => {
-    onSubmitStart(startDate)
-    onSubmitEnd(endDate)
-    onSubmitTimeUnit(timeUnit)
-  }
-
   const handleShortCut = (event: React.MouseEvent<HTMLElement>) => {
     setShortcut(event.currentTarget.textContent as string)
-    setEndDate(dayjs())
     switch (event.currentTarget.textContent) {
       case "week":
-        setStartDate(dayjs().subtract(1, "w"))
+        onChange(dayjs().subtract(1, "w"), dayjs(), timeUnitValue)
+
         break
       case "month":
-        setStartDate(dayjs().subtract(1, "month"))
+        onChange(dayjs().subtract(1, "month"), dayjs(), timeUnitValue)
         break
       case "3 months":
-        setStartDate(dayjs().subtract(3, "month"))
+        onChange(dayjs().subtract(3, "month"), dayjs(), timeUnitValue)
+
         break
       case "6 months":
-        setStartDate(dayjs().subtract(6, "month"))
+        onChange(dayjs().subtract(6, "month"), dayjs(), timeUnitValue)
         break
       case "year":
-        setStartDate(dayjs().subtract(1, "y"))
+        onChange(dayjs().subtract(1, "year"), dayjs(), timeUnitValue)
         break
       default:
-        setStartDate(undefined)
+        onChange(undefined, dayjs(), timeUnitValue)
     }
   }
 
   const getCalendarView = () => {
-    if (timeUnit == "month" || timeUnit == "year") {
-      return timeUnit
+    if (timeUnitValue == "month" || timeUnitValue == "year") {
+      return timeUnitValue
     } else {
       return "day"
     }
@@ -89,9 +70,9 @@ const DateSelector: React.FC<DateSelectorProps> = ({
         {startValue?.format("DD.MM.YYYY")} - {endValue?.format("DD.MM.YYYY")}
       </Button>
       <Popover
+        onClose={() => setAnchorEl(null)}
         open={open}
         anchorEl={anchorEl}
-        onClose={handleClose}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "center"
@@ -109,40 +90,32 @@ const DateSelector: React.FC<DateSelectorProps> = ({
             direction: "row"
           }}
         >
-          <Grid item>
-            <ButtonGroup orientation="vertical" color="primary">
-              {shortcutOptions.map((choice) => (
-                <Button variant={choice == shortcut ? "contained" : "outlined"} onClick={handleShortCut}>
-                  {choice}
-                </Button>
-              ))}
-            </ButtonGroup>
-          </Grid>
           <Grid item xs={4}>
             <DateCalendar
-              displayWeekNumber={timeUnit == "week"}
+              displayWeekNumber={timeUnitValue == "week"}
               view={getCalendarView()}
-              value={startDate || null}
+              value={startValue}
               onChange={(date: dayjs.Dayjs) => {
-                if (date.isAfter(endDate?.subtract(1, "d"))) {
-                  setEndDate(date.add(1, "day"))
+                if (date.isAfter(endValue?.subtract(1, "d"))) {
+                  onChange(date, date.add(1, "d"), timeUnitValue)
+                } else {
+                  setShortcut("")
+                  onChange(date, endValue, timeUnitValue)
                 }
-                setShortcut("")
-                setStartDate(date || startDate)
               }}
               disableHighlightToday={true}
             />
           </Grid>
           <Grid item xs={4}>
             <DateCalendar
-              displayWeekNumber={timeUnit == "week"}
+              displayWeekNumber={timeUnitValue == "week"}
               view={getCalendarView()}
-              value={endDate}
+              value={endValue}
               onChange={(date) => {
                 setShortcut("")
-                setEndDate(date || endDate)
+                onChange(startValue, date, timeUnitValue)
               }}
-              minDate={startDate?.add(1, "day")}
+              minDate={startValue?.add(1, "day")}
             />
           </Grid>
           <Grid item>
@@ -152,8 +125,10 @@ const DateSelector: React.FC<DateSelectorProps> = ({
                 <Select
                   label="time unit"
                   labelId="timeunitselect"
-                  value={timeUnit}
-                  onChange={(unit) => setTimeUnit(unit.target.value as timeUnitOptions)}
+                  value={timeUnitValue}
+                  onChange={(event) => {
+                    onChange(startValue, endValue, event.target.value as timeUnitOptions)
+                  }}
                 >
                   {timeUnitChoices.map((timeUnit) => (
                     <MenuItem key={timeUnit} value={timeUnit}>
@@ -162,14 +137,13 @@ const DateSelector: React.FC<DateSelectorProps> = ({
                   ))}
                 </Select>
               </FormControl>
-              <Stack spacing={1}>
-                <Button onClick={onSubmit} variant="contained">
-                  Submit
-                </Button>
-                <Button variant="outlined" color="error" onClick={handleClose}>
-                  Close
-                </Button>
-              </Stack>
+              <ButtonGroup orientation="vertical" color="primary">
+                {shortcutOptions.map((choice) => (
+                  <Button key={choice} variant={choice == shortcut ? "contained" : "outlined"} onClick={handleShortCut}>
+                    {choice}
+                  </Button>
+                ))}
+              </ButtonGroup>
             </Stack>
           </Grid>
         </Grid>
