@@ -128,7 +128,7 @@ describe("In a board", () => {
   })
 })
 
-describe("When exporting and importing a board", () => {
+describe("When exporting and/or importing a board", () => {
   it("can export and import a board", () => {
     cy.createBoard(defaultBoard)
     cy.loginToBoard("alpha123")

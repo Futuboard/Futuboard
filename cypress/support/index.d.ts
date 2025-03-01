@@ -42,16 +42,10 @@ declare namespace Cypress {
      */
     createUser(user: { name: string; buttonIndex: 0 | 1 }): Chainable<any>
     /**
-     * Create an action
+     * Create an action to column with ordernum == columnIndex
      * @example
-     * cy.createAction({ title: 'Test Action' })
+     * cy.createAction({ title: 'Test Action' }, 0)
      */
     createAction(action: { title: string }, columnIndex: number): Chainable<any>
-    /**
-     * Drag a draggable from dragSelector to dropSelector
-     * @example
-     * cy.drag()
-     */
-    drag(dragSelector: string, dropSelector: string): Chainable<any>
   }
 }
