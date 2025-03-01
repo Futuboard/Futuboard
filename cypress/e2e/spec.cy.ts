@@ -84,6 +84,7 @@ describe("In a board", () => {
   it("can add tasks", () => {
     cy.createColumn(defaultColumn)
     cy.createTask(defaultTask)
+    cy.wait(100)
     cy.createTask(otherTask)
 
     cy.get("strong").contains(defaultTask.title)
@@ -163,6 +164,7 @@ describe("When exporting and/or importing a board", () => {
     cy.loginToBoard("alpha123")
     cy.createColumn(defaultColumn)
     cy.createTask(defaultTask)
+    cy.wait(100)
     cy.createTask(otherTask)
     cy.createColumn(otherColumn)
     cy.createUser({ name: "Antonio", buttonIndex: 0 })

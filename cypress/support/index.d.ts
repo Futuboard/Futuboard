@@ -5,7 +5,7 @@ declare namespace Cypress {
     /**
      * Create board
      * @example
-     * cy.createBoard()
+     * cy.createBoard({ title: 'Project Alpha', password: 'alpha123 })
      */
     createBoard(board: { title: string; password?: string }): Chainable<any>
     /**
