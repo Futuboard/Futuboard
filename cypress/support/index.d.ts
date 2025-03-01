@@ -47,5 +47,17 @@ declare namespace Cypress {
      * cy.createAction({ title: 'Test Action' }, 0)
      */
     createAction(action: { title: string }, columnIndex: number): Chainable<any>
+    /**
+     * Edits a task template
+     * @example
+     * cy.editTaskTemplate({ title: 'Example', size: 5, description: "Test description", cornerNote: "Normal", color: "#ffffff" })
+     */
+    editTaskTemplate(taskTemplate: {
+      title: string
+      size: string
+      description: string
+      cornerNote: string
+      color: string
+    }): Chainable<any>
   }
 }

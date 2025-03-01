@@ -50,3 +50,15 @@ Cypress.Commands.add("createAction", ({ title }, columnIndex) => {
   cy.get('button[aria-label="submit action"]').click()
   cy.get('button[aria-label="cancel action"]').click()
 })
+
+Cypress.Commands.add("editTaskTemplate", ({ title, size, description, cornerNote, color }) => {
+  cy.get('[data-testid="MoreVertIcon"]').click()
+  cy.get("li").contains("Edit Card Template").click()
+  cy.get('textarea[name="taskTitle"]').type(title)
+  cy.get('input[name="size"]').type(size)
+  cy.get(".description").type(description)
+  cy.get('input[name="cornerNote"]').type(cornerNote)
+  cy.get(`input[type="radio"][value="${color}"]`).check()
+  cy.get("button").contains("Save Changes").click()
+  cy.get(".MuiBackdrop-root").first().click()
+})
