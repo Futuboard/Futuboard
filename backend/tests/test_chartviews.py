@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 import uuid
 from freezegun import freeze_time
@@ -272,23 +272,22 @@ def test_cumulative_flow_default_params():
     response = api_client.get(url)
     assert response.status_code == 200
 
-    data = response.json()
+    json_data = response.json()
+    data = json_data["data"]
+    column_names = json_data["columns"]
 
-    assert len(data) == 31
+    assert len(data) == 4
 
-    date = datetime(2023, 12, 5)
-    right_data = {}
-
-    for i in range(27):
-        right_data[date.isoformat()] = {"Column 1": 0, "Column 2": 0}
-        date += timedelta(days=1)
-
-    right_data["2024-01-01T00:00:00"] = {"Column 1": 5, "Column 2": 0}
-    right_data["2024-01-02T00:00:00"] = {"Column 1": 0, "Column 2": 10}
-    right_data["2024-01-03T00:00:00"] = {"Column 1": 0, "Column 2": 15}
-    right_data["2024-01-04T00:00:00"] = {"Column 1": 0, "Column 2": 5}
+    right_data = [
+        {"name": "2024-01-01T00:00:00", "Column 1": 5, "Column 2": 0},
+        {"name": "2024-01-02T00:00:00", "Column 1": 0, "Column 2": 10},
+        {"name": "2024-01-03T00:00:00", "Column 1": 0, "Column 2": 15},
+        {"name": "2024-01-04T00:00:00", "Column 1": 0, "Column 2": 5},
+    ]
 
     assert data == right_data
+
+    assert column_names == ["Column 1", "Column 2"]
 
     resetDB()
 
@@ -307,13 +306,18 @@ def test_cumulative_flow_with_params():
     response = api_client.get(url)
     assert response.status_code == 200
 
-    data = response.json()
+    json_data = response.json()
+
+    data = json_data["data"]
+    columns_names = json_data["columns"]
 
     assert len(data) == 2
 
-    assert data == {
-        "2024-01-02T00:00:00": {"Column 1": 0, "Column 2": 10},
-        "2024-01-03T00:00:00": {"Column 1": 0, "Column 2": 15},
-    }
+    assert data == [
+        {"name": "2024-01-02T00:00:00", "Column 1": 0, "Column 2": 10},
+        {"name": "2024-01-03T00:00:00", "Column 1": 0, "Column 2": 15},
+    ]
+
+    assert columns_names == ["Column 1", "Column 2"]
 
     resetDB()

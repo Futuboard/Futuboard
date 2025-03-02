@@ -156,6 +156,24 @@ describe("In a board", () => {
     cy.get('input[name="cornerNote"').should("have.value", taskTemplate.cornerNote)
     cy.get(`input[type="radio"][value="${taskTemplate.color}"]`).should("be.checked")
   })
+
+  it("can change board password", () => {
+    cy.get('[data-testid="MoreVertIcon"]').click()
+    cy.get("li").contains("Change Board Password").click()
+
+    cy.contains("Enter a New Password").should("be.visible")
+    cy.get('[name="old_password"]').type("alpha123")
+    cy.get('[name="new_password"]').type("newPassword")
+    cy.get('[name="confirm_password"]').type("newPassword")
+    cy.get("button").contains("Submit").click()
+    cy.contains("Enter a New Password").should("not.exist")
+
+    cy.get("li").contains("Change Board Password").click()
+
+    cy.get('[name="old_password"]').clear().type("alpha123")
+    cy.get("button").contains("Submit").click()
+    cy.contains("The old password is incorrect").should("be.visible")
+  })
 })
 
 describe("When exporting and/or importing a board", () => {
