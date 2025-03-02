@@ -6,6 +6,7 @@ from ..models import Column, TicketEvent
 from ..serializers import TicketEventSerializer
 import rest_framework.request
 from datetime import timedelta, datetime
+from dateutil.relativedelta import relativedelta
 
 
 @api_view(["GET"])
@@ -39,9 +40,9 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
         elif time_unit == "week":
             time_delta = timedelta(weeks=1)
         elif time_unit == "month":
-            time_delta = timedelta(days=30)
+            time_delta = relativedelta(months=1)
         elif time_unit == "year":
-            time_delta = timedelta(days=365)
+            time_delta = relativedelta(years=1)
 
         def round_time(datetime):
             if time_unit == "minute":
