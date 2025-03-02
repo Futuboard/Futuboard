@@ -115,7 +115,7 @@ interface OpenAnalyticsButtonProps {
 
 const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) => {
   return (
-    <Tooltip title="open analytics">
+    <Tooltip title="Open Analytics">
       <Link to={"/board/" + boardId + "/charts"}>
         <IconButton>
           <Analytics />
