@@ -289,7 +289,7 @@ const ChartToolbar: React.FC<chartToolBarProps> = ({ boardId }) => {
     <Box display="flex" alignItems="center" justifyContent="flex-end" sx={{ minWidth: 0, flexGrow: 1 }}>
       <Link to={`/board/${boardId}`}>
         <Button variant="contained" endIcon={<ViewWeek />}>
-          Backt to board
+          Back to board
         </Button>
       </Link>
     </Box>
