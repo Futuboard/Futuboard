@@ -1,7 +1,17 @@
-import { Download, MoreVert, EnhancedEncryption, Edit, Gradient, ColorLens } from "@mui/icons-material"
+import {
+  Download,
+  MoreVert,
+  EnhancedEncryption,
+  Edit,
+  Gradient,
+  ColorLens,
+  Analytics,
+  ViewWeek
+} from "@mui/icons-material"
 import {
   AppBar,
   Box,
+  Button,
   Dialog,
   DialogContent,
   Divider,
@@ -15,7 +25,7 @@ import {
   Typography
 } from "@mui/material"
 import React, { useState } from "react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
 import { TaskTemplate } from "@/types"
@@ -96,6 +106,22 @@ export const AddUserButton: React.FC = () => {
         </Paper>
       </Popover>
     </div>
+  )
+}
+
+interface OpenAnalyticsButtonProps {
+  boardId: string
+}
+
+const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) => {
+  return (
+    <Tooltip title="Open Analytics">
+      <Link to={"/board/" + boardId + "/charts"}>
+        <IconButton>
+          <Analytics />
+        </IconButton>
+      </Link>
+    </Tooltip>
   )
 }
 
@@ -188,6 +214,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       <AddUserButton />
       <CopyToClipboardButton />
       <CreateColumnButton boardId={boardId} />
+      <OpenAnalyticsButton boardId={boardId} />
       <IconButton
         aria-label="more"
         aria-controls="long-menu"
@@ -253,14 +280,31 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   )
 }
 
+interface chartToolBarProps {
+  boardId: string
+}
+
+const ChartToolbar: React.FC<chartToolBarProps> = ({ boardId }) => {
+  return (
+    <Box display="flex" alignItems="center" justifyContent="flex-end" sx={{ minWidth: 0, flexGrow: 1 }}>
+      <Link to={`/board/${boardId}`}>
+        <Button variant="contained" endIcon={<ViewWeek />}>
+          Back to board
+        </Button>
+      </Link>
+    </Box>
+  )
+}
+
 interface ToolBarProps {
   title: string
   boardId?: string
   boardBackgroundColor?: string
   taskTemplate?: TaskTemplate
+  chartToolbar?: boolean
 }
 
-const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: ToolBarProps) => {
+const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor, chartToolbar }: ToolBarProps) => {
   return (
     <AppBar
       position="fixed"
@@ -286,6 +330,7 @@ const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: ToolBar
             boardBackgroundColor={boardBackgroundColor || "white"}
           />
         )}
+        {boardId && chartToolbar && <ChartToolbar boardId={boardId} />}
       </Toolbar>
     </AppBar>
   )
