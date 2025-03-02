@@ -23,7 +23,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ startValue, endValue, timeU
 
   const getCalendarView = (): ("day" | "month" | "year")[] => {
     if (timeUnitValue == "year") {
-      return ["year", "month"]
+      return ["year", "year"] //Dumb but doesn't show the label if this doesn't have two values
     } else if (timeUnitValue == "month") {
       return ["month", "year"]
     } else {
@@ -44,7 +44,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ startValue, endValue, timeU
           vertical: "bottom",
           horizontal: "center"
         }}
-        transformOrigin={{ vertical: 0, horizontal: 450 }}
+        transformOrigin={{ vertical: 0, horizontal: 400 }}
       >
         <Grid
           container
