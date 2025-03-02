@@ -96,7 +96,7 @@ export type SwimlaneColumn = {
   swimlanecolumnid: string
   title: string
   columnid: string
-  order: number
+  ordernum: number
 }
 
 type Tag = (typeof cacheTagTypes)[number]
