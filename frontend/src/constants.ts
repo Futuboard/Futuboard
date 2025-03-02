@@ -8,3 +8,5 @@ export const cacheTagTypes = [
   "SwimlaneColumn",
   "BoardTemplate"
 ] as const
+
+export const timeUnitOptions = ["minute", "hour", "day", "week", "month", "year"] as const

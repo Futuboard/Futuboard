@@ -6,8 +6,11 @@ import { useParams } from "react-router-dom"
 import AccessBoardForm from "@/components/board/AccessBoardForm"
 import ToolBar from "@/components/board/Toolbar"
 import CumulativeFlowDiagram from "@/components/charts/CumulativeFlowDiagram"
-import { useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
+import { cacheTagTypes } from "@/constants"
+import { boardsApi, useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
 import { setBoardId } from "@/state/auth"
+import { setNotification } from "@/state/notification"
+import { webSocketContainer } from "@/state/websocket"
 
 const Charts: React.FC = () => {
   const dispatch = useDispatch()
@@ -20,8 +23,22 @@ const Charts: React.FC = () => {
   const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
 
   useEffect(() => {
-    dispatch(setBoardId(id))
-    setIsBoardIdset(true)
+    const inner = async () => {
+      if (!id) return
+      dispatch(setBoardId(id))
+      setIsBoardIdset(true)
+      await webSocketContainer.connectToBoard(id)
+      webSocketContainer.setOnMessageHandler((tags) => {
+        dispatch(boardsApi.util.invalidateTags(tags))
+      })
+      webSocketContainer.setResetHandler(() => {
+        dispatch(boardsApi.util.invalidateTags([...cacheTagTypes]))
+      })
+      webSocketContainer.setSendNotificationHandler((message) => {
+        dispatch(setNotification({ text: message, type: "info" }))
+      })
+    }
+    inner()
   }, [id, dispatch])
 
   useEffect(() => {
