@@ -5,7 +5,7 @@ declare namespace Cypress {
     /**
      * Create board
      * @example
-     * cy.createBoard({ title: 'Project Alpha', password: 'alpha123 })
+     * cy.createBoard({ title: 'Project Alpha', password: 'alpha123' })
      */
     createBoard(board: { title: string; password?: string }): Chainable<any>
     /**
@@ -17,7 +17,7 @@ declare namespace Cypress {
     /**
      * Creates a column
      * @example
-     * cy.createColumn({ title: 'Test Column' })
+     * cy.createColumn({ title: 'Test Column', swimlane: false })
      */
     createColumn(column: { title: string; swimlane: boolean }): Chainable<any>
     /**

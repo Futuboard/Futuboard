@@ -20,7 +20,7 @@ Cypress.Commands.add("createColumn", ({ title, swimlane = false }) => {
 })
 
 Cypress.Commands.add("createTask", ({ title, size, description, cornerNote }, columnIndex = 0) => {
-  cy.get('button[aria-label="add task"]').eq(columnIndex).click({ force: true })
+  cy.get('button[aria-label="add task"]').eq(columnIndex).click()
   cy.get('textarea[name="taskTitle"]').type(title)
   size && cy.get('input[name="size"]').type(size)
   description && cy.get(".description").type(description)
@@ -44,7 +44,7 @@ Cypress.Commands.add("createUser", ({ name, buttonIndex }) => {
 })
 
 Cypress.Commands.add("createAction", ({ title }, columnIndex) => {
-  cy.get('button[aria-label="expand swimlane"]').eq(columnIndex).click({ force: true })
+  cy.get('button[aria-label="expand swimlane"]').eq(columnIndex).click()
   cy.get('button[aria-label="add action"]').eq(columnIndex).click()
   cy.get('input[name="actionTitle"]').type(title)
   cy.get('button[aria-label="submit action"]').click()

@@ -221,20 +221,20 @@ describe("When exporting and/or importing a board", () => {
     cy.get("input[type='file']").selectFile("fixtures/two_columns_with_actions.csv", { force: true })
     cy.get("button").contains("Submit").click()
 
-    cy.get('button[aria-label="expand swimlane"]').eq(0).click({ force: true })
+    cy.get('button[aria-label="expand swimlane"]').eq(0).click()
 
     for (let i = 0; i < 4; i++) {
       cy.get(`[data-testid="action-list-${i}"]`)
-        .eq(0)
         .find(`div[title="a${i + 1}"]`)
         .should("exist")
     }
 
-    cy.get('button[aria-label="expand swimlane"]').eq(1).click({ force: true })
+    cy.get('button[aria-label="expand swimlane"]').eq(0).click()
+
+    cy.get('button[aria-label="expand swimlane"]').eq(1).click()
 
     for (let i = 0; i < 4; i++) {
       cy.get(`[data-testid="action-list-${i}"]`)
-        .eq(1)
         .find(`div[title="b${i + 1}"]`)
         .should("exist")
     }
