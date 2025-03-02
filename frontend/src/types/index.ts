@@ -122,4 +122,4 @@ export type ChartData = {
   data: { [key: string]: number }[]
 }
 
-export type timeUnitTypes = (typeof timeUnitOptions)[number]
+export type TimeUnit = (typeof timeUnitOptions)[number]

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
 import { useGetCumulativeFlowDiagramDataQuery } from "@/state/apiSlice"
-import { timeUnitTypes } from "@/types"
+import { TimeUnit } from "@/types"
 
 import DateSelector from "./DateSelector"
 
@@ -16,7 +16,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
   const [queryparams, setQueryparams] = useState<{
     start: dayjs.Dayjs | undefined
     end: dayjs.Dayjs | undefined
-    timeUnit: timeUnitTypes
+    timeUnit: TimeUnit
   }>({ start: dayjs().subtract(30, "day"), end: dayjs(), timeUnit: "day" })
 
   const { data: data } = useGetCumulativeFlowDiagramDataQuery({
@@ -40,7 +40,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
     } else return dayjs(tick).format("DD.MM.YYYY")
   }
 
-  const handleSubmit = (start: dayjs.Dayjs | undefined, end: dayjs.Dayjs | undefined, timeUnit: timeUnitTypes) => {
+  const handleSubmit = (start: dayjs.Dayjs | undefined, end: dayjs.Dayjs | undefined, timeUnit: TimeUnit) => {
     if (timeUnit == queryparams.timeUnit) {
       setShortcut("")
     }
@@ -134,7 +134,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
                   key={timeUnit}
                   value={timeUnit}
                   onClick={(event) => {
-                    handleSubmit(queryparams.start, queryparams.end, event.currentTarget.textContent as timeUnitTypes)
+                    handleSubmit(queryparams.start, queryparams.end, event.currentTarget.textContent as TimeUnit)
                   }}
                 >
                   {timeUnit}

@@ -4,14 +4,14 @@ import { DateCalendar } from "@mui/x-date-pickers"
 import dayjs from "dayjs"
 import { useState } from "react"
 
-import { timeUnitTypes } from "@/types"
+import { TimeUnit } from "@/types"
 
 interface DateSelectorProps {
   startValue: dayjs.Dayjs | undefined
   endValue: dayjs.Dayjs | undefined
-  timeUnitValue: timeUnitTypes
+  timeUnitValue: TimeUnit
   shortcutValue?: string
-  onChange: (startDate: dayjs.Dayjs | undefined, endDate: dayjs.Dayjs | undefined, timeUnit: timeUnitTypes) => void
+  onChange: (startDate: dayjs.Dayjs | undefined, endDate: dayjs.Dayjs | undefined, timeUnit: TimeUnit) => void
 }
 
 const DateSelector: React.FC<DateSelectorProps> = ({ startValue, endValue, timeUnitValue, onChange }) => {
@@ -92,9 +92,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ startValue, endValue, timeU
                   <Button
                     key={choice}
                     variant={choice == timeUnitValue ? "contained" : "outlined"}
-                    onClick={(choice) =>
-                      onChange(startValue, endValue, choice.currentTarget.textContent as timeUnitTypes)
-                    }
+                    onClick={(choice) => onChange(startValue, endValue, choice.currentTarget.textContent as TimeUnit)}
                   >
                     {choice}
                   </Button>
