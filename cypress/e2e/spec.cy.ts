@@ -241,6 +241,49 @@ describe("When exporting and/or importing a board", () => {
   })
 })
 
+describe('When changing the title of a board', () => {
+  // This name should succeed as it is four letters long.
+  const validBoardName = "test"
+
+  // This name should fail as it is too short. 
+  const invalidBoardName = "e2"
+  const nameTooShort = "Board name must be at least 3 characters"
+
+  // An empty name should prompt this error.
+  const nameIsEmpty = "Board name is required"
+
+  it('With a valid input, the title of a board changes', () => {
+    cy.createBoard(defaultBoard)
+    cy.loginToBoard('alpha123')
+    
+    cy.get('button[aria-label=more]').click()
+    cy.get('p').contains('Edit Board Name').click()
+    cy.get('input[name=title][type=text]').clear().type(validBoardName)
+    cy.get('button[type=submit]').click()
+    cy.get('h6').contains(validBoardName)
+  })
+
+  it('With an invalid input, the title of the board stays the same and there is a warning', () => {
+    cy.createBoard(defaultBoard)
+    cy.loginToBoard('alpha123')
+  
+    cy.get('button[aria-label=more]').click()
+    cy.get('p').contains('Edit Board Name').click()
+    cy.get('input[name=title][type=text]').clear().type(invalidBoardName)
+    cy.get('button[type=submit]').click()
+
+    // Check that there is both an error message and that the board name has not changed.
+    cy.get('p').contains(nameTooShort)
+    cy.get('h6').contains("Project Alpha")
+
+    // Attempt to give an empty name.
+    cy.get('input[name=title][type=text]').clear()
+    cy.get('button[type=submit]').click()
+    cy.get('p').contains(nameIsEmpty)
+    cy.get('h6').contains("Project Alpha")
+  })
+})
+
 describe("When using board templates", () => {
   it("can create board template and a new board from a template", () => {
     cy.createBoard(defaultBoard)
