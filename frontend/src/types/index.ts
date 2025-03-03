@@ -1,4 +1,4 @@
-import { cacheTagTypes } from "@/constants"
+import { cacheTagTypes, timeUnitOptions } from "@/constants"
 
 export type Board = {
   boardid: string
@@ -96,7 +96,7 @@ export type SwimlaneColumn = {
   swimlanecolumnid: string
   title: string
   columnid: string
-  order: number
+  ordernum: number
 }
 
 type Tag = (typeof cacheTagTypes)[number]
@@ -116,3 +116,10 @@ export type BoardTemplate = {
 }
 
 export type NewBoardTemplate = Omit<BoardTemplate, "boardtemplateid">
+
+export type ChartData = {
+  columns: string[]
+  data: { [key: string]: number }[]
+}
+
+export type TimeUnit = (typeof timeUnitOptions)[number]
