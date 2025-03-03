@@ -253,7 +253,7 @@ describe('When changing the title of a board', () => {
   const nameIsEmpty = "Board name is required"
 
   it('With a valid input, the title of a board changes', () => {
-    cy.createBoard()
+    cy.createBoard(defaultBoard)
     cy.loginToBoard('alpha123')
     
     cy.get('button[aria-label=more]').click()
@@ -264,7 +264,7 @@ describe('When changing the title of a board', () => {
   })
 
   it('With an invalid input, the title of the board stays the same and there is a warning', () => {
-    cy.createBoard()
+    cy.createBoard(defaultBoard)
     cy.loginToBoard('alpha123')
   
     cy.get('button[aria-label=more]').click()
