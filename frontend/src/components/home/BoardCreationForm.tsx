@@ -181,12 +181,12 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
             startIcon={<CloudUploadIcon />}
             sx={{ border: 1, paddingX: 4 }}
           >
-            Import from CSV
+            Import from JSON
             <input
               type="file"
               {...register("file", { onChange: handleFileSelect })}
               style={{ display: "none" }}
-              accept=".csv"
+              accept=".json"
             />
           </Button>
           <Typography variant="body2" color="textSecondary" style={{ marginTop: "8px" }}>
