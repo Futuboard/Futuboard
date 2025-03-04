@@ -189,7 +189,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       .replace(/[^a-zA-Z0-9]/g, "_")
     const filename = title + "-" + timestamp
     const response = await fetch(
-      `${import.meta.env.VITE_DB_ADDRESS}export/${boardId}/${filename.replace(/[^A-Za-z0-9\-._~]/g, "_")}/`,
+      `${import.meta.env.VITE_DB_ADDRESS}export/${boardId}/`,
       {
         method: "GET",
         headers: {
