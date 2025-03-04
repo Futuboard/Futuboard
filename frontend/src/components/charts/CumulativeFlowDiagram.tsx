@@ -1,7 +1,7 @@
-import { Button, ButtonGroup, Grid, Paper, rgbToHex, Stack, Typography } from "@mui/material"
+import { Button, ButtonGroup, Divider, Grid, Paper, Stack, Typography } from "@mui/material"
 import dayjs from "dayjs"
-import { useState } from "react"
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import React, { useState } from "react"
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 
 import { useGetCumulativeFlowDiagramDataQuery } from "@/state/apiSlice"
 import { TimeUnit } from "@/types"
@@ -27,24 +27,16 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
   })
 
   const [shortcut, setShortcut] = useState("month")
+  const [highlightedArea, setHighlightedArea] = useState("")
 
   if (!data?.columns) {
     return <Paper sx={{ textAlign: "center", typography: "h5", padding: 10 }}>No data</Paper>
-  }
-
-  const tickFormatter = (tick: string) => {
-    if (queryparams.timeUnit == "month") {
-      return dayjs(tick).format("MM.YYYY")
-    } else if (queryparams.timeUnit == "year") {
-      return dayjs(tick).format("YYYY")
-    } else return dayjs(tick).format("DD.MM.YYYY")
   }
 
   const handleSubmit = (start: dayjs.Dayjs | undefined, end: dayjs.Dayjs | undefined, timeUnit: TimeUnit) => {
     if (timeUnit == queryparams.timeUnit) {
       setShortcut("")
     }
-
     setQueryparams({
       start: start,
       end: end,
@@ -75,14 +67,58 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
     setShortcut(event.currentTarget.textContent as string)
   }
 
-  const gradient: string[] = []
-  const length = data.columns.length
+  const dataLength = data?.data.length || 0
 
-  for (let i = 0; i < length; i++) {
-    const red = Math.round(255 - i * (255 / length))
-    const blue = Math.round(i * (255 / length))
-    gradient.push(rgbToHex(`rgb(${red},0,${blue})`))
+  const lastTick = Object.keys(data.data[dataLength - 1])
+  lastTick.pop()
+  lastTick.reverse()
+  const lastVals = Object.values(data.data[dataLength - 1])
+  lastVals.pop()
+  lastVals.reverse()
+
+  const yAxisDomain = Math.round(lastVals.reduce((sum, a) => sum + a, 0) * 1.1)
+
+  let sum = 0
+
+  const labelYvalues = lastVals.map((val) => {
+    sum += val
+    return sum - 0.5 * val
+  })
+
+  const tickFormatter = (tick: string) => {
+    if (queryparams.timeUnit == "month") {
+      return dayjs(tick).format("MMMM YYYY")
+    } else if (queryparams.timeUnit == "year") {
+      return dayjs(tick).format("YYYY")
+    } else return dayjs(tick).format("DD.MM.YYYY")
   }
+
+  interface AreaToolTipProps {
+    active: boolean
+    payload: Array<{ [key: string]: string }>
+    label: string
+  }
+
+  const AreaToolTip: React.FC<AreaToolTipProps> = ({ active, payload, label }) => {
+    if (active && payload) {
+      return (
+        <Paper>
+          <Stack padding={1}>
+            <Typography variant="h6">{tickFormatter(label)}</Typography>
+            <Divider />
+            <Stack direction="column-reverse">
+              {payload.map((val: { [key: string]: string }) => (
+                <Typography color={val.fill} fontWeight={val.name == highlightedArea ? 900 : "normal"}>
+                  {val.name}: {val.value}
+                </Typography>
+              ))}
+            </Stack>
+          </Stack>
+        </Paper>
+      )
+    }
+  }
+  const gradient: string[] = ["#448aff", "#1565c0", "#009688", "#8bc34a", "#ffc107", "#ff9800", "#f44336", "#ad1457"]
 
   const shortcutOptions = ["week", "month", "3 months", "6 months", "year", "max"]
   const timeUnitChoices = ["day", "week", "month", "year"]
@@ -94,29 +130,52 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
           <Typography variant="h6">Cumulative Flow</Typography>
         </Grid>
         <Grid item sx={{ width: "1100px", height: "700px" }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={data?.data}
-              margin={{
-                right: 40
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" tickFormatter={tickFormatter} />
-              <YAxis type="number" domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]} />
-              <Tooltip labelFormatter={tickFormatter} itemStyle={{ color: "black" }} />
-              {data?.columns.map((name, index) => (
+          <AreaChart
+            data={data?.data}
+            margin={{
+              right: 40
+            }}
+            height={700}
+            width={1100}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" tickFormatter={tickFormatter} />
+            <YAxis
+              type="number"
+              domain={[0, yAxisDomain]}
+              yAxisId={0}
+              allowDataOverflow={true}
+              ticks={labelYvalues}
+              tickFormatter={(val) => lastTick[labelYvalues.indexOf(val)]}
+              orientation="right"
+              axisLine={false}
+            />
+            <YAxis type="number" yAxisId={1} domain={[0, yAxisDomain]} allowDataOverflow={true} />
+            <Tooltip
+              content={({ active, payload, label }) => (
+                <AreaToolTip
+                  active={active || false}
+                  payload={payload as Array<{ [key: string]: string }>}
+                  label={label}
+                />
+              )}
+            />
+            {data?.columns
+              .map((name, index) => (
                 <Area
                   type="linear"
                   key={name}
                   dataKey={name}
                   stackId="1"
-                  stroke={gradient[index + 2] || "#040042"}
-                  fill={gradient[index]}
-                />
-              ))}
-            </AreaChart>
-          </ResponsiveContainer>
+                  stroke={gradient[index % gradient.length]}
+                  fill={gradient[index % gradient.length]}
+                  yAxisId={index == 0 || data.columns.length - 1 ? 1 : 0}
+                  onMouseEnter={() => setHighlightedArea(name)}
+                  onMouseLeave={() => setHighlightedArea("")}
+                ></Area>
+              ))
+              .reverse()}
+          </AreaChart>
         </Grid>
         <Grid item>
           <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
