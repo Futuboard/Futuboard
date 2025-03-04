@@ -1,7 +1,7 @@
 import { Button, ButtonGroup, Divider, Grid, Paper, Stack, Typography } from "@mui/material"
 import dayjs from "dayjs"
 import React, { useState } from "react"
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
 import { useGetCumulativeFlowDiagramDataQuery } from "@/state/apiSlice"
 import { TimeUnit } from "@/types"
@@ -130,52 +130,52 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
           <Typography variant="h6">Cumulative Flow</Typography>
         </Grid>
         <Grid item sx={{ width: "1100px", height: "700px" }}>
-          <AreaChart
-            data={data?.data}
-            margin={{
-              right: 40
-            }}
-            height={700}
-            width={1100}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" tickFormatter={tickFormatter} />
-            <YAxis
-              type="number"
-              domain={[0, yAxisDomain]}
-              yAxisId={0}
-              allowDataOverflow={true}
-              ticks={labelYvalues}
-              tickFormatter={(val) => lastTick[labelYvalues.indexOf(val)]}
-              orientation="right"
-              axisLine={false}
-            />
-            <YAxis type="number" yAxisId={1} domain={[0, yAxisDomain]} allowDataOverflow={true} />
-            <Tooltip
-              content={({ active, payload, label }) => (
-                <AreaToolTip
-                  active={active || false}
-                  payload={payload as Array<{ [key: string]: string }>}
-                  label={label}
-                />
-              )}
-            />
-            {data?.columns
-              .map((name, index) => (
-                <Area
-                  type="linear"
-                  key={name}
-                  dataKey={name}
-                  stackId="1"
-                  stroke={gradient[index % gradient.length]}
-                  fill={gradient[index % gradient.length]}
-                  yAxisId={index == 0 || data.columns.length - 1 ? 1 : 0}
-                  onMouseEnter={() => setHighlightedArea(name)}
-                  onMouseLeave={() => setHighlightedArea("")}
-                ></Area>
-              ))
-              .reverse()}
-          </AreaChart>
+          <ResponsiveContainer>
+            <AreaChart
+              data={data?.data}
+              margin={{
+                right: 40
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" tickFormatter={tickFormatter} />
+              <YAxis
+                type="number"
+                domain={[0, yAxisDomain]}
+                yAxisId={0}
+                allowDataOverflow={true}
+                ticks={labelYvalues}
+                tickFormatter={(val) => lastTick[labelYvalues.indexOf(val)]}
+                orientation="right"
+                axisLine={false}
+              />
+              <YAxis type="number" yAxisId={1} domain={[0, yAxisDomain]} allowDataOverflow={true} />
+              <Tooltip
+                content={({ active, payload, label }) => (
+                  <AreaToolTip
+                    active={active || false}
+                    payload={payload as Array<{ [key: string]: string }>}
+                    label={label}
+                  />
+                )}
+              />
+              {data?.columns
+                .map((name, index) => (
+                  <Area
+                    type="linear"
+                    key={name}
+                    dataKey={name}
+                    stackId="1"
+                    stroke={gradient[index % gradient.length]}
+                    fill={gradient[index % gradient.length]}
+                    yAxisId={index == 0 || data.columns.length - 1 ? 1 : 0}
+                    onMouseEnter={() => setHighlightedArea(name)}
+                    onMouseLeave={() => setHighlightedArea("")}
+                  ></Area>
+                ))
+                .reverse()}
+            </AreaChart>
+          </ResponsiveContainer>
         </Grid>
         <Grid item>
           <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
