@@ -1,5 +1,5 @@
 """
-Views to import and export CSV files of board data
+Views to import and export JSON files of board data
 """
 
 from datetime import datetime
