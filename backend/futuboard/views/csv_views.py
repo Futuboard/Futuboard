@@ -6,6 +6,8 @@ from datetime import datetime
 import uuid
 from django.http import HttpResponse
 
+from ..verification import hash_password
+
 from ..models import Action, Board, Column, Swimlanecolumn, Ticket, TicketEvent, User
 
 from ..serializers import (
@@ -17,57 +19,27 @@ from ..serializers import (
     ActionSerializer,
     TicketEventSerializer,
 )
-from ..csv_parser import write_csv_header, write_board_data, verify_csv_header, read_board_data
-import csv
-import io
 from rest_framework.decorators import api_view
-from ..verification import hash_password
 from django.http import JsonResponse
 import json
 from django.db import models
 
 
 @api_view(["GET"])
-def export_board_data(request, board_id, filename):
+def export_board_data(request, board_id):
     """
-    Export board data to a csv file
+    Export board data to a json file
     """
     if request.method == "GET":
-        response = HttpResponse(content_type="text/csv")
-        response["Content-Disposition"] = 'attachment; filename="' + filename + '.csv"'
-        writer = csv.writer(response)
-        write_csv_header(writer)
-        write_board_data(writer, board_id)
-        print("Board data exported")
-        return response
-    return HttpResponse("Invalid request")
+            data = create_data_dict_from_board(board_id)
+            response = JsonResponse(data, safe=False)
+            filename = data["board"]["title"] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+            response["Content-Disposition"] = 'attachment; filename="' + filename + '.json"'
 
-
-@api_view(["POST"])
-def import_board_data(request):
-    """
-    Import board data from a csv file
-    """
-    if request.method == "POST":
-        print(request.data)
-        csv_file = request.FILES["file"]
-        print(csv_file)
-        if not csv_file.name.endswith(".csv"):
-            return HttpResponse("Invalid file type", status=400)
-        data_set = csv_file.read().decode("UTF-8")
-        io_string = io.StringIO(data_set)
-        reader = csv.reader(io_string, delimiter=",", quotechar='"')
-        if not verify_csv_header(reader):
-            return HttpResponse("Invalid file header", status=400)
-        board_data = json.loads(request.data["board"])
-        board = read_board_data(reader, board_data["title"], hash_password(board_data["password"]))
-        serializer = BoardSerializer(board)
-        return JsonResponse(serializer.data, safe=False)
-
+            return response
     return HttpResponse("Invalid request", status=400)
 
-
-def export_board_data_json(request, board_id):
+def create_data_dict_from_board(board_id):
     board = Board.objects.get(boardid=board_id)
     users = User.objects.filter(boardid=board_id)
     columns = Column.objects.filter(boardid=board_id)
@@ -76,21 +48,73 @@ def export_board_data_json(request, board_id):
     actions = Action.objects.filter(ticketid__in=tickets)
     ticketEvents = TicketEvent.objects.filter(ticketid__in=tickets)
 
-    json_data = {}
-    json_data["board"] = BoardSerializer(board).data
-    json_data["users"] = UserSerializer(users, many=True).data
-    json_data["columns"] = ColumnSerializer(columns, many=True).data
-    json_data["swimlanecolumns"] = SwimlaneColumnSerializer(swimlanecolumns, many=True).data
-    json_data["tickets"] = TicketSerializer(tickets, many=True).data
-    json_data["actions"] = ActionSerializer(actions, many=True).data
-    json_data["ticketEvents"] = TicketEventSerializer(ticketEvents, many=True).data
+    data = {}
+    data["board"] = BoardSerializer(board).data
+    data["users"] = UserSerializer(users, many=True).data
+    data["columns"] = ColumnSerializer(columns, many=True).data
+    data["swimlanecolumns"] = SwimlaneColumnSerializer(swimlanecolumns, many=True).data
+    data["tickets"] = TicketSerializer(tickets, many=True).data
+    data["actions"] = ActionSerializer(actions, many=True).data
+    data["ticketEvents"] = TicketEventSerializer(ticketEvents, many=True).data
 
-    response = JsonResponse(json_data, safe=False)
-    filename = board.title + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    response["Content-Disposition"] = 'attachment; filename="' + filename + '.json"'
+    return data
 
-    return response
 
+@api_view(["POST"])
+def import_board_data(request):
+    """
+    Import board data from a json file
+    """
+    if request.method == "POST":
+        json_file = request.FILES["file"]
+        if not json_file.name.endswith(".json"):
+            return HttpResponse("Invalid file type", status=400)
+        json_string = json_file.read().decode("UTF-8")
+        data = json.loads(json_string)
+
+        board_metadata = json.loads(request.data["board"])
+        title = board_metadata["title"]
+        password = board_metadata["password"]
+
+        created_board = create_board_from_data_dict(data, title, password)
+
+        return JsonResponse(created_board, safe=False)
+
+    return HttpResponse("Invalid request", status=400)
+
+def create_board_from_data_dict(data, new_title, new_password):
+    new_ids = {}
+
+    for key in data:
+        replace_ids(data, key, new_ids)
+    
+    board_data = data["board"]
+    board_data["title"] = new_title
+    board_data["passwordhash"] = hash_password(new_password)
+
+    new_board = add_to_db(Board, board_data)
+
+    for column in data["columns"]:
+        add_to_db(Column, column)
+
+    for swimlanecolumn in data["swimlanecolumns"]:
+        add_to_db(Swimlanecolumn, swimlanecolumn)
+
+    for ticket in data["tickets"]:
+        add_to_db(Ticket, ticket)
+
+    for action in data["actions"]:
+        add_to_db(Action, action)
+
+    for ticketEvent in data["ticketEvents"]:
+        add_to_db(TicketEvent, ticketEvent)
+
+    for user in data["users"]:
+        add_to_db(User, user)
+
+    serializer = BoardSerializer(new_board)
+
+    return serializer.data
 
 def is_valid_uuid(val):
     try:
@@ -121,7 +145,7 @@ def replace_ids(data_dict, key, new_ids):
             replace_ids(value, i, new_ids)
 
 
-def create(model, data):
+def add_to_db(model, data):
     fields = model._meta.get_fields()
 
     # Remove fields that are not in the model
@@ -157,34 +181,3 @@ def create(model, data):
 
     return new_object
 
-
-@api_view(["POST"])
-def import_board_data_json(request):
-    data = dict(request.data)
-    new_ids = {}
-
-    for key in data:
-        replace_ids(data, key, new_ids)
-
-    new_board = create(Board, data["board"])
-
-    for column in data["columns"]:
-        create(Column, column)
-
-    for swimlanecolumn in data["swimlanecolumns"]:
-        create(Swimlanecolumn, swimlanecolumn)
-
-    for ticket in data["tickets"]:
-        create(Ticket, ticket)
-
-    for action in data["actions"]:
-        create(Action, action)
-
-    for ticketEvent in data["ticketEvents"]:
-        create(TicketEvent, ticketEvent)
-
-    for user in data["users"]:
-        create(User, user)
-
-    serializer = BoardSerializer(new_board)
-    return JsonResponse(serializer.data, safe=False)

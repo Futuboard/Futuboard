@@ -50,7 +50,7 @@ urlpatterns = [
     path(
         "api/columns/<uuid:column_id>/actions/", swimlaneViews.get_actions_by_columnId, name="get_actions_by_columnId"
     ),
-    path("api/export/<uuid:board_id>/<str:filename>/", csv_views.export_board_data, name="export_board_data"),
+    path("api/export/<uuid:board_id>", csv_views.export_board_data, name="export_board_data"),
     path("api/import/", csv_views.import_board_data, name="import_board_data"),
     path("api/boardtemplates/", boardTemplateViews.board_templates, name="board_templates"),
     path(
@@ -63,6 +63,4 @@ urlpatterns = [
     path(
         "api/charts/<uuid:board_id>/cumulativeflow", chartViews.cumulative_flow, name="cumulative_flow"
     ),  # Also has url parameters, e.g. ?time_unit=day&start_time=2021-01-01&end_time=2021-01-10
-    path("api/json/<uuid:board_id>/", csv_views.export_board_data_json, name="export_board_data_json"),
-    path("api/json_import/", csv_views.import_board_data_json, name="import_board_data_json"),
 ]

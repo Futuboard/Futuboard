@@ -5,6 +5,7 @@ import uuid
 from django.utils import timezone
 from django.urls import reverse
 import json
+from django.core.files.uploadedfile import SimpleUploadedFile
 from .test_utils import resetDB
 
 
@@ -96,15 +97,15 @@ def test_import_export():
                 for ii in range(n_users):
                     users[k].actions.add(md.Action.objects.get(actionid=action.actionid))
         # Export the board
-        response = client.get(reverse("export_board_data_json", args=[boards[num].boardid]))
+        response = client.get(reverse("export_board_data", args=[boards[num].boardid]))
         data = response.content
-        json_data = json.loads(data)
-
+        # Create a file from the data
+        file = SimpleUploadedFile("test.json", data, content_type="text/json")
         assert response.status_code == 200
         # Import the board, response should have the data of the exported board csv as a content disposition
         board_data = {"title": "Test Board", "password": "abc"}
         board_data = json.dumps(board_data)
-        response = client.post(reverse("import_board_data_json"), json_data, format="json")
+        response = client.post(reverse("import_board_data"), {"board": board_data, "file": file})
         assert response.status_code == 200
         json_response = response.json()
         assert json_response["boardid"] is not None
@@ -168,5 +169,5 @@ def test_import_export():
                         assert imported_action.title == action.title
                         assert imported_action.order == action.order
         num += 1
-
+    # Clean up everything
     resetDB()
