@@ -3,7 +3,7 @@ import io
 from rest_framework.decorators import api_view
 from django.http import HttpResponse, JsonResponse
 
-from .csv_views import create_board_from_data_dict, create_data_dict_from_board
+from .import_export_views import create_board_from_data_dict, create_data_dict_from_board
 
 from ..verification import hash_password, is_admin_password_correct
 from ..models import Board, BoardTemplate
