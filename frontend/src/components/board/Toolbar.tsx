@@ -193,7 +193,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       {
         method: "GET",
         headers: {
-          "Content-Type": "text/csv"
+          "Content-Type": "application/json"
         }
       }
     )
@@ -204,7 +204,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `${filename}.csv`
+    a.download = `${filename}.json`
     a.click()
   }
 
@@ -251,7 +251,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
         </MenuItem>
         <MenuItem onClick={handleExportAndClose} sx={{ py: 1 }}>
           <Download sx={{ fontSize: "1rem", mr: 1 }} />
-          <Typography variant="body2">Download Board CSV</Typography>
+          <Typography variant="body2">Download Board JSON</Typography>
         </MenuItem>
         <BoardDeletionComponent />
       </Menu>
