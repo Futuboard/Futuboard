@@ -31,13 +31,14 @@ def export_board_data(request, board_id):
     Export board data to a json file
     """
     if request.method == "GET":
-            data = create_data_dict_from_board(board_id)
-            response = JsonResponse(data, safe=False)
-            filename = data["board"]["title"] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-            response["Content-Disposition"] = 'attachment; filename="' + filename + '.json"'
+        data = create_data_dict_from_board(board_id)
+        response = JsonResponse(data, safe=False)
+        filename = data["board"]["title"] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        response["Content-Disposition"] = f'attachment; filename="{filename}.json"'
 
-            return response
+        return response
     return HttpResponse("Invalid request", status=400)
+
 
 def create_data_dict_from_board(board_id):
     board = Board.objects.get(boardid=board_id)
@@ -82,12 +83,13 @@ def import_board_data(request):
 
     return HttpResponse("Invalid request", status=400)
 
+
 def create_board_from_data_dict(data, new_title, new_password):
     new_ids = {}
 
     for key in data:
         replace_ids(data, key, new_ids)
-    
+
     board_data = data["board"]
     board_data["title"] = new_title
     board_data["passwordhash"] = hash_password(new_password)
@@ -115,6 +117,7 @@ def create_board_from_data_dict(data, new_title, new_password):
     serializer = BoardSerializer(new_board)
 
     return serializer.data
+
 
 def is_valid_uuid(val):
     try:
@@ -180,4 +183,3 @@ def add_to_db(model, data):
             getattr(new_object, field_name).add(value)  # Same as user.tickets.add(ticket)
 
     return new_object
-

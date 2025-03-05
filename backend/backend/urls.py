@@ -1,7 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
-from backend.futuboard.views import import_export_views
-from futuboard.views import views, swimlaneViews, boardViews, boardTemplateViews, chartViews
+from futuboard.views import views, swimlaneViews, boardViews, boardTemplateViews, chartViews, import_export_views
 from django.contrib import admin
 
 router = routers.DefaultRouter()

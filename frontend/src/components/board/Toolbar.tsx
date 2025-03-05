@@ -183,29 +183,29 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   }
 
   const handleExport = async () => {
-    const date = new Date()
-    const timestamp = date
-      .toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" })
-      .replace(/[^a-zA-Z0-9]/g, "_")
-    const filename = title + "-" + timestamp
-    const response = await fetch(
-      `${import.meta.env.VITE_DB_ADDRESS}export/${boardId}/`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    )
+    const response = await fetch(`${import.meta.env.VITE_DB_ADDRESS}export/${boardId}`, {
+      method: "GET"
+    })
+
     if (!response.ok) {
       throw new Error("Network response was not ok")
     }
+
     const blob = await response.blob()
     const url = window.URL.createObjectURL(blob)
+
+    let filename = `${title}.json`
+    const contentDisposition = response.headers.get("Content-Disposition")
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="(.+)"/)
+      if (match) filename = match[1]
+    }
+
     const a = document.createElement("a")
     a.href = url
-    a.download = `${filename}.json`
+    a.download = filename
     a.click()
+    URL.revokeObjectURL(url)
   }
 
   return (
