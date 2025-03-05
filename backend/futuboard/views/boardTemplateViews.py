@@ -5,8 +5,14 @@ from .import_export_views import create_board_from_data_dict, create_data_dict_f
 
 from ..verification import is_admin_password_correct
 from ..models import Board, BoardTemplate
-from ..serializers import BoardSerializer, BoardTemplateSerializer
+from ..serializers import  BoardTemplateSerializer
 import rest_framework.request
+
+# import the logging library
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 
 # Create your views here.
@@ -47,7 +53,8 @@ def create_board_from_template(request: rest_framework.request.Request, board_te
 
         # Board is copied by exporting and importing the board data
         data = create_data_dict_from_board(board_template.boardid.boardid)
-        board = create_board_from_data_dict(data, request.data["title"], request.data["password"])
+        logger.info(data)
+        new_board = create_board_from_data_dict(data, request.data["title"], request.data["password"])
+        logger.info(new_board)
 
-        serializer = BoardSerializer(board)
-        return JsonResponse(serializer.data, safe=False)
+        return JsonResponse(new_board, safe=False)
