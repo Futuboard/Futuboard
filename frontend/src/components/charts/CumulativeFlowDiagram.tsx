@@ -108,7 +108,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
             <Divider />
             <Stack direction="column-reverse">
               {payload.map((val: { [key: string]: string }) => (
-                <Typography color={val.fill} fontWeight={val.name == highlightedArea ? 900 : "normal"}>
+                <Typography key={val.name} color={val.fill} fontWeight={val.name == highlightedArea ? 900 : "normal"}>
                   {val.name}: {val.value}
                 </Typography>
               ))}
