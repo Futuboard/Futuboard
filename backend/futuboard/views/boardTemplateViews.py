@@ -5,7 +5,7 @@ from .import_export_views import create_board_from_data_dict, create_data_dict_f
 
 from ..verification import is_admin_password_correct
 from ..models import Board, BoardTemplate
-from ..serializers import  BoardTemplateSerializer
+from ..serializers import BoardTemplateSerializer
 import rest_framework.request
 
 # import the logging library
