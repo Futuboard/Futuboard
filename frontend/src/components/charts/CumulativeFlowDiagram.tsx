@@ -147,9 +147,18 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
                 ticks={labelYvalues}
                 tickFormatter={(val) => lastTick[labelYvalues.indexOf(val)]}
                 orientation="right"
+                minTickGap={0}
+                style={{ fontSize: 11, fontWeight: 700 }}
                 axisLine={false}
               />
-              <YAxis type="number" yAxisId={1} domain={[0, yAxisDomain]} allowDataOverflow={true} />
+              <YAxis
+                type="number"
+                yAxisId={1}
+                domain={[0, yAxisDomain]}
+                tickCount={Math.max(labelYvalues.length / 2, 4)}
+                allowDataOverflow={true}
+                style={{ fontSize: 11, fontWeight: 700 }}
+              />
               <Tooltip
                 content={({ active, payload, label }) => (
                   <AreaToolTip
