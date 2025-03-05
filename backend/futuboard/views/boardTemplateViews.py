@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 
 from .import_export_views import create_board_from_data_dict, create_data_dict_from_board
 
-from ..verification import hash_password, is_admin_password_correct
+from ..verification import is_admin_password_correct
 from ..models import Board, BoardTemplate
 from ..serializers import BoardSerializer, BoardTemplateSerializer
 import rest_framework.request
