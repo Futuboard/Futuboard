@@ -46,7 +46,7 @@ def create_board_from_template(request: rest_framework.request.Request, board_te
         board_template = BoardTemplate.objects.get(boardtemplateid=board_template_id)
 
         # Board is copied by exporting and importing the board data
-        data = create_data_dict_from_board(board_template.boardid)
+        data = create_data_dict_from_board(board_template.boardid.boardid)
         board = create_board_from_data_dict(data, request.data["title"], request.data["password"])
 
         serializer = BoardSerializer(board)

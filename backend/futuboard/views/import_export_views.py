@@ -33,7 +33,7 @@ def export_board_data(request, board_id):
     if request.method == "GET":
         data = create_data_dict_from_board(board_id)
         response = JsonResponse(data, safe=False)
-        filename = data["board"]["title"] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        filename = data["board"]["title"] + "-" + datetime.now().strftime("%m-%d-%Y")
         response["Content-Disposition"] = f'attachment; filename="{filename}.json"'
 
         return response
