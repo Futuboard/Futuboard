@@ -288,7 +288,7 @@ describe("When changing the title of a board", () => {
 })
 
 describe("When using board templates", () => {
-  it.only("can create board template and a new board from a template", () => {
+  it("can create board template and a new board from a template", () => {
     cy.createBoard(defaultBoard)
     cy.loginToBoard("alpha123")
     cy.createColumn(defaultColumn)
