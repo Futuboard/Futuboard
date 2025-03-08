@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Divider, Grid, Paper, Stack, Typography } from "@mui/material"
+import { Button, ButtonGroup, CircularProgress, Divider, Grid, Paper, Stack, Typography } from "@mui/material"
 import dayjs from "dayjs"
 import React, { useState } from "react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
@@ -19,7 +19,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
     timeUnit: TimeUnit
   }>({ start: dayjs().subtract(30, "day"), end: dayjs(), timeUnit: "day" })
 
-  const { data: data } = useGetCumulativeFlowDiagramDataQuery({
+  const { data: data, isLoading: isLoading } = useGetCumulativeFlowDiagramDataQuery({
     boardId: boardId,
     timeUnit: queryparams.timeUnit,
     start: queryparams.start?.format("YYYY-MM-DD"),
@@ -28,10 +28,6 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
 
   const [shortcut, setShortcut] = useState("month")
   const [highlightedArea, setHighlightedArea] = useState("")
-
-  if (!data?.columns) {
-    return <Paper sx={{ textAlign: "center", typography: "h5", padding: 10 }}>No data</Paper>
-  }
 
   const handleSubmit = (start: dayjs.Dayjs | undefined, end: dayjs.Dayjs | undefined, timeUnit: TimeUnit) => {
     if (timeUnit == queryparams.timeUnit) {
@@ -67,24 +63,6 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
     setShortcut(event.currentTarget.textContent as string)
   }
 
-  const dataLength = data?.data.length || 0
-
-  const lastTick = Object.keys(data.data[dataLength - 1])
-  lastTick.pop()
-  lastTick.reverse()
-  const lastVals = Object.values(data.data[dataLength - 1])
-  lastVals.pop()
-  lastVals.reverse()
-
-  const yAxisDomain = Math.round(lastVals.reduce((sum, a) => sum + a, 0) * 1.1)
-
-  let sum = 0
-
-  const labelYvalues = lastVals.map((val) => {
-    sum += val
-    return sum - 0.5 * val
-  })
-
   const tickFormatter = (tick: string) => {
     if (queryparams.timeUnit == "month") {
       return dayjs(tick).format("MMMM YYYY")
@@ -118,10 +96,42 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
       )
     }
   }
-  const gradient: string[] = ["#448aff", "#1565c0", "#009688", "#8bc34a", "#ffc107", "#ff9800", "#f44336", "#ad1457"]
 
+  if (isLoading) {
+    return (
+      <Paper sx={{ textAlign: "center", typography: "h5", padding: 10 }}>
+        <CircularProgress />
+      </Paper>
+    )
+  }
+
+  if (!data?.columns || !data?.data) {
+    return <Paper sx={{ textAlign: "center", typography: "h5", padding: 10 }}>No data</Paper>
+  }
+
+  const dataLength = data?.data.length
+  const maxArealabelLength = 26
+
+  const gradient: string[] = ["#448aff", "#1565c0", "#009688", "#8bc34a", "#ffc107", "#ff9800", "#f44336", "#ad1457"]
   const shortcutOptions = ["week", "month", "3 months", "6 months", "year", "max"]
   const timeUnitChoices = ["day", "week", "month", "year"]
+
+  const lastTick = Object.keys(data.data[dataLength - 1])
+  lastTick.pop()
+  lastTick.reverse()
+  const lastVals = Object.values(data.data[dataLength - 1])
+  lastVals.pop()
+  lastVals.reverse()
+
+  let sum = 0
+
+  //add the value to the sum for the rest of the labels, remove half of value so the label is in the center of the area.
+  const labelYvalues = lastVals.map((val) => {
+    sum += val
+    return sum - 0.5 * val
+  })
+
+  const yAxisDomain = Math.round(sum * 1.1)
 
   return (
     <Paper>
@@ -145,10 +155,14 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
                 yAxisId={0}
                 allowDataOverflow={true}
                 ticks={labelYvalues}
-                tickFormatter={(val) => lastTick[labelYvalues.indexOf(val)]}
+                tickFormatter={(val) =>
+                  lastTick[labelYvalues.indexOf(val)].length > maxArealabelLength + 3
+                    ? lastTick[labelYvalues.indexOf(val)].substring(0, maxArealabelLength) + "..."
+                    : lastTick[labelYvalues.indexOf(val)]
+                }
                 orientation="right"
-                minTickGap={0}
-                style={{ fontSize: 11, fontWeight: 700 }}
+                minTickGap={3}
+                style={{ fontSize: 10, fontWeight: 700 }}
                 axisLine={false}
               />
               <YAxis
@@ -157,7 +171,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
                 domain={[0, yAxisDomain]}
                 tickCount={Math.max(labelYvalues.length / 2, 4)}
                 allowDataOverflow={true}
-                style={{ fontSize: 11, fontWeight: 700 }}
+                style={{ fontSize: 10, fontWeight: 700 }}
               />
               <Tooltip
                 content={({ active, payload, label }) => (
