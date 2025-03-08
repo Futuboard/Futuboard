@@ -50,13 +50,13 @@ def create_board_from_template(request: rest_framework.request.Request, board_te
 
         # Remove creation_date from data, so new board will have new creation_date:s
         for model in data.values():
+            model_list = model
             if not isinstance(model, list):
-                model = [model]
+                model_list = [model]
 
-            for item in model:
-                for key in item:
-                    if key == "creation_date":
-                        del item[key]
+            for item in model_list:
+                if "creation_date" in item:
+                    del item["creation_date"]
 
         new_board = create_board_from_data_dict(data, request.data["title"], request.data["password"])
 
