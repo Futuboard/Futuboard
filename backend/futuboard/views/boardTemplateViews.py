@@ -8,12 +8,6 @@ from ..models import Board, BoardTemplate
 from ..serializers import BoardTemplateSerializer
 import rest_framework.request
 
-# import the logging library
-import logging
-
-# Get an instance of a logger
-logger = logging.getLogger(__name__)
-
 
 # Create your views here.
 @api_view(["GET", "POST", "DELETE"])
@@ -53,8 +47,17 @@ def create_board_from_template(request: rest_framework.request.Request, board_te
 
         # Board is copied by exporting and importing the board data
         data = create_data_dict_from_board(board_template.boardid.boardid)
-        logger.info(data)
+
+        # Remove creation_date from data, so new board will have new creation_date:s
+        for model in data.values():
+            if not isinstance(model, list):
+                model = [model]
+
+            for item in model:
+                for key in item:
+                    if key == "creation_date":
+                        del item[key]
+
         new_board = create_board_from_data_dict(data, request.data["title"], request.data["password"])
-        logger.info(new_board)
 
         return JsonResponse(new_board, safe=False)
