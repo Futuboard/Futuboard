@@ -61,6 +61,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
+CORS_EXPOSE_HEADERS = ["Content-Disposition"]
+
 ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [

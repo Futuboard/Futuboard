@@ -1,6 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
-from futuboard.views import views, swimlaneViews, boardViews, csv_views, boardTemplateViews, chartViews
+from futuboard.views import views, swimlaneViews, boardViews, boardTemplateViews, chartViews, import_export_views
 from django.contrib import admin
 
 router = routers.DefaultRouter()
@@ -50,8 +50,8 @@ urlpatterns = [
     path(
         "api/columns/<uuid:column_id>/actions/", swimlaneViews.get_actions_by_columnId, name="get_actions_by_columnId"
     ),
-    path("api/export/<uuid:board_id>/<str:filename>/", csv_views.export_board_data, name="export_board_data"),
-    path("api/import/", csv_views.import_board_data, name="import_board_data"),
+    path("api/export/<uuid:board_id>", import_export_views.export_board_data, name="export_board_data"),
+    path("api/import/", import_export_views.import_board_data, name="import_board_data"),
     path("api/boardtemplates/", boardTemplateViews.board_templates, name="board_templates"),
     path(
         "api/boardtemplates/<uuid:board_template_id>/",
