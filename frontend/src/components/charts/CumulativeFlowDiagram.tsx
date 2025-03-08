@@ -110,7 +110,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
   }
 
   const dataLength = data?.data.length
-  const maxArealabelLength = 26
+  const maxArealabelLength = 25
 
   const gradient: string[] = ["#448aff", "#1565c0", "#009688", "#8bc34a", "#ffc107", "#ff9800", "#f44336", "#ad1457"]
   const shortcutOptions = ["week", "month", "3 months", "6 months", "year", "max"]
@@ -140,7 +140,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
           <Typography variant="h6">Cumulative Flow</Typography>
         </Grid>
         <Grid item sx={{ width: "1100px", height: "700px" }}>
-          <ResponsiveContainer>
+          <ResponsiveContainer width="105%" height="100%">
             <AreaChart
               data={data?.data}
               margin={{
@@ -150,20 +150,24 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" tickFormatter={tickFormatter} />
               <YAxis
-                type="number"
                 domain={[0, yAxisDomain]}
                 yAxisId={0}
                 allowDataOverflow={true}
                 ticks={labelYvalues}
-                tickFormatter={(val) =>
-                  lastTick[labelYvalues.indexOf(val)].length > maxArealabelLength + 3
-                    ? lastTick[labelYvalues.indexOf(val)].substring(0, maxArealabelLength) + "..."
-                    : lastTick[labelYvalues.indexOf(val)]
-                }
+                tickFormatter={(val) => {
+                  let label = lastTick[labelYvalues.indexOf(val)]
+                  if (label.length > 14 && !label.substring(0, 14).includes(" ")) {
+                    label = label.substring(0, 14) + "\n" + label.substring(14)
+                  }
+                  return label.length > maxArealabelLength + 3
+                    ? label.substring(0, maxArealabelLength).trim() + "..."
+                    : label
+                }}
                 orientation="right"
-                minTickGap={3}
+                minTickGap={1}
                 style={{ fontSize: 10, fontWeight: 700 }}
                 axisLine={false}
+                width={110}
               />
               <YAxis
                 type="number"
