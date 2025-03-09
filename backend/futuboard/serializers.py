@@ -38,7 +38,7 @@ class ColumnSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["userid", "name", "actions", "tickets"]
+        fields = ["userid", "name", "boardid", "actions", "tickets"]
 
 
 class UserSerializerWithoutActionsOrTickets(serializers.ModelSerializer):

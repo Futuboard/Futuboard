@@ -192,7 +192,10 @@ describe("When exporting and/or importing a board", () => {
     cy.get('[data-testid="DownloadIcon"]').click()
 
     const date = new Date()
-    const fileName = `${defaultBoard.title}-${date.toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/[^a-zA-Z0-9]/g, "_")}.csv`
+    const dateString = date
+      .toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" })
+      .replace(/[^a-zA-Z0-9]/g, "-")
+    const fileName = `${defaultBoard.title.replace(/\s/g, "-")}-${dateString}.json`
     const filePath = `downloads/${fileName}`
 
     cy.readFile(filePath).should("exist")
@@ -218,7 +221,7 @@ describe("When exporting and/or importing a board", () => {
   it("can import a board with correct action placement", () => {
     cy.contains("Create board").click()
     cy.get("input[name='title']").type("Imported Test Board")
-    cy.get("input[type='file']").selectFile("fixtures/two_columns_with_actions.csv", { force: true })
+    cy.get("input[type='file']").selectFile("fixtures/two_columns_with_actions.json", { force: true })
     cy.get("button").contains("Submit").click()
 
     cy.get('button[aria-label="expand swimlane"]').eq(0).click()
@@ -241,46 +244,46 @@ describe("When exporting and/or importing a board", () => {
   })
 })
 
-describe('When changing the title of a board', () => {
+describe("When changing the title of a board", () => {
   // This name should succeed as it is four letters long.
   const validBoardName = "test"
 
-  // This name should fail as it is too short. 
+  // This name should fail as it is too short.
   const invalidBoardName = "e2"
   const nameTooShort = "Board name must be at least 3 characters"
 
   // An empty name should prompt this error.
   const nameIsEmpty = "Board name is required"
 
-  it('With a valid input, the title of a board changes', () => {
+  it("With a valid input, the title of a board changes", () => {
     cy.createBoard(defaultBoard)
-    cy.loginToBoard('alpha123')
-    
-    cy.get('button[aria-label=more]').click()
-    cy.get('p').contains('Edit Board Name').click()
-    cy.get('input[name=title][type=text]').clear().type(validBoardName)
-    cy.get('button[type=submit]').click()
-    cy.get('h6').contains(validBoardName)
+    cy.loginToBoard("alpha123")
+
+    cy.get("button[aria-label=more]").click()
+    cy.get("p").contains("Edit Board Name").click()
+    cy.get("input[name=title][type=text]").clear().type(validBoardName)
+    cy.get("button[type=submit]").click()
+    cy.get("h6").contains(validBoardName)
   })
 
-  it('With an invalid input, the title of the board stays the same and there is a warning', () => {
+  it("With an invalid input, the title of the board stays the same and there is a warning", () => {
     cy.createBoard(defaultBoard)
-    cy.loginToBoard('alpha123')
-  
-    cy.get('button[aria-label=more]').click()
-    cy.get('p').contains('Edit Board Name').click()
-    cy.get('input[name=title][type=text]').clear().type(invalidBoardName)
-    cy.get('button[type=submit]').click()
+    cy.loginToBoard("alpha123")
+
+    cy.get("button[aria-label=more]").click()
+    cy.get("p").contains("Edit Board Name").click()
+    cy.get("input[name=title][type=text]").clear().type(invalidBoardName)
+    cy.get("button[type=submit]").click()
 
     // Check that there is both an error message and that the board name has not changed.
-    cy.get('p').contains(nameTooShort)
-    cy.get('h6').contains("Project Alpha")
+    cy.get("p").contains(nameTooShort)
+    cy.get("h6").contains("Project Alpha")
 
     // Attempt to give an empty name.
-    cy.get('input[name=title][type=text]').clear()
-    cy.get('button[type=submit]').click()
-    cy.get('p').contains(nameIsEmpty)
-    cy.get('h6').contains("Project Alpha")
+    cy.get("input[name=title][type=text]").clear()
+    cy.get("button[type=submit]").click()
+    cy.get("p").contains(nameIsEmpty)
+    cy.get("h6").contains("Project Alpha")
   })
 })
 
@@ -341,7 +344,7 @@ describe("When working with multiple users", () => {
     cy.contains("Create board").click()
     cy.get("input[name='title']").type("Imported test Board")
     cy.get("input[name='password']").type("alpha123")
-    cy.get("input[type='file']").selectFile("fixtures/large_board.csv", { force: true })
+    cy.get("input[type='file']").selectFile("fixtures/large_board.json", { force: true })
     cy.get("button").contains("Submit").click()
 
     cy.loginToBoard("alpha123")
