@@ -123,6 +123,9 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
   lastVals.pop()
   lastVals.reverse()
 
+  const startIndex = lastVals.findIndex((val) => val != 0)
+  lastVals.splice(0, startIndex)
+  lastTick.splice(0, startIndex)
   let sum = 0
 
   //add the value to the sum for the rest of the labels, remove half of value so the label is in the center of the area.
@@ -161,7 +164,8 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
                     : label
                 }}
                 orientation="right"
-                minTickGap={2}
+                minTickGap={-1}
+                interval="preserveStartEnd"
                 tick={{ fontSize: 10, fontWeight: 700, width: 200 }}
                 axisLine={false}
                 width={130}
