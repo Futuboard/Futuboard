@@ -71,6 +71,6 @@ urlpatterns = [
     path(
         "api/charts/<uuid:board_id>/cumulativeflow", chartViews.cumulative_flow, name="cumulative_flow"
     ),  # Also has url parameters, e.g. ?time_unit=day&start_time=2021-01-01&end_time=2021-01-10
-    path("api/scopes/", scopeViews.scopes, name="scopes"),
+    path("api/scopes/<uuid:boardid>", scopeViews.scopes_on_board, name="scopes_on_board"),
     path("api/scopes/<uuid:scopeid>/tickets", scopeViews.tickets_in_scope, name="tickets_in_scope"),
 ]

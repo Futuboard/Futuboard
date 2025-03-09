@@ -110,13 +110,13 @@ class TicketEvent(models.Model):
     DELETE = "DELETE"
     UPDATE = "UPDATE"
     MOVE = "MOVE"
-    CHANGE_SCOPE = "CHANGE_SCOPE"
+    CHANGE_SCOPE = "SCOPE"
     EVENT_TYPES = [
         (CREATE, "CREATE"),
         (DELETE, "DELETE"),
         (UPDATE, "UPDATE"),
         (MOVE, "MOVE"),
-        (CHANGE_SCOPE, "CHANGE_SCOPE"),
+        (CHANGE_SCOPE, "SCOPE"),
     ]
 
     ticketeventid = models.UUIDField(db_column="ticketEventID", default=uuid.uuid4, primary_key=True)
@@ -128,14 +128,18 @@ class TicketEvent(models.Model):
     event_type = models.CharField(choices=EVENT_TYPES, max_length=6)
 
     # If column is deleted, all events related to that column are also deleted. This also happens when a board is deleted
-    old_columnid = models.ForeignKey(Column, models.CASCADE, db_column="oldColumnId", null=True)
-    new_columnid = models.ForeignKey(Column, models.CASCADE, db_column="newColumnId", null=True)
+    old_columnid = models.ForeignKey(
+        Column, models.CASCADE, db_column="oldColumnId", null=True, related_name="old_columnid"
+    )
+    new_columnid = models.ForeignKey(
+        Column, models.CASCADE, db_column="newColumnId", null=True, related_name="new_columnid"
+    )
 
     old_size = models.IntegerField()
     new_size = models.IntegerField()
 
-    old_scopes = models.ManyToManyField("Scope")
-    new_scopes = models.ManyToManyField("Scope")
+    old_scopes = models.ManyToManyField("Scope", related_name="old_scopes")
+    new_scopes = models.ManyToManyField("Scope", related_name="new_scopes")
 
     title = models.TextField()
 
@@ -144,7 +148,7 @@ class TicketEvent(models.Model):
 
 
 class Scope(models.Model):
-    scopeid = models.UUIDField(db_column="scopeID", primary_key=True)
+    scopeid = models.UUIDField(db_column="scopeID", default=uuid.uuid4, primary_key=True)
     boardid = models.ForeignKey(Board, models.CASCADE, db_column="boardID")
     title = models.TextField()
     creation_date = models.DateTimeField(default=now)

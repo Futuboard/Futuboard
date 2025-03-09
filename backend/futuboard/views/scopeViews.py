@@ -7,14 +7,15 @@ import rest_framework.request
 
 
 @api_view(["GET", "POST", "DELETE"])
-def scopes(request: rest_framework.request.Request):
+def scopes_on_board(request: rest_framework.request.Request, boardid: str):
     if request.method == "GET":
-        query_set = Scope.objects.all()
+        board = Board.objects.get(boardid=boardid)
+        query_set = Scope.objects.filter(boardid=board)
         serializer = ScopeSerializer(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":
-        board = Board.objects.get(boardid=request.data["boardid"])
+        board = Board.objects.get(boardid=boardid)
         new_scope = Scope(
             boardid=board,
             title=request.data["title"],
@@ -37,11 +38,8 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
     if request.method == "POST":
         scope = Scope.objects.get(scopeid=scopeid)
         ticket = Ticket.objects.get(ticketid=request.data["ticketid"])
-        old_scopes = ticket.scope_set.all()
-        scope.tickets.add(ticket)
-        new_scopes = ticket.scope_set.all()
 
-        ticket_move_event = TicketEvent(
+        ticket_add_to_scope_event = TicketEvent(
             ticketid=ticket,
             event_type=TicketEvent.CHANGE_SCOPE,
             old_columnid=ticket.columnid,
@@ -49,21 +47,25 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
             old_size=ticket.size,
             new_size=ticket.size,
             title=ticket.title,
-            old_scopes=old_scopes,
-            new_scopes=new_scopes,
         )
-        ticket_move_event.save()
+
+        old_scopes = ticket.scope_set.all()
+        ticket_add_to_scope_event.old_scopes.set(old_scopes)
+
+        scope.tickets.add(ticket)
+
+        new_scopes = ticket.scope_set.all()
+        ticket_add_to_scope_event.new_scopes.set(new_scopes)
+
+        ticket_add_to_scope_event.save()
 
         return JsonResponse({"success": True})
 
     if request.method == "DELETE":
         scope = Scope.objects.get(scopeid=scopeid)
         ticket = Ticket.objects.get(ticketid=request.data["ticketid"])
-        old_scopes = ticket.scope_set.all()
-        scope.tickets.remove(ticket)
-        new_scopes = ticket.scope_set.all()
 
-        ticket_move_event = TicketEvent(
+        ticket_remove_from_scope_event = TicketEvent(
             ticketid=ticket,
             event_type=TicketEvent.CHANGE_SCOPE,
             old_columnid=ticket.columnid,
@@ -71,11 +73,21 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
             old_size=ticket.size,
             new_size=ticket.size,
             title=ticket.title,
-            old_scopes=old_scopes,
-            new_scopes=new_scopes,
         )
-        ticket_move_event.save()
+
+        old_scopes = ticket.scope_set.all()
+        ticket_remove_from_scope_event.old_scopes.set(old_scopes)
+
+        scope.tickets.remove(ticket)
+        new_scopes = ticket.scope_set.all()
+        ticket_remove_from_scope_event.new_scopes.set(new_scopes)
+
+        ticket_remove_from_scope_event.save()
 
         return JsonResponse({"success": True})
 
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+
+# TODO add setting forecast_set_date
+# TODO add setting done_columns
