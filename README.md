@@ -13,7 +13,7 @@ This README includes a users manual, instructions for setting up development, in
 
 The current version of the tool is found at [the Futuboard Website](https://futuboard.live)
 
-From the front page the user can either create a new blank board or import a new board from a CSV file that has been previously exported using the tool.
+From the front page the user can either create a new blank board or import a new board from a JSON file that has been previously exported using the tool.
 
 When the user creates a new board the tool asks for the name of the board and for an optional password. Creating the board will redirect the user to the newly created board. If the board had a password, then the user will have to enter it first.
 
@@ -25,7 +25,7 @@ Picture 1: A screenshot of the user interface
 ![image](https://github.com/Kasipallot/Futuboard/assets/135588324/7079f7da-731e-4ebb-81ff-4f5d84036702)
 Picture 2: Futuboard toolbar
 
-The toolbar contains a home button, that takes the user back to the Futuboard home page. The name of the board is displayed next to the home button. The most important features for the user are the buttons grouped at the top right. The first button allows for the user to create a new user magnet on the board. The second button copies the board link to the clipboard. The third button allows the user to create a new column and the final button opens a drop down box with two features. From the dropdown menu the user export the board data in a CSV file that the user can store locally on a computer. This can be used to create a backup that can be used to create a new board with the same data as the current one.
+The toolbar contains a home button, that takes the user back to the Futuboard home page. The name of the board is displayed next to the home button. The most important features for the user are the buttons grouped at the top right. The first button allows for the user to create a new user magnet on the board. The second button copies the board link to the clipboard. The third button allows the user to create a new column and the final button opens a drop down box with two features. From the dropdown menu the user export the board data in a JSON file that the user can store locally on a computer. This can be used to create a backup that can be used to create a new board with the same data as the current one.
 The user can also delete the current board from here.
 
 ![image](https://github.com/Kasipallot/Futuboard/assets/135588324/f523c1ef-8c05-4fd1-b89a-bba6fe89d5c2)
@@ -72,9 +72,9 @@ Picture 9: The swimlane can be opened with the arrow button on the column. New a
 - A user can create new users for the board
 - A user magnet can be placed on a ticket or action
 - Users, tickets and columns can be deleted, deleting actions has not yet been implemented.
-- The data of the board can be exported in a CSV file
+- The data of the board can be exported in a JSON file
 - A board can be deleted
-- A new board can be imported from a previously exported CSV file
+- A new board can be imported from a previously exported JSON file
 
 # Instructions for local development
 
