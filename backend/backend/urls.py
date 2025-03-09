@@ -1,6 +1,14 @@
 from django.urls import include, path
 from rest_framework import routers
-from futuboard.views import views, swimlaneViews, boardViews, boardTemplateViews, chartViews, import_export_views
+from futuboard.views import (
+    views,
+    swimlaneViews,
+    boardViews,
+    boardTemplateViews,
+    chartViews,
+    import_export_views,
+    scopeViews,
+)
 from django.contrib import admin
 
 router = routers.DefaultRouter()
@@ -63,4 +71,6 @@ urlpatterns = [
     path(
         "api/charts/<uuid:board_id>/cumulativeflow", chartViews.cumulative_flow, name="cumulative_flow"
     ),  # Also has url parameters, e.g. ?time_unit=day&start_time=2021-01-01&end_time=2021-01-10
+    path("api/scopes/", scopeViews.scopes, name="scopes"),
+    path("api/scopes/<uuid:scopeid>/tickets", scopeViews.tickets_in_scope, name="tickets_in_scope"),
 ]

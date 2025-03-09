@@ -1,4 +1,4 @@
-from .models import Board, BoardTemplate, Column, Ticket, TicketEvent, User, Swimlanecolumn, Action
+from .models import Board, BoardTemplate, Column, Scope, Ticket, TicketEvent, User, Swimlanecolumn, Action
 from rest_framework import serializers
 
 
@@ -47,8 +47,15 @@ class UserSerializerWithoutActionsOrTickets(serializers.ModelSerializer):
         fields = ["userid", "name"]
 
 
+class ScopeSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Scope
+        fields = ["scopeid", "title"]
+
+
 class TicketSerializer(serializers.ModelSerializer):
     users = UserSerializerWithoutActionsOrTickets(many=True, read_only=True, source="user_set")
+    scopes = ScopeSimpleSerializer(many=True, read_only=True, source="scope_set")
 
     class Meta:
         model = Ticket
@@ -63,6 +70,7 @@ class TicketSerializer(serializers.ModelSerializer):
             "creation_date",
             "cornernote",
             "users",
+            "scopes",
         ]
 
 
@@ -98,5 +106,25 @@ class TicketEventSerializer(serializers.ModelSerializer):
             "new_columnid",
             "old_size",
             "new_size",
+            "old_scopes",
+            "new_scopes",
             "title",
         ]
+
+
+class TicketSizeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = [
+            "ticketid",
+            "size",
+        ]
+
+
+class ScopeSerializer(serializers.ModelSerializer):
+    done_columns = ColumnSerializer(many=True, read_only=True)
+    tickets = TicketSizeSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Scope
+        fields = ["scopeid", "boardid", "title", "creation_date", "forecast_set_date", "done_columns", "tickets"]
