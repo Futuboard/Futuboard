@@ -110,7 +110,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
   }
 
   const dataLength = data?.data.length
-  const maxArealabelLength = 25
+  const maxArealabelLength = 20
 
   const gradient: string[] = ["#448aff", "#1565c0", "#009688", "#8bc34a", "#ffc107", "#ff9800", "#f44336", "#ad1457"]
   const shortcutOptions = ["week", "month", "3 months", "6 months", "year", "max"]
@@ -155,19 +155,16 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
                 allowDataOverflow={true}
                 ticks={labelYvalues}
                 tickFormatter={(val) => {
-                  let label = lastTick[labelYvalues.indexOf(val)]
-                  if (label.length > 14 && !label.substring(0, 14).includes(" ")) {
-                    label = label.substring(0, 14) + "\n" + label.substring(14)
-                  }
-                  return label.length > maxArealabelLength + 3
-                    ? label.substring(0, maxArealabelLength).trim() + "..."
+                  const label = lastTick[labelYvalues.indexOf(val)]
+                  return label.length > maxArealabelLength
+                    ? label.substring(0, maxArealabelLength - 3).trim() + "..."
                     : label
                 }}
                 orientation="right"
-                minTickGap={1}
-                style={{ fontSize: 10, fontWeight: 700 }}
+                minTickGap={2}
+                tick={{ fontSize: 10, fontWeight: 700, width: 200 }}
                 axisLine={false}
-                width={110}
+                width={130}
               />
               <YAxis
                 type="number"
@@ -178,6 +175,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
                 style={{ fontSize: 10, fontWeight: 700 }}
               />
               <Tooltip
+                offset={20}
                 content={({ active, payload, label }) => (
                   <AreaToolTip
                     active={active || false}
