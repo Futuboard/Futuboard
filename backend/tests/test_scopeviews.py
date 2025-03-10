@@ -1,5 +1,7 @@
 # from freezegun import freeze_time
+import json
 import uuid
+from freezegun import freeze_time
 import pytest
 from rest_framework.test import APIClient
 from django.urls import reverse
@@ -169,5 +171,97 @@ def test_delete_ticket_from_scope():
     assert len(response.json()) == 1
 
     assert response.json()[0]["scopes"] == []
+
+    resetDB()
+
+
+@freeze_time("2024-01-05")
+@pytest.mark.django_db
+def test_set_scope_forecast_date():
+    api_client = APIClient()
+
+    boardid = boardid = addBoard().boardid
+
+    response = api_client.post(reverse("scopes_on_board", args=[boardid]), {"title": "test scope"})
+    scope_id = response.json()["scopeid"]
+
+    response = api_client.post(reverse("set_scope_forecast_date", args=[scope_id]))
+    assert response.status_code == 200
+
+    response = api_client.get(reverse("scopes_on_board", args=[boardid]))
+
+    assert response.json()[0]["forecast_set_date"] == "2024-01-05T00:00:00Z"
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_set_scope_title():
+    api_client = APIClient()
+
+    boardid = boardid = addBoard().boardid
+
+    response = api_client.post(reverse("scopes_on_board", args=[boardid]), {"title": "test scope"})
+    scope_id = response.json()["scopeid"]
+
+    response = api_client.post(reverse("set_scope_title", args=[scope_id]), {"title": "new test title"})
+    assert response.status_code == 200
+
+    response = api_client.get(reverse("scopes_on_board", args=[boardid]))
+
+    assert response.json()[0]["title"] == "new test title"
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_set_scope_done_columns():
+    api_client = APIClient()
+
+    boardid = boardid = addBoard().boardid
+    column_id_1 = addColumn(boardid, uuid.uuid4(), "Column 1").columnid
+    column_id_2 = addColumn(boardid, uuid.uuid4(), "Column 2").columnid
+
+    response = api_client.post(reverse("scopes_on_board", args=[boardid]), {"title": "test scope"})
+    scope_id = response.json()["scopeid"]
+
+    response = api_client.post(
+        reverse("set_scope_done_columns", args=[scope_id]),
+        json.dumps({"done_columns": [str(column_id_1)]}),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+
+    response = api_client.get(reverse("scopes_on_board", args=[boardid]))
+    done_columns = response.json()[0]["done_columns"]
+    assert len(done_columns) == 1
+    assert done_columns[0]["columnid"] == str(column_id_1)
+    assert done_columns[0]["title"] == "Column 1"
+
+    response = api_client.post(
+        reverse("set_scope_done_columns", args=[scope_id]),
+        json.dumps({"done_columns": [str(column_id_1), str(column_id_2)]}),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+
+    response = api_client.get(reverse("scopes_on_board", args=[boardid]))
+    done_columns = response.json()[0]["done_columns"]
+
+    assert len(done_columns) == 2
+    # Order can vary, either one is fine
+    assert done_columns[0]["columnid"] == str(column_id_1) or done_columns[1]["columnid"] == str(column_id_1)
+    assert done_columns[0]["columnid"] == str(column_id_2) or done_columns[1]["columnid"] == str(column_id_2)
+
+    response = api_client.post(
+        reverse("set_scope_done_columns", args=[scope_id]),
+        json.dumps({"done_columns": []}),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+
+    response = api_client.get(reverse("scopes_on_board", args=[boardid]))
+    done_columns = response.json()[0]["done_columns"]
+    assert len(done_columns) == 0
 
     resetDB()

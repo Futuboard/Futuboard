@@ -73,4 +73,13 @@ urlpatterns = [
     ),  # Also has url parameters, e.g. ?time_unit=day&start_time=2021-01-01&end_time=2021-01-10
     path("api/scopes/<uuid:boardid>", scopeViews.scopes_on_board, name="scopes_on_board"),
     path("api/scopes/<uuid:scopeid>/tickets", scopeViews.tickets_in_scope, name="tickets_in_scope"),
+    path(
+        "api/scopes/<uuid:scopeid>/set_scope_forecast_date",
+        scopeViews.set_scope_forecast_date,
+        name="set_scope_forecast_date",
+    ),
+    path("api/scopes/<uuid:scopeid>/set_title", scopeViews.set_scope_title, name="set_scope_title"),
+    path(
+        "api/scopes/<uuid:scopeid>/set_done_columns", scopeViews.set_scope_done_columns, name="set_scope_done_columns"
+    ),
 ]

@@ -1,9 +1,10 @@
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 
-from ..models import Board, Scope, Ticket, TicketEvent
+from ..models import Board, Column, Scope, Ticket, TicketEvent
 from ..serializers import ScopeSerializer
 import rest_framework.request
+from django.utils.timezone import now
 
 
 @api_view(["GET", "POST", "DELETE"])
@@ -89,5 +90,26 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
-# TODO add setting forecast_set_date
-# TODO add setting done_columns
+@api_view(["POST"])
+def set_scope_forecast_date(request: rest_framework.request.Request, scopeid: str):
+    scope = Scope.objects.get(scopeid=scopeid)
+    scope.forecast_set_date = now()
+    scope.save()
+    return JsonResponse({"success": True})
+
+
+@api_view(["POST"])
+def set_scope_title(request: rest_framework.request.Request, scopeid: str):
+    scope = Scope.objects.get(scopeid=scopeid)
+    scope.title = request.data["title"]
+    scope.save()
+    return JsonResponse({"success": True})
+
+
+@api_view(["POST"])
+def set_scope_done_columns(request: rest_framework.request.Request, scopeid: str):
+    scope = Scope.objects.get(scopeid=scopeid)
+    columns = Column.objects.filter(columnid__in=request.data["done_columns"])
+    scope.done_columns.set(columns)
+    scope.save()
+    return JsonResponse({"success": True})

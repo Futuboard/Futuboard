@@ -140,6 +140,8 @@ def test_ticket_create_event():
         "new_columnid": str(column_id),
         "old_size": 0,
         "new_size": 5,
+        "new_scopes": [],
+        "old_scopes": [],
         "title": "test ticket",
     }
 
@@ -176,6 +178,8 @@ def test_ticket_move_event():
         "new_columnid": str(column_id_2),
         "old_size": 5,
         "new_size": 5,
+        "new_scopes": [],
+        "old_scopes": [],
         "title": "test ticket",
     }
 
@@ -216,6 +220,8 @@ def test_ticket_edit_event():
         "new_columnid": str(column_id),
         "old_size": 5,
         "new_size": 10,
+        "new_scopes": [],
+        "old_scopes": [],
         "title": "edited test ticket",
     }
 
@@ -252,6 +258,8 @@ def test_ticket_delete_event():
         "new_columnid": None,
         "old_size": 5,
         "new_size": 0,
+        "new_scopes": [],
+        "old_scopes": [],
         "title": "test ticket",
     }
 
