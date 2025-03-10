@@ -17,13 +17,13 @@ from .test_utils import resetDB
 @pytest.mark.django_db
 def test_import_export():
     """
-    Test creating n boards and exporting them to a csv file and then importing them back
+    Test creating n boards and exporting them to a JSON file and then importing them back
 
     Check that the imported boards are the same as the exported boards, can have different titles, passwords, ids etc.
     Export has one method: GET
-        GET: Returns a csv file with the board data
+        GET: Returns a JSON file with the board data
     Import has one method: POST
-        POST: Imports a csv file with the board data
+        POST: Imports a JSON file with the board data
     """
     client = APIClient()
     # Create n boards
@@ -97,12 +97,12 @@ def test_import_export():
                 for ii in range(n_users):
                     users[k].actions.add(md.Action.objects.get(actionid=action.actionid))
         # Export the board
-        response = client.get(reverse("export_board_data", args=[boards[num].boardid, "test.csv"]))
+        response = client.get(reverse("export_board_data", args=[boards[num].boardid]))
         data = response.content
         # Create a file from the data
-        file = SimpleUploadedFile("test.csv", data, content_type="text/csv")
+        file = SimpleUploadedFile("test.json", data, content_type="text/json")
         assert response.status_code == 200
-        # Import the board, response should have the data of the exported board csv as a content disposition
+        # Import the board, response should have the data of the exported board JSON as a content disposition
         board_data = {"title": "Test Board", "password": "abc"}
         board_data = json.dumps(board_data)
         response = client.post(reverse("import_board_data"), {"board": board_data, "file": file})
