@@ -447,9 +447,12 @@ def test_velocity():
     api_client.post(
         reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_not_in_forecast_done["ticketid"]}
     )
+    api_client.post(
+        reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_not_in_forecast_not_done["ticketid"]}
+    )
     freezer.stop()
-    move_ticket_at_time(boardid, other_column, "2024-01-06", ticket_in_forecast_done["ticketid"])
-    move_ticket_at_time(boardid, other_column, "2024-01-06", ticket_not_in_forecast_done["ticketid"])
+    move_ticket_at_time(boardid, done_column, "2024-01-06", ticket_in_forecast_done["ticketid"])
+    move_ticket_at_time(boardid, done_column, "2024-01-06", ticket_not_in_forecast_done["ticketid"])
 
     freezer = freeze_time("2024-01-10")
     freezer.start()
@@ -461,5 +464,13 @@ def test_velocity():
     data = response.json()["data"]
 
     assert len(data) == 1
+
+    assert data == [
+        {
+            "name": "2000-01-01T00:00:00",
+            other_column: 10,
+            done_column: 10,
+        }
+    ]
 
     resetDB()

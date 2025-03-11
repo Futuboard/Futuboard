@@ -48,16 +48,14 @@ def velocity(request: rest_framework.request.Request, board_id):
         columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
         scopes = Scope.objects.filter(boardid=board_id)
 
-        scope = scopes[0]  # TODO fix
-
-        data = get_column_story_points_at_times(columns, "all", scope=scope)
+        data = get_column_story_points_at_times(columns, "all", scopes=list(scopes.all()))
 
         # column_names = change_data_column_ids_to_column_names(data, columns)
 
         return JsonResponse({"data": data}, safe=False)
 
 
-def get_column_story_points_at_times(columns, time_unit, start_time=None, end_time=None, scope=None):
+def get_column_story_points_at_times(columns, time_unit, start_time=None, end_time=None, scopes=[]):
     ticket_events = (
         TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
     ).order_by("event_time")
@@ -68,9 +66,6 @@ def get_column_story_points_at_times(columns, time_unit, start_time=None, end_ti
 
     ticket_events_2 = TicketEventSerializer(ticket_events_2, many=True)
     ticket_events_2 = ticket_events_2.data
-
-    if scope is not None:
-        ticket_events = ticket_events.filter(old_scopes__in=[scope])  # ticket_events.filter(old_scopes__in=[scope]) |
 
     if len(ticket_events) == 0:
         return []
@@ -102,13 +97,23 @@ def get_column_story_points_at_times(columns, time_unit, start_time=None, end_ti
             event_dict[timestamp].append(event)
 
     empty_column_dict = {}
+    scopes_with_all = scopes.copy()
+    scopes_with_all.append("all")
     for column in columns:
-        empty_column_dict[str(column.columnid)] = 0
+        column_id = str(column.columnid)
+        empty_column_dict[column_id] = {}
+        for scope in scopes_with_all:
+            empty_column_dict[column_id][scope] = 0
 
     final_data = []
 
-    def setSize(column_sizes, columnid, change):
-        column_sizes[str(columnid)] += change
+    ticket_scopes = {}
+
+    def setSize(column_sizes, columnid, change, ticketid):
+        scopes_of_ticket = ticket_scopes.get(ticketid, [])
+        scopes_of_ticket.append("all")
+        for scope in scopes_of_ticket:
+            column_sizes[str(columnid)][scope] += change
 
     time = start_time
     can_have_events_before_start_time = earliest_event_time < start_time
@@ -129,22 +134,24 @@ def get_column_story_points_at_times(columns, time_unit, start_time=None, end_ti
         if events_at_time is not None:
             for event in events_at_time:
                 if event.event_type == TicketEvent.CREATE:
-                    setSize(column_sizes, event.new_columnid.columnid, event.new_size)
+                    setSize(column_sizes, event.new_columnid.columnid, event.new_size, event.ticketid.ticketid)
                 elif event.event_type == TicketEvent.DELETE:
-                    setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
+                    setSize(column_sizes, event.old_columnid.columnid, -event.old_size, event.ticketid.ticketid)
                 elif event.event_type == TicketEvent.MOVE:
-                    setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
-                    setSize(column_sizes, event.new_columnid.columnid, event.new_size)
+                    setSize(column_sizes, event.old_columnid.columnid, -event.old_size, event.ticketid.ticketid)
+                    setSize(column_sizes, event.new_columnid.columnid, event.new_size, event.ticketid.ticketid)
                 elif event.event_type == TicketEvent.UPDATE:
-                    setSize(column_sizes, event.new_columnid.columnid, event.new_size - event.old_size)
-                elif scope is not None and event.event_type == TicketEvent.CHANGE_SCOPE:
-                    is_in_old_scopes = scope in event.old_scopes.all()
-                    is_in_new_scopes = scope in event.new_scopes.all()
-
-                    if is_in_old_scopes and not is_in_new_scopes:
-                        setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
-                    elif is_in_new_scopes and not is_in_old_scopes:
-                        setSize(column_sizes, event.new_columnid.columnid, event.new_size)
+                    setSize(
+                        column_sizes,
+                        event.new_columnid.columnid,
+                        event.new_size - event.old_size,
+                        event.ticketid.ticketid,
+                    )
+                elif event.event_type == TicketEvent.CHANGE_SCOPE:
+                    ticket_scopes[event.ticketid.ticketid] = []
+                    for scope in event.new_scopes.all():
+                        ticket_scopes[event.ticketid.ticketid].append(scope.scopeid)
+                    setSize(column_sizes, event.new_columnid.columnid, event.new_size, event.ticketid.ticketid)
 
         previous_column_sizes = column_sizes.copy()
         time += time_delta
