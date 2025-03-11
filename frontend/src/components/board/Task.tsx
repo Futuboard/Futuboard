@@ -80,11 +80,9 @@ const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetSt
 
   const handleClose = async (data: FormData | null) => {
     if (data) {
-      if (JSON.stringify(task) === JSON.stringify(data)) {
-        handleCancel()
-        return
-      }
       handleSubmit(data)
+    } else {
+      handleCancel()
     }
   }
 

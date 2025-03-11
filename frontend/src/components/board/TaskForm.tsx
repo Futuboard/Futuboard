@@ -105,6 +105,8 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
     size: defaultValues?.size
   }
 
+  const initialFormValuesRef = useRef(initialFormValues)
+
   const isTaskCreationForm = formType === "TaskCreation"
   const isTaskEditForm = formType === "TaskEdit"
   const isTaskTemplateForm = formType === "TaskTemplate"
@@ -129,7 +131,11 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
   const watchedValues = watch()
 
   const closeModule = () => {
-    onClose(watchedValues)
+    if (isTaskEditForm && JSON.stringify(initialFormValuesRef.current) === JSON.stringify(watchedValues)) {
+      onClose(null)
+    } else {
+      onClose(watchedValues)
+    }
   }
 
   const handleFormSubmit = (data: FormData) => {
