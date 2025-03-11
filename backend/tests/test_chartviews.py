@@ -399,3 +399,67 @@ def test_cumulative_flow_with_params():
     assert columns_names == ["Column 1", "Column 2"]
 
     resetDB()
+
+
+@pytest.mark.django_db
+def test_velocity():
+    """
+    Test that velocity chart data is returned correctly
+    """
+    api_client = APIClient()
+
+    boardid, other_column, done_column = create_board_and_columns()
+    response = api_client.post(reverse("scopes_on_board", args=[boardid]), {"title": "test scope"})
+    scope_id = response.json()["scopeid"]
+
+    creation_time_1 = datetime(2024, 1, 1)
+    ticket_not_in_scope = create_ticket_at_time(boardid, done_column, creation_time_1)
+    ticket_not_in_forecast_not_done = create_ticket_at_time(boardid, other_column, creation_time_1)
+    ticket_in_forecast_not_done = create_ticket_at_time(boardid, other_column, creation_time_1)
+    ticket_in_forecast_done = create_ticket_at_time(boardid, other_column, creation_time_1)
+    ticket_not_in_forecast_done = create_ticket_at_time(boardid, other_column, creation_time_1)
+
+    freezer = freeze_time("2024-01-02")
+    freezer.start()
+    api_client.post(
+        reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_in_forecast_not_done["ticketid"]}
+    )
+    api_client.post(reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_in_forecast_done["ticketid"]})
+    freezer.stop()
+
+    freezer = freeze_time("2024-01-03")
+    freezer.start()
+    response = api_client.post(reverse("set_scope_forecast_date", args=[scope_id]))
+    freezer.stop()
+
+    freezer = freeze_time("2024-01-05")
+    freezer.start()
+    response = api_client.post(reverse("set_scope_forecast_date", args=[scope_id]))
+    freezer.stop()
+
+    freezer = freeze_time("2024-01-06")
+    freezer.start()
+    api_client.post(
+        reverse("set_scope_done_columns", args=[scope_id]),
+        json.dumps({"done_columns": [str(done_column)]}),
+        content_type="application/json",
+    )
+    api_client.post(
+        reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_not_in_forecast_done["ticketid"]}
+    )
+    freezer.stop()
+    move_ticket_at_time(boardid, other_column, "2024-01-06", ticket_in_forecast_done["ticketid"])
+    move_ticket_at_time(boardid, other_column, "2024-01-06", ticket_not_in_forecast_done["ticketid"])
+
+    freezer = freeze_time("2024-01-10")
+    freezer.start()
+    response = api_client.get(reverse("velocity", args=[boardid]))
+    freezer.stop()
+
+    assert response.status_code == 200
+
+    data = response.json()["data"]
+
+    assert len(data) == 1
+
+    resetDB()
