@@ -4,7 +4,6 @@ import {
   linkDialogPlugin,
   linkPlugin,
   MDXEditor,
-  MDXEditorMethods,
   toolbarPlugin,
   BoldItalicUnderlineToggles,
   CodeToggle,
@@ -27,8 +26,6 @@ interface DescriptionEditFieldProps {
 }
 
 const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description, onChange }) => {
-  const ref = React.useRef<MDXEditorMethods>(null)
-
   return (
     <Box
       className="description"
@@ -75,7 +72,6 @@ const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description
           markdownShortcutPlugin()
         ]}
         onChange={(markdown) => onChange(markdown)}
-        ref={ref}
         contentEditableClassName="md-editor-contenteditable"
       />
     </Box>
