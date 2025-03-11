@@ -73,6 +73,7 @@ const BoardContainer: React.FC = () => {
   }, [id, tryLogin])
 
   useEffect(() => {
+    console.log(board?.notes)
     document.title = board?.title ? board?.title + " - Futuboard" : "Futuboard"
   }, [board])
 

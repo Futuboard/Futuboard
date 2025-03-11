@@ -12,6 +12,7 @@ export type Board = {
   default_ticket_cornernote?: string
   default_ticket_color?: string
   default_ticket_size?: number
+  notes: string
 }
 
 export type Column = {
