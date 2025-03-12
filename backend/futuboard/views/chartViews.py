@@ -60,15 +60,12 @@ def velocity(request: rest_framework.request.Request, board_id):
             scope_data = data.get(scope_id, {})
             formatted_scope_data = {
                 "name": scope.title,
-                "forecast": 0,
+                "forecast": scope.forecast_size or 0,
                 "done": 0,
             }
             for column_id in scope_data:
                 if column_id in done_column_ids:
                     formatted_scope_data["done"] += scope_data[column_id]
-
-                # TODO ONLY ADD IF WAS IN SCOPE BEFORE FORECAST
-                formatted_scope_data["forecast"] += scope_data[column_id]
 
             formatted_data.append(formatted_scope_data)
 
