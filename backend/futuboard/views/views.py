@@ -76,6 +76,8 @@ def tickets_on_column(request, board_id, column_id):
                         title=ticket_from_database.title,
                     )
                     ticket_move_event.save()
+                    ticket_move_event.old_scopes.set(ticket_from_database.scope_set.all())
+                    ticket_move_event.new_scopes.set(ticket_from_database.scope_set.all())
 
             # update order of tickets
             for index, ticket_data in enumerate(tickets_data):
@@ -147,6 +149,7 @@ def update_ticket(request, column_id, ticket_id):
             title=ticket.title,
         )
         ticket_delete_event.save()
+        ticket_delete_event.old_scopes.set(ticket.scope_set.all())
         ticket.delete()
         return JsonResponse({"message": "Ticket deleted successfully"}, status=200)
 
@@ -172,6 +175,8 @@ def update_ticket(request, column_id, ticket_id):
                 title=ticket.title,
             )
             ticket_update_event.save()
+            ticket_update_event.old_scopes.set(ticket.scope_set.all())
+            ticket_update_event.new_scopes.set(ticket.scope_set.all())
 
         serializer = TicketSerializer(ticket)
         return JsonResponse(serializer.data, safe=False)

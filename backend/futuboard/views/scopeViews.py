@@ -42,7 +42,7 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
 
         ticket_add_to_scope_event = TicketEvent(
             ticketid=ticket,
-            event_type=TicketEvent.CHANGE_SCOPE,
+            event_type=TicketEvent.UPDATE,
             old_columnid=ticket.columnid,
             new_columnid=ticket.columnid,
             old_size=ticket.size,
@@ -68,7 +68,7 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
 
         ticket_remove_from_scope_event = TicketEvent(
             ticketid=ticket,
-            event_type=TicketEvent.CHANGE_SCOPE,
+            event_type=TicketEvent.UPDATE,
             old_columnid=ticket.columnid,
             new_columnid=ticket.columnid,
             old_size=ticket.size,
