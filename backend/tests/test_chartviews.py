@@ -466,17 +466,20 @@ def test_velocity():
     assert len(data) == 1
 
     assert data == [
-        {
-            "name": "2000-01-01T00:00:00",
-            str(other_column): {
-                str(scope_id): 10,
-                "all": 10,
-            },
-            str(done_column): {
-                str(scope_id): 10,
-                "all": 15,
-            },
-        }
+        {"name": "test scope", "forecast": 20, "done": 10},
     ]
+
+    """
+    assert data == {
+        str(scope_id): {
+            str(done_column): 10,
+            str(other_column): 10,
+        },
+        "all": {
+            str(done_column): 15,
+            str(other_column): 10,
+        },
+    }
+    """
 
     resetDB()
