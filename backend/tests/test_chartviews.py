@@ -413,7 +413,7 @@ def test_velocity():
     scope_id = response.json()["scopeid"]
 
     creation_time_1 = datetime(2024, 1, 1)
-    ticket_not_in_scope = create_ticket_at_time(boardid, done_column, creation_time_1)
+    _ticket_not_in_scope = create_ticket_at_time(boardid, done_column, creation_time_1)
     ticket_not_in_forecast_not_done = create_ticket_at_time(boardid, other_column, creation_time_1)
     ticket_in_forecast_not_done = create_ticket_at_time(boardid, other_column, creation_time_1)
     ticket_in_forecast_done = create_ticket_at_time(boardid, other_column, creation_time_1)
@@ -468,8 +468,14 @@ def test_velocity():
     assert data == [
         {
             "name": "2000-01-01T00:00:00",
-            other_column: 10,
-            done_column: 10,
+            str(other_column): {
+                str(scope_id): 10,
+                "all": 10,
+            },
+            str(done_column): {
+                str(scope_id): 10,
+                "all": 15,
+            },
         }
     ]
 
