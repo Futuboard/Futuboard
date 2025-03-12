@@ -37,6 +37,8 @@ def test_get_and_create_scopes_on_board():
         "title": "test scope",
         "creation_date": post_data["creation_date"],
         "forecast_set_date": None,
+        "forecast_size": None,
+        "forecast_tickets": [],
         "done_columns": [],
         "tickets": [],
     }
