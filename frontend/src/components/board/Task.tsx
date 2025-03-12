@@ -15,7 +15,7 @@ import { useSelector } from "react-redux"
 import { RootState } from "@/state/store"
 import { Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
 
-import { useUpdateTaskMutation } from "../../state/apiSlice"
+import { useAddTaskToScopeMutation, useDeleteTaskFromScopeMutation, useUpdateTaskMutation } from "../../state/apiSlice"
 
 import TaskForm from "./TaskForm"
 import UserMagnet from "./UserMagnet"
@@ -150,6 +150,8 @@ const Task: React.FC<TaskProps> = ({ task }) => {
   const selectedScope = useSelector((state: RootState) => state.scope)
 
   const [updateTask] = useUpdateTaskMutation()
+  const [addTaskToScope] = useAddTaskToScopeMutation()
+  const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
 
   const [selected, setSelected] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -160,12 +162,27 @@ const Task: React.FC<TaskProps> = ({ task }) => {
     setCornernote(task.cornernote)
   }, [task.cornernote])
 
+  useEffect(() => {
+    if (task.scopes.some((scope) => scope.scopeid === selectedScope)) {
+      setIsHighlighted(true)
+    } else {
+      setIsHighlighted(false)
+    }
+  }, [task.scopes, selectedScope])
+
   const handleDoubleClick = () => {
     setIsEditing(true)
   }
 
-  const handleClick = () => {
-    setIsHighlighted(!isHighlighted)
+  const handleClick = async () => {
+    if (selectedScope !== "") {
+      if (!isHighlighted) {
+        await addTaskToScope({ scopeId: selectedScope, ticketid: task.ticketid })
+      } else {
+        await deleteTaskFromScope({ scopeId: selectedScope, ticketid: task.ticketid })
+      }
+      setIsHighlighted(!isHighlighted)
+    }
   }
 
   const handleBlur = async () => {

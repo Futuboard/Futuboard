@@ -38,11 +38,12 @@ export type Task = {
   size?: number
   columnid: string
   users: UserWithoutTicketsOrActions[]
+  scopes: Scope[]
 }
 
-export type NewTask = Omit<Task, "users">
+export type NewTask = Omit<Task, "users" | "scopes">
 
-export type TaskTemplate = Omit<Task, "ticketid" | "columnid" | "users">
+export type TaskTemplate = Omit<Task, "ticketid" | "columnid" | "users" | "scopes">
 
 export type User = {
   userid: string
@@ -123,3 +124,13 @@ export type ChartData = {
 }
 
 export type TimeUnit = (typeof timeUnitOptions)[number]
+
+export type Scope = {
+  scopeid: string
+  boardid: string
+  title: string
+  creation_date: string
+  forecast_set_date: string
+  done_columns: Column[]
+  tickets: Task[]
+}

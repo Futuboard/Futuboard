@@ -2,23 +2,24 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 //import { getId } from "@/services/Utils"
 
-type ScopeState = { scopeId: string | null } // | { scopeId: null }
+type ScopeState = string
 
-const initialState: ScopeState = { scopeId: "hello" } //{ scopeId: null }
+const initialState: ScopeState = ""
 
 const scopeSlice = createSlice({
   name: "scope",
   initialState,
   reducers: {
-    setScope: (state: ScopeState, action: PayloadAction<{ scopeId: string }>) => {
-      state.scopeId = action.payload.scopeId
+    setScope: (_state: ScopeState, action: PayloadAction<string>) => {
+      return action.payload
     },
-    disableScope: (state: ScopeState) => {
-      state.scopeId = null
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    disableScope: (_state: ScopeState) => {
+      return ""
     }
   }
 })
 
 export const scopeReducer = scopeSlice.reducer
 
-export const { setScope /* disableScope */ } = scopeSlice.actions
+export const { setScope, disableScope } = scopeSlice.actions
