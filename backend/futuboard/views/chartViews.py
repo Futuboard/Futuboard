@@ -53,13 +53,29 @@ def burn_up(request: rest_framework.request.Request, board_id, scope_id):
         if time_unit not in possible_time_units:
             return JsonResponse({"error": "Invalid time unit"}, status=400)
 
+        scope = Scope.objects.get(scopeid=scope_id)
+
+        if not scope or scope.boardid.boardid != board_id:
+            return JsonResponse({"error": "Invalid scope"}, status=400)
+
         columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
 
         data_with_column_ids = get_column_story_points_at_times(columns, time_unit, start_time, end_time, scope_id)
 
-        (data_with_column_names, column_names) = change_column_ids_to_names(data_with_column_ids, columns)
+        done_column_ids = [str(column.columnid) for column in scope.done_columns.all()]
 
-        return JsonResponse({"columns": column_names, "data": data_with_column_names}, safe=False)
+        data = []
+
+        for timestamp, column_data in data_with_column_ids:
+            scope_size = 0
+            done_size = 0
+            for column_id in column_data:
+                if column_id in done_column_ids:
+                    done_size += column_data[column_id]
+                scope_size += column_data[column_id]
+            data.append({"name": timestamp, "scope": scope_size, "done": done_size})
+
+        return JsonResponse({"data": data}, safe=False)
 
 
 @api_view(["GET"])
@@ -88,7 +104,7 @@ def velocity(request: rest_framework.request.Request, board_id):
 
 def get_column_story_points_at_times(
     columns, time_unit, start_time=None, end_time=None, scope_id=None
-) -> list[tuple[str, dict[str, dict[str, int]]]]:
+) -> list[tuple[str, dict[str, int]]]:
     ticket_events = (
         TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
     ).order_by("event_time")
@@ -163,6 +179,15 @@ def get_column_story_points_at_times(
                     setSize(column_sizes, event.new_columnid.columnid, event.new_size)
                 elif event.event_type == TicketEvent.UPDATE:
                     setSize(column_sizes, event.new_columnid.columnid, event.new_size - event.old_size)
+                elif event.event_type == TicketEvent.SCOPE_CHANGE:
+                    is_in_old_scopes = event.old_scopes.filter(scopeid=scope_id).exists()
+                    is_in_new_scopes = event.new_scopes.filter(scopeid=scope_id).exists()
+                    if is_in_old_scopes and not is_in_new_scopes:
+                        # Scope was removed from ticket
+                        setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
+                    elif not is_in_old_scopes and is_in_new_scopes:
+                        # Scope was added to ticket
+                        setSize(column_sizes, event.new_columnid.columnid, event.new_size)
 
         prev_column_sizes = column_sizes.copy()
         time += time_delta

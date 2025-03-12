@@ -464,3 +464,72 @@ def test_velocity():
     ]
 
     resetDB()
+
+
+@pytest.mark.django_db
+def test_burn_up():
+    """
+    Test that burn up chart data is returned correctly
+    """
+    api_client = APIClient()
+
+    boardid, other_column, done_column = create_board_and_columns()
+    response = api_client.post(reverse("scopes_on_board", args=[boardid]), {"title": "test scope"})
+    scope_id = response.json()["scopeid"]
+
+    creation_time_1 = datetime(2024, 1, 1)
+    _ticket_not_in_scope = create_ticket_at_time(boardid, done_column, creation_time_1, size=7)
+    ticket_not_done = create_ticket_at_time(boardid, other_column, creation_time_1, size=10)
+    ticket_removed_from_scope = create_ticket_at_time(boardid, other_column, creation_time_1, size=6)
+    ticket_done = create_ticket_at_time(boardid, other_column, creation_time_1, size=3)
+    ticket_always_in_done = create_ticket_at_time(boardid, done_column, creation_time_1, size=2)
+
+    freezer = freeze_time("2024-01-01")  # Scope 16, Done 0
+    freezer.start()
+    api_client.post(reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_not_done["ticketid"]})
+    api_client.post(reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_removed_from_scope["ticketid"]})
+    freezer.stop()
+
+    freezer = freeze_time("2024-01-02")  # Scope 19, Done 0
+    freezer.start()
+    api_client.post(reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_done["ticketid"]})
+    freezer.stop()
+
+    freezer = freeze_time("2024-01-03")  # Scope 21, Done 2
+    freezer.start()
+    api_client.post(
+        reverse("set_scope_done_columns", args=[scope_id]),
+        json.dumps({"done_columns": [str(done_column)]}),
+        content_type="application/json",
+    )
+    api_client.post(reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_always_in_done["ticketid"]})
+    freezer.stop()
+
+    freezer = freeze_time("2024-01-04")  # Scope 15, Done 5
+    freezer.start()
+    move_ticket_at_time(boardid, done_column, "2024-01-04", ticket_done["ticketid"])
+    api_client.delete(
+        reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_removed_from_scope["ticketid"]}
+    )
+    freezer.stop()
+
+    freezer = freeze_time("2024-01-5")  # Scope 15, Done 5
+    freezer.start()
+    response = api_client.get(reverse("burn_up", args=[boardid, scope_id]))
+    freezer.stop()
+
+    assert response.status_code == 200
+
+    data = response.json()["data"]
+
+    assert len(data) == 5
+
+    assert data == [
+        {"name": "2024-01-01T00:00:00", "scope": 16, "done": 0},
+        {"name": "2024-01-02T00:00:00", "scope": 19, "done": 0},
+        {"name": "2024-01-03T00:00:00", "scope": 21, "done": 2},
+        {"name": "2024-01-04T00:00:00", "scope": 15, "done": 5},
+        {"name": "2024-01-05T00:00:00", "scope": 15, "done": 5},
+    ]
+
+    resetDB()
