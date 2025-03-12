@@ -313,7 +313,7 @@ def test_ticket_event_scopes_stay_in_events():
     assert data[0]["old_scopes"] == []
     assert data[0]["new_scopes"] == []
 
-    assert data[1]["event_type"] == "UPDATE"
+    assert data[1]["event_type"] == "SCOPE"
     assert data[1]["old_scopes"] == []
     assert data[1]["new_scopes"] == [scope_id]
 
@@ -325,7 +325,7 @@ def test_ticket_event_scopes_stay_in_events():
     assert data[3]["old_scopes"] == [scope_id]
     assert data[3]["new_scopes"] == [scope_id]
 
-    assert data[4]["event_type"] == "UPDATE"
+    assert data[4]["event_type"] == "SCOPE"
     assert data[4]["old_scopes"] == [scope_id]
     assert data[4]["new_scopes"] == [scope_id, scope_id_2]
 

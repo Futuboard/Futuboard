@@ -101,7 +101,7 @@ def test_add_ticket_to_scope():
     serializer = TicketEventSerializer(ticket_change_event)
     change_event_data = serializer.data
 
-    assert change_event_data["event_type"] == "UPDATE"
+    assert change_event_data["event_type"] == "SCOPE"
     assert change_event_data["old_columnid"] == column_id
     assert change_event_data["new_columnid"] == column_id
     assert change_event_data["old_size"] == 3
@@ -159,7 +159,7 @@ def test_delete_ticket_from_scope():
     change_events_data = serializer.data
 
     assert len(change_events_data) == 2
-    assert change_events_data[1]["event_type"] == "UPDATE"
+    assert change_events_data[1]["event_type"] == "SCOPE"
     assert change_events_data[1]["old_columnid"] == column_id
     assert change_events_data[1]["new_columnid"] == column_id
     assert change_events_data[1]["old_size"] == 3

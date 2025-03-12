@@ -103,11 +103,13 @@ class TicketEvent(models.Model):
     DELETE = "DELETE"
     UPDATE = "UPDATE"
     MOVE = "MOVE"
+    SCOPE_CHANGE = "SCOPE"
     EVENT_TYPES = [
         (CREATE, "CREATE"),
         (DELETE, "DELETE"),
         (UPDATE, "UPDATE"),
         (MOVE, "MOVE"),
+        (SCOPE_CHANGE, "SCOPE"),
     ]
 
     ticketeventid = models.UUIDField(db_column="ticketEventID", default=uuid.uuid4, primary_key=True)
