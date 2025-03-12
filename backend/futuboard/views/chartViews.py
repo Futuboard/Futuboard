@@ -35,56 +35,43 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
 
         columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
 
-        data = get_column_story_points_at_times(columns, time_unit, start_time, end_time)
+        data_with_column_ids = get_column_story_points_at_times(columns, time_unit, start_time, end_time)
 
-        column_names = change_data_column_ids_to_column_names(data, columns)
+        (data_with_column_names, column_names) = change_column_ids_to_names(data_with_column_ids, columns)
 
-        return JsonResponse({"columns": column_names, "data": data}, safe=False)
+        return JsonResponse({"columns": column_names, "data": data_with_column_names}, safe=False)
 
 
 @api_view(["GET"])
 def velocity(request: rest_framework.request.Request, board_id):
     if request.method == "GET":
-        columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
         scopes = Scope.objects.filter(boardid=board_id).order_by("title")
 
-        data = get_column_story_points_at_times(columns, "all", scopes=list(scopes.all()))
-
-        data = data[0][1]  # Only one data point for velocity, and we only want the data, not the timestamp
-
-        formatted_data = []
+        data = []
 
         for scope in scopes:
-            scope_id = str(scope.scopeid)
-            done_column_ids = [str(column.columnid) for column in scope.done_columns.all()]
-            scope_data = data.get(scope_id, {})
-            formatted_scope_data = {
+            scope_data = {
                 "name": scope.title,
                 "forecast": scope.forecast_size or 0,
                 "done": 0,
             }
-            for column_id in scope_data:
-                if column_id in done_column_ids:
-                    formatted_scope_data["done"] += scope_data[column_id]
 
-            formatted_data.append(formatted_scope_data)
+            for done_column in scope.done_columns.all():
+                tickets = done_column.ticket_set.filter(scope__in=[scope])
+                for ticket in tickets:
+                    scope_data["done"] += ticket.size
 
-        return JsonResponse({"data": formatted_data}, safe=False)
+            data.append(scope_data)
+
+        return JsonResponse({"data": data}, safe=False)
 
 
 def get_column_story_points_at_times(
-    columns, time_unit, start_time=None, end_time=None, scopes=[]
+    columns, time_unit, start_time=None, end_time=None
 ) -> list[tuple[str, dict[str, dict[str, int]]]]:
     ticket_events = (
         TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
     ).order_by("event_time")
-
-    ticket_events_2 = (
-        TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
-    ).order_by("event_time")
-
-    ticket_events_2 = TicketEventSerializer(ticket_events_2, many=True)
-    ticket_events_2 = ticket_events_2.data
 
     if len(ticket_events) == 0:
         return []
@@ -115,24 +102,15 @@ def get_column_story_points_at_times(
         else:
             event_dict[timestamp].append(event)
 
-    empty_scope_dict = {}
-    scope_ids_with_all = [str(scope.scopeid) for scope in scopes.copy()]
-    scope_ids_with_all.append("all")
-    for scope_id in scope_ids_with_all:
-        empty_scope_dict[scope_id] = {}
-        for column in columns:
-            empty_scope_dict[scope_id][str(column.columnid)] = 0
+    empty_column_dict = {}
+
+    for column in columns:
+        empty_column_dict[str(column.columnid)] = 0
 
     final_data = []
 
-    ticket_scopeids = {}
-
-    def setSize(scope_sizes, columnid, change, ticketid, add_to_all=True):
-        scopes_of_ticket = ticket_scopeids.get(ticketid, []).copy()
-        if add_to_all:
-            scopes_of_ticket.append("all")
-        for scope in scopes_of_ticket:
-            scope_sizes[scope][str(columnid)] += change
+    def setSize(column_sizes, columnid, change):
+        column_sizes[str(columnid)] += change
 
     time = start_time
     can_have_events_before_start_time = earliest_event_time < start_time
@@ -142,43 +120,28 @@ def get_column_story_points_at_times(
 
     time_delta = get_time_delta(time_unit)
 
-    prev_scope_sizes = None
+    prev_column_sizes = None
     while time <= end_time:
         timestamp = time.strftime(DATE_TIME_FORMAT)
-        scope_sizes = prev_scope_sizes or empty_scope_dict.copy()
+        column_sizes = prev_column_sizes or empty_column_dict.copy()
 
         events_at_time = event_dict.get(timestamp)
 
         if events_at_time is not None:
             for event in events_at_time:
                 if event.event_type == TicketEvent.CREATE:
-                    setSize(scope_sizes, event.new_columnid.columnid, event.new_size, event.ticketid.ticketid)
+                    setSize(column_sizes, event.new_columnid.columnid, event.new_size)
                 elif event.event_type == TicketEvent.DELETE:
-                    setSize(scope_sizes, event.old_columnid.columnid, -event.old_size, event.ticketid.ticketid)
+                    setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
                 elif event.event_type == TicketEvent.MOVE:
-                    setSize(scope_sizes, event.old_columnid.columnid, -event.old_size, event.ticketid.ticketid)
-                    setSize(scope_sizes, event.new_columnid.columnid, event.new_size, event.ticketid.ticketid)
+                    setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
+                    setSize(column_sizes, event.new_columnid.columnid, event.new_size)
                 elif event.event_type == TicketEvent.UPDATE:
-                    setSize(
-                        scope_sizes,
-                        event.new_columnid.columnid,
-                        event.new_size - event.old_size,
-                        event.ticketid.ticketid,
-                    )
-                elif event.event_type == TicketEvent.CHANGE_SCOPE:
-                    ticket_scopeids[event.ticketid.ticketid] = [str(scope.scopeid) for scope in event.new_scopes.all()]
+                    setSize(column_sizes, event.new_columnid.columnid, event.new_size - event.old_size)
 
-                    setSize(
-                        scope_sizes,
-                        event.new_columnid.columnid,
-                        event.new_size,
-                        event.ticketid.ticketid,
-                        add_to_all=False,
-                    )
-
-        prev_scope_sizes = scope_sizes.copy()
+        prev_column_sizes = column_sizes.copy()
         time += time_delta
-        final_data.append((timestamp, scope_sizes))
+        final_data.append((timestamp, column_sizes))
 
     if can_have_events_before_start_time:
         # Only keep events after/on the start time
@@ -199,8 +162,6 @@ def get_time_delta(time_unit):
         time_delta = relativedelta(months=1)
     elif time_unit == "year":
         time_delta = relativedelta(years=1)
-    elif time_unit == "all":
-        time_delta = relativedelta(years=1)
 
     return time_delta
 
@@ -218,14 +179,14 @@ def round_time(date, time_unit):
         return date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     elif time_unit == "year":
         return date.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-    elif time_unit == "all":  # "all" means we just want a single point in time
-        return datetime(2000, 1, 1, 0, 0, 0, 0)
     else:
         raise ValueError("Invalid time unit")
 
 
-def change_data_column_ids_to_column_names(data, columns):
+def change_column_ids_to_names(data, columns):
     column_names = {}
+
+    new_data = []
 
     for column in columns:
         column_name = column.title
@@ -239,11 +200,13 @@ def change_data_column_ids_to_column_names(data, columns):
 
         column_names[str(column.columnid)] = column_name
 
-    for datapoint in data:
-        for column in columns:
-            id = str(column.columnid)
-            if id in datapoint:
-                column_name = column_names[id]
-                datapoint[column_name] = datapoint.pop(id)
+    for timestamp, column_data in data:
+        datapoint = {"name": timestamp}
 
-    return list(column_names.values())
+        for column_id in column_data:
+            column_name = column_names[column_id]
+            datapoint[column_name] = column_data[column_id]
+
+        new_data.append(datapoint)
+
+    return (new_data, list(column_names.values()))
