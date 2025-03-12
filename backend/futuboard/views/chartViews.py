@@ -43,6 +43,26 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
 
 
 @api_view(["GET"])
+def burn_up(request: rest_framework.request.Request, board_id, scope_id):
+    if request.method == "GET":
+        possible_time_units = ["minute", "hour", "day", "week", "month", "year"]
+        time_unit = request.query_params.get("time_unit", "day")  # Default to day
+        start_time = request.query_params.get("start_time")
+        end_time = request.query_params.get("end_time")
+
+        if time_unit not in possible_time_units:
+            return JsonResponse({"error": "Invalid time unit"}, status=400)
+
+        columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
+
+        data_with_column_ids = get_column_story_points_at_times(columns, time_unit, start_time, end_time, scope_id)
+
+        (data_with_column_names, column_names) = change_column_ids_to_names(data_with_column_ids, columns)
+
+        return JsonResponse({"columns": column_names, "data": data_with_column_names}, safe=False)
+
+
+@api_view(["GET"])
 def velocity(request: rest_framework.request.Request, board_id):
     if request.method == "GET":
         scopes = Scope.objects.filter(boardid=board_id).order_by("title")
@@ -67,11 +87,16 @@ def velocity(request: rest_framework.request.Request, board_id):
 
 
 def get_column_story_points_at_times(
-    columns, time_unit, start_time=None, end_time=None
+    columns, time_unit, start_time=None, end_time=None, scope_id=None
 ) -> list[tuple[str, dict[str, dict[str, int]]]]:
     ticket_events = (
         TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
     ).order_by("event_time")
+
+    if scope_id is not None:
+        ticket_events = ticket_events.filter(old_scopes__in=[scope_id]) | ticket_events.filter(
+            new_scopes__in=[scope_id]
+        )
 
     if len(ticket_events) == 0:
         return []
