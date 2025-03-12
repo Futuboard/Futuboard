@@ -72,7 +72,8 @@ urlpatterns = [
     # Cumulativeflow has url parameters, e.g. ?time_unit=day&start_time=2021-01-01&end_time=2021-01-10&count_unit=cards
     path("api/charts/<uuid:board_id>/cumulativeflow", chartViews.cumulative_flow, name="cumulative_flow"),
     path("api/charts/<uuid:board_id>/velocity", chartViews.velocity, name="velocity"),
-    path("api/scopes/<uuid:boardid>/", scopeViews.scopes_on_board, name="scopes_on_board"),
+    path("api/charts/<uuid:board_id>/<uuid:scope_id>/burnup", chartViews.burn_up, name="burn_up"),
+    path("api/scopes/<uuid:boardid>", scopeViews.scopes_on_board, name="scopes_on_board"),
     path("api/scopes/<uuid:scopeid>/tickets", scopeViews.tickets_in_scope, name="tickets_in_scope"),
     path(
         "api/scopes/<uuid:scopeid>/set_scope_forecast",
