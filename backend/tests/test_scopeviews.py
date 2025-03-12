@@ -177,20 +177,36 @@ def test_delete_ticket_from_scope():
 
 @freeze_time("2024-01-05")
 @pytest.mark.django_db
-def test_set_scope_forecast_date():
+def test_set_scope_forecast():
     api_client = APIClient()
 
     boardid = boardid = addBoard().boardid
+    column_id = addColumn(boardid, uuid.uuid4(), "Column 1").columnid
+    ticket_id = addTicket(column_id, uuid.uuid4(), "Ticket", size=2).ticketid
 
     response = api_client.post(reverse("scopes_on_board", args=[boardid]), {"title": "test scope"})
     scope_id = response.json()["scopeid"]
 
-    response = api_client.post(reverse("set_scope_forecast_date", args=[scope_id]))
+    response = api_client.post(reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_id})
+    assert response.status_code == 200
+
+    response = api_client.post(reverse("set_scope_forecast", args=[scope_id]))
     assert response.status_code == 200
 
     response = api_client.get(reverse("scopes_on_board", args=[boardid]))
 
     assert response.json()[0]["forecast_set_date"] == "2024-01-05T00:00:00Z"
+    assert response.json()[0]["forecast_size"] == 2
+    assert response.json()[0]["forecast_tickets"] == [{"ticketid": str(ticket_id), "size": 2}]
+
+    response = api_client.delete(reverse("update_ticket", args=[column_id, ticket_id]))
+    assert response.status_code == 200
+
+    response = api_client.get(reverse("scopes_on_board", args=[boardid]))
+
+    assert response.json()[0]["forecast_set_date"] == "2024-01-05T00:00:00Z"
+    assert response.json()[0]["forecast_size"] == 2
+    assert response.json()[0]["forecast_tickets"] == []
 
     resetDB()
 

@@ -74,9 +74,9 @@ urlpatterns = [
     path("api/scopes/<uuid:boardid>", scopeViews.scopes_on_board, name="scopes_on_board"),
     path("api/scopes/<uuid:scopeid>/tickets", scopeViews.tickets_in_scope, name="tickets_in_scope"),
     path(
-        "api/scopes/<uuid:scopeid>/set_scope_forecast_date",
-        scopeViews.set_scope_forecast_date,
-        name="set_scope_forecast_date",
+        "api/scopes/<uuid:scopeid>/set_scope_forecast",
+        scopeViews.set_scope_forecast,
+        name="set_scope_forecast",
     ),
     path("api/scopes/<uuid:scopeid>/set_title", scopeViews.set_scope_title, name="set_scope_title"),
     path(

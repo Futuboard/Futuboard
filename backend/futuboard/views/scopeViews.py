@@ -91,9 +91,14 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
 
 
 @api_view(["POST"])
-def set_scope_forecast_date(request: rest_framework.request.Request, scopeid: str):
+def set_scope_forecast(request: rest_framework.request.Request, scopeid: str):
     scope = Scope.objects.get(scopeid=scopeid)
     scope.forecast_set_date = now()
+    scope_size = 0
+    for ticket in scope.tickets.all():
+        scope_size += ticket.size
+    scope.forecast_size = scope_size
+    scope.forecast_tickets.set(scope.tickets.all())
     scope.save()
     return JsonResponse({"success": True})
 

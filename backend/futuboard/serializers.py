@@ -124,7 +124,18 @@ class TicketSizeSerializer(serializers.ModelSerializer):
 class ScopeSerializer(serializers.ModelSerializer):
     done_columns = ColumnSerializer(many=True, read_only=True)
     tickets = TicketSizeSerializer(many=True, read_only=True)
+    forecast_tickets = TicketSizeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Scope
-        fields = ["scopeid", "boardid", "title", "creation_date", "forecast_set_date", "done_columns", "tickets"]
+        fields = [
+            "scopeid",
+            "boardid",
+            "title",
+            "creation_date",
+            "forecast_set_date",
+            "forecast_size",
+            "forecast_tickets",
+            "done_columns",
+            "tickets",
+        ]

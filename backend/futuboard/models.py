@@ -146,6 +146,8 @@ class Scope(models.Model):
     title = models.TextField()
     creation_date = models.DateTimeField(default=now)
     forecast_set_date = models.DateTimeField(blank=True, null=True)
+    forecast_size = models.IntegerField(blank=True, null=True)
+    forecast_tickets = models.ManyToManyField(Ticket, related_name="forecast_tickets")
     done_columns = models.ManyToManyField(Column)
     tickets = models.ManyToManyField(Ticket)
 
