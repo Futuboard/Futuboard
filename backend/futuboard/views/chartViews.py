@@ -50,12 +50,16 @@ def velocity(request: rest_framework.request.Request, board_id):
 
         data = get_column_story_points_at_times(columns, "all", scopes=list(scopes.all()))
 
-        # column_names = change_data_column_ids_to_column_names(data, columns)
+        data = data[0]  # Only one data point for velocity
+
+        del data["name"]  # Remove the name (date) field
 
         return JsonResponse({"data": data}, safe=False)
 
 
-def get_column_story_points_at_times(columns, time_unit, start_time=None, end_time=None, scopes=[]):
+def get_column_story_points_at_times(
+    columns, time_unit, start_time=None, end_time=None, scopes=[]
+) -> list[dict[str, str | dict[str, int]]]:
     ticket_events = (
         TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
     ).order_by("event_time")
@@ -97,21 +101,22 @@ def get_column_story_points_at_times(columns, time_unit, start_time=None, end_ti
             event_dict[timestamp].append(event)
 
     empty_column_dict = {}
-    scopes_with_all = scopes.copy()
-    scopes_with_all.append("all")
+    scope_ids_with_all = [str(scope.scopeid) for scope in scopes.copy()]
+    scope_ids_with_all.append("all")
     for column in columns:
         column_id = str(column.columnid)
         empty_column_dict[column_id] = {}
-        for scope in scopes_with_all:
-            empty_column_dict[column_id][scope] = 0
+        for scope_id in scope_ids_with_all:
+            empty_column_dict[column_id][scope_id] = 0
 
     final_data = []
 
-    ticket_scopes = {}
+    ticket_scopeids = {}
 
-    def setSize(column_sizes, columnid, change, ticketid):
-        scopes_of_ticket = ticket_scopes.get(ticketid, [])
-        scopes_of_ticket.append("all")
+    def setSize(column_sizes, columnid, change, ticketid, add_to_all=True):
+        scopes_of_ticket = ticket_scopeids.get(ticketid, []).copy()
+        if add_to_all:
+            scopes_of_ticket.append("all")
         for scope in scopes_of_ticket:
             column_sizes[str(columnid)][scope] += change
 
@@ -133,6 +138,7 @@ def get_column_story_points_at_times(columns, time_unit, start_time=None, end_ti
 
         if events_at_time is not None:
             for event in events_at_time:
+                print(event.event_type)
                 if event.event_type == TicketEvent.CREATE:
                     setSize(column_sizes, event.new_columnid.columnid, event.new_size, event.ticketid.ticketid)
                 elif event.event_type == TicketEvent.DELETE:
@@ -148,10 +154,15 @@ def get_column_story_points_at_times(columns, time_unit, start_time=None, end_ti
                         event.ticketid.ticketid,
                     )
                 elif event.event_type == TicketEvent.CHANGE_SCOPE:
-                    ticket_scopes[event.ticketid.ticketid] = []
-                    for scope in event.new_scopes.all():
-                        ticket_scopes[event.ticketid.ticketid].append(scope.scopeid)
-                    setSize(column_sizes, event.new_columnid.columnid, event.new_size, event.ticketid.ticketid)
+                    ticket_scopeids[event.ticketid.ticketid] = [str(scope.scopeid) for scope in event.new_scopes.all()]
+
+                    setSize(
+                        column_sizes,
+                        event.new_columnid.columnid,
+                        event.new_size,
+                        event.ticketid.ticketid,
+                        add_to_all=False,
+                    )
 
         previous_column_sizes = column_sizes.copy()
         time += time_delta
