@@ -330,7 +330,7 @@ def test_ticket_event_scopes_stay_in_events():
     assert data[4]["new_scopes"] == [scope_id, scope_id_2] or data[4]["new_scopes"] == [scope_id_2, scope_id]
 
     assert data[5]["event_type"] == "DELETE"
-    assert data[5]["old_scopes"] == [scope_id, scope_id_2] or data[5]["new_scopes"] == [scope_id_2, scope_id]
+    assert data[5]["old_scopes"] == [scope_id, scope_id_2] or data[5]["old_scopes"] == [scope_id_2, scope_id]
     assert data[5]["new_scopes"] == []
 
     resetDB()
