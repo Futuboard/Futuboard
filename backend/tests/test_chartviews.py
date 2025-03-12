@@ -413,11 +413,11 @@ def test_velocity():
     scope_id = response.json()["scopeid"]
 
     creation_time_1 = datetime(2024, 1, 1)
-    _ticket_not_in_scope = create_ticket_at_time(boardid, done_column, creation_time_1)
-    ticket_not_in_forecast_not_done = create_ticket_at_time(boardid, other_column, creation_time_1)
-    ticket_in_forecast_not_done = create_ticket_at_time(boardid, other_column, creation_time_1)
-    ticket_in_forecast_done = create_ticket_at_time(boardid, other_column, creation_time_1)
-    ticket_not_in_forecast_done = create_ticket_at_time(boardid, other_column, creation_time_1)
+    _ticket_not_in_scope = create_ticket_at_time(boardid, done_column, creation_time_1, size=7)
+    ticket_not_in_forecast_not_done = create_ticket_at_time(boardid, other_column, creation_time_1, size=10)
+    ticket_in_forecast_not_done = create_ticket_at_time(boardid, other_column, creation_time_1, size=6)
+    ticket_in_forecast_done = create_ticket_at_time(boardid, other_column, creation_time_1, size=3)
+    ticket_not_in_forecast_done = create_ticket_at_time(boardid, done_column, creation_time_1, size=2)
 
     freezer = freeze_time("2024-01-02")
     freezer.start()
@@ -429,15 +429,10 @@ def test_velocity():
 
     freezer = freeze_time("2024-01-03")
     freezer.start()
-    response = api_client.post(reverse("set_scope_forecast_date", args=[scope_id]))
+    response = api_client.post(reverse("set_scope_forecast", args=[scope_id]))
     freezer.stop()
 
-    freezer = freeze_time("2024-01-05")
-    freezer.start()
-    response = api_client.post(reverse("set_scope_forecast_date", args=[scope_id]))
-    freezer.stop()
-
-    freezer = freeze_time("2024-01-06")
+    freezer = freeze_time("2024-01-04")
     freezer.start()
     api_client.post(
         reverse("set_scope_done_columns", args=[scope_id]),
@@ -452,7 +447,6 @@ def test_velocity():
     )
     freezer.stop()
     move_ticket_at_time(boardid, done_column, "2024-01-06", ticket_in_forecast_done["ticketid"])
-    move_ticket_at_time(boardid, done_column, "2024-01-06", ticket_not_in_forecast_done["ticketid"])
 
     freezer = freeze_time("2024-01-10")
     freezer.start()
@@ -466,20 +460,7 @@ def test_velocity():
     assert len(data) == 1
 
     assert data == [
-        {"name": "test scope", "forecast": 20, "done": 10},
+        {"name": "test scope", "forecast": 9, "done": 5},
     ]
-
-    """
-    assert data == {
-        str(scope_id): {
-            str(done_column): 10,
-            str(other_column): 10,
-        },
-        "all": {
-            str(done_column): 15,
-            str(other_column): 10,
-        },
-    }
-    """
 
     resetDB()
