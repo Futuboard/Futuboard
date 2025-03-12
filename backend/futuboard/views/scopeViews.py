@@ -49,16 +49,16 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
             new_size=ticket.size,
             title=ticket.title,
         )
+        ticket_add_to_scope_event.save()
 
-        old_scopes = ticket.scope_set.all()
-        ticket_add_to_scope_event.old_scopes.set(old_scopes)
+        ticket_scopes = list(ticket.scope_set.all())
+
+        ticket_add_to_scope_event.old_scopes.set(ticket_scopes)
 
         scope.tickets.add(ticket)
+        ticket_scopes.append(scope)
 
-        new_scopes = ticket.scope_set.all()
-        ticket_add_to_scope_event.new_scopes.set(new_scopes)
-
-        ticket_add_to_scope_event.save()
+        ticket_add_to_scope_event.new_scopes.set(ticket_scopes)
 
         return JsonResponse({"success": True})
 
@@ -75,15 +75,15 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
             new_size=ticket.size,
             title=ticket.title,
         )
+        ticket_remove_from_scope_event.save()
 
-        old_scopes = ticket.scope_set.all()
-        ticket_remove_from_scope_event.old_scopes.set(old_scopes)
+        ticket_scopes = list(ticket.scope_set.all())
+        ticket_remove_from_scope_event.old_scopes.set(ticket_scopes)
 
         scope.tickets.remove(ticket)
-        new_scopes = ticket.scope_set.all()
-        ticket_remove_from_scope_event.new_scopes.set(new_scopes)
+        ticket_scopes.remove(scope)
 
-        ticket_remove_from_scope_event.save()
+        ticket_remove_from_scope_event.new_scopes.set(ticket_scopes)
 
         return JsonResponse({"success": True})
 
