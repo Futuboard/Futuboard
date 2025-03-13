@@ -38,7 +38,7 @@ export type Task = {
   size?: number
   columnid: string
   users: UserWithoutTicketsOrActions[]
-  scopes: Scope[]
+  scopes: SimpleScope[]
 }
 
 export type NewTask = Omit<Task, "users" | "scopes">
@@ -136,6 +136,13 @@ export type Scope = {
   title: string
   creation_date: string
   forecast_set_date: string
+  forecast_size: number
+  forecast_tickets: TaskSize[]
   done_columns: Column[]
   tickets: TaskSize[]
+}
+
+export type SimpleScope = {
+  scopeid: string
+  title: string
 }

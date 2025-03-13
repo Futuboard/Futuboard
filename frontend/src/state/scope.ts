@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-//import { getId } from "@/services/Utils"
-
 type ScopeState = string
 
 const initialState: ScopeState = ""
@@ -13,8 +11,7 @@ const scopeSlice = createSlice({
     setScope: (_state: ScopeState, action: PayloadAction<string>) => {
       return action.payload
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    disableScope: (_state: ScopeState) => {
+    disableScope: () => {
       return ""
     }
   }
