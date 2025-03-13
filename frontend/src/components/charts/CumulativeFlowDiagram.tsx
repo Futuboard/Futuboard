@@ -1,11 +1,12 @@
 import { Button, ButtonGroup, CircularProgress, Divider, Grid, Paper, Stack, Typography } from "@mui/material"
 import dayjs from "dayjs"
 import React, { useState } from "react"
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 
 import { useGetCumulativeFlowDiagramDataQuery } from "@/state/apiSlice"
 import { TimeUnit } from "@/types"
 
+import ChartContainer from "./ChartContainer"
 import DateSelector from "./DateSelector"
 
 interface CumulativeFlowDiagramProps {
@@ -120,7 +121,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
     .filter((label) => label !== "name")
     .reverse()
   const lastVals = Object.values(data.data[dataLength - 1])
-    .filter((value) => typeof value == "number")
+    .filter((number) => typeof number == "number")
     .reverse()
 
   const startIndex = lastVals.findIndex((val) => val != 0)
@@ -137,106 +138,99 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
   const yAxisDomain = Math.round(sum * 1.1)
 
   return (
-    <Paper>
-      <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ padding: 2 }} spacing={1}>
-        <Grid item>
-          <Typography variant="h6">Cumulative Flow</Typography>
-        </Grid>
-        <Grid item sx={{ width: "1100px", height: "650px" }}>
-          <ResponsiveContainer>
-            <AreaChart data={data?.data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" tickFormatter={tickFormatter} />
-              <YAxis
-                domain={[0, yAxisDomain]}
-                yAxisId={0}
-                allowDataOverflow={true}
-                ticks={labelYvalues}
-                tickFormatter={(val) => {
-                  const label = lastTick[labelYvalues.indexOf(val)]
-                  return label.length > maxArealabelLength
-                    ? label.substring(0, maxArealabelLength - 3).trim() + "..."
-                    : label
-                }}
-                orientation="right"
-                minTickGap={-1}
-                interval="preserveStartEnd"
-                tick={{ fontSize: 10, fontWeight: 700, width: 200 }}
-                axisLine={false}
-                width={130}
-              />
-              <YAxis
-                type="number"
-                yAxisId={1}
-                domain={[0, yAxisDomain]}
-                tickCount={Math.max(labelYvalues.length / 2, 4)}
-                allowDataOverflow={true}
-                style={{ fontSize: 10, fontWeight: 700 }}
-              />
-              <Tooltip
-                offset={20}
-                content={({ active, payload, label }) => (
-                  <AreaToolTip
-                    active={active || false}
-                    payload={payload as Array<{ [key: string]: string }>}
-                    label={label}
-                  />
-                )}
-              />
-              {data?.columns
-                .map((name, index) => (
-                  <Area
-                    type="linear"
-                    key={name}
-                    dataKey={name}
-                    stackId="1"
-                    stroke={gradient[index % gradient.length]}
-                    fill={gradient[index % gradient.length]}
-                    yAxisId={index == 0 || data.columns.length - 1 ? 1 : 0}
-                    onMouseEnter={() => setHighlightedArea(name)}
-                    onMouseLeave={() => setHighlightedArea("")}
-                  ></Area>
-                ))
-                .reverse()}
-            </AreaChart>
-          </ResponsiveContainer>
-        </Grid>
-        <Grid item>
-          <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
-            <ButtonGroup color="primary">
-              {shortcutOptions.map((choice) => (
-                <Button key={choice} variant={choice == shortcut ? "contained" : "outlined"} onClick={handleShortCut}>
-                  {choice}
-                </Button>
-              ))}
-            </ButtonGroup>
-            <ButtonGroup size="small">
-              {timeUnitChoices.map((timeUnit) => (
-                <Button
-                  variant={timeUnit == queryparams.timeUnit ? "contained" : "outlined"}
-                  key={timeUnit}
-                  value={timeUnit}
-                  onClick={(event) => {
-                    handleSubmit(queryparams.start, queryparams.end, event.currentTarget.textContent as TimeUnit)
-                  }}
-                >
-                  {timeUnit}
-                </Button>
-              ))}
-            </ButtonGroup>
-          </Stack>
-        </Grid>
-        <Grid item>
-          <DateSelector
-            startValue={queryparams.start}
-            endValue={queryparams.end}
-            timeUnitValue={queryparams.timeUnit}
-            onChange={handleSubmit}
-            shortcutValue={shortcut}
+    <>
+      <ChartContainer>
+        <AreaChart data={data?.data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" tickFormatter={tickFormatter} />
+          <YAxis
+            domain={[0, yAxisDomain]}
+            yAxisId={0}
+            allowDataOverflow={true}
+            ticks={labelYvalues}
+            tickFormatter={(val) => {
+              const label = lastTick[labelYvalues.indexOf(val)]
+              return label.length > maxArealabelLength
+                ? label.substring(0, maxArealabelLength - 3).trim() + "..."
+                : label
+            }}
+            orientation="right"
+            minTickGap={-1}
+            interval="preserveStartEnd"
+            tick={{ fontSize: 10, fontWeight: 700, width: 200 }}
+            axisLine={false}
+            width={130}
           />
-        </Grid>
+          <YAxis
+            type="number"
+            yAxisId={1}
+            domain={[0, yAxisDomain]}
+            tickCount={Math.max(labelYvalues.length / 2, 4)}
+            allowDataOverflow={true}
+            style={{ fontSize: 10, fontWeight: 700 }}
+          />
+          <Tooltip
+            offset={20}
+            content={({ active, payload, label }) => (
+              <AreaToolTip
+                active={active || false}
+                payload={payload as Array<{ [key: string]: string }>}
+                label={label}
+              />
+            )}
+          />
+          {data?.columns
+            .map((name, index) => (
+              <Area
+                type="linear"
+                key={name}
+                dataKey={name}
+                stackId="1"
+                stroke={gradient[index % gradient.length]}
+                fill={gradient[index % gradient.length]}
+                yAxisId={index == 0 || data.columns.length - 1 ? 1 : 0}
+                onMouseEnter={() => setHighlightedArea(name)}
+                onMouseLeave={() => setHighlightedArea("")}
+              ></Area>
+            ))
+            .reverse()}
+        </AreaChart>
+      </ChartContainer>
+      <Grid item>
+        <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
+          <ButtonGroup color="primary">
+            {shortcutOptions.map((choice) => (
+              <Button key={choice} variant={choice == shortcut ? "contained" : "outlined"} onClick={handleShortCut}>
+                {choice}
+              </Button>
+            ))}
+          </ButtonGroup>
+          <ButtonGroup size="small">
+            {timeUnitChoices.map((timeUnit) => (
+              <Button
+                variant={timeUnit == queryparams.timeUnit ? "contained" : "outlined"}
+                key={timeUnit}
+                value={timeUnit}
+                onClick={(event) => {
+                  handleSubmit(queryparams.start, queryparams.end, event.currentTarget.textContent as TimeUnit)
+                }}
+              >
+                {timeUnit}
+              </Button>
+            ))}
+          </ButtonGroup>
+        </Stack>
       </Grid>
-    </Paper>
+      <Grid item>
+        <DateSelector
+          startValue={queryparams.start}
+          endValue={queryparams.end}
+          timeUnitValue={queryparams.timeUnit}
+          onChange={handleSubmit}
+          shortcutValue={shortcut}
+        />
+      </Grid>
+    </>
   )
 }
 

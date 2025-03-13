@@ -1,8 +1,10 @@
-import { CircularProgress, Grid, Paper, Typography } from "@mui/material"
+import { CircularProgress, Paper } from "@mui/material"
 import React from "react"
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Legend, Bar } from "recharts"
+import { XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Legend, Bar } from "recharts"
 
 import { useGetVelocityChartDataQuery } from "@/state/apiSlice"
+
+import ChartContainer from "./ChartContainer"
 
 interface VelocityChartProps {
   boardId: string
@@ -24,26 +26,17 @@ const VelocityChart: React.FC<VelocityChartProps> = ({ boardId }) => {
   }
 
   return (
-    <Paper>
-      <Grid container direction="column" justifyContent="center" alignItems="center" sx={{ padding: 2 }} spacing={1}>
-        <Grid item>
-          <Typography variant="h6">Velocity</Typography>
-        </Grid>
-        <Grid item sx={{ width: "1100px", height: "650px" }}>
-          <ResponsiveContainer>
-            <BarChart data={data.data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="forecast" fill="#03a9f4" />
-              <Bar dataKey="done" fill="#89c344" />
-            </BarChart>
-          </ResponsiveContainer>
-        </Grid>
-      </Grid>
-    </Paper>
+    <ChartContainer>
+      <BarChart data={data.data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="forecast" fill="#03a9f4" />
+        <Bar dataKey="done" fill="#89c344" />
+      </BarChart>
+    </ChartContainer>
   )
 }
 
