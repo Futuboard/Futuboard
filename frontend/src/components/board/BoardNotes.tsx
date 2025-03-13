@@ -68,11 +68,11 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
         </ButtonGroup>
       </Fade>
       <Fade in={!open} unmountOnExit>
-        <Fab sx={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 1001 }} onClick={openNotes} color="info">
-          <Tooltip title="open notes" placement="left">
+        <Tooltip title="open notes" placement="left" arrow>
+          <Fab sx={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 1001 }} onClick={openNotes} color="info">
             <StickyNote2 />
-          </Tooltip>
-        </Fab>
+          </Fab>
+        </Tooltip>
       </Fade>
 
       <Fade in={Boolean(anchorEl)} unmountOnExit>
