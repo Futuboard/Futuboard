@@ -55,7 +55,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
     <div>
       <Fade in={open} unmountOnExit>
         <ButtonGroup
-          sx={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 1401 }}
+          sx={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 1001 }}
           variant="contained"
           color="info"
         >
@@ -68,7 +68,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
         </ButtonGroup>
       </Fade>
       <Fade in={!open} unmountOnExit>
-        <Fab sx={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 1401 }} onClick={openNotes} color="info">
+        <Fab sx={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 1001 }} onClick={openNotes} color="info">
           <Tooltip title="open notes" placement="left">
             <StickyNote2 />
           </Tooltip>
@@ -83,7 +83,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
             bottom: "1rem",
             right: "1rem",
             top: "calc(65px + 1rem)",
-            zIndex: 1400
+            zIndex: 1000
           }}
           elevation={16}
         >
