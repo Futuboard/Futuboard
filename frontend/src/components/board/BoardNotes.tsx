@@ -19,7 +19,7 @@ import {
 } from "@mdxeditor/editor"
 import { StickyNote2 } from "@mui/icons-material"
 import CloseIcon from "@mui/icons-material/Close"
-import { Fab, Fade, Paper, Tooltip } from "@mui/material"
+import { Button, ButtonGroup, Fab, Fade, Paper, Tooltip } from "@mui/material"
 import { useState } from "react"
 
 import { useUpdateBoardNotesMutation } from "@/state/apiSlice"
@@ -44,31 +44,45 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
     }
   }
 
+  const handleClose = () => {
+    setAnchorEl(null)
+    setNotes(content)
+  }
+
   const open = Boolean(anchorEl)
 
   return (
     <div>
-      <Fab sx={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 1401 }} onClick={openNotes} color="info">
-        {anchorEl ? (
-          <Fade in={open}>
-            <CloseIcon />
-          </Fade>
-        ) : (
+      <Fade in={open} unmountOnExit>
+        <ButtonGroup
+          sx={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 1401 }}
+          variant="contained"
+          color="info"
+        >
+          <Button onClick={openNotes} endIcon={<StickyNote2 />}>
+            Save
+          </Button>
+          <Button onClick={handleClose} endIcon={<CloseIcon />}>
+            Cancel
+          </Button>
+        </ButtonGroup>
+      </Fade>
+      <Fade in={!open} unmountOnExit>
+        <Fab sx={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 1401 }} onClick={openNotes} color="info">
           <Tooltip title="open notes" placement="left">
-            <Fade in={!open}>
-              <StickyNote2 />
-            </Fade>
+            <StickyNote2 />
           </Tooltip>
-        )}
-      </Fab>
+        </Fab>
+      </Fade>
+
       <Fade in={Boolean(anchorEl)} unmountOnExit>
         <Paper
           sx={{
             width: "520px",
             position: "fixed",
-            bottom: "0.75rem",
-            right: "0.75rem",
-            top: "calc(65px + 0.75rem)",
+            bottom: "1rem",
+            right: "1rem",
+            top: "calc(65px + 1rem)",
             zIndex: 1400
           }}
           elevation={16}
