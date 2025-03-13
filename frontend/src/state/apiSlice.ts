@@ -708,6 +708,17 @@ export const boardsApi = createApi({
         { type: "Columns", id: "LIST" },
         { type: "Ticket", id: "LIST" }
       ]
+    }),
+    getVelocityChartData: builder.query<ChartData, { boardId: string }>({
+      query: ({ boardId }) => ({
+        url: `charts/${boardId}/velocity`,
+        method: "GET"
+      }),
+      providesTags: [
+        { type: "Columns", id: "LIST" },
+        { type: "Ticket", id: "LIST" }
+        //{ type: "Scope", id: "LIST" }
+      ]
     })
   })
 })
@@ -751,5 +762,6 @@ export const {
   useDeleteUserFromTicketMutation,
   useCheckAdminPasswordMutation,
   useUpdateTaskTemplateMutation,
-  useGetCumulativeFlowDiagramDataQuery
+  useGetCumulativeFlowDiagramDataQuery,
+  useGetVelocityChartDataQuery
 } = boardsApi
