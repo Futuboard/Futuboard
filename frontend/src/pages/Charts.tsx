@@ -1,11 +1,12 @@
 import { Box, GlobalStyles } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
-import { useParams } from "react-router-dom"
+import { useLocation, useParams } from "react-router-dom"
 
 import AccessBoardForm from "@/components/board/AccessBoardForm"
 import ToolBar from "@/components/board/Toolbar"
 import CumulativeFlowDiagram from "@/components/charts/CumulativeFlowDiagram"
+import VelocityChart from "@/components/charts/VelocityChart"
 import { cacheTagTypes } from "@/constants"
 import { boardsApi, useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
 import { setBoardId } from "@/state/auth"
@@ -18,6 +19,7 @@ const Charts: React.FC = () => {
   const [isBoardIdSet, setIsBoardIdset] = useState(false)
   const [tryLogin] = useLoginMutation()
   const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
+  const location = useLocation()
 
   const id = params.id || ""
   const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
@@ -76,21 +78,55 @@ const Charts: React.FC = () => {
     )
   }
 
+  //         <VelocityChart boardId={id} />
+
+  /*
+          <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-evenly",
+            alignItems: "center",
+            width: "300px",
+            backgroundColor: "white",
+            height: "100%"
+          }}
+        >
+          {chartTypes.map((chartType) => (
+            <Typography variant="h6">{chartType.name}</Typography>
+          ))}
+        </Box>
+        */
+
+  const chartName = location.pathname.split("/").pop()
+
+  const charts = {
+    cumulativeFlow: CumulativeFlowDiagram,
+    velocity: VelocityChart
+  }
+
+  const ChartComponent = charts[chartName as keyof typeof charts] || CumulativeFlowDiagram
+
   return (
-    <div>
+    <Box sx={{ height: "calc(100vh - 65px)", paddingTop: "65px" }}>
       <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
       <ToolBar boardId={id} title={`Charts - ${board?.title}`} chartToolbar={true} />
-      <Box
-        sx={{
-          marginTop: 10,
-          justifyContent: "center",
-          alignItems: "center",
-          display: "flex"
-        }}
-      >
-        <CumulativeFlowDiagram boardId={id} />
+      <Box sx={{ position: "relative", height: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%"
+          }}
+        >
+          <ChartComponent boardId={id} />
+        </Box>
       </Box>
-    </div>
+    </Box>
   )
 }
 

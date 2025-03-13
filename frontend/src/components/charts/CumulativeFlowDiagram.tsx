@@ -142,7 +142,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
         <Grid item>
           <Typography variant="h6">Cumulative Flow</Typography>
         </Grid>
-        <Grid item sx={{ width: "1100px", height: "700px" }}>
+        <Grid item sx={{ width: "1100px", height: "650px" }}>
           <ResponsiveContainer width="105%" height="100%">
             <AreaChart
               data={data?.data}

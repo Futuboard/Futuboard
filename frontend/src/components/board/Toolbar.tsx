@@ -6,7 +6,9 @@ import {
   Gradient,
   ColorLens,
   Analytics,
-  ViewWeek
+  ViewWeek,
+  Speed,
+  Air
 } from "@mui/icons-material"
 import {
   AppBar,
@@ -116,8 +118,8 @@ interface OpenAnalyticsButtonProps {
 const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) => {
   return (
     <Tooltip title="Open Analytics">
-      <Link to={"/board/" + boardId + "/charts"}>
-        <IconButton>
+      <Link to={"/board/" + boardId + "/charts/cumulativeFlow"}>
+        <IconButton sx={{ color: "#2d3748" }}>
           <Analytics />
         </IconButton>
       </Link>
@@ -287,6 +289,20 @@ interface chartToolBarProps {
 const ChartToolbar: React.FC<chartToolBarProps> = ({ boardId }) => {
   return (
     <Box display="flex" alignItems="center" justifyContent="flex-end" sx={{ minWidth: 0, flexGrow: 1 }}>
+      <Tooltip title="Cumulative Flow">
+        <Link to={"velocity"}>
+          <IconButton sx={{ color: "#2d3748" }}>
+            <Speed />
+          </IconButton>
+        </Link>
+      </Tooltip>
+      <Tooltip title="Cumulative Flow">
+        <Link to={"cumulativeFlow"}>
+          <IconButton sx={{ color: "#2d3748", marginRight: 2 }}>
+            <Air />
+          </IconButton>
+        </Link>
+      </Tooltip>
       <Link to={`/board/${boardId}`}>
         <Button variant="contained" endIcon={<ViewWeek />}>
           Back to board
