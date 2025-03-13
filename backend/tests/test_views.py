@@ -719,10 +719,12 @@ def test_update_board_notes():
 
     response = api_client.put(
         reverse("update_board_notes", args=[boardid]),
-        data={"notes": "no moi"},
+        data={"notes": "test notes"},
         headers={"Authorization": f"Bearer {token}"},
     )
 
     assert response.status_code == 200
-    assert response.json()["notes"] == "no moi"
-    assert md.Board.objects.get(pk=boardid).notes == "no moi"
+    assert response.json()["notes"] == "test notes"
+    assert md.Board.objects.get(pk=boardid).notes == "test notes"
+
+    resetDB()
