@@ -8,10 +8,11 @@ from django.http import HttpResponse
 
 from ..verification import hash_password
 
-from ..models import Action, Board, Column, Swimlanecolumn, Ticket, TicketEvent, User
+from ..models import Action, Board, Column, Scope, Swimlanecolumn, Ticket, TicketEvent, User
 
 from ..serializers import (
     BoardSerializer,
+    ScopeSerializer,
     SwimlaneColumnSerializer,
     TicketSerializer,
     UserSerializer,
@@ -48,6 +49,7 @@ def create_data_dict_from_board(board_id):
     tickets = Ticket.objects.filter(columnid__in=columns)
     actions = Action.objects.filter(ticketid__in=tickets)
     ticketEvents = TicketEvent.objects.filter(ticketid__in=tickets)
+    scopes = Scope.objects.filter(boardid=board_id)
 
     data = {}
     data["board"] = BoardSerializer(board).data
@@ -57,6 +59,7 @@ def create_data_dict_from_board(board_id):
     data["tickets"] = TicketSerializer(tickets, many=True).data
     data["actions"] = ActionSerializer(actions, many=True).data
     data["ticketEvents"] = TicketEventSerializer(ticketEvents, many=True).data
+    data["scopes"] = ScopeSerializer(scopes, many=True).data
 
     return data
 
@@ -113,6 +116,9 @@ def create_board_from_data_dict(data, new_title, new_password):
 
     for user in data["users"]:
         add_to_db(User, user)
+
+    for scope in data["scopes"]:
+        add_to_db(Scope, scope)
 
     serializer = BoardSerializer(new_board)
 
