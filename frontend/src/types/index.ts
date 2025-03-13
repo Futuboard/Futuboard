@@ -44,11 +44,14 @@ export type Task = {
 export type NewTask = Omit<Task, "users" | "scopes">
 
 export type TaskTemplate = Omit<Task, "ticketid" | "columnid" | "users" | "scopes">
+<<<<<<< HEAD
 
 export type TaskSize = {
   ticketid: string
   size: number
 }
+=======
+>>>>>>> origin/ticket-select-in-scope-test
 
 export type User = {
   userid: string
