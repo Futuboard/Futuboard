@@ -1,37 +1,28 @@
-import ToolBar from "@components/board/Toolbar"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
-import { Box, GlobalStyles } from "@mui/material"
 import { produce } from "immer"
-import { useEffect, useState } from "react"
-import { useDispatch } from "react-redux"
-import { useParams } from "react-router-dom"
 
-import { cacheTagTypes } from "@/constants"
-import { setBoardId } from "@/state/auth"
+import Board from "@/components/board/Board"
+import ToolBar from "@/components/board/Toolbar"
 import { setNotification } from "@/state/notification"
 import { store } from "@/state/store"
-import { webSocketContainer } from "@/state/websocket"
-import { Action, Task, User } from "@/types"
+import { Action, Task, User, Board as BoardType } from "@/types"
 
-import AccessBoardForm from "../components/board/AccessBoardForm"
-import Board from "../components/board/Board"
 import {
   boardsApi,
   useDeleteUserFromActionMutation,
   useDeleteUserFromTicketMutation,
-  useGetBoardQuery,
-  useLoginMutation,
   usePostUserToActionMutation,
   usePostUserToTicketMutation,
   useUpdateActionListMutation,
   useUpdateColumnOrderMutation,
   useUpdateTaskListByColumnIdMutation
-} from "../state/apiSlice"
+} from "../../state/apiSlice"
 
-const BoardContainer: React.FC = () => {
-  const dispatch = useDispatch()
-  const { id } = useParams()
+type BoardProps = {
+  board: BoardType
+}
 
+const BoardContainer: React.FC<BoardProps> = ({ board }) => {
   const [updateTaskList] = useUpdateTaskListByColumnIdMutation()
   const [updateColumns] = useUpdateColumnOrderMutation()
   const [postUserToTask] = usePostUserToTicketMutation()
@@ -39,50 +30,12 @@ const BoardContainer: React.FC = () => {
   const [updateActions] = useUpdateActionListMutation()
   const [deleteUserFromTicket] = useDeleteUserFromTicketMutation()
   const [deleteUserFromAction] = useDeleteUserFromActionMutation()
-  const [tryLogin] = useLoginMutation()
-  const [isBoardIdSet, setIsBoardIdset] = useState(false)
-  const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
-  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
 
-  useEffect(() => {
-    const inner = async () => {
-      if (!id) return
-      dispatch(setBoardId(id))
-      setIsBoardIdset(true)
-      await webSocketContainer.connectToBoard(id)
-      webSocketContainer.setOnMessageHandler((tags) => {
-        dispatch(boardsApi.util.invalidateTags(tags))
-      })
-      webSocketContainer.setResetHandler(() => {
-        dispatch(boardsApi.util.invalidateTags([...cacheTagTypes]))
-      })
-      webSocketContainer.setSendNotificationHandler((message) => {
-        dispatch(setNotification({ text: message, type: "info" }))
-      })
-    }
-    inner()
-  }, [id, dispatch])
-
-  useEffect(() => {
-    if (!id) return
-    const inner = async () => {
-      await tryLogin({ boardId: id, password: "" })
-      setHasTriedEmptyPasswordLogin(true)
-    }
-    inner()
-  }, [id, tryLogin])
-
-  useEffect(() => {
-    document.title = board?.title ? board?.title + " - Futuboard" : "Futuboard"
-  }, [board])
-
-  if (!id) {
-    return null
-  }
+  const boardId = board.boardid
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
   const selectActions = boardsApi.endpoints.getActionsByColumnId.select
-  const selectColumns = boardsApi.endpoints.getColumnsByBoardId.select(id)
+  const selectColumns = boardsApi.endpoints.getColumnsByBoardId.select(boardId)
 
   const handleOnDragEnd = async (result: DropResult) => {
     const { source, destination, type, draggableId } = result
@@ -93,17 +46,17 @@ const BoardContainer: React.FC = () => {
     const state = store.getState()
 
     if (type === "task") {
-      const selectDestinationTasks = selectTasksByColumnId({ boardId: id, columnId: destination.droppableId })
+      const selectDestinationTasks = selectTasksByColumnId({ boardId, columnId: destination.droppableId })
       const destinationTasks = selectDestinationTasks(state).data || []
 
-      const selectSourceTasks = selectTasksByColumnId({ boardId: id, columnId: source.droppableId })
+      const selectSourceTasks = selectTasksByColumnId({ boardId, columnId: source.droppableId })
       const sourceTasks = selectSourceTasks(state).data || []
 
       //dragging tasks in the same column
       if (destination.droppableId === source.droppableId) {
         const dataCopy = [...(destinationTasks ?? [])]
         const newOrdered = reorder<Task>(dataCopy, source.index, destination.index)
-        await updateTaskList({ boardId: id, columnId: source.droppableId, tasks: newOrdered })
+        await updateTaskList({ boardId, columnId: source.droppableId, tasks: newOrdered })
       }
       //dragging tasks to different columns
       if (destination.droppableId !== source.droppableId) {
@@ -119,8 +72,8 @@ const BoardContainer: React.FC = () => {
           draft?.splice(destination!.index, 0, sourceTasks![source.index])
         })
         await Promise.all([
-          updateTaskList({ boardId: id, columnId: destination.droppableId, tasks: nextDestinationTasks ?? [] }),
-          updateTaskList({ boardId: id, columnId: source.droppableId, tasks: nextSourceTasks ?? [] })
+          updateTaskList({ boardId, columnId: destination.droppableId, tasks: nextDestinationTasks ?? [] }),
+          updateTaskList({ boardId, columnId: source.droppableId, tasks: nextSourceTasks ?? [] })
         ])
       }
     }
@@ -141,7 +94,7 @@ const BoardContainer: React.FC = () => {
 
       let destinationUsers: User[] = []
 
-      const allUsers = boardsApi.endpoints.getUsersByBoardId.select(id)(state).data || []
+      const allUsers = boardsApi.endpoints.getUsersByBoardId.select(boardId)(state).data || []
 
       if (destinationType === "ticket") {
         destinationUsers = allUsers.filter((user) => user.tickets.includes(destinationId))
@@ -258,50 +211,28 @@ const BoardContainer: React.FC = () => {
       const columns = selectColumns(state).data || []
       const dataCopy = [...columns]
       const newOrdered = reorder(dataCopy, source.index, destination.index) //reorder column list
-      await updateColumns({ boardId: id, columns: newOrdered })
+      await updateColumns({ boardId, columns: newOrdered })
     }
   }
 
-  if (isLoading || !hasTriedEmptyPasswordLogin) {
-    return null
-  }
-
-  if (isLoggedIn) {
-    const defaultValues = {
-      title: board?.default_ticket_title || "",
-      description: board?.default_ticket_description || "",
-      cornernote: board?.default_ticket_cornernote || "",
-      color: board?.default_ticket_color || "",
-      size: board?.default_ticket_size || undefined
-    }
-    return (
-      <DragDropContext onDragEnd={handleOnDragEnd}>
-        <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
-        <ToolBar
-          boardId={id}
-          title={board.title || ""}
-          taskTemplate={defaultValues}
-          boardBackgroundColor={board.background_color || "white"}
-        />
-        <Board />
-      </DragDropContext>
-    )
+  const taskTemplateValues = {
+    title: board?.default_ticket_title || "",
+    description: board?.default_ticket_description || "",
+    cornernote: board?.default_ticket_cornernote || "",
+    color: board?.default_ticket_color || "",
+    size: board?.default_ticket_size || undefined
   }
 
   return (
-    <>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh"
-        }}
-      >
-        <AccessBoardForm id={id} />
-      </Box>
-    </>
+    <DragDropContext onDragEnd={handleOnDragEnd}>
+      <ToolBar
+        boardId={boardId}
+        title={board.title}
+        taskTemplate={taskTemplateValues}
+        boardBackgroundColor={board.background_color}
+      />
+      <Board />
+    </DragDropContext>
   )
 }
 
