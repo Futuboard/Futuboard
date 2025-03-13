@@ -48,7 +48,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
 
   return (
     <div>
-      <Fab sx={{ position: "fixed", bottom: 25, right: 25, zIndex: 1401 }} onClick={openNotes} color="info">
+      <Fab sx={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 1401 }} onClick={openNotes} color="info">
         {anchorEl ? (
           <Fade in={open}>
             <CloseIcon />
@@ -66,8 +66,9 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
           sx={{
             width: "520px",
             position: "fixed",
-            bottom: 15,
-            right: 15,
+            bottom: "0.5rem",
+            right: "0.5rem",
+            top: "80px",
             zIndex: 1400
           }}
           elevation={16}
