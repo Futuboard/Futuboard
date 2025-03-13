@@ -117,11 +117,11 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
   const timeUnitChoices = ["day", "week", "month", "year"]
 
   const lastTick = Object.keys(data.data[dataLength - 1])
-  lastTick.pop()
-  lastTick.reverse()
+    .filter((label) => label !== "name")
+    .reverse()
   const lastVals = Object.values(data.data[dataLength - 1])
-  lastVals.pop()
-  lastVals.reverse()
+    .filter((value) => typeof value == "number")
+    .reverse()
 
   const startIndex = lastVals.findIndex((val) => val != 0)
   lastVals.splice(0, startIndex)
@@ -143,13 +143,8 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
           <Typography variant="h6">Cumulative Flow</Typography>
         </Grid>
         <Grid item sx={{ width: "1100px", height: "650px" }}>
-          <ResponsiveContainer width="105%" height="100%">
-            <AreaChart
-              data={data?.data}
-              margin={{
-                right: 40
-              }}
-            >
+          <ResponsiveContainer>
+            <AreaChart data={data?.data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" tickFormatter={tickFormatter} />
               <YAxis
