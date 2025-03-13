@@ -30,7 +30,7 @@ const VelocityChart: React.FC<VelocityChartProps> = ({ boardId }) => {
           <Typography variant="h6">Velocity</Typography>
         </Grid>
         <Grid item sx={{ width: "1100px", height: "650px" }}>
-          <ResponsiveContainer width="105%" height="100%">
+          <ResponsiveContainer>
             <BarChart data={data.data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
