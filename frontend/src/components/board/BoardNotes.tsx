@@ -55,7 +55,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
     <div>
       <Fade in={open} unmountOnExit>
         <ButtonGroup
-          sx={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 1001 }}
+          sx={{ position: "fixed", bottom: "1.75rem", right: "1.75rem", zIndex: 1001 }}
           variant="contained"
           color="info"
         >
