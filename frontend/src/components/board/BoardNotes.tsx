@@ -66,9 +66,9 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
           sx={{
             width: "520px",
             position: "fixed",
-            bottom: "0.5rem",
-            right: "0.5rem",
-            top: "80px",
+            bottom: "0.75rem",
+            right: "0.75rem",
+            top: "calc(65px + 0.75rem)",
             zIndex: 1400
           }}
           elevation={16}
