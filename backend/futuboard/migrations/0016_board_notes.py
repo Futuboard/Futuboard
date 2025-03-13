@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('futuboard', '0015_add_ticket_create_event_to_all_tickets'),
+        ("futuboard", "0015_add_ticket_create_event_to_all_tickets"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='board',
-            name='notes',
-            field=models.TextField(default=''),
+            model_name="board",
+            name="notes",
+            field=models.TextField(default=""),
         ),
     ]
