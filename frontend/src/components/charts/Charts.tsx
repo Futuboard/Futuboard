@@ -1,5 +1,5 @@
 import { Speed, Water } from "@mui/icons-material"
-import { Box, Divider, Typography } from "@mui/material"
+import { Box, Divider, Grid, Paper, Typography } from "@mui/material"
 import { Link, useLocation } from "react-router-dom"
 
 import CumulativeFlowDiagram from "@/components/charts/CumulativeFlowDiagram"
@@ -32,7 +32,8 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
     chartName = "cumulativeFlow"
   }
 
-  const ChartComponent = charts[chartName as keyof typeof charts]?.component
+  const selectedChart = charts[chartName as keyof typeof charts]
+  const ChartComponent = selectedChart.component
 
   return (
     <Box sx={{ position: "relative", height: "100%" }}>
@@ -88,7 +89,21 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
           height: "100%"
         }}
       >
-        <ChartComponent boardId={board.boardid} />
+        <Paper>
+          <Grid
+            container
+            direction="column"
+            justifyContent="center"
+            alignItems="center"
+            sx={{ padding: 2 }}
+            spacing={1}
+          >
+            <Grid item>
+              <Typography variant="h6">{selectedChart.displayName}</Typography>
+            </Grid>
+            <ChartComponent boardId={board.boardid} />
+          </Grid>
+        </Paper>
       </Box>
     </Box>
   )
