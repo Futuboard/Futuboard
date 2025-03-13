@@ -50,6 +50,9 @@ def velocity(request: rest_framework.request.Request, board_id):
         data = []
 
         for scope in scopes:
+            if scope.forecast_set_date is None:
+                continue
+
             scope_data = {
                 "name": scope.title,
                 "forecast": scope.forecast_size or 0,
