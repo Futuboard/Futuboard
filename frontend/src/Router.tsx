@@ -1,10 +1,10 @@
-import BoardContainer from "@pages/BoardContainer"
 import Home from "@pages/Home"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 
 import Notification from "./components/board/Notification"
 import Admin from "./pages/Admin"
-import Charts from "./pages/Charts"
+import BoardPage from "./pages/BoardPage"
+import ChartsPage from "./pages/ChartsPage"
 
 const Router = () => {
   return (
@@ -13,8 +13,8 @@ const Router = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<Admin />} />
-        <Route path="/board/:id" element={<BoardContainer />} />
-        <Route path="/board/:id/charts/*" element={<Charts />} />
+        <Route path="/board/:id" element={<BoardPage />} />
+        <Route path="/board/:id/charts/*" element={<ChartsPage />} />
       </Routes>
     </BrowserRouter>
   )

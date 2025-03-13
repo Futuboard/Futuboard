@@ -27,10 +27,9 @@ import { useUpdateBoardNotesMutation } from "@/state/apiSlice"
 interface BoardNotesProps {
   boardId: string
   content: string
-  onChange: (markdown: string) => void
 }
 
-const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) => {
+const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
   const [open, setOpen] = useState(false)
   const [updateBoardNotes] = useUpdateBoardNotesMutation()
   const [notes, setNotes] = useState("")
@@ -42,7 +41,6 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
   const saveNotes = async () => {
     if (content != notes) {
       try {
-        onChange(notes)
         await updateBoardNotes({ boardId: boardId, notes: notes })
       } catch (error) {
         console.error(error)
