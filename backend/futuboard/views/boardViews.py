@@ -186,7 +186,7 @@ def update_board_notes(request, board_id):
         if result := token_access_failed(board_id, request):
             return result
         board = Board.objects.get(pk=board_id)
-        board.notes = request.data.get("notes", board.notes)
+        board.notes = request.data.get("notes")
         board.save()
         serializer = BoardSerializer(board)
         return JsonResponse(serializer.data, safe=False)
