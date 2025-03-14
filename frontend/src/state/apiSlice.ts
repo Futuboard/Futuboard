@@ -178,7 +178,14 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: () => invalidateRemoteCache(["Boards"])
     }),
-
+    updateBoardNotes: builder.mutation<string, { boardId: string; notes: string }>({
+      query: ({ boardId, notes }) => ({
+        url: `boards/${boardId}/notes`,
+        method: "PUT",
+        body: { notes: notes }
+      }),
+      invalidatesTags: () => invalidateRemoteCache(["Boards"])
+    }),
     getColumnsByBoardId: builder.query<Column[], string>({
       query: (boardid) => `boards/${boardid}/columns/`,
       providesTags: [{ type: "Columns", id: "LIST" }]
@@ -725,6 +732,7 @@ export const {
   useUpdateBoardTitleMutation,
   useUpdateBoardPasswordMutation,
   useUpdateBoardColorMutation,
+  useUpdateBoardNotesMutation,
   useGetColumnsByBoardIdQuery,
   useGetTaskListByColumnIdQuery,
   useAddColumnMutation,

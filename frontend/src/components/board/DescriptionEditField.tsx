@@ -72,7 +72,7 @@ const DescriptionEditField: React.FC<DescriptionEditFieldProps> = ({ description
           markdownShortcutPlugin()
         ]}
         onChange={(markdown) => onChange(markdown)}
-        contentEditableClassName="md-editor-contenteditable"
+        contentEditableClassName="md-editor-contenteditable-description"
       />
     </Box>
   )

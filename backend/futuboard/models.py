@@ -30,6 +30,7 @@ class Board(models.Model):
     default_ticket_color = models.TextField(blank=True, null=True)
     default_ticket_size = models.IntegerField(blank=True, null=True)
     default_ticket_cornernote = models.TextField(blank=True, null=True)
+    notes = models.TextField(default="")
 
     class Meta:
         db_table = "Board"

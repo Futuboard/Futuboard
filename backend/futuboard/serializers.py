@@ -16,6 +16,7 @@ class BoardSerializer(serializers.ModelSerializer):
             "default_ticket_color",
             "default_ticket_size",
             "default_ticket_cornernote",
+            "notes",
         ]
 
 

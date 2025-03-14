@@ -119,8 +119,8 @@ const ColumnEditForm: React.FC<AddColumnCreationFormProps> = (props) => {
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography>
-              <b>{column.title}</b>
+            <Typography variant="h6" sx={{ width: 150, wordWrap: "break-word" }}>
+              {column.title}
             </Typography>
             <DeleteColumnButton column={column} />
           </Box>
