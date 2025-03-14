@@ -20,7 +20,7 @@ import {
 import { StickyNote2 } from "@mui/icons-material"
 import CloseIcon from "@mui/icons-material/Close"
 import { Button, ButtonGroup, Fab, Fade, Paper, Tooltip } from "@mui/material"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { useUpdateBoardNotesMutation } from "@/state/apiSlice"
 
@@ -33,14 +33,22 @@ interface BoardNotesProps {
 const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [updateBoardNotes] = useUpdateBoardNotesMutation()
-  const [notes, setNotes] = useState(content)
+  const [notes, setNotes] = useState("")
 
-  const openNotes = (event: React.MouseEvent<HTMLButtonElement>) => {
+  useEffect(() => {
+    setNotes(content)
+  }, [content])
+
+  const openNotes = async (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(anchorEl ? null : event.currentTarget)
 
     if (content != notes) {
-      onChange(notes)
-      updateBoardNotes({ boardId: boardId, notes: notes })
+      try {
+        onChange(notes)
+        await updateBoardNotes({ boardId: boardId, notes: notes })
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 
