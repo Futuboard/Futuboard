@@ -12,6 +12,7 @@ from ..models import Action, Board, Column, Scope, Swimlanecolumn, Ticket, Ticke
 
 from ..serializers import (
     BoardSerializer,
+    ScopeSerializer,
     SwimlaneColumnSerializer,
     TicketSerializer,
     UserSerializer,
@@ -57,6 +58,7 @@ def create_data_dict_from_board(board_id):
     data["tickets"] = TicketSerializer(tickets, many=True).data
     data["actions"] = ActionSerializer(actions, many=True).data
     data["ticketEvents"] = TicketEventSerializer(ticketEvents, many=True).data
+    data["scopes"] = ScopeSerializer(Scope.objects.filter(boardid=board_id), many=True).data
 
     return data
 
