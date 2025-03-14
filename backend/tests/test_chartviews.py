@@ -140,6 +140,8 @@ def test_ticket_create_event():
         "new_columnid": str(column_id),
         "old_size": 0,
         "new_size": 5,
+        "new_scopes": [],
+        "old_scopes": [],
         "title": "test ticket",
     }
 
@@ -176,6 +178,8 @@ def test_ticket_move_event():
         "new_columnid": str(column_id_2),
         "old_size": 5,
         "new_size": 5,
+        "new_scopes": [],
+        "old_scopes": [],
         "title": "test ticket",
     }
 
@@ -216,6 +220,8 @@ def test_ticket_edit_event():
         "new_columnid": str(column_id),
         "old_size": 5,
         "new_size": 10,
+        "new_scopes": [],
+        "old_scopes": [],
         "title": "edited test ticket",
     }
 
@@ -252,8 +258,80 @@ def test_ticket_delete_event():
         "new_columnid": None,
         "old_size": 5,
         "new_size": 0,
+        "new_scopes": [],
+        "old_scopes": [],
         "title": "test ticket",
     }
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_ticket_event_scopes_stay_in_events():
+    """
+    Test that correct events are returned for ticket edit
+    """
+    api_client = APIClient()
+
+    boardid, column_id, column_id_2 = create_board_and_columns()
+
+    ticket = create_ticket_at_time(boardid, column_id, datetime(2024, 1, 1))
+
+    scope_response = api_client.post(reverse("scopes_on_board", args=[boardid]), {"title": "test scope"})
+    scope_id = scope_response.json()["scopeid"]
+
+    scope_response_2 = api_client.post(reverse("scopes_on_board", args=[boardid]), {"title": "test scope"})
+    scope_id_2 = scope_response_2.json()["scopeid"]
+
+    freezer = freeze_time(datetime(2024, 1, 2))
+    freezer.start()
+    api_client.post(reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket["ticketid"]})
+    freezer.stop()
+
+    new_ticket = ticket.copy()
+    new_ticket["title"] = "edited test ticket"
+    new_ticket["size"] = 10
+
+    edit_ticket_at_time(column_id, datetime(2024, 1, 3), new_ticket)
+    move_ticket_at_time(boardid, column_id_2, datetime(2024, 1, 4), ticket["ticketid"])
+
+    freezer = freeze_time(datetime(2024, 1, 5))
+    freezer.start()
+    api_client.post(reverse("tickets_in_scope", args=[scope_id_2]), {"ticketid": ticket["ticketid"]})
+    freezer.stop()
+
+    delete_ticket_at_time(column_id_2, datetime(2024, 1, 6), ticket["ticketid"])
+
+    response = api_client.get(reverse("events", args=[boardid]))
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data) == 6
+
+    assert data[0]["event_type"] == "CREATE"
+    assert data[0]["old_scopes"] == []
+    assert data[0]["new_scopes"] == []
+
+    assert data[1]["event_type"] == "SCOPE"
+    assert data[1]["old_scopes"] == []
+    assert data[1]["new_scopes"] == [scope_id]
+
+    assert data[2]["event_type"] == "UPDATE"
+    assert data[2]["old_scopes"] == [scope_id]
+    assert data[2]["new_scopes"] == [scope_id]
+
+    assert data[3]["event_type"] == "MOVE"
+    assert data[3]["old_scopes"] == [scope_id]
+    assert data[3]["new_scopes"] == [scope_id]
+
+    assert data[4]["event_type"] == "SCOPE"
+    assert data[4]["old_scopes"] == [scope_id]
+    assert data[4]["new_scopes"] == [scope_id, scope_id_2] or data[4]["new_scopes"] == [scope_id_2, scope_id]
+
+    assert data[5]["event_type"] == "DELETE"
+    assert data[5]["old_scopes"] == [scope_id, scope_id_2] or data[5]["old_scopes"] == [scope_id_2, scope_id]
+    assert data[5]["new_scopes"] == []
 
     resetDB()
 
