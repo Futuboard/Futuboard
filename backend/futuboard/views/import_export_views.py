@@ -8,7 +8,7 @@ from django.http import HttpResponse
 
 from ..verification import hash_password
 
-from ..models import Action, Board, Column, Swimlanecolumn, Ticket, TicketEvent, User
+from ..models import Action, Board, Column, Scope, Swimlanecolumn, Ticket, TicketEvent, User
 
 from ..serializers import (
     BoardSerializer,
@@ -107,6 +107,9 @@ def create_board_from_data_dict(data, new_title, new_password):
 
     for action in data["actions"]:
         add_to_db(Action, action)
+
+    for scope in data["scopes"]:
+        add_to_db(Scope, scope)
 
     for ticketEvent in data["ticketEvents"]:
         add_to_db(TicketEvent, ticketEvent)
