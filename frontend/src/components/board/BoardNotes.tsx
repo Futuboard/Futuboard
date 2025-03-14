@@ -31,7 +31,7 @@ interface BoardNotesProps {
 }
 
 const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+  const [open, setOpen] = useState(false)
   const [updateBoardNotes] = useUpdateBoardNotesMutation()
   const [notes, setNotes] = useState("")
 
@@ -39,9 +39,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
     setNotes(content)
   }, [content])
 
-  const openNotes = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(anchorEl ? null : event.currentTarget)
-
+  const saveNotes = async () => {
     if (content != notes) {
       try {
         onChange(notes)
@@ -50,14 +48,13 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
         console.error(error)
       }
     }
+    setOpen(false)
   }
 
   const handleClose = () => {
-    setAnchorEl(null)
+    setOpen(false)
     setNotes(content)
   }
-
-  const open = Boolean(anchorEl)
 
   return (
     <div>
@@ -67,7 +64,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
           variant="contained"
           color="info"
         >
-          <Button onClick={openNotes} endIcon={<StickyNote2 />}>
+          <Button onClick={saveNotes} endIcon={<StickyNote2 />}>
             Save
           </Button>
           <Button onClick={handleClose} endIcon={<CloseIcon />}>
@@ -77,13 +74,17 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
       </Fade>
       <Fade in={!open} unmountOnExit>
         <Tooltip title="open notes" placement="left" arrow>
-          <Fab sx={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 1001 }} onClick={openNotes} color="info">
+          <Fab
+            sx={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 1001 }}
+            onClick={() => setOpen(true)}
+            color="info"
+          >
             <StickyNote2 />
           </Fab>
         </Tooltip>
       </Fade>
 
-      <Fade in={Boolean(anchorEl)} unmountOnExit>
+      <Fade in={open} unmountOnExit>
         <Paper
           sx={{
             width: "520px",
