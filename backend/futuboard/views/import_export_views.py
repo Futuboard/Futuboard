@@ -110,7 +110,7 @@ def create_board_from_data_dict(data, new_title, new_password):
     for action in data["actions"]:
         add_to_db(Action, action)
 
-    for scope in data["scopes"]:
+    for scope in data.get("scopes", []):
         add_to_db(Scope, scope)
 
     for ticketEvent in data["ticketEvents"]:
