@@ -88,7 +88,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
           elevation={16}
         >
           <MDXEditor
-            placeholder="Share notes for the board"
+            placeholder="Shared notes for the board"
             markdown={notes}
             onChange={setNotes}
             trim={false}
