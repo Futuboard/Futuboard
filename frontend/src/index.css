@@ -66,6 +66,5 @@ button:focus-visible {
 }
 
 .md-editor-contenteditable-notes {
-  overflow-y: auto;
-  height: 89vh;
+  height: 84vh;
 }

@@ -19,7 +19,7 @@ import {
 } from "@mdxeditor/editor"
 import { StickyNote2 } from "@mui/icons-material"
 import CloseIcon from "@mui/icons-material/Close"
-import { Button, ButtonGroup, Fab, Fade, Paper, Tooltip } from "@mui/material"
+import { Box, Button, ButtonGroup, Fab, Fade, Paper, Tooltip } from "@mui/material"
 import { useEffect, useState } from "react"
 
 import { useUpdateBoardNotesMutation } from "@/state/apiSlice"
@@ -58,24 +58,10 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
 
   return (
     <div>
-      <Fade in={open} unmountOnExit>
-        <ButtonGroup
-          sx={{ position: "fixed", bottom: "1.75rem", right: "1.75rem", zIndex: 1001 }}
-          variant="contained"
-          color="info"
-        >
-          <Button onClick={saveNotes} endIcon={<StickyNote2 />}>
-            Save
-          </Button>
-          <Button onClick={handleClose} endIcon={<CloseIcon />}>
-            Cancel
-          </Button>
-        </ButtonGroup>
-      </Fade>
       <Fade in={!open} unmountOnExit>
         <Tooltip title="open notes" placement="left" arrow>
           <Fab
-            sx={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 1001 }}
+            sx={{ position: "fixed", bottom: "0.75rem", right: "0.75rem", zIndex: 1001 }}
             onClick={() => setOpen(true)}
             color="info"
           >
@@ -92,42 +78,56 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
             bottom: "1rem",
             right: "1rem",
             top: "calc(65px + 1rem)",
-            zIndex: 1000
+            zIndex: 1000,
+            justifyContent: "flex-start",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end"
           }}
           elevation={16}
         >
-          <MDXEditor
-            placeholder="Shared notes for the board"
-            markdown={notes}
-            onChange={setNotes}
-            trim={false}
-            plugins={[
-              toolbarPlugin({
-                toolbarContents: () => (
-                  <>
-                    <BlockTypeSelect />
-                    <BoldItalicUnderlineToggles />
-                    <Separator />
-                    <ListsToggle />
-                    <Separator />
-                    <CreateLink />
-                    <Separator />
-                    <CodeToggle />
-                    <InsertTable />
-                  </>
-                )
-              }),
-              linkPlugin(),
-              linkDialogPlugin(),
-              tablePlugin(),
-              listsPlugin(),
-              quotePlugin(),
-              headingsPlugin(),
-              thematicBreakPlugin(),
-              markdownShortcutPlugin()
-            ]}
-            contentEditableClassName="md-editor-contenteditable-notes"
-          />
+          <Box sx={{ overflow: "auto" }}>
+            <MDXEditor
+              placeholder="Shared notes for the board"
+              markdown={notes}
+              onChange={setNotes}
+              trim={false}
+              plugins={[
+                toolbarPlugin({
+                  toolbarContents: () => (
+                    <>
+                      <BlockTypeSelect />
+                      <BoldItalicUnderlineToggles />
+                      <Separator />
+                      <ListsToggle />
+                      <Separator />
+                      <CreateLink />
+                      <Separator />
+                      <CodeToggle />
+                      <InsertTable />
+                    </>
+                  )
+                }),
+                linkPlugin(),
+                linkDialogPlugin(),
+                tablePlugin(),
+                listsPlugin(),
+                quotePlugin(),
+                headingsPlugin(),
+                thematicBreakPlugin(),
+                markdownShortcutPlugin()
+              ]}
+              contentEditableClassName="md-editor-contenteditable-notes"
+            />
+          </Box>
+          <ButtonGroup sx={{ margin: "13px 13px 0 0" }} variant="contained" color="info">
+            <Button onClick={saveNotes} endIcon={<StickyNote2 />}>
+              Save
+            </Button>
+            <Button onClick={handleClose} endIcon={<CloseIcon />}>
+              Cancel
+            </Button>
+          </ButtonGroup>
         </Paper>
       </Fade>
     </div>
