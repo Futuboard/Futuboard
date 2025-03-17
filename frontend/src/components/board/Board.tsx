@@ -52,7 +52,10 @@ const Board: React.FC = () => {
         <Box
           {...provided.droppableProps}
           ref={provided.innerRef}
-          sx={{ display: "inline-flex", height: "100vh", width: "fit-content", margin: "4rem 545px 25px 25px" }}
+          sx={{
+            display: "inline-flex",
+            margin: "4rem 545px 25px 25px"
+          }}
         >
           {isSuccess && columns.map((column, index) => <Column key={column.columnid} column={column} index={index} />)}
           {provided.placeholder}

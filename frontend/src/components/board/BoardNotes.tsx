@@ -61,7 +61,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
       <Fade in={!open} unmountOnExit>
         <Tooltip title="open notes" placement="left" arrow>
           <Fab
-            sx={{ position: "fixed", bottom: "0.75rem", right: "0.75rem", zIndex: 1001 }}
+            sx={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 1001 }}
             onClick={() => setOpen(true)}
             color="info"
           >
@@ -75,18 +75,18 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
           sx={{
             width: "520px",
             position: "fixed",
-            bottom: "1rem",
-            right: "1rem",
-            top: "calc(65px + 1rem)",
+            bottom: "1.5rem",
+            right: "1.5rem",
+            top: "calc(65px + 1.5rem)",
             zIndex: 1000,
-            justifyContent: "flex-start",
+            justifyContent: "space-between",
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-end"
           }}
           elevation={16}
         >
-          <Box sx={{ overflow: "auto" }}>
+          <Box sx={{ overflow: "hidden" }}>
             <MDXEditor
               placeholder="Shared notes for the board"
               markdown={notes}
@@ -120,7 +120,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
               contentEditableClassName="md-editor-contenteditable-notes"
             />
           </Box>
-          <ButtonGroup sx={{ margin: "13px 13px 0 0" }} variant="contained" color="info">
+          <ButtonGroup sx={{ marginBottom: 1, marginRight: 1 }} variant="contained" color="info">
             <Button onClick={saveNotes} endIcon={<StickyNote2 />}>
               Save
             </Button>

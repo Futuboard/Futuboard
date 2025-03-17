@@ -279,15 +279,17 @@ const BoardContainer: React.FC = () => {
     }
     return (
       <DragDropContext onDragEnd={handleOnDragEnd}>
-        <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
-        <ToolBar
-          boardId={id}
-          title={board.title || ""}
-          taskTemplate={defaultValues}
-          boardBackgroundColor={board.background_color || "white"}
-        />
-        <Board />
-        <BoardNotes content={boardNotes} onChange={setBoardNotes} boardId={board.boardid} />
+        <Box sx={{ width: "100vw", height: "100vh", overflow: "scroll" }}>
+          <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
+          <ToolBar
+            boardId={id}
+            title={board.title || ""}
+            taskTemplate={defaultValues}
+            boardBackgroundColor={board.background_color || "white"}
+          />
+          <Board />
+          <BoardNotes content={boardNotes} onChange={setBoardNotes} boardId={board.boardid} />
+        </Box>
       </DragDropContext>
     )
   }
