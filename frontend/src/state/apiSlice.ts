@@ -178,7 +178,7 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: () => invalidateRemoteCache(["Boards"])
     }),
-    updateBoardNotes: builder.mutation<string, { boardId: string; notes: string }>({
+    updateBoardNotes: builder.mutation<Board, { boardId: string; notes: string }>({
       query: ({ boardId, notes }) => ({
         url: `boards/${boardId}/notes`,
         method: "PUT",
