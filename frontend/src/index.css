@@ -67,5 +67,5 @@ button:focus-visible {
 
 .md-editor-contenteditable-notes {
   overflow: auto;
-  height: 84vh;
+  height: calc(100vh - 165px - 3rem);
 }

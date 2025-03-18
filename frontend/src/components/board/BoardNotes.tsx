@@ -84,7 +84,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
           }}
           elevation={16}
         >
-          <Box sx={{ overflow: "hidden" }}>
+          <Box>
             <MDXEditor
               placeholder="Shared notes for the board"
               markdown={notes}
