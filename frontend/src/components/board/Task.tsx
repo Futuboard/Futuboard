@@ -258,7 +258,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                         padding: "0px 20px 0px 10px"
                       }}
                     >
-                      <Typography variant={"body2"} gutterBottom style={{ color: "#2D3748" }}>
+                      <Typography variant={"body2"} gutterBottom sx={{ color: "#2D3748", wordWrap: "break-word" }}>
                         <strong>{task.title}</strong>
                       </Typography>
                     </div>
