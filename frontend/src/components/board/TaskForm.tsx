@@ -1,7 +1,8 @@
-import { DeleteForever } from "@mui/icons-material"
+import { Close, DeleteForever, Notes } from "@mui/icons-material"
 import {
   Box,
   Button,
+  ButtonGroup,
   ClickAwayListener,
   Dialog,
   DialogActions,
@@ -15,6 +16,7 @@ import {
   IconButton,
   Radio,
   RadioGroup,
+  Stack,
   TextField,
   Tooltip,
   Typography
@@ -157,9 +159,19 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Typography gutterBottom variant="h6">
-                {" "}
-                <b>{formTitle}</b>
+              <Typography
+                gutterBottom
+                variant="h6"
+                sx={{
+                  width: "100%",
+                  maxHeight: 125,
+                  wordWrap: "break-word",
+                  overflowY: "hidden",
+                  textOverflow: "ellipsis",
+                  fontWeight: "bold"
+                }}
+              >
+                {formTitle}
               </Typography>
             </Box>
             <Divider />
@@ -175,6 +187,7 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
               inputRef={inputRef}
               inputProps={{ spellCheck: "false" }}
               multiline
+              maxRows={3}
               fullWidth
               helperText={errors.taskTitle?.message}
               error={Boolean(errors.taskTitle)}
@@ -257,18 +270,19 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item container spacing={4} xs={12}>
-            <Grid item xs={10}>
-              <Button type="submit" color="primary" variant="contained">
-                {isTaskCreationForm ? "Submit" : "Save Changes"}
-              </Button>
-              <Button onClick={onCancel}>Cancel</Button>
-            </Grid>
-            {defaultValues && isTaskEditForm && (
-              <Grid item xs={1}>
-                <DeleteTaskButton task={defaultValues as Task} />
-              </Grid>
-            )}
+          <Grid item xs={12}>
+            <Divider sx={{ marginBottom: 2 }} />
+            <Stack direction="row" justifyContent="space-between">
+              <ButtonGroup>
+                <Button type="submit" color="primary" variant="contained" endIcon={<Notes />}>
+                  {isTaskCreationForm ? "Submit" : "Save Changes"}
+                </Button>
+                <Button onClick={onCancel} endIcon={<Close />}>
+                  Cancel
+                </Button>
+              </ButtonGroup>
+              {defaultValues && isTaskEditForm && <DeleteTaskButton task={defaultValues as Task} />}
+            </Stack>
           </Grid>
         </Grid>
       </form>
