@@ -313,7 +313,10 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ columnId, tasks }, apiActions) {
-        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Columns", id: columnId }]
+        const tagsToInvalidate: CacheInvalidationTag[] = [
+          { type: "Columns", id: columnId },
+          { type: "Ticket", id: "LIST" }
+        ]
 
         updateCache(
           "getTaskListByColumnId",
@@ -329,8 +332,8 @@ export const boardsApi = createApi({
         )
 
         apiActions.queryFulfilled.finally(() => {
-          invalidateRemoteCache([...tagsToInvalidate, { type: "Ticket", id: "LIST" }])
-          boardsApi.util.invalidateTags(tagsToInvalidate)
+          invalidateRemoteCache([...tagsToInvalidate])
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
       }
     }),
@@ -416,7 +419,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(tagsToInvalidate)
-          boardsApi.util.invalidateTags(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
       }
     }),
@@ -463,7 +466,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(tagsToInvalidate)
-          boardsApi.util.invalidateTags(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
       }
     }),
@@ -513,7 +516,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(tagsToInvalidate)
-          boardsApi.util.invalidateTags(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
       }
     }),
@@ -560,7 +563,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(tagsToInvalidate)
-          boardsApi.util.invalidateTags(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
       }
     }),
