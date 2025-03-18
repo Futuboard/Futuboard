@@ -19,7 +19,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@hello-pangea/dnd": "^16.5.0",
-    "@mdxeditor/editor": "^3.26.0",
+    "@mdxeditor/editor": "^3.28.0",
     "@mui/icons-material": "^5.14.19",
     "@mui/material": "^5.16.14",
     "@mui/x-date-pickers": "^7.27.0",

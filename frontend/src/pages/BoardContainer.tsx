@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useParams } from "react-router-dom"
 
+import BoardNotes from "@/components/board/BoardNotes"
 import { cacheTagTypes } from "@/constants"
 import { setBoardId } from "@/state/auth"
 import { setNotification } from "@/state/notification"
@@ -43,6 +44,7 @@ const BoardContainer: React.FC = () => {
   const [isBoardIdSet, setIsBoardIdset] = useState(false)
   const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
   const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
+  const [boardNotes, setBoardNotes] = useState("")
 
   useEffect(() => {
     const inner = async () => {
@@ -73,6 +75,7 @@ const BoardContainer: React.FC = () => {
   }, [id, tryLogin])
 
   useEffect(() => {
+    setBoardNotes(board?.notes || "")
     document.title = board?.title ? board?.title + " - Futuboard" : "Futuboard"
   }, [board])
 
@@ -276,14 +279,17 @@ const BoardContainer: React.FC = () => {
     }
     return (
       <DragDropContext onDragEnd={handleOnDragEnd}>
-        <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
-        <ToolBar
-          boardId={id}
-          title={board.title || ""}
-          taskTemplate={defaultValues}
-          boardBackgroundColor={board.background_color || "white"}
-        />
-        <Board />
+        <Box sx={{ width: "100vw", height: "100vh", overflow: "scroll" }}>
+          <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
+          <ToolBar
+            boardId={id}
+            title={board.title || ""}
+            taskTemplate={defaultValues}
+            boardBackgroundColor={board.background_color || "white"}
+          />
+          <Board />
+          <BoardNotes content={boardNotes} onChange={setBoardNotes} boardId={board.boardid} />
+        </Box>
       </DragDropContext>
     )
   }
