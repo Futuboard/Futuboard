@@ -19,7 +19,7 @@ import {
 } from "@mdxeditor/editor"
 import { StickyNote2 } from "@mui/icons-material"
 import CloseIcon from "@mui/icons-material/Close"
-import { Box, Button, ButtonGroup, Fab, Fade, Paper, Tooltip } from "@mui/material"
+import { Box, Button, ButtonGroup, Divider, Fab, Fade, Paper, Tooltip } from "@mui/material"
 import { useEffect, useState } from "react"
 
 import { useUpdateBoardNotesMutation } from "@/state/apiSlice"
@@ -79,10 +79,8 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
             right: "1.5rem",
             top: "calc(65px + 1.5rem)",
             zIndex: 1000,
-            justifyContent: "space-between",
             display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-end"
+            flexDirection: "column"
           }}
           elevation={16}
         >
@@ -120,14 +118,17 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
               contentEditableClassName="md-editor-contenteditable-notes"
             />
           </Box>
-          <ButtonGroup sx={{ marginBottom: 1, marginRight: 1 }} variant="contained" color="info">
-            <Button onClick={saveNotes} endIcon={<StickyNote2 />}>
-              Save
-            </Button>
-            <Button onClick={handleClose} endIcon={<CloseIcon />}>
-              Cancel
-            </Button>
-          </ButtonGroup>
+          <Divider variant="middle" />
+          <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "flex-end", padding: 1 }}>
+            <ButtonGroup variant="contained" color="info">
+              <Button onClick={saveNotes} endIcon={<StickyNote2 />}>
+                Save
+              </Button>
+              <Button onClick={handleClose} endIcon={<CloseIcon />}>
+                Cancel
+              </Button>
+            </ButtonGroup>
+          </Box>
         </Paper>
       </Fade>
     </div>
