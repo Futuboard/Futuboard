@@ -329,7 +329,7 @@ export const boardsApi = createApi({
         )
 
         apiActions.queryFulfilled.finally(() => {
-          invalidateRemoteCache(tagsToInvalidate)
+          invalidateRemoteCache([...tagsToInvalidate, { type: "Ticket", id: "LIST" }])
           boardsApi.util.invalidateTags(tagsToInvalidate)
         })
       }
