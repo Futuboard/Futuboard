@@ -54,7 +54,7 @@ const Board: React.FC = () => {
           ref={provided.innerRef}
           sx={{
             display: "inline-flex",
-            margin: "4rem 545px 25px 25px"
+            margin: "25px 545px 25px 25px"
           }}
         >
           {isSuccess && columns.map((column, index) => <Column key={column.columnid} column={column} index={index} />)}
