@@ -7,13 +7,15 @@ import {
   DroppableStateSnapshot
 } from "@hello-pangea/dnd"
 import { EditNote } from "@mui/icons-material"
-import { IconButton, Paper, Popover, Tooltip, Typography } from "@mui/material"
+import { Box, IconButton, Paper, Popover, Tooltip, Typography } from "@mui/material"
 import ClickAwayListener from "@mui/material/ClickAwayListener"
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { useSelector } from "react-redux"
 
+import { RootState } from "@/state/store"
 import { Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
 
-import { useUpdateTaskMutation } from "../../state/apiSlice"
+import { useAddTaskToScopeMutation, useDeleteTaskFromScopeMutation, useUpdateTaskMutation } from "../../state/apiSlice"
 
 import TaskForm from "./TaskForm"
 import UserMagnet from "./UserMagnet"
@@ -61,10 +63,11 @@ interface FormData {
   color?: string
 }
 
-const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetStateAction<boolean>> }> = ({
-  task,
-  setTaskSelected
-}) => {
+const EditTaskButton: React.FC<{
+  task: TaskType
+  setTaskSelected: Dispatch<SetStateAction<boolean>>
+  disabled?: boolean
+}> = ({ task, setTaskSelected, disabled }) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
   const [updateTask] = useUpdateTaskMutation()
 
@@ -106,9 +109,11 @@ const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetSt
   return (
     <div>
       <Tooltip title="Edit card">
-        <IconButton size="small" onClick={handleClick}>
-          <EditNote />
-        </IconButton>
+        <span>
+          <IconButton size="small" onClick={handleClick} disabled={disabled}>
+            <EditNote />
+          </IconButton>
+        </span>
       </Tooltip>
       <Popover
         disableRestoreFocus
@@ -145,18 +150,44 @@ interface TaskProps {
 }
 
 const Task: React.FC<TaskProps> = ({ task }) => {
+  const selectedScope = useSelector((state: RootState) => state.scope)
+
   const [updateTask] = useUpdateTaskMutation()
+  const [addTaskToScope] = useAddTaskToScopeMutation()
+  const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
 
   const [selected, setSelected] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [cornernote, setCornernote] = useState(task.cornernote)
+  const [isHighlighted, setIsHighlighted] = useState(false)
 
   useEffect(() => {
     setCornernote(task.cornernote)
   }, [task.cornernote])
 
+  useEffect(() => {
+    if (task.scopes.some((scope) => scope.scopeid === selectedScope)) {
+      setIsHighlighted(true)
+    } else {
+      setIsHighlighted(false)
+    }
+  }, [task.scopes, selectedScope])
+
   const handleDoubleClick = () => {
-    setIsEditing(true)
+    if (selectedScope === "") {
+      setIsEditing(true)
+    }
+  }
+
+  const handleClick = async () => {
+    if (selectedScope !== "") {
+      if (!isHighlighted) {
+        await addTaskToScope({ scopeId: selectedScope, ticketid: task.ticketid })
+      } else {
+        await deleteTaskFromScope({ scopeId: selectedScope, ticketid: task.ticketid })
+      }
+      setIsHighlighted(!isHighlighted)
+    }
   }
 
   const handleBlur = async () => {
@@ -186,12 +217,17 @@ const Task: React.FC<TaskProps> = ({ task }) => {
     <Droppable droppableId={task.ticketid + "/ticket"} type="user" direction="vertical">
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => {
         return (
-          <div ref={provided.innerRef}>
+          <Box ref={provided.innerRef}>
             <Paper
               elevation={selected ? 24 : 4}
+              onClick={handleClick}
               sx={{
                 padding: "4px",
-                backgroundColor: snapshot.isDraggingOver ? "rgba(22, 95, 199, 0.2)" : "white",
+                backgroundColor: snapshot.isDraggingOver
+                  ? "rgba(22, 95, 199, 0.2)"
+                  : isHighlighted
+                    ? "lightgreen"
+                    : "white",
                 height: "100px",
                 marginBottom: "5px",
                 borderColor: task.color,
@@ -205,11 +241,9 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                 borderTopStyle: "solid"
               }}
             >
-              <div
-                style={{ display: "flex", justifyContent: "space-between", flexDirection: "column", height: "100%" }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", overflow: "hidden" }}>
-                  <div style={{ overflow: "hidden", flexGrow: 1 }} onDoubleClick={handleDoubleClick}>
+              <Box sx={{ display: "flex", justifyContent: "space-between", flexDirection: "column", height: "100%" }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", overflow: "hidden" }}>
+                  <Box sx={{ overflow: "hidden", flexGrow: 1 }} onDoubleClick={handleDoubleClick}>
                     {isEditing ? (
                       <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={handleBlur}>
                         <input
@@ -227,19 +261,19 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                         variant={"body2"}
                         gutterBottom
                         width={"70%"}
-                        style={{ paddingTop: "6px", paddingLeft: "7px", color: "#2D3748" }}
+                        sx={{ paddingTop: "6px", paddingLeft: "7px", color: "#2D3748" }}
                       >
                         {cornernote}
                       </Typography>
                     )}
-                  </div>
-                  <div>
-                    <EditTaskButton task={task} setTaskSelected={setSelected} />
-                  </div>
-                </div>
-                <div>
-                  <div
-                    style={{
+                  </Box>
+                  <Box>
+                    <EditTaskButton task={task} setTaskSelected={setSelected} disabled={selectedScope !== ""} />
+                  </Box>
+                </Box>
+                <Box>
+                  <Box
+                    sx={{
                       display: "flex",
                       justifyContent: "space-between",
                       overflow: "hidden",
@@ -247,8 +281,8 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                       alignItems: "center"
                     }}
                   >
-                    <div
-                      style={{
+                    <Box
+                      sx={{
                         display: "-webkit-box",
                         WebkitBoxOrient: "vertical",
                         WebkitLineClamp: 2,
@@ -258,18 +292,18 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                         padding: "0px 20px 0px 10px"
                       }}
                     >
-                      <Typography variant={"body2"} gutterBottom style={{ color: "#2D3748" }}>
+                      <Typography variant={"body2"} gutterBottom sx={{ color: "#2D3748" }}>
                         <strong>{task.title}</strong>
                       </Typography>
-                    </div>
-                  </div>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <div style={{ overflow: "hidden", width: "90%" }}>
+                    </Box>
+                  </Box>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Box sx={{ overflow: "hidden", width: "90%" }}>
                     <TaskUserList users={task.users} taskid={task.ticketid} />
-                  </div>
-                  <div
-                    style={{
+                  </Box>
+                  <Box
+                    sx={{
                       display: "flex",
                       justifyContent: "flex-end",
                       alignItems: "flex-end",
@@ -278,17 +312,17 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                       paddingBottom: "3px"
                     }}
                   >
-                    <div>
+                    <Box>
                       <Typography sx={{ fontWeight: "bold", fontSize: "17px", color: "#2D3748" }}>
                         {task.size}
                       </Typography>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
               {provided.placeholder}
             </Paper>
-          </div>
+          </Box>
         )
       }}
     </Droppable>

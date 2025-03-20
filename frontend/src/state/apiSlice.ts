@@ -715,6 +715,32 @@ export const boardsApi = createApi({
         { type: "Columns", id: "LIST" },
         { type: "Ticket", id: "LIST" }
       ]
+    }),
+
+    addTaskToScope: builder.mutation<{ success: boolean }, { scopeId: string; ticketid: string }>({
+      query: ({ scopeId, ticketid }) => ({
+        url: `scopes/${scopeId}/tickets`,
+        method: "POST",
+        body: { ticketid }
+      }),
+      invalidatesTags: (_result, _error, { ticketid }) =>
+        invalidateRemoteCache([
+          { type: "Ticket", id: ticketid },
+          { type: "Ticket", id: "LIST" }
+        ])
+    }),
+
+    deleteTaskFromScope: builder.mutation<{ success: boolean }, { scopeId: string; ticketid: string }>({
+      query: ({ scopeId, ticketid }) => ({
+        url: `scopes/${scopeId}/tickets`,
+        method: "DELETE",
+        body: { ticketid }
+      }),
+      invalidatesTags: (_result, _error, { ticketid }) =>
+        invalidateRemoteCache([
+          { type: "Ticket", id: ticketid },
+          { type: "Ticket", id: "LIST" }
+        ])
     })
   })
 })
@@ -759,5 +785,7 @@ export const {
   useDeleteUserFromTicketMutation,
   useCheckAdminPasswordMutation,
   useUpdateTaskTemplateMutation,
-  useGetCumulativeFlowDiagramDataQuery
+  useGetCumulativeFlowDiagramDataQuery,
+  useAddTaskToScopeMutation,
+  useDeleteTaskFromScopeMutation
 } = boardsApi

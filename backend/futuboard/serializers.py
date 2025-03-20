@@ -123,6 +123,7 @@ class TicketSizeSerializer(serializers.ModelSerializer):
 
 
 class ScopeSerializer(serializers.ModelSerializer):
+<<<<<<< HEAD
     class Meta:
         model = Scope
         fields = [
@@ -139,6 +140,8 @@ class ScopeSerializer(serializers.ModelSerializer):
 
 
 class ScopeSerializerWithRelationInfo(serializers.ModelSerializer):
+=======
+>>>>>>> ticket-select-in-scope-test
     done_columns = ColumnSerializer(many=True, read_only=True)
     tickets = TicketSizeSerializer(many=True, read_only=True)
     forecast_tickets = TicketSizeSerializer(many=True, read_only=True)
