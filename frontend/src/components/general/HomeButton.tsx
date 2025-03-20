@@ -1,7 +1,7 @@
 import { IconButton, Tooltip } from "@mui/material"
 import { Link } from "react-router-dom"
 
-import LogoIcon from "./LogoIcon"
+import LogoIcon from "../board/LogoIcon"
 
 const HomeButton = () => {
   return (

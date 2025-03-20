@@ -1,6 +1,6 @@
-import ToolBar from "@/components/board/Toolbar"
 import Charts from "@/components/charts/Charts"
-import LoggedInContainer from "@/components/LoggedInContainer"
+import LoggedInContainer from "@/components/general/LoggedInContainer"
+import ToolBar from "@/components/general/Toolbar"
 
 const ChartsContainer = () => {
   return (

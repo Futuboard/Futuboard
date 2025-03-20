@@ -30,16 +30,17 @@ import { Link, useParams } from "react-router-dom"
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
 import { TaskTemplate } from "@/types"
 
-import BoardBackgroundColorForm from "./BoardBackgroundColorForm"
-import BoardDeletionComponent from "./BoardDeletionComponent"
-import BoardPasswordChangeForm from "./BoardPasswordChangeForm"
-import BoardTitleChangeForm from "./BoardTitleChangeForm"
-import CopyToClipboardButton from "./CopyToClipBoardButton"
-import CreateColumnButton from "./CreateColumnButton"
+import BoardBackgroundColorForm from "../board/BoardBackgroundColorForm"
+import BoardDeletionComponent from "../board/BoardDeletionComponent"
+import BoardPasswordChangeForm from "../board/BoardPasswordChangeForm"
+import BoardTitleChangeForm from "../board/BoardTitleChangeForm"
+import CopyToClipboardButton from "../board/CopyToClipBoardButton"
+import CreateColumnButton from "../board/CreateColumnButton"
+import TaskForm from "../board/TaskForm"
+import UserCreationForm from "../board/UserCreationForm"
+import UserList from "../board/UserList"
+
 import HomeButton from "./HomeButton"
-import TaskForm from "./TaskForm"
-import UserCreationForm from "./UserCreationForm"
-import UserList from "./UserList"
 
 interface FormData {
   name: string

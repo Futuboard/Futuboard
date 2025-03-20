@@ -3,11 +3,11 @@ import { Box, Typography } from "@mui/material"
 import { useParams } from "react-router"
 
 import { useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
+import { AddUserButton } from "../general/Toolbar"
 
 import Column from "./Column"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
-import { AddUserButton } from "./Toolbar"
 
 const Board: React.FC = () => {
   const { id = "default-id" } = useParams()

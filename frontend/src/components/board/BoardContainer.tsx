@@ -2,7 +2,7 @@ import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 import { produce } from "immer"
 
 import Board from "@/components/board/Board"
-import ToolBar from "@/components/board/Toolbar"
+import ToolBar from "@/components/general/Toolbar"
 import { setNotification } from "@/state/notification"
 import { store } from "@/state/store"
 import { Action, Task, User, Board as BoardType } from "@/types"
