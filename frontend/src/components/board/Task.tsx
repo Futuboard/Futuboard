@@ -10,10 +10,12 @@ import { EditNote } from "@mui/icons-material"
 import { IconButton, Paper, Popover, Tooltip, Typography } from "@mui/material"
 import ClickAwayListener from "@mui/material/ClickAwayListener"
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { useSelector } from "react-redux"
 
+import { RootState } from "@/state/store"
 import { Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
 
-import { useUpdateTaskMutation } from "../../state/apiSlice"
+import { useAddTaskToScopeMutation, useDeleteTaskFromScopeMutation, useUpdateTaskMutation } from "../../state/apiSlice"
 
 import TaskForm from "./TaskForm"
 import UserMagnet from "./UserMagnet"
@@ -145,18 +147,42 @@ interface TaskProps {
 }
 
 const Task: React.FC<TaskProps> = ({ task }) => {
+  const selectedScope = useSelector((state: RootState) => state.scope)
+
   const [updateTask] = useUpdateTaskMutation()
+  const [addTaskToScope] = useAddTaskToScopeMutation()
+  const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
 
   const [selected, setSelected] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [cornernote, setCornernote] = useState(task.cornernote)
+  const [isHighlighted, setIsHighlighted] = useState(false)
 
   useEffect(() => {
     setCornernote(task.cornernote)
   }, [task.cornernote])
 
+  useEffect(() => {
+    if (task.scopes.some((scope) => scope.scopeid === selectedScope)) {
+      setIsHighlighted(true)
+    } else {
+      setIsHighlighted(false)
+    }
+  }, [task.scopes, selectedScope])
+
   const handleDoubleClick = () => {
     setIsEditing(true)
+  }
+
+  const handleClick = async () => {
+    if (selectedScope !== "") {
+      if (!isHighlighted) {
+        await addTaskToScope({ scopeId: selectedScope, ticketid: task.ticketid })
+      } else {
+        await deleteTaskFromScope({ scopeId: selectedScope, ticketid: task.ticketid })
+      }
+      setIsHighlighted(!isHighlighted)
+    }
   }
 
   const handleBlur = async () => {
@@ -189,9 +215,14 @@ const Task: React.FC<TaskProps> = ({ task }) => {
           <div ref={provided.innerRef}>
             <Paper
               elevation={selected ? 24 : 4}
+              onClick={handleClick}
               sx={{
                 padding: "4px",
-                backgroundColor: snapshot.isDraggingOver ? "rgba(22, 95, 199, 0.2)" : "white",
+                backgroundColor: snapshot.isDraggingOver
+                  ? "rgba(22, 95, 199, 0.2)"
+                  : isHighlighted
+                    ? "lightgreen"
+                    : "white",
                 height: "100px",
                 marginBottom: "5px",
                 borderColor: task.color,
