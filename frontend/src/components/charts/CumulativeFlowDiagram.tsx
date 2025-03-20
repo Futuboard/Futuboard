@@ -1,10 +1,11 @@
-import { Button, ButtonGroup, CircularProgress, Divider, Grid, Paper, Stack, Typography } from "@mui/material"
+import { Button, ButtonGroup, CircularProgress, Divider, InputLabel, Paper, Stack, Typography } from "@mui/material"
 import dayjs from "dayjs"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 
+import { countUnitOptions } from "@/constants"
 import { useGetCumulativeFlowDiagramDataQuery } from "@/state/apiSlice"
-import { TimeUnit } from "@/types"
+import { CountUnit, TimeUnit } from "@/types"
 
 import ChartContainer from "./ChartContainer"
 import DateSelector from "./DateSelector"
@@ -18,49 +19,79 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
     start: dayjs.Dayjs | undefined
     end: dayjs.Dayjs | undefined
     timeUnit: TimeUnit
-  }>({ start: dayjs().subtract(30, "day"), end: dayjs(), timeUnit: "day" })
+    countUnit: CountUnit
+  }>({ start: dayjs().subtract(30, "day"), end: dayjs(), timeUnit: "day", countUnit: "size" })
 
-  const { data: data, isLoading: isLoading } = useGetCumulativeFlowDiagramDataQuery({
+  const {
+    data: data,
+    isLoading: isLoading,
+    refetch
+  } = useGetCumulativeFlowDiagramDataQuery({
     boardId: boardId,
     timeUnit: queryparams.timeUnit,
     start: queryparams.start?.format("YYYY-MM-DD"),
-    end: queryparams.end?.format("YYYY-MM-DD")
+    end: queryparams.end?.format("YYYY-MM-DD"),
+    countUnit: queryparams.countUnit
   })
 
   const [shortcut, setShortcut] = useState("month")
   const [highlightedArea, setHighlightedArea] = useState("")
 
-  const handleSubmit = (start: dayjs.Dayjs | undefined, end: dayjs.Dayjs | undefined, timeUnit: TimeUnit) => {
-    if (timeUnit == queryparams.timeUnit) {
-      setShortcut("")
-    }
+  useEffect(() => {
+    refetch()
+  }, [queryparams, refetch])
+
+  const setStart = (start: dayjs.Dayjs | undefined) => {
+    setQueryparams((params) => ({ ...params, start }))
+  }
+
+  const setEnd = (end: dayjs.Dayjs | undefined) => {
+    setQueryparams((params) => ({ ...params, end }))
+  }
+
+  const setTimeUnit = (timeUnit: TimeUnit) => {
+    setQueryparams((params) => ({ ...params, timeUnit }))
+  }
+
+  const setCountUnit = (countUnit: CountUnit) => {
+    setQueryparams((params) => ({ ...params, countUnit }))
+  }
+
+  const handleDateSelectorChange = (
+    start: dayjs.Dayjs | undefined,
+    end: dayjs.Dayjs | undefined,
+    timeUnit: TimeUnit
+  ) => {
     setQueryparams({
       start: start,
       end: end,
-      timeUnit: timeUnit
+      timeUnit: timeUnit,
+      countUnit: queryparams.countUnit
     })
   }
 
   const handleShortCut = (event: React.MouseEvent<HTMLElement>) => {
     switch (event.currentTarget.textContent) {
       case "week":
-        handleSubmit(dayjs().subtract(1, "w"), dayjs(), queryparams.timeUnit)
+        setStart(dayjs().subtract(1, "w"))
         break
       case "month":
-        handleSubmit(dayjs().subtract(1, "month"), dayjs(), queryparams.timeUnit)
+        setStart(dayjs().subtract(1, "month"))
         break
       case "3 months":
-        handleSubmit(dayjs().subtract(3, "month"), dayjs(), queryparams.timeUnit)
+        setStart(dayjs().subtract(3, "month"))
         break
       case "6 months":
-        handleSubmit(dayjs().subtract(6, "month"), dayjs(), queryparams.timeUnit)
+        setStart(dayjs().subtract(6, "month"))
         break
       case "year":
-        handleSubmit(dayjs().subtract(1, "year"), dayjs(), queryparams.timeUnit)
+        setStart(dayjs().subtract(1, "year"))
         break
-      default:
-        handleSubmit(undefined, dayjs(), queryparams.timeUnit)
+      case "max":
+        setStart(undefined)
+        break
     }
+    setEnd(dayjs())
     setShortcut(event.currentTarget.textContent as string)
   }
 
@@ -196,8 +227,10 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
             .reverse()}
         </AreaChart>
       </ChartContainer>
-      <Grid item>
-        <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
+
+      <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ marginBottom: 1 }}>
+        <InputLabel sx={{ display: "flex", alignItems: "center", flexDirection: "column", gap: 0.5 }}>
+          Time frame
           <ButtonGroup color="primary">
             {shortcutOptions.map((choice) => (
               <Button key={choice} variant={choice == shortcut ? "contained" : "outlined"} onClick={handleShortCut}>
@@ -205,6 +238,9 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
               </Button>
             ))}
           </ButtonGroup>
+        </InputLabel>
+        <InputLabel sx={{ display: "flex", alignItems: "center", flexDirection: "column", gap: 0.5 }}>
+          Time unit
           <ButtonGroup size="small">
             {timeUnitChoices.map((timeUnit) => (
               <Button
@@ -212,24 +248,39 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
                 key={timeUnit}
                 value={timeUnit}
                 onClick={(event) => {
-                  handleSubmit(queryparams.start, queryparams.end, event.currentTarget.textContent as TimeUnit)
+                  setTimeUnit(event.currentTarget.value as TimeUnit)
                 }}
               >
                 {timeUnit}
               </Button>
             ))}
           </ButtonGroup>
-        </Stack>
-      </Grid>
-      <Grid item>
-        <DateSelector
-          startValue={queryparams.start}
-          endValue={queryparams.end}
-          timeUnitValue={queryparams.timeUnit}
-          onChange={handleSubmit}
-          shortcutValue={shortcut}
-        />
-      </Grid>
+        </InputLabel>
+        <InputLabel sx={{ display: "flex", alignItems: "center", flexDirection: "column", gap: 0.5 }}>
+          Count unit
+          <ButtonGroup size="small">
+            {countUnitOptions.map((unit) => (
+              <Button
+                variant={unit == queryparams.countUnit ? "contained" : "outlined"}
+                key={unit}
+                value={unit}
+                onClick={(event) => {
+                  setCountUnit(event.currentTarget.value as CountUnit)
+                }}
+              >
+                {unit}
+              </Button>
+            ))}
+          </ButtonGroup>
+        </InputLabel>
+      </Stack>
+      <DateSelector
+        startValue={queryparams.start}
+        endValue={queryparams.end}
+        timeUnitValue={queryparams.timeUnit}
+        onChange={handleDateSelectorChange}
+        shortcutValue={shortcut}
+      />
     </>
   )
 }

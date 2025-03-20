@@ -29,13 +29,14 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
         time_unit = request.query_params.get("time_unit", "day")  # Default to day
         start_time = request.query_params.get("start_time")
         end_time = request.query_params.get("end_time")
+        count_unit = request.query_params.get("count_unit", "size")  # Default to size
 
         if time_unit not in possible_time_units:
             return JsonResponse({"error": "Invalid time unit"}, status=400)
 
         columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
 
-        data_with_column_ids = get_column_story_points_at_times(columns, time_unit, start_time, end_time)
+        data_with_column_ids = get_column_sizes_at_times(columns, time_unit, count_unit, start_time, end_time)
 
         (data_with_column_names, column_names) = change_column_ids_to_names(data_with_column_ids, columns)
 
@@ -69,8 +70,8 @@ def velocity(request: rest_framework.request.Request, board_id):
         return JsonResponse({"data": data}, safe=False)
 
 
-def get_column_story_points_at_times(
-    columns, time_unit, start_time=None, end_time=None
+def get_column_sizes_at_times(
+    columns, time_unit, count_unit, start_time=None, end_time=None
 ) -> list[tuple[str, dict[str, dict[str, int]]]]:
     ticket_events = (
         TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
@@ -132,15 +133,25 @@ def get_column_story_points_at_times(
 
         if events_at_time is not None:
             for event in events_at_time:
-                if event.event_type == TicketEvent.CREATE:
-                    setSize(column_sizes, event.new_columnid.columnid, event.new_size)
-                elif event.event_type == TicketEvent.DELETE:
-                    setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
-                elif event.event_type == TicketEvent.MOVE:
-                    setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
-                    setSize(column_sizes, event.new_columnid.columnid, event.new_size)
-                elif event.event_type == TicketEvent.UPDATE:
-                    setSize(column_sizes, event.new_columnid.columnid, event.new_size - event.old_size)
+                if count_unit == "size":
+                    if event.event_type == TicketEvent.CREATE:
+                        setSize(column_sizes, event.new_columnid.columnid, event.new_size)
+                    elif event.event_type == TicketEvent.DELETE:
+                        setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
+                    elif event.event_type == TicketEvent.MOVE:
+                        setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
+                        setSize(column_sizes, event.new_columnid.columnid, event.new_size)
+                    elif event.event_type == TicketEvent.UPDATE:
+                        setSize(column_sizes, event.new_columnid.columnid, event.new_size - event.old_size)
+
+                elif count_unit == "cards":
+                    if event.event_type == TicketEvent.CREATE:
+                        setSize(column_sizes, event.new_columnid.columnid, 1)
+                    elif event.event_type == TicketEvent.DELETE:
+                        setSize(column_sizes, event.old_columnid.columnid, -1)
+                    elif event.event_type == TicketEvent.MOVE:
+                        setSize(column_sizes, event.old_columnid.columnid, -1)
+                        setSize(column_sizes, event.new_columnid.columnid, 1)
 
         prev_column_sizes = column_sizes.copy()
         time += time_delta

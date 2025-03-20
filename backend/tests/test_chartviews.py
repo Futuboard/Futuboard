@@ -379,7 +379,7 @@ def test_cumulative_flow_with_params():
     boardid = create_board_with_events()
 
     url = reverse("cumulative_flow", args=[boardid])
-    url += "?time_unit=day&start_time=2024-01-02&end_time=2024-01-03"
+    url += "?time_unit=day&start_time=2024-01-02&end_time=2024-01-03&count_unit=cards"
 
     response = api_client.get(url)
     assert response.status_code == 200
@@ -392,8 +392,8 @@ def test_cumulative_flow_with_params():
     assert len(data) == 2
 
     assert data == [
-        {"name": "2024-01-02T00:00:00", "Column 1": 0, "Column 2": 10},
-        {"name": "2024-01-03T00:00:00", "Column 1": 0, "Column 2": 15},
+        {"name": "2024-01-02T00:00:00", "Column 1": 0, "Column 2": 2},
+        {"name": "2024-01-03T00:00:00", "Column 1": 0, "Column 2": 2},
     ]
 
     assert columns_names == ["Column 1", "Column 2"]

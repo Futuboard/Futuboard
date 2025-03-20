@@ -707,12 +707,12 @@ export const boardsApi = createApi({
     }),
     getCumulativeFlowDiagramData: builder.query<
       ChartData,
-      { boardId: string; timeUnit?: string; start?: string; end?: string }
+      { boardId: string; timeUnit?: string; start?: string; end?: string; countUnit?: string }
     >({
-      query: ({ boardId, timeUnit, start, end }) => ({
+      query: ({ boardId, timeUnit, start, end, countUnit }) => ({
         url: `charts/${boardId}/cumulativeflow`,
         method: "GET",
-        params: { time_unit: timeUnit, start_time: start, end_time: end }
+        params: { time_unit: timeUnit, start_time: start, end_time: end, count_unit: countUnit }
       }),
       providesTags: [
         { type: "Columns", id: "LIST" },
