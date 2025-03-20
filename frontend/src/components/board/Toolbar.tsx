@@ -39,7 +39,6 @@ import BoardTitleChangeForm from "./BoardTitleChangeForm"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
 import HomeButton from "./HomeButton"
-import ScopeDemo from "./ScopeDemo"
 import ScopeList from "./ScopeList"
 import TaskForm from "./TaskForm"
 import UserCreationForm from "./UserCreationForm"
@@ -239,7 +238,6 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   return (
     <Box display="flex" alignItems="center" justifyContent="flex-end" sx={{ minWidth: 0, flexGrow: 1 }}>
       {isSuccess && users.length > 0 && <UserList users={users} />}
-      <ScopeDemo />
       <AddUserButton />
       <OpenScopeListButton handler={handleScopeList} />
       <CopyToClipboardButton />
