@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from django.http import JsonResponse
 
 from ..models import Board, Column, Scope, Ticket, TicketEvent
-from ..serializers import ScopeSerializer
+from ..serializers import ScopeSerializerWithRelationInfo
 import rest_framework.request
 from django.utils.timezone import now
 
@@ -12,7 +12,7 @@ def scopes_on_board(request: rest_framework.request.Request, boardid: str):
     if request.method == "GET":
         board = Board.objects.get(boardid=boardid)
         query_set = Scope.objects.filter(boardid=board)
-        serializer = ScopeSerializer(query_set, many=True)
+        serializer = ScopeSerializerWithRelationInfo(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":
@@ -23,7 +23,7 @@ def scopes_on_board(request: rest_framework.request.Request, boardid: str):
         )
         new_scope.save()
 
-        serializer = ScopeSerializer(new_scope)
+        serializer = ScopeSerializerWithRelationInfo(new_scope)
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "DELETE":

@@ -16,6 +16,7 @@ class BoardSerializer(serializers.ModelSerializer):
             "default_ticket_color",
             "default_ticket_size",
             "default_ticket_cornernote",
+            "notes",
         ]
 
 
@@ -122,6 +123,22 @@ class TicketSizeSerializer(serializers.ModelSerializer):
 
 
 class ScopeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Scope
+        fields = [
+            "scopeid",
+            "boardid",
+            "title",
+            "creation_date",
+            "forecast_set_date",
+            "forecast_size",
+            "forecast_tickets",
+            "done_columns",
+            "tickets",
+        ]
+
+
+class ScopeSerializerWithRelationInfo(serializers.ModelSerializer):
     done_columns = ColumnSerializer(many=True, read_only=True)
     tickets = TicketSizeSerializer(many=True, read_only=True)
     forecast_tickets = TicketSizeSerializer(many=True, read_only=True)

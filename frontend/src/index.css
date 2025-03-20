@@ -60,7 +60,12 @@ button:focus-visible {
   z-index: 9999;
 }
 
-.md-editor-contenteditable {
+.md-editor-contenteditable-description {
   overflow-y: auto;
   height: 330px;
+}
+
+.md-editor-contenteditable-notes {
+  overflow: auto;
+  height: calc(100vh - 165px - 3rem);
 }

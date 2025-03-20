@@ -701,3 +701,30 @@ def test_update_ticket_template():
     assert md.Board.objects.get(pk=boardid).default_ticket_title == "New title"
 
     resetDB()
+
+
+@pytest.mark.django_db
+def test_update_board_notes():
+    """
+    Test updating the board's notes
+    """
+    api_client = APIClient()
+    boardid = addBoard(password="password").boardid
+
+    # Get token for auth
+    response = api_client.post(reverse("board_by_id", args=[boardid]), {"password": "password"})
+    assert response.status_code == 200
+    data = response.json()
+    token = data["token"]
+
+    response = api_client.put(
+        reverse("update_board_notes", args=[boardid]),
+        data={"notes": "test notes"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["notes"] == "test notes"
+    assert md.Board.objects.get(pk=boardid).notes == "test notes"
+
+    resetDB()
