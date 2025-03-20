@@ -137,7 +137,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
     )
   }
 
-  if (!data?.columns || !data?.data) {
+  if (!data?.columns || !data?.data || data?.data.length == 0) {
     return <Paper sx={{ textAlign: "center", typography: "h5", padding: 10 }}>No data</Paper>
   }
 

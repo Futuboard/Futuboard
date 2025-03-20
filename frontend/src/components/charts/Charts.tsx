@@ -53,7 +53,7 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
           <Typography
             variant="h4"
             fontWeight="bold"
-            sx={{ marginBottom: 2, paddingTop: 3, widht: "100%", textAlign: "center" }}
+            sx={{ marginBottom: 2, paddingTop: 3, width: "100%", textAlign: "center" }}
           >
             Charts
           </Typography>
