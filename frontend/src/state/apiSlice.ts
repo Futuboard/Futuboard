@@ -17,7 +17,8 @@ import {
   BoardTemplate,
   NewBoardTemplate,
   TaskTemplate,
-  ChartData
+  ChartData,
+  Scope
 } from "@/types"
 
 import { getAdminPassword, getAuth, setToken } from "./auth"
@@ -734,6 +735,50 @@ export const boardsApi = createApi({
           { type: "Ticket", id: ticketid },
           { type: "Ticket", id: "LIST" }
         ])
+    }),
+
+    addScope: builder.mutation<Scope, { boardId: string; title: string }>({
+      query: ({ boardId, title }) => ({
+        url: `scopes/${boardId}/`,
+        method: "POST",
+        body: { title }
+      }),
+      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+    }),
+
+    deleteScope: builder.mutation<Scope, { boardid: string; scopeid: string }>({
+      query: ({ boardid, scopeid }) => ({
+        url: `scopes/${boardid}/`,
+        method: "DELETE",
+        body: { scopeid }
+      }),
+      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+    }),
+
+    setDoneColumns: builder.mutation<Scope, { scopeid: string; columnidlist: string[] }>({
+      query: ({ scopeid, columnidlist }) => ({
+        url: `scopes/${scopeid}/set_done_columns`,
+        method: "POST",
+        body: { done_columns: columnidlist }
+      }),
+      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+    }),
+
+    setScopeForecast: builder.mutation<Scope, { scopeid: string }>({
+      query: ({ scopeid }) => ({
+        url: `scopes/${scopeid}/set_scope_forecast`,
+        method: "POST"
+      }),
+      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+    }),
+
+    setScopeTitle: builder.mutation<Scope, { scopeid: string; title: string }>({
+      query: ({ scopeid, title }) => ({
+        url: `scopes/${scopeid}/set_title`,
+        method: "POST",
+        body: { title: title }
+      }),
+      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
     })
   })
 })
@@ -779,5 +824,10 @@ export const {
   useUpdateTaskTemplateMutation,
   useGetCumulativeFlowDiagramDataQuery,
   useAddTaskToScopeMutation,
-  useDeleteTaskFromScopeMutation
+  useDeleteTaskFromScopeMutation,
+  useAddScopeMutation,
+  useDeleteScopeMutation,
+  useSetDoneColumnsMutation,
+  useSetScopeForecastMutation,
+  useSetScopeTitleMutation
 } = boardsApi
