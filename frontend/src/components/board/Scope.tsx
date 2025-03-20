@@ -22,6 +22,8 @@ import { useDeleteScopeMutation, useSetScopeTitleMutation } from "@/state/apiSli
 import { useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
 import DoneColumnChooser from "./DoneColumnChooser"
 import SetScopeForecastButton from "./SetForecastButton"
+import { useDispatch, useSelector } from "react-redux"
+import { disableScope, setScope } from "@/state/scope"
 
 interface DeleteScopeButtonProps {
   scope: Scopetype
@@ -79,6 +81,8 @@ const Scope: React.FC<ScopeProps> = (props) => {
   const { data: columns } = useGetColumnsByBoardIdQuery(scope?.boardid)
   const [setScopeTitle] = useSetScopeTitleMutation()
   const [title, setTitle] = useState(scope.title)
+  const dispatch = useDispatch()
+  dispatch(setScope(scope.scopeid))
 
   const handleTextFieldBlur = (event: React.FocusEvent<HTMLTextAreaElement>) => {
     setScopeTitle({ scopeid: scope.scopeid, title: event.target.value })
@@ -123,7 +127,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
         <Grid item xs={12}>
           <Typography gutterBottom variant="h6">
             {"Size:   "}
-            <b>{scope?.tickets.reduce((sum, ticket) => sum + (ticket.size || 0), 0)}</b>
+            <b>{scope?.tickets.reduce((sum, ticket) => sum + (1 || 0), 0)}</b>
           </Typography>
         </Grid>
 

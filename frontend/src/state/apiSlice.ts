@@ -725,10 +725,12 @@ export const boardsApi = createApi({
         method: "POST",
         body: { ticketid }
       }),
-      invalidatesTags: (_result, _error, { ticketid }) =>
+      invalidatesTags: (_result, _error, { ticketid, scopeId }) =>
         invalidateRemoteCache([
           { type: "Ticket", id: ticketid },
-          { type: "Ticket", id: "LIST" }
+          { type: "Ticket", id: "LIST" },
+          { type: "Scopes", id: scopeId },
+          { type: "Scopes", id: "LIST" }
         ])
     }),
 
@@ -738,10 +740,12 @@ export const boardsApi = createApi({
         method: "DELETE",
         body: { ticketid }
       }),
-      invalidatesTags: (_result, _error, { ticketid }) =>
+      invalidatesTags: (_result, _error, { ticketid, scopeId }) =>
         invalidateRemoteCache([
           { type: "Ticket", id: ticketid },
-          { type: "Ticket", id: "LIST" }
+          { type: "Ticket", id: "LIST" },
+          { type: "Scopes", id: scopeId },
+          { type: "Scopes", id: "LIST" }
         ])
     }),
 
@@ -788,14 +792,14 @@ export const boardsApi = createApi({
       }),
       invalidatesTags: () => invalidateRemoteCache(["Scopes"])
     }),
-    
+
     getScopes: builder.query<Scope[], string>({
       query: (boardId) => ({
         url: `scopes/${boardId}`,
-      method: "GET"
-      })
+        method: "GET"
+      }),
+      providesTags: [{ type: "Scopes", id: "LIST" }]
     })
-
   })
 })
 

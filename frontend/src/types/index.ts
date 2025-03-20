@@ -143,18 +143,6 @@ export type Scope = {
 
 export type TimeUnit = (typeof timeUnitOptions)[number]
 
-export type Scope = {
-  scopeid: string
-  boardid: string
-  title: string
-  creation_date: string
-  forecast_set_date: string
-  forecast_size: number
-  forecast_tickets: TaskSize[]
-  done_columns: Column[]
-  tickets: TaskSize[]
-}
-
 export type SimpleScope = {
   scopeid: string
   title: string
