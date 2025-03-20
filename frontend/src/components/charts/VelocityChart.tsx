@@ -1,4 +1,4 @@
-import { CircularProgress, Paper } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import React from "react"
 import { XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Legend, Bar, LabelList } from "recharts"
 
@@ -15,14 +15,14 @@ const VelocityChart: React.FC<VelocityChartProps> = ({ boardId }) => {
 
   if (isLoading) {
     return (
-      <Paper sx={{ textAlign: "center", typography: "h5", padding: 10 }}>
+      <Box sx={{ typography: "h5", paddingX: 10, paddingY: 8 }}>
         <CircularProgress />
-      </Paper>
+      </Box>
     )
   }
 
-  if (!data?.data) {
-    return <Paper sx={{ textAlign: "center", typography: "h5", padding: 10 }}>No data</Paper>
+  if (!data?.data || data?.data.length == 0) {
+    return <Box sx={{ typography: "h5", padding: 10 }}>No data</Box>
   }
 
   const xAxisLableFormatter = (scopeName: string) => {
@@ -37,7 +37,12 @@ const VelocityChart: React.FC<VelocityChartProps> = ({ boardId }) => {
     <ChartContainer>
       <BarChart data={data.data}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" style={{ fontSize: "1.5rem" }} interval={0} tickFormatter={xAxisLableFormatter} />
+        <XAxis
+          dataKey="name"
+          style={{ fontSize: "1.5rem", fill: "#213547" }}
+          interval={0}
+          tickFormatter={xAxisLableFormatter}
+        />
         <YAxis />
         <Tooltip />
         <Legend
@@ -46,10 +51,10 @@ const VelocityChart: React.FC<VelocityChartProps> = ({ boardId }) => {
           }}
         />
         <Bar dataKey="forecast" fill="#03a9f4">
-          <LabelList dataKey="forecast" position="top" style={{ fontSize: "1.5rem" }} />
+          <LabelList dataKey="forecast" position="top" style={{ fontSize: "1.5rem", fill: "#213547" }} />
         </Bar>
         <Bar dataKey="done" fill="#89c344">
-          <LabelList dataKey="done" position="top" style={{ fontSize: "1.5rem" }} />
+          <LabelList dataKey="done" position="top" style={{ fontSize: "1.5rem", fill: "#213547" }} />
         </Bar>
       </BarChart>
     </ChartContainer>

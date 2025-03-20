@@ -1,4 +1,14 @@
-import { Button, ButtonGroup, CircularProgress, Divider, InputLabel, Paper, Stack, Typography } from "@mui/material"
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  CircularProgress,
+  Divider,
+  InputLabel,
+  Paper,
+  Stack,
+  Typography
+} from "@mui/material"
 import dayjs from "dayjs"
 import React, { useEffect, useState } from "react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
@@ -131,14 +141,14 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
 
   if (isLoading) {
     return (
-      <Paper sx={{ textAlign: "center", typography: "h5", padding: 10 }}>
+      <Box sx={{ typography: "h5", paddingX: 10, paddingY: 8 }}>
         <CircularProgress />
-      </Paper>
+      </Box>
     )
   }
 
   if (!data?.columns || !data?.data || data?.data.length == 0) {
-    return <Paper sx={{ textAlign: "center", typography: "h5", padding: 10 }}>No data</Paper>
+    return <Box sx={{ typography: "h5", padding: 10 }}>No data</Box>
   }
 
   const dataLength = data?.data.length
