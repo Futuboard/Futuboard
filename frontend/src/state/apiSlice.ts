@@ -703,6 +703,7 @@ export const boardsApi = createApi({
         body: { password }
       })
     }),
+
     getCumulativeFlowDiagramData: builder.query<
       ChartData,
       { boardId: string; timeUnit?: string; start?: string; end?: string }
@@ -786,7 +787,15 @@ export const boardsApi = createApi({
         body: { title: title }
       }),
       invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+    }),
+    
+    getScopes: builder.query<Scope[], string>({
+      query: (boardId) => ({
+        url: `scopes/${boardId}`,
+      method: "GET"
+      })
     })
+
   })
 })
 
@@ -837,5 +846,6 @@ export const {
   useDeleteScopeMutation,
   useSetDoneColumnsMutation,
   useSetScopeForecastMutation,
-  useSetScopeTitleMutation
+  useSetScopeTitleMutation,
+  useGetScopesQuery
 } = boardsApi

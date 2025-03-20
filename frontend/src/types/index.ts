@@ -129,6 +129,18 @@ export type ChartData = {
   data: { [key: string]: number }[]
 }
 
+export type Scope = {
+  scopeid: string
+  boardid: string
+  title: string
+  creation_date: string
+  forecast_set_date: string
+  forecast_size: number
+  forecast_tickets: string[]
+  done_columns: string[]
+  tickets: string[]
+}
+
 export type TimeUnit = (typeof timeUnitOptions)[number]
 
 export type Scope = {

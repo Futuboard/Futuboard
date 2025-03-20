@@ -6,8 +6,10 @@ import {
   Gradient,
   ColorLens,
   Analytics,
-  ViewWeek
+  ViewWeek,
 } from "@mui/icons-material"
+//TODO FIX THIS IMPORT
+import AllOutIcon from "@mui/icons-material/AllOut"
 import {
   AppBar,
   Box,
@@ -38,6 +40,7 @@ import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
 import HomeButton from "./HomeButton"
 import ScopeDemo from "./ScopeDemo"
+import ScopeList from "./ScopeList"
 import TaskForm from "./TaskForm"
 import UserCreationForm from "./UserCreationForm"
 import UserList from "./UserList"
@@ -115,6 +118,7 @@ interface OpenAnalyticsButtonProps {
 }
 
 const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) => {
+
   return (
     <Tooltip title="Open Analytics">
       <Link to={"/board/" + boardId + "/charts"}>
@@ -122,6 +126,21 @@ const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) =>
           <Analytics />
         </IconButton>
       </Link>
+    </Tooltip>
+  )
+}
+
+interface OpenScopeListButtonProps {
+  handler: (event: React.MouseEvent<HTMLButtonElement>) => void
+}
+
+const OpenScopeListButton: React.FC<OpenScopeListButtonProps> = ({ handler }) => {
+
+  return (
+    <Tooltip title="View and Set Scopes">
+      <IconButton onClick={handler}>
+        <AllOutIcon />
+      </IconButton>
     </Tooltip>
   )
 }
@@ -145,12 +164,14 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   const { data: users, isSuccess } = useGetUsersByBoardIdQuery(boardId)
   const { id = "default-id" } = useParams()
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+  const [anchorElScopeList, setAnchorElScopeList] = React.useState<HTMLButtonElement | null>(null)
   const open = Boolean(anchorEl)
   const [updateTaskTemplate] = useUpdateTaskTemplateMutation()
   const [passwordFormOpen, setPasswordFormOpen] = useState(false)
   const [titleFormOpen, setTitleFormOpen] = useState(false)
   const [colorFormOpen, setColorFormOpen] = useState(false)
   const [taskFormOpen, setTaskFormOpen] = useState(false)
+  const [scopeListOpen, setScopeListOpen] = useState(false)
 
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -163,6 +184,12 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   const handleExportAndClose = () => {
     handleExport()
     handleClose()
+  }
+
+  const handleScopeList = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const value = !scopeListOpen
+    setScopeListOpen(value)
+    setAnchorElScopeList(event.currentTarget)
   }
 
   const handleSubmitTaskFormData = async (data: TaskFormData | null) => {
@@ -214,6 +241,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       {isSuccess && users.length > 0 && <UserList users={users} />}
       <ScopeDemo />
       <AddUserButton />
+      <OpenScopeListButton handler={handleScopeList} />
       <CopyToClipboardButton />
       <CreateColumnButton boardId={boardId} />
       <OpenAnalyticsButton boardId={boardId} />
@@ -226,6 +254,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       >
         <MoreVert />
       </IconButton>
+      <ScopeList visible={scopeListOpen} boardId={boardId} anchorEl={anchorElScopeList}/>
       <Menu
         id="long-menu"
         anchorEl={anchorEl}

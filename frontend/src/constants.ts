@@ -6,7 +6,8 @@ export const cacheTagTypes = [
   "Action",
   "ActionList",
   "SwimlaneColumn",
-  "BoardTemplate"
+  "BoardTemplate",
+  "Scopes"
 ] as const
 
 export const timeUnitOptions = ["minute", "hour", "day", "week", "month", "year"] as const

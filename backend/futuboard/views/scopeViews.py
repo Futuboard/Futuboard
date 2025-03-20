@@ -2,11 +2,8 @@ from rest_framework.decorators import api_view
 from django.http import JsonResponse
 
 from ..models import Board, Column, Scope, Ticket, TicketEvent
-<<<<<<< HEAD
 from ..serializers import ScopeSerializerWithRelationInfo
-=======
 from ..serializers import ScopeSerializer
->>>>>>> ticket-select-in-scope-test
 import rest_framework.request
 from django.utils.timezone import now
 
@@ -16,11 +13,7 @@ def scopes_on_board(request: rest_framework.request.Request, boardid: str):
     if request.method == "GET":
         board = Board.objects.get(boardid=boardid)
         query_set = Scope.objects.filter(boardid=board)
-<<<<<<< HEAD
         serializer = ScopeSerializerWithRelationInfo(query_set, many=True)
-=======
-        serializer = ScopeSerializer(query_set, many=True)
->>>>>>> ticket-select-in-scope-test
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":
@@ -31,11 +24,7 @@ def scopes_on_board(request: rest_framework.request.Request, boardid: str):
         )
         new_scope.save()
 
-<<<<<<< HEAD
         serializer = ScopeSerializerWithRelationInfo(new_scope)
-=======
-        serializer = ScopeSerializer(new_scope)
->>>>>>> ticket-select-in-scope-test
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "DELETE":
