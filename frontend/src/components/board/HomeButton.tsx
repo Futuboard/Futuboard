@@ -7,7 +7,7 @@ const HomeButton = () => {
   return (
     <Tooltip title="Home">
       <Link to="/">
-        <IconButton>
+        <IconButton aria-label="Home">
           <LogoIcon />
         </IconButton>
       </Link>
