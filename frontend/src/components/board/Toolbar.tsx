@@ -6,7 +6,7 @@ import {
   Gradient,
   ColorLens,
   Analytics,
-  ViewWeek,
+  ViewWeek
 } from "@mui/icons-material"
 //TODO FIX THIS IMPORT
 import AllOutIcon from "@mui/icons-material/AllOut"
@@ -43,6 +43,8 @@ import ScopeList from "./ScopeList"
 import TaskForm from "./TaskForm"
 import UserCreationForm from "./UserCreationForm"
 import UserList from "./UserList"
+import { useDispatch } from "react-redux"
+import { disableScope } from "@/state/scope"
 
 interface FormData {
   name: string
@@ -117,7 +119,6 @@ interface OpenAnalyticsButtonProps {
 }
 
 const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) => {
-
   return (
     <Tooltip title="Open Analytics">
       <Link to={"/board/" + boardId + "/charts"}>
@@ -134,7 +135,6 @@ interface OpenScopeListButtonProps {
 }
 
 const OpenScopeListButton: React.FC<OpenScopeListButtonProps> = ({ handler }) => {
-
   return (
     <Tooltip title="View and Set Scopes">
       <IconButton onClick={handler}>
@@ -171,6 +171,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   const [colorFormOpen, setColorFormOpen] = useState(false)
   const [taskFormOpen, setTaskFormOpen] = useState(false)
   const [scopeListOpen, setScopeListOpen] = useState(false)
+  const dispatch = useDispatch()
 
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -189,6 +190,9 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
     const value = !scopeListOpen
     setScopeListOpen(value)
     setAnchorElScopeList(event.currentTarget)
+    if (!value) {
+      dispatch(disableScope())
+    }
   }
 
   const handleSubmitTaskFormData = async (data: TaskFormData | null) => {
@@ -252,7 +256,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       >
         <MoreVert />
       </IconButton>
-      <ScopeList visible={scopeListOpen} boardId={boardId} anchorEl={anchorElScopeList}/>
+      <ScopeList visible={scopeListOpen} boardId={boardId} anchorEl={anchorElScopeList} />
       <Menu
         id="long-menu"
         anchorEl={anchorEl}

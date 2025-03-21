@@ -11,7 +11,8 @@ import {
   IconButton,
   TextField,
   Tooltip,
-  Typography
+  Typography,
+  Paper
 } from "@mui/material"
 
 import { Scope as Scopetype } from "@/types"
@@ -22,7 +23,7 @@ import { useDeleteScopeMutation, useSetScopeTitleMutation } from "@/state/apiSli
 import { useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
 import DoneColumnChooser from "./DoneColumnChooser"
 import SetScopeForecastButton from "./SetForecastButton"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { disableScope, setScope } from "@/state/scope"
 
 interface DeleteScopeButtonProps {
@@ -31,8 +32,8 @@ interface DeleteScopeButtonProps {
 
 const DeleteScopeButton: React.FC<DeleteScopeButtonProps> = ({ scope }) => {
   const [deleteScope] = useDeleteScopeMutation()
-
   const [open, setOpen] = useState(false)
+  const dispatch = useDispatch()
 
   const handleClickOpen = () => {
     setOpen(true)
@@ -45,6 +46,7 @@ const DeleteScopeButton: React.FC<DeleteScopeButtonProps> = ({ scope }) => {
   const handleDelete = () => {
     deleteScope({ boardid: scope.boardid, scopeid: scope.scopeid })
     setOpen(false)
+    dispatch(disableScope())
   }
 
   return (
@@ -81,6 +83,9 @@ const Scope: React.FC<ScopeProps> = (props) => {
   const { data: columns } = useGetColumnsByBoardIdQuery(scope?.boardid)
   const [setScopeTitle] = useSetScopeTitleMutation()
   const [title, setTitle] = useState(scope.title)
+  const [tickets, setTickets] = useState(scope.tickets.length)
+  const [size, setSize] = useState(scope.tickets.length)
+
   const dispatch = useDispatch()
   dispatch(setScope(scope.scopeid))
 
@@ -94,66 +99,70 @@ const Scope: React.FC<ScopeProps> = (props) => {
 
   useEffect(() => {
     setTitle(scope.title)
-  }, [scope.title])
+    setTickets(scope.tickets.length)
+    setSize(scope.tickets.length)
+  }, [scope.title, scope.tickets])
 
   return (
     <Grid container spacing={2} width={350}>
-      <Grid item xs={12}>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <TextField
-            placeholder="Enter scope name"
-            value={title}
-            onChange={handleTextFieldChange}
-            variant="standard"
-            fullWidth
-            onBlur={handleTextFieldBlur}
-            InputProps={{
-              disableUnderline: true,
-              sx: { fontSize: "1.4rem", fontWeight: "bold" }
-            }}
-          />
-        </Box>
-        <Divider />
-      </Grid>
-
-      <Grid item xs={12}>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography gutterBottom variant="h6">
-            {"Tickets:  "}
-            <b>{scope?.tickets.length}</b>
-          </Typography>
-        </Box>
-
+      <Paper elevation={3} style={{ padding: "18px" }}>
         <Grid item xs={12}>
-          <Typography gutterBottom variant="h6">
-            {"Size:   "}
-            <b>{scope?.tickets.reduce((sum, ticket) => sum + (1 || 0), 0)}</b>
-          </Typography>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <TextField
+              placeholder="Enter scope name"
+              value={title}
+              onChange={handleTextFieldChange}
+              variant="standard"
+              fullWidth
+              onBlur={handleTextFieldBlur}
+              InputProps={{
+                disableUnderline: true,
+                sx: { fontSize: "1.4rem", fontWeight: "bold" }
+              }}
+            />
+          </Box>
+          <Divider />
         </Grid>
 
-        <Grid item xs={12} marginTop={3} marginBottom={2}>
-          <DoneColumnChooser scope={scope} columns={columns ? columns : []} />
-        </Grid>
+        <Grid item xs={12} marginTop={1}>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography gutterBottom variant="h6">
+              {"Tickets:  "}
+              <b>{tickets}</b>
+            </Typography>
+          </Box>
 
-        <Grid item container spacing={2} xs={12} alignItems="center">
-          <Grid item>
-            <SetScopeForecastButton scope={scope} />
+          <Grid item xs={12}>
+            <Typography gutterBottom variant="h6">
+              {"Size:   "}
+              <b>{size}</b>
+            </Typography>
           </Grid>
-          <Grid item sx={{ display: "flex", alignItems: "center", height: "100%" }}>
-            <Tooltip
-              title="Saves the scope forecast with the currently selected tickets, their total size, and the timestamp. If the scope changes afterwards, it does not affect the forecast."
-              placement="right"
-            >
-              <InfoIcon sx={{ fontSize: 24 }} />
-            </Tooltip>
+
+          <Grid item xs={12} marginTop={3} marginBottom={2}>
+            <DoneColumnChooser scope={scope} columns={columns ? columns : []} />
           </Grid>
+
+          <Grid item container spacing={2} xs={12} alignItems="center">
+            <Grid item>
+              <SetScopeForecastButton scope={scope} />
+            </Grid>
+            <Grid item sx={{ display: "flex", alignItems: "center", height: "100%" }}>
+              <Tooltip
+                title="Saves the scope forecast with the currently selected tickets, their total size, and the timestamp. If the scope changes afterwards, it does not affect the forecast."
+                placement="right"
+              >
+                <InfoIcon sx={{ fontSize: 24 }} />
+              </Tooltip>
+            </Grid>
+          </Grid>
+          {scope && (
+            <Grid item xs={1} sx={{ display: "flex", ml: "auto" }}>
+              <DeleteScopeButton scope={scope} />
+            </Grid>
+          )}
         </Grid>
-        {scope && (
-          <Grid item xs={1} sx={{ display: "flex", ml: "auto" }}>
-            <DeleteScopeButton scope={scope} />
-          </Grid>
-        )}
-      </Grid>
+      </Paper>
     </Grid>
   )
 }

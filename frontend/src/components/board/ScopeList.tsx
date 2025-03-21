@@ -7,12 +7,12 @@ import IconButton from "@mui/material/IconButton"
 import List from "@mui/material/List"
 import ListItem from "@mui/material/ListItem"
 import ListItemButton from "@mui/material/ListItemButton"
-import Paper from "@mui/material/Paper"
 import Popper from "@mui/material/Popper"
 import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
-import React, { useState } from "react"
-
+import React, { useState, useRef } from "react"
+import { useDispatch } from "react-redux"
+import { disableScope, setScope } from "@/state/scope"
 import { useAddScopeMutation } from "@/state/apiSlice"
 import { useGetScopesQuery } from "@/state/apiSlice"
 import { Scope as Scopetype } from "@/types"
@@ -26,11 +26,10 @@ interface ScopeListItemProps {
   deactivate: () => void
 }
 
-const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactivate}) => {
+const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactivate }) => {
   const displayName = scope.title.length < 30 ? scope.title : scope.title.substring(0, 30) + "..."
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(anchorEl ? null : event.currentTarget)
+  const anchor = document.getElementById("scope-anchor")
+  const handleClick = () => {
     deactivate()
   }
   return (
@@ -45,10 +44,8 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactiva
           <EditIcon />
         </IconButton>
       </ListItemButton>
-      <Popper open={isActive} anchorEl={anchorEl} disablePortal placement="left">
-        <Paper elevation={3} style={{ padding: "18px" }}>
-          <Scope scope={scope}></Scope>
-        </Paper>
+      <Popper open={isActive} anchorEl={anchor} placement="left-end">
+        <Scope key={scope.scopeid} scope={scope}></Scope>
       </Popper>
       <Divider />
     </div>
@@ -66,7 +63,7 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
   const scopes = info.data ? info.data : []
   const [open, setOpen] = useState(false)
   const [addScope] = useAddScopeMutation()
-  const [activeScope, setActiveScope] = useState(0)
+  const [activeScope, setActiveScope] = useState<string | null>(null)
 
   const openDialog = () => {
     setOpen(true)
@@ -93,7 +90,7 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
           minWidth: 330
         }}
       >
-        <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start">
+        <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start" id="scope-anchor">
           <Typography sx={{ padding: "5px" }} color="black" variant="body1">
             Create Scope
           </Typography>
@@ -103,10 +100,16 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
         </ListItemButton>
         <Divider />
         {scopes.length > 0 ? (
-          scopes.map((scope, index) => <ScopeListItem key={index} scope={scope} isActive={activeScope === (index + 1)} deactivate={() => setActiveScope(index + 1)}/>)
+          scopes.map((scope) => (
+            <ScopeListItem
+              key={scope.scopeid}
+              scope={scope}
+              isActive={activeScope === scope.scopeid}
+              deactivate={() => setActiveScope(scope.scopeid)}
+            />
+          ))
         ) : (
-          <div>
-          </div>
+          <div></div>
         )}
         <Dialog open={open} onClose={handleCloseDialog}>
           <DialogContent>

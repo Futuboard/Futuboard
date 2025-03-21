@@ -27,6 +27,8 @@ const DoneColumnChooser: React.FC<DoneColumnChooserProps> = ({ columns, scope })
           options={columns}
           onChange={handleChange}
           value={scope.done_columns}
+          filterSelectedOptions
+          isOptionEqualToValue={(option, value) => option.columnid === value.columnid}
           getOptionLabel={(option) => option.title}
           renderInput={(params) => <TextField {...params} label="Done Columns" />}
         />
