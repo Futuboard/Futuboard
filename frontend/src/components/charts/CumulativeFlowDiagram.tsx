@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, CircularProgress, InputLabel, Stack } from "@mui/material"
+import { Box, Button, ButtonGroup, CircularProgress, Stack } from "@mui/material"
 import dayjs from "dayjs"
 import React, { useEffect, useState } from "react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
@@ -207,7 +207,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
       </ChartContainer>
 
       <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ marginBottom: 1 }}>
-        <InputLabel sx={{ display: "flex", alignItems: "center", flexDirection: "column", gap: 0.5 }}>
+        <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", gap: 0.5, color: "#666666" }}>
           Time frame
           <ButtonGroup color="primary">
             {shortcutOptions.map((choice) => (
@@ -216,8 +216,8 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
               </Button>
             ))}
           </ButtonGroup>
-        </InputLabel>
-        <InputLabel sx={{ display: "flex", alignItems: "center", flexDirection: "column", gap: 0.5 }}>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", gap: 0.5, color: "#666666" }}>
           Time unit
           <ButtonGroup size="small">
             {timeUnitChoices.map((timeUnit) => (
@@ -233,8 +233,8 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
               </Button>
             ))}
           </ButtonGroup>
-        </InputLabel>
-        <InputLabel sx={{ display: "flex", alignItems: "center", flexDirection: "column", gap: 0.5 }}>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", flexDirection: "column", gap: 0.5, color: "#666666" }}>
           Count unit
           <ButtonGroup size="small">
             {countUnitOptions.map((unit) => (
@@ -250,7 +250,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
               </Button>
             ))}
           </ButtonGroup>
-        </InputLabel>
+        </Box>
       </Stack>
       <DateSelector
         startValue={queryparams.start}
