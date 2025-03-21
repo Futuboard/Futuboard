@@ -318,8 +318,16 @@ const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor, chartTool
           sx={{ marginX: 2, borderRightWidth: "2px", height: "35px", borderColor: "#D1D5DB" }}
         />
         <Typography
-          variant="h6"
-          sx={{ color: "#213547", marginLeft: 1, height: "100%", display: "flex", alignItems: "center", flexGrow: 1 }}
+          variant="h1"
+          sx={{
+            color: "#213547",
+            marginLeft: 1,
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            flexGrow: 1,
+            fontSize: 24
+          }}
         >
           {title}
         </Typography>

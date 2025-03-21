@@ -51,9 +51,9 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
       >
         <Box>
           <Typography
-            variant="h4"
+            variant="h5"
             fontWeight="bold"
-            sx={{ marginBottom: 2, paddingTop: 3, width: "100%", textAlign: "center" }}
+            sx={{ marginBottom: 1.5, paddingTop: 3, width: "100%", textAlign: "center" }}
           >
             Charts
           </Typography>
@@ -65,20 +65,23 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
           }
         </Box>
         {Object.entries(charts).map(([name, { displayName, Icon }]) => (
-          <Link
-            to={name}
-            key={name}
-            style={{ color: "#213547", backgroundColor: name === chartName ? "#e0e0e2" : "white" }}
+          <Box
+            sx={{
+              ":hover": { filter: "brightness(0.96)" },
+              backgroundColor: name === chartName ? "#e0e0e2" : "white"
+            }}
           >
-            <Typography
-              variant="h6"
-              sx={{ display: "flex", alignItems: "center", gap: 0.5, paddingX: 3, paddingY: 2 }}
-              key={name}
-            >
-              <Icon />
-              {displayName}
-            </Typography>
-          </Link>
+            <Link to={name} key={name} style={{ color: "#213547" }}>
+              <Typography
+                variant="h6"
+                sx={{ display: "flex", alignItems: "center", gap: 0.5, paddingX: 3, paddingY: 2, fontSize: 18 }}
+                key={name}
+              >
+                <Icon />
+                {displayName}
+              </Typography>
+            </Link>
+          </Box>
         ))}
       </Box>
       <Box
