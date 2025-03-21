@@ -10,7 +10,7 @@ import ListItemButton from "@mui/material/ListItemButton"
 import Popper from "@mui/material/Popper"
 import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { disableScope, setScope } from "@/state/scope"
 import { useAddScopeMutation } from "@/state/apiSlice"
@@ -82,6 +82,12 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
     addScope({ boardId, title: data.scopeTitle })
     setOpen(false)
   }
+
+  useEffect(() => {
+    if (!visible) {
+      setActiveScope(null)
+    }
+  }, [visible])
 
   return (
     <Popper open={visible} anchorEl={anchorEl}>
