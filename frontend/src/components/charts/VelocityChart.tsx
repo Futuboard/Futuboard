@@ -25,7 +25,7 @@ const VelocityChart: React.FC<VelocityChartProps> = ({ boardId }) => {
     return <Box sx={{ typography: "h5", padding: 10 }}>No data</Box>
   }
 
-  const xAxisLableFormatter = (scopeName: string) => {
+  const xAxisLabelFormatter = (scopeName: string) => {
     const maxLength = 15
     if (scopeName.length > maxLength) {
       return `${scopeName.substring(0, maxLength)}...`
@@ -41,7 +41,7 @@ const VelocityChart: React.FC<VelocityChartProps> = ({ boardId }) => {
           dataKey="name"
           style={{ fontSize: "1.5rem", fill: "#213547" }}
           interval={0}
-          tickFormatter={xAxisLableFormatter}
+          tickFormatter={xAxisLabelFormatter}
         />
         <YAxis />
         <Tooltip />
