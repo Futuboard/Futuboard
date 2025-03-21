@@ -11,7 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "cypress": "^13.16.0",
+    "cypress": "^14.2.0",
     "puppeteer": "^23.9.0",
     "puppeteer-cluster": "^0.24.0"
   },

@@ -4,15 +4,19 @@ import { useDispatch } from "react-redux"
 import { useParams } from "react-router-dom"
 
 import AccessBoardForm from "@/components/board/AccessBoardForm"
-import ToolBar from "@/components/board/Toolbar"
-import CumulativeFlowDiagram from "@/components/charts/CumulativeFlowDiagram"
 import { cacheTagTypes } from "@/constants"
 import { boardsApi, useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
 import { setBoardId } from "@/state/auth"
 import { setNotification } from "@/state/notification"
 import { webSocketContainer } from "@/state/websocket"
+import { Board } from "@/types"
 
-const Charts: React.FC = () => {
+type LoggedInContainerProps = {
+  children: ({ board }: { board: Board }) => React.ReactNode
+  titlePrefix?: string
+}
+
+const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePrefix = "" }) => {
   const dispatch = useDispatch()
   const params = useParams()
   const [isBoardIdSet, setIsBoardIdset] = useState(false)
@@ -51,8 +55,9 @@ const Charts: React.FC = () => {
   }, [id, tryLogin])
 
   useEffect(() => {
-    document.title = board?.title ? "Charts - " + board?.title : "Futuboard"
-  }, [board])
+    const prefix = titlePrefix ? titlePrefix + " - " : ""
+    document.title = board?.title ? prefix + board?.title + "- Futuboard" : "Futuboard"
+  }, [board, titlePrefix])
 
   if (isLoading || !hasTriedEmptyPasswordLogin) {
     return null
@@ -77,21 +82,11 @@ const Charts: React.FC = () => {
   }
 
   return (
-    <div>
+    <Box sx={{ height: "calc(100vh - 65px)", paddingTop: "65px" }}>
       <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
-      <ToolBar boardId={id} title={`Charts - ${board?.title}`} chartToolbar={true} />
-      <Box
-        sx={{
-          marginTop: 10,
-          justifyContent: "center",
-          alignItems: "center",
-          display: "flex"
-        }}
-      >
-        <CumulativeFlowDiagram boardId={id} />
-      </Box>
-    </div>
+      {children({ board })}
+    </Box>
   )
 }
 
-export default Charts
+export default LoggedInContainer

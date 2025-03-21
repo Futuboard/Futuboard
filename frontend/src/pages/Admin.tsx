@@ -16,7 +16,7 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 
 import AdminLoginForm from "@/components/admin/AdminLoginForm"
-import ToolBar from "@/components/board/Toolbar"
+import ToolBar from "@/components/general/Toolbar"
 import {
   useAddBoardTemplateMutation,
   useDeleteBoardTemplateMutation,

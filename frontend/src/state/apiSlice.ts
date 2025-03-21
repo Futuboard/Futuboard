@@ -313,7 +313,10 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ columnId, tasks }, apiActions) {
-        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Columns", id: columnId }]
+        const tagsToInvalidate: CacheInvalidationTag[] = [
+          { type: "Columns", id: columnId },
+          { type: "Ticket", id: "LIST" }
+        ]
 
         updateCache(
           "getTaskListByColumnId",
@@ -329,8 +332,8 @@ export const boardsApi = createApi({
         )
 
         apiActions.queryFulfilled.finally(() => {
-          invalidateRemoteCache([...tagsToInvalidate, { type: "Ticket", id: "LIST" }])
-          boardsApi.util.invalidateTags(tagsToInvalidate)
+          invalidateRemoteCache([...tagsToInvalidate])
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
       }
     }),
@@ -416,7 +419,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(tagsToInvalidate)
-          boardsApi.util.invalidateTags(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
       }
     }),
@@ -463,7 +466,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(tagsToInvalidate)
-          boardsApi.util.invalidateTags(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
       }
     }),
@@ -513,7 +516,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(tagsToInvalidate)
-          boardsApi.util.invalidateTags(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
       }
     }),
@@ -560,7 +563,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(tagsToInvalidate)
-          boardsApi.util.invalidateTags(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
       }
     }),
@@ -704,16 +707,27 @@ export const boardsApi = createApi({
     }),
     getCumulativeFlowDiagramData: builder.query<
       ChartData,
-      { boardId: string; timeUnit?: string; start?: string; end?: string }
+      { boardId: string; timeUnit?: string; start?: string; end?: string; countUnit?: string }
     >({
-      query: ({ boardId, timeUnit, start, end }) => ({
+      query: ({ boardId, timeUnit, start, end, countUnit }) => ({
         url: `charts/${boardId}/cumulativeflow`,
         method: "GET",
-        params: { time_unit: timeUnit, start_time: start, end_time: end }
+        params: { time_unit: timeUnit, start_time: start, end_time: end, count_unit: countUnit }
       }),
       providesTags: [
         { type: "Columns", id: "LIST" },
         { type: "Ticket", id: "LIST" }
+      ]
+    }),
+    getVelocityChartData: builder.query<ChartData, { boardId: string }>({
+      query: ({ boardId }) => ({
+        url: `charts/${boardId}/velocity`,
+        method: "GET"
+      }),
+      providesTags: [
+        { type: "Columns", id: "LIST" },
+        { type: "Ticket", id: "LIST" }
+        //{ type: "Scope", id: "LIST" }
       ]
     })
   })
@@ -759,5 +773,6 @@ export const {
   useDeleteUserFromTicketMutation,
   useCheckAdminPasswordMutation,
   useUpdateTaskTemplateMutation,
-  useGetCumulativeFlowDiagramDataQuery
+  useGetCumulativeFlowDiagramDataQuery,
+  useGetVelocityChartDataQuery
 } = boardsApi

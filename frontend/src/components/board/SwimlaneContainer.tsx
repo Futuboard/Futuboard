@@ -83,7 +83,6 @@ const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
       <Paper
         elevation={4}
         sx={{
-          margin: "25px 0px",
           minHeight: "85vh",
           backgroundColor: "#E5DBD9",
           padding: "4px",

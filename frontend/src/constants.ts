@@ -10,3 +10,5 @@ export const cacheTagTypes = [
 ] as const
 
 export const timeUnitOptions = ["minute", "hour", "day", "week", "month", "year"] as const
+
+export const countUnitOptions = ["size", "cards"] as const

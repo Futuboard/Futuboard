@@ -1,4 +1,4 @@
-import { cacheTagTypes, timeUnitOptions } from "@/constants"
+import { cacheTagTypes, countUnitOptions, timeUnitOptions } from "@/constants"
 
 export type Board = {
   boardid: string
@@ -124,3 +124,5 @@ export type ChartData = {
 }
 
 export type TimeUnit = (typeof timeUnitOptions)[number]
+
+export type CountUnit = (typeof countUnitOptions)[number]

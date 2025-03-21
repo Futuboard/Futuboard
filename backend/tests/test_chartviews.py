@@ -379,7 +379,7 @@ def test_cumulative_flow_with_params():
     boardid = create_board_with_events()
 
     url = reverse("cumulative_flow", args=[boardid])
-    url += "?time_unit=day&start_time=2024-01-02&end_time=2024-01-03"
+    url += "?time_unit=day&start_time=2024-01-02&end_time=2024-01-03&count_unit=cards"
 
     response = api_client.get(url)
     assert response.status_code == 200
@@ -392,10 +392,75 @@ def test_cumulative_flow_with_params():
     assert len(data) == 2
 
     assert data == [
-        {"name": "2024-01-02T00:00:00", "Column 1": 0, "Column 2": 10},
-        {"name": "2024-01-03T00:00:00", "Column 1": 0, "Column 2": 15},
+        {"name": "2024-01-02T00:00:00", "Column 1": 0, "Column 2": 2},
+        {"name": "2024-01-03T00:00:00", "Column 1": 0, "Column 2": 2},
     ]
 
     assert columns_names == ["Column 1", "Column 2"]
+
+    resetDB()
+
+
+@pytest.mark.django_db
+def test_velocity():
+    """
+    Test that velocity chart data is returned correctly
+    """
+    api_client = APIClient()
+
+    boardid, other_column, done_column = create_board_and_columns()
+    response = api_client.post(reverse("scopes_on_board", args=[boardid]), {"title": "test scope"})
+    scope_id = response.json()["scopeid"]
+
+    creation_time_1 = datetime(2024, 1, 1)
+    _ticket_not_in_scope = create_ticket_at_time(boardid, done_column, creation_time_1, size=7)
+    ticket_not_in_forecast_not_done = create_ticket_at_time(boardid, other_column, creation_time_1, size=10)
+    ticket_in_forecast_not_done = create_ticket_at_time(boardid, other_column, creation_time_1, size=6)
+    ticket_in_forecast_done = create_ticket_at_time(boardid, other_column, creation_time_1, size=3)
+    ticket_not_in_forecast_done = create_ticket_at_time(boardid, done_column, creation_time_1, size=2)
+
+    freezer = freeze_time("2024-01-02")
+    freezer.start()
+    api_client.post(
+        reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_in_forecast_not_done["ticketid"]}
+    )
+    api_client.post(reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_in_forecast_done["ticketid"]})
+    freezer.stop()
+
+    freezer = freeze_time("2024-01-03")
+    freezer.start()
+    response = api_client.post(reverse("set_scope_forecast", args=[scope_id]))
+    freezer.stop()
+
+    freezer = freeze_time("2024-01-04")
+    freezer.start()
+    api_client.post(
+        reverse("set_scope_done_columns", args=[scope_id]),
+        json.dumps({"done_columns": [str(done_column)]}),
+        content_type="application/json",
+    )
+    api_client.post(
+        reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_not_in_forecast_done["ticketid"]}
+    )
+    api_client.post(
+        reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_not_in_forecast_not_done["ticketid"]}
+    )
+    freezer.stop()
+    move_ticket_at_time(boardid, done_column, "2024-01-06", ticket_in_forecast_done["ticketid"])
+
+    freezer = freeze_time("2024-01-10")
+    freezer.start()
+    response = api_client.get(reverse("velocity", args=[boardid]))
+    freezer.stop()
+
+    assert response.status_code == 200
+
+    data = response.json()["data"]
+
+    assert len(data) == 1
+
+    assert data == [
+        {"name": "test scope", "forecast": 9, "done": 5},
+    ]
 
     resetDB()
