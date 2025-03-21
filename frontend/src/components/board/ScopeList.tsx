@@ -29,8 +29,11 @@ interface ScopeListItemProps {
 const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactivate }) => {
   const displayName = scope.title.length < 30 ? scope.title : scope.title.substring(0, 30) + "..."
   const anchor = document.getElementById("scope-anchor")
+  const dispatch = useDispatch()
+
   const handleClick = () => {
     deactivate()
+    dispatch(setScope(scope.scopeid))
   }
   return (
     <div>
@@ -44,9 +47,11 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactiva
           <EditIcon />
         </IconButton>
       </ListItemButton>
-      <Popper open={isActive} anchorEl={anchor} placement="left-end">
-        <Scope key={scope.scopeid} scope={scope}></Scope>
-      </Popper>
+      {anchor && (
+        <Popper open={isActive} anchorEl={anchor} placement="left-end">
+          <Scope key={scope.scopeid} scope={scope}></Scope>
+        </Popper>
+      )}
       <Divider />
     </div>
   )

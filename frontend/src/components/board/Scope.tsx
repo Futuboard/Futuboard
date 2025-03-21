@@ -86,9 +86,6 @@ const Scope: React.FC<ScopeProps> = (props) => {
   const [tickets, setTickets] = useState(scope.tickets.length)
   const [size, setSize] = useState(scope.tickets.length)
 
-  const dispatch = useDispatch()
-  dispatch(setScope(scope.scopeid))
-
   const handleTextFieldBlur = (event: React.FocusEvent<HTMLTextAreaElement>) => {
     setScopeTitle({ scopeid: scope.scopeid, title: event.target.value })
   }
