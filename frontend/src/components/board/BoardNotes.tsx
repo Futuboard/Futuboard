@@ -55,11 +55,16 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
   }
 
   return (
-    <div>
+    <>
       <Fade in={!open} unmountOnExit>
         <Tooltip title="open notes" placement="left" arrow>
           <Fab
-            sx={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 1001 }}
+            sx={{
+              position: "fixed",
+              bottom: "calc(100% - 100vh + 1.5rem)",
+              right: "calc(100% - 100vw + 1.5rem)",
+              zIndex: 1001
+            }}
             onClick={() => setOpen(true)}
             color="info"
           >
@@ -73,8 +78,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
           sx={{
             width: "520px",
             position: "fixed",
-            bottom: "1.5rem",
-            right: "1.5rem",
+            right: "calc(100% - 100vw + 1.75rem)",
             top: "calc(65px + 1.5rem)",
             zIndex: 1000,
             display: "flex",
@@ -129,7 +133,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
           </Box>
         </Paper>
       </Fade>
-    </div>
+    </>
   )
 }
 

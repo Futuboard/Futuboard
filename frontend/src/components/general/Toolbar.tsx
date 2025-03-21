@@ -210,7 +210,12 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   }
 
   return (
-    <Box display="flex" alignItems="center" justifyContent="flex-end" sx={{ minWidth: 0, flexGrow: 1 }}>
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="flex-end"
+      sx={{ minWidth: 0, flexGrow: 1, marginRight: "calc(100% - 100vw + 3rem)" }}
+    >
       {isSuccess && users.length > 0 && <UserList users={users} />}
       <AddUserButton />
       <CopyToClipboardButton />
