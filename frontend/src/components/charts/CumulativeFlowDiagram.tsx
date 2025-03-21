@@ -1,14 +1,4 @@
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  CircularProgress,
-  Divider,
-  InputLabel,
-  Paper,
-  Stack,
-  Typography
-} from "@mui/material"
+import { Box, Button, ButtonGroup, CircularProgress, InputLabel, Stack } from "@mui/material"
 import dayjs from "dayjs"
 import React, { useEffect, useState } from "react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
@@ -18,6 +8,7 @@ import { useGetCumulativeFlowDiagramDataQuery } from "@/state/apiSlice"
 import { CountUnit, TimeUnit } from "@/types"
 
 import ChartContainer from "./ChartContainer"
+import ChartToolTip from "./ChartToolTip"
 import DateSelector from "./DateSelector"
 
 interface CumulativeFlowDiagramProps {
@@ -78,6 +69,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
       timeUnit: timeUnit,
       countUnit: queryparams.countUnit
     })
+    setShortcut("")
   }
 
   const handleShortCut = (event: React.MouseEvent<HTMLElement>) => {
@@ -111,32 +103,6 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
     } else if (queryparams.timeUnit == "year") {
       return dayjs(tick).format("YYYY")
     } else return dayjs(tick).format("DD.MM.YYYY")
-  }
-
-  interface AreaToolTipProps {
-    active: boolean
-    payload: Array<{ [key: string]: string }>
-    label: string
-  }
-
-  const AreaToolTip: React.FC<AreaToolTipProps> = ({ active, payload, label }) => {
-    if (active && payload) {
-      return (
-        <Paper>
-          <Stack padding={1}>
-            <Typography variant="h6">{tickFormatter(label)}</Typography>
-            <Divider />
-            <Stack direction="column-reverse">
-              {payload.map((val: { [key: string]: string }) => (
-                <Typography key={val.name} color={val.fill} fontWeight={val.name == highlightedArea ? 900 : "normal"}>
-                  {val.name}: {val.value}
-                </Typography>
-              ))}
-            </Stack>
-          </Stack>
-        </Paper>
-      )
-    }
   }
 
   if (isLoading) {
@@ -213,10 +179,12 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
           <Tooltip
             offset={20}
             content={({ active, payload, label }) => (
-              <AreaToolTip
+              <ChartToolTip
                 active={active || false}
                 payload={payload as Array<{ [key: string]: string }>}
                 label={label}
+                labelFormatter={tickFormatter}
+                highlightedItem={highlightedArea}
               />
             )}
           />
