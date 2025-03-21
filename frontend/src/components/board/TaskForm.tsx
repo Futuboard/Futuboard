@@ -1,4 +1,5 @@
 import { DeleteForever } from "@mui/icons-material"
+import AllOutIcon from "@mui/icons-material/AllOut"
 import {
   Box,
   Button,
@@ -24,7 +25,7 @@ import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 
 import { useDeleteTaskMutation } from "@/state/apiSlice"
-import { Task, Task as TaskType, User, TaskTemplate } from "@/types"
+import { Task, Task as TaskType, User, TaskTemplate, SimpleScope } from "@/types"
 
 import DescriptionEditField from "./DescriptionEditField"
 
@@ -151,6 +152,20 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
     }
   }, [isTaskCreationForm])
 
+  const scopesList = (task: Task) => {
+    if (task.scopes.length > 0) {
+      return task.scopes.map((scope: SimpleScope, index) => {
+        if (index == 0) {
+          return scope.title
+        } else {
+          return " " + scope.title
+        }
+      })
+    } else {
+      return "none"
+    }
+  }
+
   return (
     <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={closeModule}>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -158,9 +173,13 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
           <Grid item xs={12}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Typography gutterBottom variant="h6">
-                {" "}
                 <b>{formTitle}</b>
               </Typography>
+              {defaultValues && isTaskEditForm && (
+                <Tooltip title={`Scopes: ${scopesList(defaultValues as Task)}`} sx={{ alignSelf: "flex-start" }}>
+                  <AllOutIcon />
+                </Tooltip>
+              )}
             </Box>
             <Divider />
           </Grid>
