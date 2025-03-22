@@ -26,7 +26,7 @@ jobs:
         run: docker compose up -d --wait
 
       - name: Run Cypress tests
-        run: cd cypress && npm install &&  npm test
+        run: cd cypress && npm ci &&  npm test
 
       - name: Stop containers
         run: docker compose down
