@@ -84,7 +84,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
   const [setScopeTitle] = useSetScopeTitleMutation()
   const [title, setTitle] = useState(scope.title)
   const [tickets, setTickets] = useState(scope.tickets.length)
-  const [size, setSize] = useState(scope.tickets.length)
+  const [size, setSize] = useState(scope.tickets.reduce((sum, task) => sum + (task.size || 0), 0))
 
   const handleTextFieldBlur = (event: React.FocusEvent<HTMLTextAreaElement>) => {
     setScopeTitle({ scopeid: scope.scopeid, title: event.target.value })
@@ -97,12 +97,12 @@ const Scope: React.FC<ScopeProps> = (props) => {
   useEffect(() => {
     setTitle(scope.title)
     setTickets(scope.tickets.length)
-    setSize(scope.tickets.length)
+    setSize(scope.tickets.reduce((sum, task) => sum + (task.size || 0), 0))
   }, [scope.title, scope.tickets])
 
   return (
     <Grid container spacing={2} width={350}>
-      <Paper elevation={3} style={{ padding: "18px" }}>
+      <Paper elevation={3} sx={{ padding: "18px", marginTop: "7px" }}>
         <Grid item xs={12}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <TextField

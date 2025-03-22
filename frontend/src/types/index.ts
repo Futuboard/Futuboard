@@ -136,9 +136,9 @@ export type Scope = {
   creation_date: string
   forecast_set_date: string
   forecast_size: number
-  forecast_tickets: string[]
-  done_columns: string[]
-  tickets: string[]
+  forecast_tickets: TaskSize[]
+  done_columns: Column[]
+  tickets: TaskSize[]
 }
 
 export type TimeUnit = (typeof timeUnitOptions)[number]
