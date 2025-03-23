@@ -185,6 +185,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
                 label={label}
                 labelFormatter={tickFormatter}
                 highlightedItem={highlightedArea}
+                isReverse
               />
             )}
           />
