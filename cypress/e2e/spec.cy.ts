@@ -263,7 +263,7 @@ describe("When changing the title of a board", () => {
     cy.get("p").contains("Edit Board Name").click()
     cy.get("input[name=title][type=text]").clear().type(validBoardName)
     cy.get("button[type=submit]").click()
-    cy.get("h6").contains(validBoardName)
+    cy.get("h1").contains(validBoardName)
   })
 
   it("With an invalid input, the title of the board stays the same and there is a warning", () => {
@@ -277,13 +277,13 @@ describe("When changing the title of a board", () => {
 
     // Check that there is both an error message and that the board name has not changed.
     cy.get("p").contains(nameTooShort)
-    cy.get("h6").contains("Project Alpha")
+    cy.get("h1").contains("Project Alpha")
 
     // Attempt to give an empty name.
     cy.get("input[name=title][type=text]").clear()
     cy.get("button[type=submit]").click()
     cy.get("p").contains(nameIsEmpty)
-    cy.get("h6").contains("Project Alpha")
+    cy.get("h1").contains("Project Alpha")
   })
 })
 
