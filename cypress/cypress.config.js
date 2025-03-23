@@ -8,7 +8,7 @@ export default defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       on("task", {
-        "stress-test": async ({ boardUrl, concurrentUsers }: { boardUrl: string; concurrentUsers: number }) => {
+        "stress-test": async ({ boardUrl, concurrentUsers }) => {
           return new Promise(async (resolve, reject) => {
             const cluster = await Cluster.launch({
               concurrency: Cluster.CONCURRENCY_CONTEXT,
@@ -80,4 +80,4 @@ export default defineConfig({
   retries: process.env.RETRY_COUNT ? Number(process.env.RETRY_COUNT) : 0
 })
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))

@@ -3,11 +3,11 @@ import { Box, Typography } from "@mui/material"
 import { useParams } from "react-router"
 
 import { useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
+import { AddUserButton } from "../general/Toolbar"
 
 import Column from "./Column"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
-import { AddUserButton } from "./Toolbar"
 
 const Board: React.FC = () => {
   const { id = "default-id" } = useParams()
@@ -54,7 +54,7 @@ const Board: React.FC = () => {
           ref={provided.innerRef}
           sx={{
             display: "inline-flex",
-            margin: "4rem 545px 25px 25px"
+            margin: "25px 545px 25px 25px"
           }}
         >
           {isSuccess && columns.map((column, index) => <Column key={column.columnid} column={column} index={index} />)}

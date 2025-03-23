@@ -27,10 +27,9 @@ import { useUpdateBoardNotesMutation } from "@/state/apiSlice"
 interface BoardNotesProps {
   boardId: string
   content: string
-  onChange: (markdown: string) => void
 }
 
-const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) => {
+const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
   const [open, setOpen] = useState(false)
   const [updateBoardNotes] = useUpdateBoardNotesMutation()
   const [notes, setNotes] = useState("")
@@ -42,7 +41,6 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
   const saveNotes = async () => {
     if (content != notes) {
       try {
-        onChange(notes)
         await updateBoardNotes({ boardId: boardId, notes: notes })
       } catch (error) {
         console.error(error)
@@ -57,11 +55,16 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
   }
 
   return (
-    <div>
+    <>
       <Fade in={!open} unmountOnExit>
         <Tooltip title="open notes" placement="left" arrow>
           <Fab
-            sx={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 1001 }}
+            sx={{
+              position: "fixed",
+              bottom: "calc(100% - 100vh + 1.5rem)",
+              right: "calc(100% - 100vw + 1.5rem)",
+              zIndex: 1001
+            }}
             onClick={() => setOpen(true)}
             color="info"
           >
@@ -75,8 +78,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
           sx={{
             width: "520px",
             position: "fixed",
-            bottom: "1.5rem",
-            right: "1.5rem",
+            right: "calc(100% - 100vw + 1.75rem)",
             top: "calc(65px + 1.5rem)",
             zIndex: 1000,
             display: "flex",
@@ -131,7 +133,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, onChange }) =
           </Box>
         </Paper>
       </Fade>
-    </div>
+    </>
   )
 }
 

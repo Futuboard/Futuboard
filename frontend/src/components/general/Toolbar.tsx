@@ -30,16 +30,17 @@ import { Link, useParams } from "react-router-dom"
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
 import { TaskTemplate } from "@/types"
 
-import BoardBackgroundColorForm from "./BoardBackgroundColorForm"
-import BoardDeletionComponent from "./BoardDeletionComponent"
-import BoardPasswordChangeForm from "./BoardPasswordChangeForm"
-import BoardTitleChangeForm from "./BoardTitleChangeForm"
-import CopyToClipboardButton from "./CopyToClipBoardButton"
-import CreateColumnButton from "./CreateColumnButton"
+import BoardBackgroundColorForm from "../board/BoardBackgroundColorForm"
+import BoardDeletionComponent from "../board/BoardDeletionComponent"
+import BoardPasswordChangeForm from "../board/BoardPasswordChangeForm"
+import BoardTitleChangeForm from "../board/BoardTitleChangeForm"
+import CopyToClipboardButton from "../board/CopyToClipBoardButton"
+import CreateColumnButton from "../board/CreateColumnButton"
+import TaskForm from "../board/TaskForm"
+import UserCreationForm from "../board/UserCreationForm"
+import UserList from "../board/UserList"
+
 import HomeButton from "./HomeButton"
-import TaskForm from "./TaskForm"
-import UserCreationForm from "./UserCreationForm"
-import UserList from "./UserList"
 
 interface FormData {
   name: string
@@ -116,8 +117,8 @@ interface OpenAnalyticsButtonProps {
 const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) => {
   return (
     <Tooltip title="Open Analytics">
-      <Link to={"/board/" + boardId + "/charts"}>
-        <IconButton>
+      <Link to={"/board/" + boardId + "/charts/cumulativeFlow"}>
+        <IconButton sx={{ color: "#2d3748" }}>
           <Analytics />
         </IconButton>
       </Link>
@@ -209,7 +210,12 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   }
 
   return (
-    <Box display="flex" alignItems="center" justifyContent="flex-end" sx={{ minWidth: 0, flexGrow: 1 }}>
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="flex-end"
+      sx={{ minWidth: 0, flexGrow: 1, marginRight: "calc(100% - 100vw + 3rem)" }}
+    >
       {isSuccess && users.length > 0 && <UserList users={users} />}
       <AddUserButton />
       <CopyToClipboardButton />
@@ -317,8 +323,16 @@ const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor, chartTool
           sx={{ marginX: 2, borderRightWidth: "2px", height: "35px", borderColor: "#D1D5DB" }}
         />
         <Typography
-          variant="h6"
-          sx={{ color: "#213547", marginLeft: 1, height: "100%", display: "flex", alignItems: "center", flexGrow: 1 }}
+          variant="h1"
+          sx={{
+            color: "#213547",
+            marginLeft: 1,
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            flexGrow: 1,
+            fontSize: 24
+          }}
         >
           {title}
         </Typography>
