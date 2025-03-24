@@ -6,9 +6,9 @@ import {
   Gradient,
   ColorLens,
   Analytics,
-  ViewWeek
+  ViewWeek,
 } from "@mui/icons-material"
-//TODO FIX THIS IMPORT
+//For some reason, this import did not work like the ones above.
 import AllOutIcon from "@mui/icons-material/AllOut"
 import {
   AppBar,
@@ -27,9 +27,11 @@ import {
   Typography
 } from "@mui/material"
 import React, { useState } from "react"
+import { useDispatch } from "react-redux"
 import { Link, useParams } from "react-router-dom"
 
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
+import { disableScope } from "@/state/scope"
 import { TaskTemplate } from "@/types"
 
 import BoardBackgroundColorForm from "./BoardBackgroundColorForm"
@@ -43,8 +45,6 @@ import ScopeList from "./ScopeList"
 import TaskForm from "./TaskForm"
 import UserCreationForm from "./UserCreationForm"
 import UserList from "./UserList"
-import { useDispatch } from "react-redux"
-import { disableScope } from "@/state/scope"
 
 interface FormData {
   name: string
@@ -243,9 +243,9 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
     <Box display="flex" alignItems="center" justifyContent="flex-end" sx={{ minWidth: 0, flexGrow: 1 }}>
       {isSuccess && users.length > 0 && <UserList users={users} />}
       <AddUserButton />
-      <OpenScopeListButton handler={handleScopeList} />
       <CopyToClipboardButton />
       <CreateColumnButton boardId={boardId} />
+      <OpenScopeListButton handler={handleScopeList} />
       <OpenAnalyticsButton boardId={boardId} />
       <IconButton
         aria-label="more"

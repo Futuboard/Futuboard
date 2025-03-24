@@ -10,11 +10,12 @@ import ListItemButton from "@mui/material/ListItemButton"
 import Popper from "@mui/material/Popper"
 import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { disableScope, setScope } from "@/state/scope"
+
 import { useAddScopeMutation } from "@/state/apiSlice"
 import { useGetScopesQuery } from "@/state/apiSlice"
+import { setScope } from "@/state/scope"
 import { Scope as Scopetype } from "@/types"
 
 import Scope from "./Scope"
@@ -27,7 +28,7 @@ interface ScopeListItemProps {
 }
 
 const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactivate }) => {
-  const displayName = scope.title.length < 30 ? scope.title : scope.title.substring(0, 30) + "..."
+  const displayName = scope.title.length < 20 ? scope.title : scope.title.substring(0, 16) + "..."
   const anchor = document.getElementById("scope-anchor")
   const dispatch = useDispatch()
 
@@ -38,7 +39,7 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactiva
   return (
     <div>
       <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start">
-        <Tooltip title={scope.title.length < 30 ? "" : scope.title} disableInteractive>
+        <Tooltip title={scope.title.length < 20 ? "" : scope.title} disableInteractive>
           <Typography sx={{ padding: "5px" }} color="black" variant="body1">
             {displayName}
           </Typography>
@@ -46,7 +47,7 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactiva
         <IconButton onClick={handleClick} sx={{ padding: "7px", marginLeft: "auto" }}>
           <EditIcon />
         </IconButton>
-      </ListItemButton>
+      </ListItemButton >
       {anchor && (
         <Popper open={isActive} anchorEl={anchor} placement="left-end">
           <Scope key={scope.scopeid} scope={scope}></Scope>
@@ -98,14 +99,11 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
           borderRadius: 2,
           paddingTop: 1.65,
           paddingBottom: 0,
-          minWidth: 330
+          minWidth: 200
         }}
       >
         <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start" id="scope-anchor">
-          <Typography sx={{ padding: "5px" }} color="black" variant="body1">
-            Create Scope
-          </Typography>
-          <IconButton onClick={openDialog} sx={{ marginLeft: "auto" }}>
+          <IconButton onClick={openDialog} sx={{ margin: "auto" }}>
             <AddIcon />
           </IconButton>
         </ListItemButton>
@@ -120,7 +118,9 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
             />
           ))
         ) : (
-          <div></div>
+          <ListItem>
+            <Typography sx={{ margin: "auto", padding: "5px" }} >No scopes yet</Typography>
+          </ListItem>
         )}
         <Dialog open={open} onClose={handleCloseDialog}>
           <DialogContent>

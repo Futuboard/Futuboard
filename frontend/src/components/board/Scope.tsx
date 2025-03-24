@@ -1,3 +1,5 @@
+import { DeleteForever } from "@mui/icons-material"
+import InfoIcon from "@mui/icons-material/Info"
 import {
   Box,
   Button,
@@ -14,17 +16,21 @@ import {
   Typography,
   Paper
 } from "@mui/material"
-
-import { Scope as Scopetype } from "@/types"
-import InfoIcon from "@mui/icons-material/Info"
-import { DeleteForever } from "@mui/icons-material"
 import { useState, useEffect } from "react"
+import { useDispatch } from "react-redux"
+
 import { useDeleteScopeMutation, useSetScopeTitleMutation } from "@/state/apiSlice"
+import { disableScope } from "@/state/scope"
+import { Scope as Scopetype } from "@/types"
+
+
+
 import { useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
+
 import DoneColumnChooser from "./DoneColumnChooser"
 import SetScopeForecastButton from "./SetForecastButton"
-import { useDispatch } from "react-redux"
-import { disableScope, setScope } from "@/state/scope"
+
+
 
 interface DeleteScopeButtonProps {
   scope: Scopetype
@@ -102,7 +108,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
 
   return (
     <Grid container spacing={2} width={350}>
-      <Paper elevation={3} sx={{ padding: "18px", marginTop: "7px" }}>
+      <Paper sx={{ padding: "18px", marginTop: "7px" }}>
         <Grid item xs={12}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <TextField
