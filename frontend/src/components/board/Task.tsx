@@ -208,7 +208,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
               <div
                 style={{ display: "flex", justifyContent: "space-between", flexDirection: "column", height: "100%" }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", overflow: "hidden" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", overflow: "visible" }}>
                   <div style={{ overflow: "hidden", flexGrow: 1 }} onDoubleClick={handleDoubleClick}>
                     {isEditing ? (
                       <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={handleBlur}>
@@ -227,7 +227,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                         variant={"body2"}
                         gutterBottom
                         width={"70%"}
-                        style={{ paddingTop: "6px", paddingLeft: "7px", color: "#2D3748" }}
+                        sx={{ paddingTop: "6px", paddingLeft: "7px", color: "#2D3748" }}
                       >
                         {cornernote}
                       </Typography>
