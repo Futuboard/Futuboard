@@ -124,6 +124,8 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
     defaultValues: initialFormValues
   })
 
+  const colorOptions = ["#ffffff", "#ffeb3b", "#8bc34a", "#ff4081", "#03a9f4"]
+
   const selectedColor = watch("color")
 
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -262,11 +264,9 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
                   }
                 }}
               >
-                <FormControlLabel value="#ffffff" control={<Radio style={{ color: "#ffffff" }} />} label={null} />
-                <FormControlLabel value="#ffeb3b" control={<Radio style={{ color: "#ffeb3b" }} />} label={null} />
-                <FormControlLabel value="#8bc34a" control={<Radio style={{ color: "#8bc34a" }} />} label={null} />
-                <FormControlLabel value="#ff4081" control={<Radio style={{ color: "#ff4081" }} />} label={null} />
-                <FormControlLabel value="#03a9f4" control={<Radio style={{ color: "#03a9f4" }} />} label={null} />
+                {colorOptions.map((val) => (
+                  <FormControlLabel value={val} control={<Radio style={{ color: val }} />} label={null} />
+                ))}
               </RadioGroup>
             </FormControl>
           </Grid>
