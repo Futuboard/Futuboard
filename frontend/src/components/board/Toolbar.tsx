@@ -6,7 +6,7 @@ import {
   Gradient,
   ColorLens,
   Analytics,
-  ViewWeek,
+  ViewWeek
 } from "@mui/icons-material"
 //For some reason, this import did not work like the ones above.
 import AllOutIcon from "@mui/icons-material/AllOut"
@@ -26,7 +26,7 @@ import {
   Tooltip,
   Typography
 } from "@mui/material"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { Link, useParams } from "react-router-dom"
 
@@ -139,7 +139,7 @@ const OpenScopeListButton: React.FC<OpenScopeListButtonProps> = ({ handler, isOp
   const color = isOpen ? "#e2e2e2" : "white"
   return (
     <Tooltip title="View and Set Scopes">
-      <IconButton onClick={handler} sx={{color: "black", background: color}} >
+      <IconButton onClick={handler} sx={{ color: "black", background: color }}>
         <AllOutIcon />
       </IconButton>
     </Tooltip>
@@ -175,6 +175,12 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   const [scopeListOpen, setScopeListOpen] = useState(false)
   const dispatch = useDispatch()
 
+  useEffect(() => {
+    if (!scopeListOpen) {
+      dispatch(disableScope())
+    }
+  }, [scopeListOpen, dispatch])
+
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -189,12 +195,8 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   }
 
   const handleScopeList = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const value = !scopeListOpen
-    setScopeListOpen(value)
+    setScopeListOpen(!scopeListOpen)
     setAnchorElScopeList(event.currentTarget)
-    if (!value) {
-      dispatch(disableScope())
-    }
   }
 
   const handleSubmitTaskFormData = async (data: TaskFormData | null) => {
