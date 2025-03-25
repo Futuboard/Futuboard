@@ -47,7 +47,7 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactiva
         <IconButton onClick={handleClick} sx={{ padding: "7px", marginLeft: "auto" }}>
           <EditIcon />
         </IconButton>
-      </ListItemButton >
+      </ListItemButton>
       {anchor && (
         <Popper open={isActive} anchorEl={anchor} placement="left-end">
           <Scope key={scope.scopeid} scope={scope}></Scope>
@@ -70,6 +70,7 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
   const [open, setOpen] = useState(false)
   const [addScope] = useAddScopeMutation()
   const [activeScope, setActiveScope] = useState<string | null>(null)
+  const collator = Intl.Collator(undefined, { numeric: true, sensitivity: "base" })
 
   const openDialog = () => {
     setOpen(true)
@@ -109,17 +110,20 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
         </ListItemButton>
         <Divider />
         {scopes.length > 0 ? (
-          scopes.map((scope) => (
-            <ScopeListItem
-              key={scope.scopeid}
-              scope={scope}
-              isActive={activeScope === scope.scopeid}
-              deactivate={() => setActiveScope(scope.scopeid)}
-            />
-          ))
+          scopes
+            .slice()
+            .sort((a, b) => collator.compare(a.title, b.title))
+            .map((scope) => (
+              <ScopeListItem
+                key={scope.scopeid}
+                scope={scope}
+                isActive={activeScope === scope.scopeid}
+                deactivate={() => setActiveScope(scope.scopeid)}
+              />
+            ))
         ) : (
           <ListItem>
-            <Typography sx={{ margin: "auto", padding: "5px" }} >No scopes yet</Typography>
+            <Typography sx={{ margin: "auto", padding: "5px" }}>No scopes yet</Typography>
           </ListItem>
         )}
         <Dialog open={open} onClose={handleCloseDialog}>
