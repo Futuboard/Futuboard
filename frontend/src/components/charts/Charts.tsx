@@ -1,10 +1,12 @@
-import { Speed, Water } from "@mui/icons-material"
+import { LocalFireDepartmentOutlined, SpeedOutlined, WaterOutlined } from "@mui/icons-material"
 import { Box, Divider, Grid, Paper, Typography } from "@mui/material"
 import { Link, useLocation } from "react-router-dom"
 
 import CumulativeFlowDiagram from "@/components/charts/CumulativeFlowDiagram"
 import VelocityChart from "@/components/charts/VelocityChart"
 import { Board } from "@/types"
+
+import BurnUpChart from "./BurnUpChart"
 
 type ChartsProps = {
   board: Board
@@ -19,12 +21,17 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
     cumulativeFlow: {
       displayName: "Cumulative Flow",
       component: CumulativeFlowDiagram,
-      Icon: Water
+      Icon: WaterOutlined
     },
     velocity: {
       displayName: "Velocity",
       component: VelocityChart,
-      Icon: Speed
+      Icon: SpeedOutlined
+    },
+    burnUp: {
+      displayName: "Burn Up",
+      component: BurnUpChart,
+      Icon: LocalFireDepartmentOutlined
     }
   }
 
