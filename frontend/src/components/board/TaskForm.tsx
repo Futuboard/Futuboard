@@ -14,6 +14,7 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
+  Popover,
   Radio,
   RadioGroup,
   TextField,
@@ -97,6 +98,8 @@ interface FormData {
 const TaskForm: React.FC<TaskFormProps> = (props) => {
   const { formTitle, formType, onSubmit, onCancel, onClose, defaultValues } = props
 
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null)
+
   const initialFormValues = {
     taskTitle: defaultValues?.title || "",
     corners: defaultValues?.caretakers || [],
@@ -154,17 +157,63 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
 
   const scopesList = (task: Task) => {
     if (task.scopes.length > 0) {
-      return task.scopes.map((scope: SimpleScope, index) => {
-        if (index == 0) {
-          return scope.title
-        } else {
-          return " " + scope.title
-        }
-      })
+      return task.scopes.map((scope: SimpleScope) => (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            backgroundColor: "#b6deff",
+            alignItems: "center",
+            margin: "12px",
+            padding: "2px",
+            border: "solid 1px",
+            borderRadius: "4px",
+            color: "black",
+            width: "60px",
+            overflow: "hidden",
+            height: "20px"
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: "13px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "inline-block"
+            }}
+          >
+            {scope.title}
+          </Typography>
+        </Box>
+      ))
     } else {
-      return "none"
+      return (
+        <Typography
+          sx={{
+            fontSize: "13px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            margin: "10px"
+          }}
+        >
+          Not in any scopes
+        </Typography>
+      )
     }
   }
+
+  const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null)
+  }
+
+  const scopeListOpen = Boolean(anchorEl)
 
   return (
     <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={closeModule}>
@@ -176,9 +225,27 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
                 <b>{formTitle}</b>
               </Typography>
               {defaultValues && isTaskEditForm && (
-                <Tooltip title={`Scopes: ${scopesList(defaultValues as Task)}`} sx={{ alignSelf: "flex-start" }}>
+                <Box
+                  onMouseEnter={handlePopoverOpen}
+                  onMouseLeave={handlePopoverClose}
+                  sx={{ alignSelf: "flex-start" }}
+                >
                   <AllOutIcon />
-                </Tooltip>
+                  <Popover
+                    sx={{ pointerEvents: "none" }}
+                    open={scopeListOpen}
+                    anchorEl={anchorEl}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "left"
+                    }}
+                    onClose={handlePopoverClose}
+                    disableRestoreFocus
+                  >
+                    <Box>{scopesList(defaultValues as Task)}</Box>
+                  </Popover>
+                </Box>
               )}
             </Box>
             <Divider />
