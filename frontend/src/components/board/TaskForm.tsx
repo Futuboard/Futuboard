@@ -24,7 +24,7 @@ import { useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 
 import { useDeleteTaskMutation } from "@/state/apiSlice"
-import { Task, Task as TaskType, User, TaskTemplate } from "@/types"
+import { Task, Task as TaskType, User, TaskTemplate, SimpleScope } from "@/types"
 
 import DescriptionEditField from "./DescriptionEditField"
 
@@ -73,6 +73,56 @@ const DeleteTaskButton: React.FC<DeleteTaskButtonProps> = ({ task }) => {
       </Dialog>
     </div>
   )
+}
+
+interface TicketScopeListProps {
+  task: Task
+}
+
+const TicketScopeList: React.FC<TicketScopeListProps> = ({ task }) => {
+  if (task.scopes.length > 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "flex-start",
+          gap: "10px",
+          paddingTop: "15px",
+          paddingBottom: "12px"
+        }}
+      >
+        {task.scopes.map((scope: SimpleScope) => (
+          <Box
+            key={scope.scopeid}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              backgroundColor: "#b6deff",
+              alignItems: "center",
+              paddingY: "4px",
+              paddingX: "10px",
+              border: "solid 1px",
+              borderColor: "gray",
+              borderRadius: "4px"
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: "13px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                display: "inline-block"
+              }}
+            >
+              {scope.title}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+    )
+  }
 }
 
 interface TaskFormProps {
@@ -158,11 +208,11 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
           <Grid item xs={12}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Typography gutterBottom variant="h6">
-                {" "}
                 <b>{formTitle}</b>
               </Typography>
             </Box>
             <Divider />
+            {defaultValues && isTaskEditForm && <TicketScopeList task={defaultValues as Task} />}
           </Grid>
           <Grid item xs={12}>
             <TextField

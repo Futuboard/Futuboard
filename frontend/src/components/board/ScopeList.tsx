@@ -16,13 +16,13 @@ import { useDispatch } from "react-redux"
 import { useAddScopeMutation } from "@/state/apiSlice"
 import { useGetScopesQuery } from "@/state/apiSlice"
 import { setScope } from "@/state/scope"
-import { Scope as Scopetype } from "@/types"
+import { Scope as ScopeType } from "@/types"
 
 import Scope from "./Scope"
 import ScopeCreationForm from "./ScopeCreationForm"
 
 interface ScopeListItemProps {
-  scope: Scopetype
+  scope: ScopeType
   isActive: boolean
   deactivate: () => void
 }
