@@ -23,14 +23,10 @@ import { useDeleteScopeMutation, useSetScopeTitleMutation } from "@/state/apiSli
 import { disableScope } from "@/state/scope"
 import { Scope as Scopetype } from "@/types"
 
-
-
 import { useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
 
 import DoneColumnChooser from "./DoneColumnChooser"
 import SetScopeForecastButton from "./SetForecastButton"
-
-
 
 interface DeleteScopeButtonProps {
   scope: Scopetype
@@ -159,6 +155,36 @@ const Scope: React.FC<ScopeProps> = (props) => {
               </Tooltip>
             </Grid>
           </Grid>
+
+          {scope.forecast_set_date && (
+            <Grid item xs={12} marginTop={3}>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Typography marginBottom={1}>{"Current Forecast  "}</Typography>
+              </Box>
+
+              <Grid item xs={12}>
+                <Typography>
+                  {"Tickets:   "}
+                  <b>{scope.forecast_tickets.length}</b>
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Typography>
+                  {"Size:   "}
+                  <b>{scope.forecast_size}</b>
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Typography>
+                  {"Set date:   "}
+                  <b>{scope.forecast_set_date.slice(0, 10)}</b>
+                </Typography>
+              </Grid>
+            </Grid>
+          )}
+
           {scope && (
             <Grid item xs={1} sx={{ display: "flex", ml: "auto" }}>
               <DeleteScopeButton scope={scope} />
