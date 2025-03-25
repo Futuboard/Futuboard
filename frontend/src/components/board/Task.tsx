@@ -226,7 +226,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                         noWrap
                         variant={"body2"}
                         gutterBottom
-                        width={"70%"}
+                        width={"90%"}
                         sx={{ paddingTop: "6px", paddingLeft: "7px", color: "#2D3748" }}
                       >
                         {cornernote}

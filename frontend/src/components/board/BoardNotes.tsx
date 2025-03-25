@@ -61,8 +61,8 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
           <Fab
             sx={{
               position: "fixed",
-              bottom: "calc(100% - 100vh + 1.5rem)",
-              right: "calc(100% - 100vw + 1.5rem)",
+              bottom: "1.5rem",
+              right: "1.5rem",
               zIndex: 1001
             }}
             onClick={() => setOpen(true)}
@@ -78,7 +78,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
           sx={{
             width: "520px",
             position: "fixed",
-            right: "calc(100% - 100vw + 1.75rem)",
+            right: "1.75rem",
             top: "calc(65px + 1.5rem)",
             zIndex: 1000,
             display: "flex",
@@ -122,11 +122,11 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
           </Box>
           <Divider variant="middle" />
           <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "flex-end", padding: 1 }}>
-            <ButtonGroup variant="contained" color="info">
-              <Button onClick={saveNotes} endIcon={<StickyNote2 />}>
+            <ButtonGroup color="primary">
+              <Button onClick={saveNotes} endIcon={<StickyNote2 />} variant="contained">
                 Save
               </Button>
-              <Button onClick={handleClose} endIcon={<CloseIcon />}>
+              <Button onClick={handleClose} endIcon={<CloseIcon />} variant="outlined">
                 Cancel
               </Button>
             </ButtonGroup>
