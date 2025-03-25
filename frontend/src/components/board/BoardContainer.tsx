@@ -1,4 +1,5 @@
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
+import { Box } from "@mui/material"
 import { produce } from "immer"
 
 import Board from "@/components/board/Board"
@@ -19,7 +20,6 @@ import {
 } from "../../state/apiSlice"
 
 import BoardNotes from "./BoardNotes"
-import { Box } from "@mui/material"
 
 type BoardProps = {
   board: BoardType
