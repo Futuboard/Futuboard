@@ -132,12 +132,14 @@ const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) =>
 
 interface OpenScopeListButtonProps {
   handler: (event: React.MouseEvent<HTMLButtonElement>) => void
+  isOpen: boolean
 }
 
-const OpenScopeListButton: React.FC<OpenScopeListButtonProps> = ({ handler }) => {
+const OpenScopeListButton: React.FC<OpenScopeListButtonProps> = ({ handler, isOpen }) => {
+  const color = isOpen ? "#e2e2e2" : "white"
   return (
     <Tooltip title="View and Set Scopes">
-      <IconButton onClick={handler}>
+      <IconButton onClick={handler} sx={{color: "black", background: color}} >
         <AllOutIcon />
       </IconButton>
     </Tooltip>
@@ -245,7 +247,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       <AddUserButton />
       <CopyToClipboardButton />
       <CreateColumnButton boardId={boardId} />
-      <OpenScopeListButton handler={handleScopeList} />
+      <OpenScopeListButton handler={handleScopeList} isOpen={scopeListOpen} />
       <OpenAnalyticsButton boardId={boardId} />
       <IconButton
         aria-label="more"
