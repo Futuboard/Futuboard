@@ -1,4 +1,4 @@
-import { Close, DeleteForever, Notes } from "@mui/icons-material"
+import { DeleteForever } from "@mui/icons-material"
 import {
   Box,
   Button,
@@ -189,7 +189,7 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
               inputRef={inputRef}
               inputProps={{ spellCheck: "false" }}
               multiline
-              maxRows={3}
+              maxRows={4}
               fullWidth
               helperText={errors.taskTitle?.message}
               error={Boolean(errors.taskTitle)}
@@ -273,13 +273,11 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
           <Grid item xs={12}>
             <Divider sx={{ marginBottom: 2 }} />
             <Stack direction="row" justifyContent="space-between">
-              <ButtonGroup>
-                <Button type="submit" color="primary" variant="contained" endIcon={<Notes />}>
+              <ButtonGroup color="primary">
+                <Button type="submit" variant="contained">
                   {isTaskCreationForm ? "Submit" : "Save Changes"}
                 </Button>
-                <Button onClick={onCancel} endIcon={<Close />}>
-                  Cancel
-                </Button>
+                <Button onClick={onCancel}>Cancel</Button>
               </ButtonGroup>
               {defaultValues && isTaskEditForm && <DeleteTaskButton task={defaultValues as Task} />}
             </Stack>

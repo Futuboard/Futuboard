@@ -5,8 +5,8 @@ import {
   Edit,
   Gradient,
   ColorLens,
-  Analytics,
-  ViewWeek
+  ViewWeek,
+  AnalyticsOutlined
 } from "@mui/icons-material"
 import {
   AppBar,
@@ -119,7 +119,7 @@ const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) =>
     <Tooltip title="Open Analytics">
       <Link to={"/board/" + boardId + "/charts/cumulativeFlow"}>
         <IconButton sx={{ color: "#2d3748" }}>
-          <Analytics />
+          <AnalyticsOutlined />
         </IconButton>
       </Link>
     </Tooltip>
