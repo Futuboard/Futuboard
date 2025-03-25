@@ -48,8 +48,6 @@ def burn_up(request: rest_framework.request.Request, board_id, scope_id):
     if request.method == "GET":
         possible_time_units = ["minute", "hour", "day", "week", "month", "year"]
         time_unit = request.query_params.get("time_unit", "day")  # Default to day
-        start_time = request.query_params.get("start_time")
-        end_time = request.query_params.get("end_time")
         count_unit = request.query_params.get("count_unit", "size")  # Default to size
 
         if time_unit not in possible_time_units:
@@ -62,9 +60,7 @@ def burn_up(request: rest_framework.request.Request, board_id, scope_id):
 
         columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
 
-        data_with_column_ids = get_column_sizes_at_times(
-            columns, time_unit, count_unit, start_time, end_time, scope_id
-        )
+        data_with_column_ids = get_column_sizes_at_times(columns, time_unit, count_unit, scope_id=scope_id)
 
         done_column_ids = [str(column.columnid) for column in scope.done_columns.all()]
 
