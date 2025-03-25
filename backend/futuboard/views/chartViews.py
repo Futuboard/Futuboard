@@ -105,9 +105,7 @@ def velocity(request: rest_framework.request.Request, board_id):
         return JsonResponse({"data": data}, safe=False)
 
 
-def get_column_sizes_at_times(
-    columns, time_unit, count_unit, start_time=None, end_time=None, scope_id=None
-) -> list[tuple[str, dict[str, int]]]:
+def get_column_sizes_at_times(columns, time_unit, count_unit, start_time=None, end_time=None, scope_id=None):
     ticket_events = (
         TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
     ).order_by("event_time")
