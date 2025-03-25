@@ -298,19 +298,21 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
   const tasks = useSelector(
     (state: RootState) => selectTasksByColumnId({ boardId: id, columnId: column.columnid })(state).data || defaultTasks
   )
+  const selectedScope = useSelector((state: RootState) => state.scope)
+  const isScopeSelected = selectedScope !== ""
 
   const sizeSum = useMemo(() => tasks.reduce((sum, task) => sum + Number(task.size), 0), [tasks])
 
   const taskNum = useMemo(() => tasks.length, [tasks])
 
-  let bgColor = "#E5DBD9"
+  let bgColor = isScopeSelected ? "#beb7b5" : "#E5DBD9"
 
   // change border color when task or size limit is exceeded
   if (
     (column.wip_limit && taskNum > column.wip_limit) ||
     (column.wip_limit_story && sizeSum > column.wip_limit_story)
   ) {
-    bgColor = "#FF4747"
+    bgColor = isScopeSelected ? "#d63838" : "#FF4747"
   }
   return (
     <Draggable draggableId={column.columnid} index={index}>

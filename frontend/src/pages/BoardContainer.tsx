@@ -1,16 +1,16 @@
 import ToolBar from "@components/board/Toolbar"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
-import { Box, GlobalStyles } from "@mui/material"
+import { Backdrop, Box, GlobalStyles } from "@mui/material"
 import { produce } from "immer"
 import { useEffect, useState } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 
 import BoardNotes from "@/components/board/BoardNotes"
 import { cacheTagTypes } from "@/constants"
 import { setBoardId } from "@/state/auth"
 import { setNotification } from "@/state/notification"
-import { store } from "@/state/store"
+import { RootState, store } from "@/state/store"
 import { webSocketContainer } from "@/state/websocket"
 import { Action, Task, User } from "@/types"
 
@@ -45,6 +45,8 @@ const BoardContainer: React.FC = () => {
   const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
   const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
   const [boardNotes, setBoardNotes] = useState("")
+  const selectedScope = useSelector((state: RootState) => state.scope)
+  const isScopeSelected = selectedScope !== ""
 
   useEffect(() => {
     const inner = async () => {
@@ -281,6 +283,7 @@ const BoardContainer: React.FC = () => {
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Box sx={{ width: "100vw", height: "100vh", overflow: "scroll" }}>
           <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
+          <Backdrop open={isScopeSelected} sx={{ backgroundColor: "rgba(0, 0, 0, 0.2)", zIndex: -999 }} />
           <ToolBar
             boardId={id}
             title={board.title || ""}

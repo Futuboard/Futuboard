@@ -151,6 +151,7 @@ interface TaskProps {
 
 const Task: React.FC<TaskProps> = ({ task }) => {
   const selectedScope = useSelector((state: RootState) => state.scope)
+  const isScopeSelected = selectedScope !== ""
 
   const [updateTask] = useUpdateTaskMutation()
   const [addTaskToScope] = useAddTaskToScopeMutation()
@@ -174,13 +175,13 @@ const Task: React.FC<TaskProps> = ({ task }) => {
   }, [task.scopes, selectedScope])
 
   const handleDoubleClick = () => {
-    if (selectedScope === "") {
+    if (!isScopeSelected) {
       setIsEditing(true)
     }
   }
 
   const handleClick = async () => {
-    if (selectedScope !== "") {
+    if (isScopeSelected) {
       if (!isHighlighted) {
         await addTaskToScope({ scopeId: selectedScope, ticketid: task.ticketid })
       } else {
@@ -230,7 +231,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                     : "white",
                 height: "100px",
                 marginBottom: "5px",
-                borderColor: task.color,
+                borderColor: task.color, // changes the whole task color when highlighted: !isScopeSelected ? task.color : isHighlighted ? "lightgreen" : task.color,
                 borderBottomWidth: "7px",
                 borderBottomStyle: "solid",
                 borderLeftWidth: "2px",
@@ -238,7 +239,8 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                 borderRightWidth: "2px",
                 borderRightStyle: "solid",
                 borderTopWidth: "2px",
-                borderTopStyle: "solid"
+                borderTopStyle: "solid",
+                cursor: isScopeSelected ? "pointer" : "auto"
               }}
             >
               <Box sx={{ display: "flex", justifyContent: "space-between", flexDirection: "column", height: "100%" }}>
@@ -268,7 +270,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                     )}
                   </Box>
                   <Box>
-                    <EditTaskButton task={task} setTaskSelected={setSelected} disabled={selectedScope !== ""} />
+                    <EditTaskButton task={task} setTaskSelected={setSelected} disabled={isScopeSelected} />
                   </Box>
                 </Box>
                 <Box>
