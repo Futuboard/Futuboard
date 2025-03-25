@@ -17,7 +17,8 @@ import {
   BoardTemplate,
   NewBoardTemplate,
   TaskTemplate,
-  ChartData
+  ChartData,
+  Scope
 } from "@/types"
 
 import { getAdminPassword, getAuth, setToken } from "./auth"
@@ -726,9 +727,31 @@ export const boardsApi = createApi({
       }),
       providesTags: [
         { type: "Columns", id: "LIST" },
-        { type: "Ticket", id: "LIST" }
-        //{ type: "Scope", id: "LIST" }
+        { type: "Ticket", id: "LIST" },
+        { type: "Scopes", id: "LIST" }
       ]
+    }),
+    getBurnUpChartData: builder.query<
+      ChartData,
+      { boardId: string; scopeId: string; timeUnit?: string; countUnit?: string }
+    >({
+      query: ({ boardId, scopeId, timeUnit, countUnit }) => ({
+        url: `charts/${boardId}/${scopeId}/burnup`,
+        method: "GET",
+        params: { time_unit: timeUnit, count_unit: countUnit }
+      }),
+      providesTags: [
+        { type: "Columns", id: "LIST" },
+        { type: "Ticket", id: "LIST" },
+        { type: "Scopes", id: "LIST" }
+      ]
+    }),
+    getScopes: builder.query<Scope[], string>({
+      query: (boardId) => ({
+        url: `scopes/${boardId}`,
+        method: "GET"
+      }),
+      providesTags: [{ type: "Scopes", id: "LIST" }]
     })
   })
 })
@@ -773,6 +796,8 @@ export const {
   useDeleteUserFromTicketMutation,
   useCheckAdminPasswordMutation,
   useUpdateTaskTemplateMutation,
+  useGetScopesQuery,
   useGetCumulativeFlowDiagramDataQuery,
-  useGetVelocityChartDataQuery
+  useGetVelocityChartDataQuery,
+  useGetBurnUpChartDataQuery
 } = boardsApi
