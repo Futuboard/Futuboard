@@ -18,7 +18,9 @@ import {
   useAddTaskMutation,
   useGetTaskListByColumnIdQuery,
   useUpdateColumnMutation,
-  useGetBoardQuery
+  useGetBoardQuery,
+  useAddTaskToScopeMutation,
+  useDeleteTaskFromScopeMutation
 } from "../../state/apiSlice"
 
 import ColumnEditForm from "./ColumnEditForm"
@@ -223,7 +225,7 @@ interface ColumnFormData {
   columnWipLimitStory: number | null
 }
 
-const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
+const EditColumnButton: React.FC<{ column: Column; disabled: boolean }> = ({ column, disabled }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [updateColumn] = useUpdateColumnMutation()
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -253,7 +255,7 @@ const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
   return (
     <div>
       <Tooltip title="Edit column">
-        <IconButton size="small" onClick={handleClick}>
+        <IconButton size="small" onClick={handleClick} disabled={disabled}>
           <Edit />
         </IconButton>
       </Tooltip>
@@ -288,6 +290,9 @@ interface ColumnProps {
 const defaultTasks: TaskType[] = []
 
 const Column: React.FC<ColumnProps> = ({ column, index }) => {
+  const [addTaskToScope] = useAddTaskToScopeMutation()
+  const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
+
   const [showSwimlanes, setShowSwimlanes] = useState(false)
 
   const isSwimlaneColumn = column.swimlane || false // change this to column.swimlane boolean
@@ -302,8 +307,23 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
   const isScopeSelected = selectedScope !== ""
 
   const sizeSum = useMemo(() => tasks.reduce((sum, task) => sum + Number(task.size), 0), [tasks])
-
   const taskNum = useMemo(() => tasks.length, [tasks])
+
+  const handleClick = () => {
+    if (tasks && isScopeSelected) {
+      // Check if selectedScope is in every task
+      if (tasks.every((task: TaskType) => task.scopes.some((scope) => scope.scopeid === selectedScope))) {
+        // Remove every task in column from selectedScope
+        tasks.forEach(async (task: TaskType) => {
+          await deleteTaskFromScope({ scopeId: selectedScope, ticketid: task.ticketid })
+        })
+      } else {
+        tasks.forEach(async (task: TaskType) => {
+          await addTaskToScope({ scopeId: selectedScope, ticketid: task.ticketid })
+        })
+      }
+    }
+  }
 
   let bgColor = isScopeSelected ? "#beb7b5" : "#E5DBD9"
 
@@ -332,16 +352,25 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
               borderColor: "rgba(0, 0, 0, 0.12)"
             }}
           >
-            <div {...provided.dragHandleProps} style={{ display: "flex", justifyContent: "space-between" }}>
+            <div
+              {...provided.dragHandleProps}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                cursor: isScopeSelected ? "pointer" : "default"
+              }}
+              onClick={handleClick}
+            >
               <Typography variant={"h5"} noWrap gutterBottom sx={{ paddingLeft: "3px", color: "#2D3748" }}>
                 {column.title}
               </Typography>
-              <EditColumnButton column={column} />
+              <EditColumnButton column={column} disabled={isScopeSelected} />
               {isSwimlaneColumn && (
                 <IconButton
                   color="primary"
                   aria-label="expand swimlane"
                   onClick={() => setShowSwimlanes(!showSwimlanes)}
+                  disabled={isScopeSelected}
                 >
                   {showSwimlanes ? <ArrowBackIosIcon /> : <ArrowForwardIosIcon />}
                 </IconButton>
