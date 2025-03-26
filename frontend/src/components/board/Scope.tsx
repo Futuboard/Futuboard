@@ -1,6 +1,6 @@
 import { DeleteForever } from "@mui/icons-material"
-import InfoIcon from "@mui/icons-material/Info"
 import CloseIcon from "@mui/icons-material/Close"
+import InfoIcon from "@mui/icons-material/Info"
 import {
   Box,
   Button,
