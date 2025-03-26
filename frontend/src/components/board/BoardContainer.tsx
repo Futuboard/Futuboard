@@ -1,4 +1,5 @@
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
+import { Box } from "@mui/material"
 import { produce } from "immer"
 
 import Board from "@/components/board/Board"
@@ -227,14 +228,22 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
 
   return (
     <DragDropContext onDragEnd={handleOnDragEnd}>
-      <ToolBar
-        boardId={boardId}
-        title={board.title}
-        taskTemplate={taskTemplateValues}
-        boardBackgroundColor={board.background_color}
-      />
-      <Board />
-      <BoardNotes content={board.notes} boardId={board.boardid} />
+      <Box
+        sx={{
+          height: "100%",
+          width: "100%",
+          overflow: "scroll" //Checlists in the ticket descriptions break if removed.
+        }}
+      >
+        <ToolBar
+          boardId={boardId}
+          title={board.title}
+          taskTemplate={taskTemplateValues}
+          boardBackgroundColor={board.background_color}
+        />
+        <Board />
+        <BoardNotes content={board.notes} boardId={board.boardid} />
+      </Box>
     </DragDropContext>
   )
 }

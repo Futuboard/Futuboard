@@ -1,5 +1,5 @@
 import { Speed, Water } from "@mui/icons-material"
-import { Box, Divider, Grid, Paper, Typography } from "@mui/material"
+import { Box, Divider, Paper, Stack, Typography } from "@mui/material"
 import { Link, useLocation } from "react-router-dom"
 
 import CumulativeFlowDiagram from "@/components/charts/CumulativeFlowDiagram"
@@ -36,7 +36,12 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
   const ChartComponent = selectedChart.component
 
   return (
-    <Box sx={{ position: "relative", height: "100%" }}>
+    <Box
+      sx={{
+        position: "relative",
+        height: "100%"
+      }}
+    >
       <Box
         sx={{
           position: "absolute",
@@ -46,6 +51,7 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
           flexDirection: "column",
           backgroundColor: "white",
           height: "100%",
+          width: "220px",
           borderRight: "2px solid #d1d5db"
         }}
       >
@@ -57,12 +63,11 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
           >
             Charts
           </Typography>
-          {
-            <Divider
-              flexItem
-              sx={{ borderBottomWidth: 2, marginX: 2, opacity: chartName === "cumulativeFlow" ? 0 : 1 }}
-            />
-          }
+
+          <Divider
+            flexItem
+            sx={{ borderBottomWidth: 2, marginX: 2, opacity: chartName === "cumulativeFlow" ? 0 : 1 }}
+          />
         </Box>
         {Object.entries(charts).map(([name, { displayName, Icon }]) => (
           <Box
@@ -89,23 +94,15 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "100%"
+          height: "100%",
+          marginLeft: "220px"
         }}
       >
         <Paper>
-          <Grid
-            container
-            direction="column"
-            justifyContent="center"
-            alignItems="center"
-            sx={{ padding: 2 }}
-            spacing={1}
-          >
-            <Grid item>
-              <Typography variant="h6">{selectedChart.displayName}</Typography>
-            </Grid>
+          <Stack direction="column" justifyContent="center" alignItems="center" sx={{ padding: 2 }} spacing={1}>
+            <Typography variant="h6">{selectedChart.displayName}</Typography>
             <ChartComponent boardId={board.boardid} />
-          </Grid>
+          </Stack>
         </Paper>
       </Box>
     </Box>

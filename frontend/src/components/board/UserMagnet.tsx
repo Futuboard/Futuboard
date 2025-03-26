@@ -17,38 +17,40 @@ const UserMagnet: React.FC<UserMagnetProps> = ({ user, editable }) => {
   }
 
   return (
-    <Card
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        backgroundColor: editable ? "rgb(230,170,170)" : "rgb(230,247,206)",
-        alignItems: "center",
-        margin: "4px",
-        border: "solid 1px",
-        borderRadius: "10px",
-        color: "black",
-        width: editable ? "70px" : "60px",
-        overflow: "hidden",
-        height: "20px"
-      }}
-    >
-      <Typography
+    <div title={user.name}>
+      <Card
         sx={{
-          fontSize: "13px",
+          display: "flex",
+          justifyContent: "center",
+          backgroundColor: editable ? "rgb(230,170,170)" : "rgb(230,247,206)",
+          alignItems: "center",
+          margin: "4px",
+          border: "solid 1px",
+          borderRadius: "10px",
+          color: "black",
+          width: editable ? "70px" : "60px",
           overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          display: "inline-block"
+          height: "20px"
         }}
       >
-        {user.name}
-      </Typography>
-      {editable && ( //can later show a form to change user color, name, delete etc
-        <IconButton size="small" title="Delete User" onClick={() => handleDelete()}>
-          <Delete style={{ fontSize: 18 }} />
-        </IconButton>
-      )}
-    </Card>
+        <Typography
+          sx={{
+            fontSize: "13px",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            display: "inline-block"
+          }}
+        >
+          {user.name}
+        </Typography>
+        {editable && ( //can later show a form to change user color, name, delete etc
+          <IconButton size="small" title="Delete User" onClick={() => handleDelete()}>
+            <Delete style={{ fontSize: 18 }} />
+          </IconButton>
+        )}
+      </Card>
+    </div>
   )
 }
 
