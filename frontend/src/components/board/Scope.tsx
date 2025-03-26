@@ -1,5 +1,6 @@
 import { DeleteForever } from "@mui/icons-material"
 import InfoIcon from "@mui/icons-material/Info"
+import CloseIcon from "@mui/icons-material/Close"
 import {
   Box,
   Button,
@@ -79,10 +80,11 @@ const DeleteScopeButton: React.FC<DeleteScopeButtonProps> = ({ scope }) => {
 
 interface ScopeProps {
   scope: Scopetype
+  onClose: () => void
 }
 
 const Scope: React.FC<ScopeProps> = (props) => {
-  const { scope } = props
+  const { scope, onClose } = props
   const { data: columns } = useGetColumnsByBoardIdQuery(scope?.boardid)
   const [setScopeTitle] = useSetScopeTitleMutation()
   const [title, setTitle] = useState(scope.title)
@@ -137,6 +139,13 @@ const Scope: React.FC<ScopeProps> = (props) => {
                 sx: { fontSize: "1.4rem", fontWeight: "bold" }
               }}
             />
+            <Box sx={{ display: "flex", ml: "auto" }}>
+              <Tooltip title="Close Scope">
+                <IconButton onClick={onClose}>
+                  <CloseIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
           <Divider />
         </Grid>
@@ -177,7 +186,9 @@ const Scope: React.FC<ScopeProps> = (props) => {
           {scope.forecast_set_date && (
             <Grid item xs={12} marginTop={3}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Typography marginBottom={1}>{"Current Forecast  "}</Typography>
+                <Typography marginBottom={1} sx={{ fontWeight: "bold" }}>
+                  {"Current Forecast  "}
+                </Typography>
               </Box>
 
               <Grid item xs={12}>
@@ -203,11 +214,9 @@ const Scope: React.FC<ScopeProps> = (props) => {
             </Grid>
           )}
 
-          {scope && (
-            <Grid item xs={1} sx={{ display: "flex", ml: "auto" }}>
-              <DeleteScopeButton scope={scope} />
-            </Grid>
-          )}
+          <Grid item xs={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <DeleteScopeButton scope={scope} />
+          </Grid>
         </Grid>
       </Paper>
     </Grid>
