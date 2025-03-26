@@ -71,6 +71,6 @@ button:focus-visible {
 }
 
 .chart-container {
-  height: calc(100vh - 20rem);
-  width: calc(100vw - 40rem);
+  height: calc(100vh - 30rem);
+  width: calc(100vw - 50rem);
 }
