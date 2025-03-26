@@ -15,7 +15,7 @@ import { useDispatch } from "react-redux"
 
 import { useAddScopeMutation } from "@/state/apiSlice"
 import { useGetScopesQuery } from "@/state/apiSlice"
-import { setScope } from "@/state/scope"
+import { disableScope, setScope } from "@/state/scope"
 import { Scope as ScopeType } from "@/types"
 
 import Scope from "./Scope"
@@ -23,11 +23,12 @@ import ScopeCreationForm from "./ScopeCreationForm"
 
 interface ScopeListItemProps {
   scope: ScopeType
+  onClose: () => void
   isActive: boolean
   deactivate: () => void
 }
 
-const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactivate }) => {
+const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose, isActive, deactivate }) => {
   const displayName = scope.title.length < 20 ? scope.title : scope.title.substring(0, 16) + "..."
   const anchor = document.getElementById("scope-anchor")
   const dispatch = useDispatch()
@@ -36,6 +37,12 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactiva
     deactivate()
     dispatch(setScope(scope.scopeid))
   }
+
+  const handleCloseScope = () => {
+    dispatch(disableScope())
+    onClose()
+  }
+
   return (
     <div>
       <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start">
@@ -50,7 +57,7 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, isActive, deactiva
       </ListItemButton>
       {anchor && (
         <Popper open={isActive} anchorEl={anchor} placement="left-end">
-          <Scope key={scope.scopeid} scope={scope}></Scope>
+          <Scope key={scope.scopeid} scope={scope} onClose={handleCloseScope}></Scope>
         </Popper>
       )}
       <Divider />
@@ -85,6 +92,10 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
     setOpen(false)
   }
 
+  const handleCloseScope = () => {
+    setActiveScope(null)
+  }
+
   useEffect(() => {
     if (!visible) {
       setActiveScope(null)
@@ -117,6 +128,7 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
               <ScopeListItem
                 key={scope.scopeid}
                 scope={scope}
+                onClose={handleCloseScope}
                 isActive={activeScope === scope.scopeid}
                 deactivate={() => setActiveScope(scope.scopeid)}
               />
