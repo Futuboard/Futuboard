@@ -19,11 +19,14 @@ import {
 } from "@mui/material"
 import { useState, useEffect } from "react"
 import { useDispatch } from "react-redux"
+
 import { useDeleteScopeMutation, useSetScopeTitleMutation } from "@/state/apiSlice"
 import { setNotification } from "@/state/notification"
 import { disableScope } from "@/state/scope"
 import { Scope as Scopetype } from "@/types"
+
 import { useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
+
 import DoneColumnSelector from "./DoneColumnSelector"
 import SetScopeForecastButton from "./SetForecastButton"
 

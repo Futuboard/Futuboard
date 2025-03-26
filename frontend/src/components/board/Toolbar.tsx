@@ -132,14 +132,12 @@ const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) =>
 
 interface OpenScopeListButtonProps {
   handler: (event: React.MouseEvent<HTMLButtonElement>) => void
-  isOpen: boolean
 }
 
-const OpenScopeListButton: React.FC<OpenScopeListButtonProps> = ({ handler, isOpen }) => {
-  const color = isOpen ? "#e2e2e2" : "white"
+const OpenScopeListButton: React.FC<OpenScopeListButtonProps> = ({ handler }) => {
   return (
     <Tooltip title="View and Set Scopes">
-      <IconButton onClick={handler} sx={{ color: "black", background: color }}>
+      <IconButton onClick={handler}>
         <AllOutIcon />
       </IconButton>
     </Tooltip>
@@ -165,7 +163,6 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   const { data: users, isSuccess } = useGetUsersByBoardIdQuery(boardId)
   const { id = "default-id" } = useParams()
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
-  const [anchorElScopeList, setAnchorElScopeList] = React.useState<HTMLButtonElement | null>(null)
   const open = Boolean(anchorEl)
   const [updateTaskTemplate] = useUpdateTaskTemplateMutation()
   const [passwordFormOpen, setPasswordFormOpen] = useState(false)
@@ -194,9 +191,8 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
     handleClose()
   }
 
-  const handleScopeList = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleScopeList = () => {
     setScopeListOpen(!scopeListOpen)
-    setAnchorElScopeList(event.currentTarget)
   }
 
   const handleSubmitTaskFormData = async (data: TaskFormData | null) => {
@@ -249,7 +245,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       <AddUserButton />
       <CopyToClipboardButton />
       <CreateColumnButton boardId={boardId} />
-      <OpenScopeListButton handler={handleScopeList} isOpen={scopeListOpen} />
+      <OpenScopeListButton handler={handleScopeList} />
       <OpenAnalyticsButton boardId={boardId} />
       <IconButton
         aria-label="more"
@@ -260,7 +256,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       >
         <MoreVert />
       </IconButton>
-      <ScopeList visible={scopeListOpen} boardId={boardId} anchorEl={anchorElScopeList} />
+      <ScopeList visible={scopeListOpen} boardId={boardId} closeDrawer={handleScopeList} />
       <Menu
         id="long-menu"
         anchorEl={anchorEl}

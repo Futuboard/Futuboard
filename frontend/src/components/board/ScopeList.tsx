@@ -1,8 +1,10 @@
 import AddIcon from "@mui/icons-material/Add"
+import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import EditIcon from "@mui/icons-material/Edit"
 import { Dialog } from "@mui/material"
 import DialogContent from "@mui/material/DialogContent"
 import Divider from "@mui/material/Divider"
+import Drawer from "@mui/material/Drawer"
 import IconButton from "@mui/material/IconButton"
 import List from "@mui/material/List"
 import ListItem from "@mui/material/ListItem"
@@ -29,7 +31,7 @@ interface ScopeListItemProps {
 }
 
 const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose, isActive, deactivate }) => {
-  const displayName = scope.title.length < 20 ? scope.title : scope.title.substring(0, 16) + "..."
+  const displayName = scope.title.length < 30 ? scope.title : scope.title.substring(0, 26) + "..."
   const anchor = document.getElementById("scope-anchor")
   const dispatch = useDispatch()
 
@@ -45,15 +47,13 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose, isActive,
 
   return (
     <div>
-      <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start">
-        <Tooltip title={scope.title.length < 20 ? "" : scope.title} disableInteractive>
+      <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start" onClick={handleClick}>
+        <Tooltip title={scope.title.length < 30 ? "" : scope.title} disableInteractive>
           <Typography sx={{ padding: "5px" }} color="black" variant="body1">
             {displayName}
           </Typography>
         </Tooltip>
-        <IconButton onClick={handleClick} sx={{ padding: "7px", marginLeft: "auto" }}>
-          <EditIcon />
-        </IconButton>
+          <EditIcon sx={{ padding: "7px", marginLeft: "auto", color: "gray"}} />
       </ListItemButton>
       {anchor && (
         <Popper open={isActive} anchorEl={anchor} placement="left-end">
@@ -66,12 +66,12 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose, isActive,
 }
 
 interface ScopeListProps {
-  anchorEl: HTMLButtonElement | null
   visible: boolean
+  closeDrawer: (event: React.MouseEvent<HTMLButtonElement>) => void
   boardId: string
 }
 
-const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => {
+const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, closeDrawer }) => {
   const info = useGetScopesQuery(boardId)
   const scopes = info.data ? info.data : []
   const [open, setOpen] = useState(false)
@@ -103,21 +103,23 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
   }, [visible])
 
   return (
-    <Popper open={visible} anchorEl={anchorEl}>
+    <Drawer open={visible} anchor={"right"} variant="persistent" sx={{color: "grey"}}>
+    <ListItem sx={{maxHeight: "55px" }} >
+    <IconButton onClick={closeDrawer}>
+      <ChevronRightIcon sx={{padding: "0px"}} />
+    </IconButton>
+    </ListItem>
       <List
         sx={{
-          bgcolor: "background.paper",
-          boxShadow: 1,
-          borderRadius: 2,
-          paddingTop: 1.65,
-          paddingBottom: 0,
-          minWidth: 200
+          boxShadow: 0,
+          borderRadius: 0,
+          minWidth: 270,
+          maxWidth: 270
         }}
       >
-        <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start" id="scope-anchor">
-          <IconButton onClick={openDialog} sx={{ margin: "auto" }}>
-            <AddIcon />
-          </IconButton>
+          <Divider sx={{ border: 0.01, color: "#cfcfcf" }} />
+        <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start" id="scope-anchor" onClick={openDialog}>
+          <AddIcon sx={{ margin: "auto", padding: "5px"}} color="primary"/>
         </ListItemButton>
         <Divider />
         {scopes.length > 0 ? (
@@ -135,7 +137,7 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
             ))
         ) : (
           <ListItem>
-            <Typography sx={{ margin: "auto", padding: "5px" }}>No scopes yet</Typography>
+            <Typography sx={{ margin: "auto", padding: "0px" }}>No scopes yet</Typography>
           </ListItem>
         )}
         <Dialog open={open} onClose={handleCloseDialog}>
@@ -144,7 +146,7 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, anchorEl }) => 
           </DialogContent>
         </Dialog>
       </List>
-    </Popper>
+    </Drawer>
   )
 }
 
