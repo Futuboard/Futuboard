@@ -20,6 +20,7 @@ import { useState, useEffect } from "react"
 import { useDispatch } from "react-redux"
 
 import { useDeleteScopeMutation, useSetScopeTitleMutation } from "@/state/apiSlice"
+import { setNotification } from "@/state/notification"
 import { disableScope } from "@/state/scope"
 import { Scope as Scopetype } from "@/types"
 
@@ -87,13 +88,29 @@ const Scope: React.FC<ScopeProps> = (props) => {
   const [title, setTitle] = useState(scope.title)
   const [tickets, setTickets] = useState(scope.tickets.length)
   const [size, setSize] = useState(scope.tickets.reduce((sum, task) => sum + (task.size || 0), 0))
+  const dispatch = useDispatch()
 
-  const handleTextFieldBlur = (event: React.FocusEvent<HTMLTextAreaElement>) => {
-    setScopeTitle({ scopeid: scope.scopeid, title: event.target.value })
+  const handleSubmitTitle = async () => {
+    if (title !== "") {
+      await setScopeTitle({ scopeid: scope.scopeid, title: title })
+    } else {
+      dispatch(setNotification({ text: "Scope name is required. Changing back...", type: "error" }))
+    }
+  }
+
+  const handleTextFieldBlur = () => {
+    handleSubmitTitle()
   }
 
   const handleTextFieldChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTitle(event.target.value)
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault()
+      handleSubmitTitle()
+    }
   }
 
   useEffect(() => {
@@ -114,6 +131,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
               variant="standard"
               fullWidth
               onBlur={handleTextFieldBlur}
+              onKeyDown={handleKeyDown}
               InputProps={{
                 disableUnderline: true,
                 sx: { fontSize: "1.4rem", fontWeight: "bold" }

@@ -784,7 +784,7 @@ export const boardsApi = createApi({
       invalidatesTags: () => invalidateRemoteCache(["Scopes"])
     }),
 
-    setScopeTitle: builder.mutation<Scope, { scopeid: string; title: string }>({
+    setScopeTitle: builder.mutation<{ success: boolean }, { scopeid: string; title: string }>({
       query: ({ scopeid, title }) => ({
         url: `scopes/${scopeid}/set_title`,
         method: "POST",

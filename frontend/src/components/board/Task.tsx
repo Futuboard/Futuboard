@@ -231,7 +231,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                     : "white",
                 height: "100px",
                 marginBottom: "5px",
-                borderColor: task.color, // changes the whole task color when highlighted: !isScopeSelected ? task.color : isHighlighted ? "lightgreen" : task.color,
+                borderColor: task.color, // !isScopeSelected ? task.color : isHighlighted ? "lightgreen" : task.color,
                 borderBottomWidth: "7px",
                 borderBottomStyle: "solid",
                 borderLeftWidth: "2px",
