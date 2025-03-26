@@ -15,7 +15,7 @@ const SetScopeForecastButton: React.FC<SetScopeForecastButtonProps> = ({ scope }
     if (scope.forecast_set_date) {
       setOpen(true)
     } else {
-      setScopeForecast({ scopeid: scope.scopeid })
+      setForecast()
     }
   }
 
@@ -23,7 +23,7 @@ const SetScopeForecastButton: React.FC<SetScopeForecastButtonProps> = ({ scope }
     setOpen(false)
   }
 
-  const setForecast = async () => {
+  const setForecast = () => {
     setScopeForecast({ scopeid: scope.scopeid })
     setOpen(false)
   }

@@ -19,15 +19,12 @@ import {
 } from "@mui/material"
 import { useState, useEffect } from "react"
 import { useDispatch } from "react-redux"
-
 import { useDeleteScopeMutation, useSetScopeTitleMutation } from "@/state/apiSlice"
 import { setNotification } from "@/state/notification"
 import { disableScope } from "@/state/scope"
 import { Scope as Scopetype } from "@/types"
-
 import { useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
-
-import DoneColumnChooser from "./DoneColumnChooser"
+import DoneColumnSelector from "./DoneColumnSelector"
 import SetScopeForecastButton from "./SetForecastButton"
 
 interface DeleteScopeButtonProps {
@@ -151,12 +148,12 @@ const Scope: React.FC<ScopeProps> = (props) => {
         </Grid>
 
         <Grid item xs={12} marginTop={1}>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Grid item xs={12}>
             <Typography gutterBottom variant="h6">
               {"Tickets:  "}
               <b>{tickets}</b>
             </Typography>
-          </Box>
+          </Grid>
 
           <Grid item xs={12}>
             <Typography gutterBottom variant="h6">
@@ -166,7 +163,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
           </Grid>
 
           <Grid item xs={12} marginTop={3} marginBottom={2}>
-            <DoneColumnChooser scope={scope} columns={columns ? columns : []} />
+            <DoneColumnSelector scope={scope} columns={columns ? columns : []} />
           </Grid>
 
           <Grid item container spacing={2} xs={12} alignItems="center">
