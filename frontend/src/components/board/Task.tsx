@@ -10,8 +10,9 @@ import { EditNote } from "@mui/icons-material"
 import { Box, IconButton, Paper, Popover, Tooltip, Typography } from "@mui/material"
 import ClickAwayListener from "@mui/material/ClickAwayListener"
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 
+import { setNotification } from "@/state/notification"
 import { RootState } from "@/state/store"
 import { Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
 
@@ -162,6 +163,8 @@ const Task: React.FC<TaskProps> = ({ task }) => {
   const [cornernote, setCornernote] = useState(task.cornernote)
   const [isHighlighted, setIsHighlighted] = useState(false)
 
+  const dispatch = useDispatch()
+
   useEffect(() => {
     setCornernote(task.cornernote)
   }, [task.cornernote])
@@ -180,14 +183,45 @@ const Task: React.FC<TaskProps> = ({ task }) => {
     }
   }
 
+  const errorHandleAddScope = () => {
+    dispatch(setNotification({ text: "Error adding the ticket to the scope. Please try again later.", type: "error" }))
+    setIsHighlighted(false)
+  }
+
+  const errorHandleRemoveScope = () => {
+    dispatch(
+      setNotification({ text: "Error removing the ticket from the scope. Please try again later.", type: "error" })
+    )
+    setIsHighlighted(true)
+  }
+
   const handleClick = async () => {
     if (isScopeSelected) {
       if (!isHighlighted) {
-        await addTaskToScope({ scopeId: selectedScope, ticketid: task.ticketid })
+        setIsHighlighted(true)
+        const response = await addTaskToScope({ scopeId: selectedScope, ticketid: task.ticketid })
+        if ("error" in response) {
+          errorHandleAddScope()
+          return
+        }
+        const success = response.data.success
+        if (!success) {
+          errorHandleAddScope()
+          return
+        }
       } else {
-        await deleteTaskFromScope({ scopeId: selectedScope, ticketid: task.ticketid })
+        setIsHighlighted(false)
+        const response = await deleteTaskFromScope({ scopeId: selectedScope, ticketid: task.ticketid })
+        if ("error" in response) {
+          errorHandleRemoveScope()
+          return
+        }
+        const success = response.data.success
+        if (!success) {
+          errorHandleRemoveScope()
+          return
+        }
       }
-      setIsHighlighted(!isHighlighted)
     }
   }
 
