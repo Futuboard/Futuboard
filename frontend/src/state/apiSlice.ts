@@ -719,34 +719,12 @@ export const boardsApi = createApi({
       ]
     }),
 
-    addTaskToScope: builder.mutation<{ success: boolean }, { scopeId: string; ticketid: string }>({
-      query: ({ scopeId, ticketid }) => ({
-        url: `scopes/${scopeId}/tickets`,
-        method: "POST",
-        body: { ticketid }
+    getScopes: builder.query<Scope[], string>({
+      query: (boardId) => ({
+        url: `scopes/${boardId}`,
+        method: "GET"
       }),
-      invalidatesTags: (_result, _error, { ticketid, scopeId }) =>
-        invalidateRemoteCache([
-          { type: "Ticket", id: ticketid },
-          { type: "Ticket", id: "LIST" },
-          { type: "Scopes", id: scopeId },
-          { type: "Scopes", id: "LIST" }
-        ])
-    }),
-
-    deleteTaskFromScope: builder.mutation<{ success: boolean }, { scopeId: string; ticketid: string }>({
-      query: ({ scopeId, ticketid }) => ({
-        url: `scopes/${scopeId}/tickets`,
-        method: "DELETE",
-        body: { ticketid }
-      }),
-      invalidatesTags: (_result, _error, { ticketid, scopeId }) =>
-        invalidateRemoteCache([
-          { type: "Ticket", id: ticketid },
-          { type: "Ticket", id: "LIST" },
-          { type: "Scopes", id: scopeId },
-          { type: "Scopes", id: "LIST" }
-        ])
+      providesTags: [{ type: "Scopes", id: "LIST" }]
     }),
 
     addScope: builder.mutation<Scope, { boardId: string; title: string }>({
@@ -790,15 +768,75 @@ export const boardsApi = createApi({
         method: "POST",
         body: { title: title }
       }),
-      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+      invalidatesTags: () => invalidateRemoteCache(["Ticket", "Scopes"])
     }),
 
-    getScopes: builder.query<Scope[], string>({
-      query: (boardId) => ({
-        url: `scopes/${boardId}`,
-        method: "GET"
+    addTaskToScope: builder.mutation<{ success: boolean }, { scopeId: string; ticketid: string }>({
+      query: ({ scopeId, ticketid }) => ({
+        url: `scopes/${scopeId}/tickets`,
+        method: "POST",
+        body: { ticketid }
       }),
-      providesTags: [{ type: "Scopes", id: "LIST" }]
+      //update optimistically
+      onQueryStarted({ ticketid, scopeId }, apiActions) {
+        const invalidationTags: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
+        updateCache(
+          "getTaskListByColumnId",
+          invalidationTags,
+          (draft) => {
+            const tasks = draft as Task[]
+            const task = tasks.find((task) => task.ticketid === ticketid)
+            if (task) {
+              task.scopes.push({ scopeid: scopeId, title: "temp" })
+            }
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(invalidationTags)
+          boardsApi.util.invalidateTags(invalidationTags)
+        })
+      },
+      invalidatesTags: (_result, _error, { ticketid }) =>
+        invalidateRemoteCache([
+          { type: "Ticket", id: ticketid },
+          { type: "Scopes", id: "LIST" }
+        ])
+    }),
+
+    deleteTaskFromScope: builder.mutation<{ success: boolean }, { scopeId: string; ticketid: string }>({
+      query: ({ scopeId, ticketid }) => ({
+        url: `scopes/${scopeId}/tickets`,
+        method: "DELETE",
+        body: { ticketid }
+      }),
+      //update optimistically
+      onQueryStarted({ ticketid, scopeId }, apiActions) {
+        const invalidationTags: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
+        updateCache(
+          "getTaskListByColumnId",
+          invalidationTags,
+          (draft) => {
+            const tasks = draft as Task[]
+            const task = tasks.find((task) => task.ticketid === ticketid)
+            if (task) {
+              task.scopes = task.scopes.filter((scope) => scope.scopeid !== scopeId)
+            }
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(invalidationTags)
+          boardsApi.util.invalidateTags(invalidationTags)
+        })
+      },
+      invalidatesTags: (_result, _error, { ticketid }) =>
+        invalidateRemoteCache([
+          { type: "Ticket", id: ticketid },
+          { type: "Scopes", id: "LIST" }
+        ])
     })
   })
 })

@@ -314,12 +314,12 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
       // Check if selectedScope is in every task
       if (tasks.every((task: TaskType) => task.scopes.some((scope) => scope.scopeid === selectedScope))) {
         // Remove every task in column from selectedScope
-        tasks.forEach(async (task: TaskType) => {
-          await deleteTaskFromScope({ scopeId: selectedScope, ticketid: task.ticketid })
+        tasks.forEach((task: TaskType) => {
+          deleteTaskFromScope({ scopeId: selectedScope, ticketid: task.ticketid })
         })
       } else {
         tasks.forEach(async (task: TaskType) => {
-          await addTaskToScope({ scopeId: selectedScope, ticketid: task.ticketid })
+          addTaskToScope({ scopeId: selectedScope, ticketid: task.ticketid })
         })
       }
     }
