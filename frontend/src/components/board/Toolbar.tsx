@@ -138,7 +138,7 @@ const OpenScopeListButton: React.FC<OpenScopeListButtonProps> = ({ handler }) =>
   return (
     <Tooltip title="View and Set Scopes">
       <IconButton onClick={handler}>
-        <AllOutIcon />
+        <AllOutIcon sx={{ color: "black" }} />
       </IconButton>
     </Tooltip>
   )
