@@ -1,8 +1,8 @@
 Cypress.Commands.add("createBoard", ({ title, password }) => {
   cy.get("button").contains("Create board").click()
   cy.get(".MuiDialog-root").should("be.visible")
-  cy.get(".MuiDialog-root").find("label").contains("Name").parent().find("input").type(title)
-  password && cy.get(".MuiDialog-root").find("label").contains("Password").parent().find("input").type(password)
+  cy.get(".MuiDialog-root").find("label").contains("Board Name").parent().find("input").type(title)
+  password && cy.get(".MuiDialog-root").find("label").contains("Board Password").parent().find("input").type(password)
   cy.get(".MuiDialog-root").contains("button", "Submit").click()
 })
 
