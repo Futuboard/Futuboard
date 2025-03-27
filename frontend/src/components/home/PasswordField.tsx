@@ -14,7 +14,7 @@ interface AddPasswordFieldProps {
   label?: string
 }
 
-const PasswordField: React.FC<AddPasswordFieldProps> = ({ register, errorText, label = "Password" }) => {
+const PasswordField: React.FC<AddPasswordFieldProps> = ({ register, errorText, label = "Board Password" }) => {
   const [showPassword, setShowPassword] = useState(false)
 
   const handleClickShowPassword = () => setShowPassword((show) => !show)
@@ -23,7 +23,7 @@ const PasswordField: React.FC<AddPasswordFieldProps> = ({ register, errorText, l
     <FormControl sx={{ width: "90%" }}>
       <InputLabel htmlFor="outlined-adornment-password">{label}</InputLabel>
       <OutlinedInput
-        type={showPassword ? "Text" : "Password"}
+        type={showPassword ? "Text" : "password"}
         error={Boolean(errorText)}
         {...register}
         endAdornment={
