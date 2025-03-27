@@ -330,8 +330,8 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
               borderColor: "rgba(0, 0, 0, 0.12)"
             }}
           >
-            <div {...provided.dragHandleProps} style={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant={"h5"} noWrap gutterBottom sx={{ paddingLeft: "3px", color: "#2D3748" }}>
+            <div {...provided.dragHandleProps} style={{ display: "grid", gridTemplateColumns: isSwimlaneColumn ? "1fr auto auto" : "1fr auto", alignItems: "center",}}>
+              <Typography variant={"h5"} noWrap sx={{ paddingLeft: "3px", color: "#2D3748" }}>
                 {column.title}
               </Typography>
               <EditColumnButton column={column} />
