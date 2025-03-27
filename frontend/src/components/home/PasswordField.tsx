@@ -23,7 +23,7 @@ const PasswordField: React.FC<AddPasswordFieldProps> = ({ register, errorText, l
     <FormControl sx={{ width: "90%" }}>
       <InputLabel htmlFor="outlined-adornment-password">{label}</InputLabel>
       <OutlinedInput
-        type={showPassword ? "Text" : "password"}
+        type={showPassword ? "Text" : "Password"}
         error={Boolean(errorText)}
         {...register}
         endAdornment={
