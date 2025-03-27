@@ -48,12 +48,12 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose, isActive,
   return (
     <div>
       <ListItemButton sx={{ padding: "5px" }} alignItems="center" onClick={handleClick} selected={isActive}>
+        <EditIcon sx={{ paddingLeft: "20px", padding: "7px", color: "gray", alignSelf: "center"}} />
         <Tooltip title={scope.title.length < 30 ? "" : scope.title} disableInteractive>
-          <Typography sx={{ paddingLeft: "10px" }} color="black" variant="body1">
+          <Typography color="black" variant="body1">
             {displayName}
           </Typography>
         </Tooltip>
-          <EditIcon sx={{ padding: "7px", marginLeft: "auto", color: "gray", alignSelf: "center"}} />
       </ListItemButton>
       {anchor && (
         <Popper open={isActive} anchorEl={anchor} placement="left-end">
@@ -103,7 +103,7 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, closeDrawer }) 
   }, [visible])
 
   return (
-    <Drawer open={visible} anchor={"right"} variant="persistent" sx={{color: "grey"}}>
+    <Drawer open={visible} anchor={"right"} variant="persistent" sx={{borderLeft: 2, borderColor: "black"}} style={{borderLeft: "2px solid #D1D5DB"}}>
       <List
         sx={{
           boxShadow: 0,
@@ -117,7 +117,7 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, closeDrawer }) 
       <IconButton onClick={closeDrawer}>
         <ChevronRightIcon />
       </IconButton>
-      <Typography variant="h6" sx={{ paddingLeft: "45px" }} >Scopes</Typography>
+      <Typography variant="h6" fontWeight="bold" sx={{ paddingLeft: "42px", height: "63%"}} >Scopes</Typography>
     </ListItem>
           <Divider sx={{ borderBottom: "2px solid #D1D5DB" }} />
         <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start" id="scope-anchor" onClick={openDialog}>
