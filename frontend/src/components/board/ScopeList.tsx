@@ -47,13 +47,13 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose, isActive,
 
   return (
     <div>
-      <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start" onClick={handleClick}>
+      <ListItemButton sx={{ padding: "5px" }} alignItems="center" onClick={handleClick} selected={isActive}>
         <Tooltip title={scope.title.length < 30 ? "" : scope.title} disableInteractive>
-          <Typography sx={{ padding: "5px" }} color="black" variant="body1">
+          <Typography sx={{ paddingLeft: "10px" }} color="black" variant="body1">
             {displayName}
           </Typography>
         </Tooltip>
-          <EditIcon sx={{ padding: "7px", marginLeft: "auto", color: "gray"}} />
+          <EditIcon sx={{ padding: "7px", marginLeft: "auto", color: "gray", alignSelf: "center"}} />
       </ListItemButton>
       {anchor && (
         <Popper open={isActive} anchorEl={anchor} placement="left-end">
@@ -104,11 +104,6 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, closeDrawer }) 
 
   return (
     <Drawer open={visible} anchor={"right"} variant="persistent" sx={{color: "grey"}}>
-    <ListItem sx={{maxHeight: "55px" }} >
-    <IconButton onClick={closeDrawer}>
-      <ChevronRightIcon sx={{padding: "0px"}} />
-    </IconButton>
-    </ListItem>
       <List
         sx={{
           boxShadow: 0,
@@ -116,10 +111,19 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, closeDrawer }) 
           minWidth: 270,
           maxWidth: 270
         }}
+        disablePadding
       >
-          <Divider sx={{ border: 0.01, color: "#cfcfcf" }} />
+    <ListItem sx={{ height: "63px" }} >
+      <IconButton onClick={closeDrawer}>
+        <ChevronRightIcon />
+      </IconButton>
+      <Typography variant="h6" sx={{ paddingLeft: "45px" }} >Scopes</Typography>
+    </ListItem>
+          <Divider sx={{ borderBottom: "2px solid #D1D5DB" }} />
         <ListItemButton sx={{ padding: "5px" }} alignItems="flex-start" id="scope-anchor" onClick={openDialog}>
-          <AddIcon sx={{ margin: "auto", padding: "5px"}} color="primary"/>
+          <Tooltip title="Create a Scope" disableInteractive>
+            <AddIcon sx={{ margin: "auto", padding: "5px"}} color="primary"/>
+          </Tooltip>
         </ListItemButton>
         <Divider />
         {scopes.length > 0 ? (
@@ -137,7 +141,7 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, closeDrawer }) 
             ))
         ) : (
           <ListItem>
-            <Typography sx={{ margin: "auto", padding: "0px" }}>No scopes yet</Typography>
+            <Typography sx={{ margin: "auto" }}>No scopes yet</Typography>
           </ListItem>
         )}
         <Dialog open={open} onClose={handleCloseDialog}>
