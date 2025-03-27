@@ -764,7 +764,7 @@ export const boardsApi = createApi({
         method: "DELETE",
         body: { scopeid }
       }),
-      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+      invalidatesTags: () => invalidateRemoteCache(["Ticket", "Scopes"])
     }),
 
     setDoneColumns: builder.mutation<Scope, { scopeid: string; columnidlist: string[] }>({
