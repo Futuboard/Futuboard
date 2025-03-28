@@ -3,7 +3,6 @@ from django.http import JsonResponse
 
 from ..models import Board, Column, Scope, Ticket, TicketEvent
 from ..serializers import ScopeSerializerWithRelationInfo
-from ..serializers import ScopeSerializer
 import rest_framework.request
 from django.utils.timezone import now
 

@@ -1,7 +1,8 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material"
-import { Scope as Scopetype } from "@/types"
 import { useState } from "react"
+
 import { useSetScopeForecastMutation } from "@/state/apiSlice"
+import { Scope as Scopetype } from "@/types"
 
 interface SetScopeForecastButtonProps {
   scope: Scopetype

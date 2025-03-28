@@ -1,17 +1,19 @@
 import AddIcon from "@mui/icons-material/Add"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import EditIcon from "@mui/icons-material/Edit"
-import { Dialog } from "@mui/material"
-import DialogContent from "@mui/material/DialogContent"
-import Divider from "@mui/material/Divider"
-import Drawer from "@mui/material/Drawer"
-import IconButton from "@mui/material/IconButton"
-import List from "@mui/material/List"
-import ListItem from "@mui/material/ListItem"
-import ListItemButton from "@mui/material/ListItemButton"
-import Popper from "@mui/material/Popper"
-import Tooltip from "@mui/material/Tooltip"
-import Typography from "@mui/material/Typography"
+import {
+  Dialog,
+  DialogContent,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  Popper,
+  Tooltip,
+  Typography
+} from "@mui/material"
 import React, { useState, useEffect } from "react"
 import { useDispatch } from "react-redux"
 
@@ -47,7 +49,7 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose, isActive,
 
   return (
     <div>
-      <ListItemButton sx={{ padding: "5px" }} alignItems="center" onClick={handleClick} selected={isActive}>
+      <ListItemButton sx={{ padding: "5px" }} onClick={handleClick} selected={isActive}>
         <EditIcon sx={{ paddingLeft: "20px", padding: "7px", color: "gray", alignSelf: "center" }} />
         <Tooltip title={scope.title.length < 30 ? "" : scope.title} disableInteractive>
           <Typography color="black" variant="body1">
@@ -103,22 +105,8 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, closeDrawer }) 
   }, [visible])
 
   return (
-    <Drawer
-      open={visible}
-      anchor={"right"}
-      variant="persistent"
-      sx={{ borderLeft: 2, borderColor: "black" }}
-      style={{ borderLeft: "2px solid #D1D5DB" }}
-    >
-      <List
-        sx={{
-          boxShadow: 0,
-          borderRadius: 0,
-          minWidth: 270,
-          maxWidth: 270
-        }}
-        disablePadding
-      >
+    <Drawer open={visible} anchor={"right"} variant="persistent">
+      <List sx={{ minWidth: 270, maxWidth: 270 }} disablePadding>
         <ListItem sx={{ height: "63px" }}>
           <IconButton onClick={closeDrawer}>
             <ChevronRightIcon />

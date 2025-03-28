@@ -1,7 +1,8 @@
-import { Scope, Column } from "@/types"
-import { useSetDoneColumnsMutation } from "@/state/apiSlice"
-import TextField from "@mui/material/TextField"
 import Autocomplete from "@mui/material/Autocomplete"
+import TextField from "@mui/material/TextField"
+
+import { useSetDoneColumnsMutation } from "@/state/apiSlice"
+import { Scope, Column } from "@/types"
 
 interface DoneColumnSelectorProps {
   scope: Scope
