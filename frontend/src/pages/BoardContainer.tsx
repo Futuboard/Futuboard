@@ -46,7 +46,7 @@ const BoardContainer: React.FC = () => {
   const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
   const [boardNotes, setBoardNotes] = useState("")
   const selectedScope = useSelector((state: RootState) => state.scope)
-  const isScopeSelected = selectedScope !== ""
+  const isScopeSelected = Boolean(selectedScope)
 
   useEffect(() => {
     const inner = async () => {

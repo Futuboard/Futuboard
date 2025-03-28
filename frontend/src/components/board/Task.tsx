@@ -13,7 +13,7 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
 import { RootState } from "@/state/store"
-import { Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
+import { SimpleScope, Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
 
 import { useAddTaskToScopeMutation, useDeleteTaskFromScopeMutation, useUpdateTaskMutation } from "../../state/apiSlice"
 
@@ -151,7 +151,7 @@ interface TaskProps {
 
 const Task: React.FC<TaskProps> = ({ task }) => {
   const selectedScope = useSelector((state: RootState) => state.scope)
-  const isScopeSelected = selectedScope !== ""
+  const isScopeSelected = Boolean(selectedScope)
 
   const [updateTask] = useUpdateTaskMutation()
   const [addTaskToScope] = useAddTaskToScopeMutation()
@@ -167,7 +167,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
   }, [task.cornernote])
 
   useEffect(() => {
-    if (task.scopes.some((scope) => scope.scopeid === selectedScope)) {
+    if (task.scopes.some((scope) => scope.scopeid === selectedScope?.scopeid)) {
       setIsHighlighted(true)
     } else {
       setIsHighlighted(false)
@@ -183,9 +183,9 @@ const Task: React.FC<TaskProps> = ({ task }) => {
   const handleClick = async () => {
     if (isScopeSelected) {
       if (!isHighlighted) {
-        addTaskToScope({ scopeId: selectedScope, ticketid: task.ticketid })
+        addTaskToScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
       } else {
-        deleteTaskFromScope({ scopeId: selectedScope, ticketid: task.ticketid })
+        deleteTaskFromScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
       }
     }
   }

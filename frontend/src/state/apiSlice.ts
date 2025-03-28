@@ -18,7 +18,8 @@ import {
   NewBoardTemplate,
   TaskTemplate,
   ChartData,
-  Scope
+  Scope,
+  SimpleScope
 } from "@/types"
 
 import { getAdminPassword, getAuth, setToken } from "./auth"
@@ -771,14 +772,14 @@ export const boardsApi = createApi({
       invalidatesTags: () => invalidateRemoteCache(["Ticket", "Scopes"])
     }),
 
-    addTaskToScope: builder.mutation<{ success: boolean }, { scopeId: string; ticketid: string }>({
-      query: ({ scopeId, ticketid }) => ({
-        url: `scopes/${scopeId}/tickets`,
+    addTaskToScope: builder.mutation<{ success: boolean }, { scope: SimpleScope; ticketid: string }>({
+      query: ({ scope, ticketid }) => ({
+        url: `scopes/${scope.scopeid}/tickets`,
         method: "POST",
         body: { ticketid }
       }),
       //update optimistically
-      onQueryStarted({ ticketid, scopeId }, apiActions) {
+      onQueryStarted({ ticketid, scope }, apiActions) {
         const invalidationTags: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
         updateCache(
           "getTaskListByColumnId",
@@ -787,7 +788,7 @@ export const boardsApi = createApi({
             const tasks = draft as Task[]
             const task = tasks.find((task) => task.ticketid === ticketid)
             if (task) {
-              task.scopes.push({ scopeid: scopeId, title: "temp" })
+              task.scopes.push({ scopeid: scope.scopeid, title: scope.title })
             }
           },
           apiActions
@@ -798,21 +799,17 @@ export const boardsApi = createApi({
           boardsApi.util.invalidateTags(invalidationTags)
         })
       },
-      invalidatesTags: (_result, _error, { ticketid }) =>
-        invalidateRemoteCache([
-          { type: "Ticket", id: ticketid },
-          { type: "Scopes", id: "LIST" }
-        ])
+      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
     }),
 
-    deleteTaskFromScope: builder.mutation<{ success: boolean }, { scopeId: string; ticketid: string }>({
-      query: ({ scopeId, ticketid }) => ({
-        url: `scopes/${scopeId}/tickets`,
+    deleteTaskFromScope: builder.mutation<{ success: boolean }, { scope: SimpleScope; ticketid: string }>({
+      query: ({ scope, ticketid }) => ({
+        url: `scopes/${scope.scopeid}/tickets`,
         method: "DELETE",
         body: { ticketid }
       }),
       //update optimistically
-      onQueryStarted({ ticketid, scopeId }, apiActions) {
+      onQueryStarted({ ticketid, scope }, apiActions) {
         const invalidationTags: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
         updateCache(
           "getTaskListByColumnId",
@@ -821,7 +818,7 @@ export const boardsApi = createApi({
             const tasks = draft as Task[]
             const task = tasks.find((task) => task.ticketid === ticketid)
             if (task) {
-              task.scopes = task.scopes.filter((scope) => scope.scopeid !== scopeId)
+              task.scopes = task.scopes.filter((taskscope) => taskscope.scopeid !== scope.scopeid)
             }
           },
           apiActions
@@ -832,11 +829,7 @@ export const boardsApi = createApi({
           boardsApi.util.invalidateTags(invalidationTags)
         })
       },
-      invalidatesTags: (_result, _error, { ticketid }) =>
-        invalidateRemoteCache([
-          { type: "Ticket", id: ticketid },
-          { type: "Scopes", id: "LIST" }
-        ])
+      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
     })
   })
 })

@@ -10,7 +10,7 @@ import { useSelector } from "react-redux"
 import { useParams } from "react-router"
 
 import { RootState } from "@/state/store"
-import type { Column, Task as TaskType, User, TaskTemplate } from "@/types"
+import type { Column, Task as TaskType, User, TaskTemplate, SimpleScope } from "@/types"
 
 import { getId } from "../../services/Utils"
 import {
@@ -304,7 +304,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
     (state: RootState) => selectTasksByColumnId({ boardId: id, columnId: column.columnid })(state).data || defaultTasks
   )
   const selectedScope = useSelector((state: RootState) => state.scope)
-  const isScopeSelected = selectedScope !== ""
+  const isScopeSelected = Boolean(selectedScope)
 
   const sizeSum = useMemo(() => tasks.reduce((sum, task) => sum + Number(task.size), 0), [tasks])
   const taskNum = useMemo(() => tasks.length, [tasks])
@@ -312,14 +312,14 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
   const handleClick = () => {
     if (tasks && isScopeSelected) {
       // Check if selectedScope is in every task
-      if (tasks.every((task: TaskType) => task.scopes.some((scope) => scope.scopeid === selectedScope))) {
+      if (tasks.every((task: TaskType) => task.scopes.some((scope) => scope.scopeid === selectedScope?.scopeid))) {
         // Remove every task in column from selectedScope
         tasks.forEach((task: TaskType) => {
-          deleteTaskFromScope({ scopeId: selectedScope, ticketid: task.ticketid })
+          deleteTaskFromScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
         })
       } else {
         tasks.forEach(async (task: TaskType) => {
-          addTaskToScope({ scopeId: selectedScope, ticketid: task.ticketid })
+          addTaskToScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
         })
       }
     }

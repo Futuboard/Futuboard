@@ -1,18 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-type ScopeState = string
+import { SimpleScope } from "@/types"
 
-const initialState: ScopeState = ""
+type ScopeState = SimpleScope | null
 
 const scopeSlice = createSlice({
   name: "scope",
-  initialState,
+  initialState: null as ScopeState,
   reducers: {
-    setScope: (_state: ScopeState, action: PayloadAction<string>) => {
+    setScope: (_state: ScopeState, action: PayloadAction<SimpleScope>) => {
       return action.payload
     },
     disableScope: () => {
-      return ""
+      return null
     }
   }
 })
