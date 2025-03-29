@@ -50,11 +50,9 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose }) => {
     <div>
       <ListItemButton sx={{ padding: 1 }} onClick={handleClick} selected={isScopeSelected}>
         <EditIcon sx={{ paddingLeft: 1, padding: 1.5, color: "gray", alignSelf: "center", fontSize: 20 }} />
-        <Tooltip title={scope.title.length < 30 ? "" : scope.title} disableInteractive>
-          <Typography color="black" variant="body1">
-            {scope.title}
-          </Typography>
-        </Tooltip>
+        <Typography color="black" variant="body1" sx={{ textWrap: "stable" }}>
+          {scope.title}
+        </Typography>
       </ListItemButton>
       {anchor && (
         <Popper open={isScopeSelected} anchorEl={anchor} placement="left-end">

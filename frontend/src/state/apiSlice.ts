@@ -746,7 +746,24 @@ export const boardsApi = createApi({
         method: "DELETE",
         body: { scopeid }
       }),
-      invalidatesTags: () => invalidateRemoteCache(["Ticket", "Scopes"])
+      //update optimistically
+      onQueryStarted({ scopeid }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Scopes", id: "LIST" }]
+        updateCache(
+          "getScopes",
+          tagsToInvalidate,
+          (draft) => {
+            const scopes = draft as Scope[]
+            return scopes.filter((scope) => scope.scopeid !== scopeid)
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
+        })
+      }
     }),
 
     setDoneColumns: builder.mutation<Scope, { scope: Scope; columns: Column[] }>({
