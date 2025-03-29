@@ -1,6 +1,7 @@
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 import { Backdrop } from "@mui/material"
 import { produce } from "immer"
+import { useState } from "react"
 import { useSelector } from "react-redux"
 
 import Board from "@/components/board/Board"
@@ -34,6 +35,7 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
   const [updateActions] = useUpdateActionListMutation()
   const [deleteUserFromTicket] = useDeleteUserFromTicketMutation()
   const [deleteUserFromAction] = useDeleteUserFromActionMutation()
+  const [isNotesOpen, setIsNotesOpen] = useState(false)
   const selectedScope = useSelector((state: RootState) => state.scope)
   const isScopeSelected = Boolean(selectedScope)
 
@@ -238,8 +240,13 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
         taskTemplate={taskTemplateValues}
         boardBackgroundColor={board.background_color}
       />
-      <Board />
-      <BoardNotes content={board.notes} boardId={board.boardid} />
+      <Board isBoardNotesOpen={isNotesOpen} />
+      <BoardNotes
+        content={board.notes}
+        boardId={board.boardid}
+        open={isNotesOpen}
+        handleSetOpen={(value) => setIsNotesOpen(value)}
+      />
     </DragDropContext>
   )
 }
