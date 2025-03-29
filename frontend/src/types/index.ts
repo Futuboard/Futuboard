@@ -136,9 +136,9 @@ export type Scope = {
   creation_date: string
   forecast_set_date: string
   forecast_size: number
-  forecast_tickets: TaskSize[]
+  forecast_tickets: TaskWithOnlySize[]
   done_columns: Column[]
-  tickets: TaskSize[]
+  tickets: TaskWithOnlySize[]
 }
 
 export type SimpleScope = {
