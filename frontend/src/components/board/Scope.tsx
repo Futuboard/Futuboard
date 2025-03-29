@@ -1,6 +1,5 @@
 import { DeleteForever } from "@mui/icons-material"
-import CloseIcon from "@mui/icons-material/Close"
-import InfoIcon from "@mui/icons-material/Info"
+import { Close, Edit, Info } from "@mui/icons-material"
 import {
   Box,
   Button,
@@ -17,11 +16,11 @@ import {
   Typography,
   Paper
 } from "@mui/material"
+import dayjs from "dayjs"
 import { useState, useEffect } from "react"
 import { useDispatch } from "react-redux"
 
 import { useDeleteScopeMutation, useSetScopeTitleMutation } from "@/state/apiSlice"
-import { setNotification } from "@/state/notification"
 import { disableScope } from "@/state/scope"
 import { Scope as Scopetype } from "@/types"
 
@@ -90,13 +89,10 @@ const Scope: React.FC<ScopeProps> = (props) => {
   const [title, setTitle] = useState(scope.title)
   const [tickets, setTickets] = useState(scope.tickets.length)
   const [size, setSize] = useState(scope.tickets.reduce((sum, task) => sum + (task.size || 0), 0))
-  const dispatch = useDispatch()
 
   const handleSubmitTitle = async () => {
     if (title !== "") {
       await setScopeTitle({ scopeid: scope.scopeid, title: title })
-    } else {
-      dispatch(setNotification({ text: "Scope name is required. Changing back...", type: "error" }))
     }
   }
 
@@ -126,6 +122,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
       <Paper sx={{ padding: "18px", marginTop: "7px" }}>
         <Grid item xs={12}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Edit sx={{ paddingRight: "3px" }} />
             <TextField
               placeholder="Enter scope name"
               value={title}
@@ -142,7 +139,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
             <Box sx={{ display: "flex", ml: "auto" }}>
               <Tooltip title="Close Scope">
                 <IconButton onClick={onClose}>
-                  <CloseIcon />
+                  <Close />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -175,10 +172,10 @@ const Scope: React.FC<ScopeProps> = (props) => {
             </Grid>
             <Grid item sx={{ display: "flex", alignItems: "center", height: "100%" }}>
               <Tooltip
-                title="Saves the scope forecast with the currently selected tickets, their total size, and the timestamp. If the scope changes afterwards, it does not affect the forecast."
+                title="Saves the scope forecast with the currently selected tickets. If the scope changes afterwards, it does not affect the forecast. Used for the velocity chart"
                 placement="right"
               >
-                <InfoIcon sx={{ fontSize: 24 }} />
+                <Info sx={{ fontSize: 24 }} />
               </Tooltip>
             </Grid>
           </Grid>
@@ -208,7 +205,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
               <Grid item xs={12}>
                 <Typography>
                   {"Set date:   "}
-                  <b>{scope.forecast_set_date.slice(0, 10)}</b>
+                  <b>{dayjs(scope.forecast_set_date).format("DD.MM.YYYY")}</b>
                 </Typography>
               </Grid>
             </Grid>

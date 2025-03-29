@@ -6,10 +6,9 @@ import {
   Gradient,
   ColorLens,
   Analytics,
-  ViewWeek
+  ViewWeek,
+  AllOut
 } from "@mui/icons-material"
-//For some reason, this import did not work like the ones above.
-import AllOutIcon from "@mui/icons-material/AllOut"
 import {
   AppBar,
   Box,
@@ -139,7 +138,7 @@ const OpenScopeListButton: React.FC<OpenScopeListButtonProps> = ({ handler }) =>
   return (
     <Tooltip title="View and Set Scopes">
       <IconButton onClick={handler}>
-        <AllOutIcon sx={{ color: "black" }} />
+        <AllOut sx={{ color: "black" }} />
       </IconButton>
     </Tooltip>
   )
