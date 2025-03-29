@@ -325,14 +325,14 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
     }
   }
 
-  let bgColor = isScopeSelected ? "#beb7b5" : "#E5DBD9"
+  let bgColor = isScopeSelected ? "#beb7b5" : "#e5dbd9"
 
   // change border color when task or size limit is exceeded
   if (
     (column.wip_limit && taskNum > column.wip_limit) ||
     (column.wip_limit_story && sizeSum > column.wip_limit_story)
   ) {
-    bgColor = isScopeSelected ? "#d63838" : "#FF4747"
+    bgColor = isScopeSelected ? "#d63838" : "#ff4747"
   }
   return (
     <Draggable draggableId={column.columnid} index={index}>
@@ -357,11 +357,16 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
               style={{
                 display: "flex",
                 justifyContent: "space-between",
-                cursor: isScopeSelected ? "pointer" : "default"
+                alignItems: "center",
+                padding: "3px",
+                marginBottom: "2px",
+                backgroundColor: "#e6dcda",
+                cursor: isScopeSelected ? "pointer" : "default",
+                borderRadius: "3px"
               }}
               onClick={handleClick}
             >
-              <Typography variant={"h5"} noWrap gutterBottom sx={{ paddingLeft: "3px", color: "#2D3748" }}>
+              <Typography variant={"h5"} noWrap sx={{ paddingLeft: "3px", color: "#2D3748" }}>
                 {column.title}
               </Typography>
               <EditColumnButton column={column} disabled={isScopeSelected} />
