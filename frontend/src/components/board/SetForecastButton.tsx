@@ -11,9 +11,10 @@ interface SetScopeForecastButtonProps {
 const SetScopeForecastButton: React.FC<SetScopeForecastButtonProps> = ({ scope }) => {
   const [setScopeForecast] = useSetScopeForecastMutation()
   const [open, setOpen] = useState(false)
+  const isForecastSet = Boolean(scope.forecast_set_date)
 
   const handleClick = () => {
-    if (scope.forecast_set_date) {
+    if (isForecastSet) {
       setOpen(true)
     } else {
       setForecast()
@@ -32,7 +33,7 @@ const SetScopeForecastButton: React.FC<SetScopeForecastButtonProps> = ({ scope }
   return (
     <div>
       <Button onClick={handleClick} type="submit" color={"primary"} variant="contained">
-        Set Forecast
+        {isForecastSet ? "Update Forecast" : "Set Forecast"}
       </Button>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{"Confirm Forecast Update"}</DialogTitle>
@@ -42,11 +43,11 @@ const SetScopeForecastButton: React.FC<SetScopeForecastButtonProps> = ({ scope }
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
           <Button onClick={setForecast} type="submit" color="primary" variant="contained">
             Update Forecast
+          </Button>
+          <Button onClick={handleClose} color="primary">
+            Cancel
           </Button>
         </DialogActions>
       </Dialog>
