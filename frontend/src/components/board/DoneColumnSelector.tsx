@@ -12,9 +12,8 @@ interface DoneColumnSelectorProps {
 const DoneColumnSelector: React.FC<DoneColumnSelectorProps> = ({ columns, scope }) => {
   const [updateDoneColumns] = useSetDoneColumnsMutation()
 
-  const handleChange = (_: React.SyntheticEvent, doneColumns: Column[]) => {
-    const ids = doneColumns.map((c) => c.columnid)
-    updateDoneColumns({ scopeid: scope.scopeid, columnidlist: ids })
+  const handleChange = (_: React.SyntheticEvent, columns: Column[]) => {
+    updateDoneColumns({ scope, columns })
   }
 
   return (

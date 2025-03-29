@@ -636,7 +636,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(invalidationTags)
-          boardsApi.util.invalidateTags(invalidationTags)
+          apiActions.dispatch(boardsApi.util.invalidateTags(invalidationTags))
         })
       }
     }),
@@ -694,7 +694,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(invalidationTags)
-          boardsApi.util.invalidateTags(invalidationTags)
+          apiActions.dispatch(boardsApi.util.invalidateTags(invalidationTags))
         })
       }
     }),
@@ -725,7 +725,7 @@ export const boardsApi = createApi({
 
     getScopes: builder.query<Scope[], string>({
       query: (boardId) => ({
-        url: `scopes/${boardId}`,
+        url: `scopes/${boardId}/`,
         method: "GET"
       }),
       providesTags: [{ type: "Scopes", id: "LIST" }]
@@ -749,13 +749,36 @@ export const boardsApi = createApi({
       invalidatesTags: () => invalidateRemoteCache(["Ticket", "Scopes"])
     }),
 
-    setDoneColumns: builder.mutation<Scope, { scopeid: string; columnidlist: string[] }>({
-      query: ({ scopeid, columnidlist }) => ({
-        url: `scopes/${scopeid}/set_done_columns`,
+    setDoneColumns: builder.mutation<Scope, { scope: Scope; columns: Column[] }>({
+      query: ({ scope, columns }) => ({
+        url: `scopes/${scope.scopeid}/set_done_columns`,
         method: "POST",
-        body: { done_columns: columnidlist }
+        body: { done_columns: columns.map((c) => c.columnid) }
       }),
-      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+      //update optimistically
+      onQueryStarted({ scope, columns }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Scopes", id: "LIST" }]
+        updateCache(
+          "getScopes",
+          tagsToInvalidate,
+          (draft) => {
+            const scopes = draft as Scope[]
+            const updatedScope = scopes.find((previousScope) => previousScope.scopeid === scope.scopeid)
+            if (updatedScope) {
+              const addedColumns = columns.filter(
+                (column) => !updatedScope.done_columns.some((doneColumn) => doneColumn.columnid === column.columnid)
+              )
+              updatedScope.done_columns.push(...addedColumns)
+            }
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
+        })
+      }
     }),
 
     setScopeForecast: builder.mutation<Scope, { scopeid: string }>({
@@ -783,10 +806,10 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ ticketid, scope }, apiActions) {
-        const invalidationTags: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
+        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
         updateCache(
           "getTaskListByColumnId",
-          invalidationTags,
+          tagsToInvalidate,
           (draft) => {
             const tasks = draft as Task[]
             const task = tasks.find((task) => task.ticketid === ticketid)
@@ -797,12 +820,13 @@ export const boardsApi = createApi({
           apiActions
         )
 
+        tagsToInvalidate.push("Scopes")
+
         apiActions.queryFulfilled.finally(() => {
-          invalidateRemoteCache(invalidationTags)
-          boardsApi.util.invalidateTags(invalidationTags)
+          invalidateRemoteCache(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
-      },
-      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+      }
     }),
 
     deleteTaskFromScope: builder.mutation<{ success: boolean }, { scope: SimpleScope; ticketid: string }>({
@@ -813,26 +837,27 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ ticketid, scope }, apiActions) {
-        const invalidationTags: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
+        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
         updateCache(
           "getTaskListByColumnId",
-          invalidationTags,
+          tagsToInvalidate,
           (draft) => {
             const tasks = draft as Task[]
             const task = tasks.find((task) => task.ticketid === ticketid)
             if (task) {
-              task.scopes = task.scopes.filter((taskscope) => taskscope.scopeid !== scope.scopeid)
+              task.scopes = task.scopes.filter((taskScope) => taskScope.scopeid !== scope.scopeid)
             }
           },
           apiActions
         )
 
+        tagsToInvalidate.push("Scopes")
+
         apiActions.queryFulfilled.finally(() => {
-          invalidateRemoteCache(invalidationTags)
-          boardsApi.util.invalidateTags(invalidationTags)
+          invalidateRemoteCache(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
-      },
-      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+      }
     }),
 
     getVelocityChartData: builder.query<ChartData, { boardId: string }>({
@@ -842,8 +867,8 @@ export const boardsApi = createApi({
       }),
       providesTags: [
         { type: "Columns", id: "LIST" },
-        { type: "Ticket", id: "LIST" }
-        //{ type: "Scope", id: "LIST" }
+        { type: "Ticket", id: "LIST" },
+        { type: "Scopes", id: "LIST" }
       ]
     })
   })
