@@ -341,7 +341,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
           <Paper
             elevation={4}
             sx={{
-              margin: "25px 20px",
+              marginX: "20px",
               width: "250px",
               minHeight: "74vh",
               height: "fit-content",

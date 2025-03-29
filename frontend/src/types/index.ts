@@ -1,4 +1,4 @@
-import { cacheTagTypes, timeUnitOptions } from "@/constants"
+import { cacheTagTypes, countUnitOptions, timeUnitOptions } from "@/constants"
 
 export type Board = {
   boardid: string
@@ -141,9 +141,11 @@ export type Scope = {
   tickets: TaskSize[]
 }
 
-export type TimeUnit = (typeof timeUnitOptions)[number]
-
 export type SimpleScope = {
   scopeid: string
   title: string
 }
+
+export type TimeUnit = (typeof timeUnitOptions)[number]
+
+export type CountUnit = (typeof countUnitOptions)[number]

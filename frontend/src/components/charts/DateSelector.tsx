@@ -41,10 +41,10 @@ const DateSelector: React.FC<DateSelectorProps> = ({ startValue, endValue, timeU
         open={open}
         anchorEl={anchorEl}
         anchorOrigin={{
-          vertical: "bottom",
+          vertical: "top",
           horizontal: "center"
         }}
-        transformOrigin={{ vertical: 0, horizontal: 400 }}
+        transformOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Grid
           container
@@ -86,7 +86,9 @@ const DateSelector: React.FC<DateSelectorProps> = ({ startValue, endValue, timeU
           </Grid>
           <Grid item marginRight={2}>
             <Stack justifyItems="center" alignItems="center" spacing={1}>
-              <Typography variant="subtitle2">Time unit</Typography>
+              <Typography variant="subtitle2" sx={{ color: "#666666" }}>
+                Time unit
+              </Typography>
               <ButtonGroup orientation="vertical" color="primary">
                 {timeUnitChoices.map((choice) => (
                   <Button
