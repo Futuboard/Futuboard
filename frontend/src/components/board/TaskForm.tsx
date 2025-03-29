@@ -98,7 +98,7 @@ const TicketScopeList: React.FC<TicketScopeListProps> = ({ task }) => {
             sx={{
               display: "flex",
               justifyContent: "center",
-              backgroundColor: "#b6deff",
+              backgroundColor: "#84D8FE",
               alignItems: "center",
               paddingY: "4px",
               paddingX: "10px",

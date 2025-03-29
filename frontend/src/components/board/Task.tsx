@@ -158,9 +158,9 @@ const Task: React.FC<TaskProps> = ({ task }) => {
   const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
 
   const [selected, setSelected] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditingCornerNote, setIsEditingCornerNote] = useState(false)
   const [cornernote, setCornernote] = useState(task.cornernote)
-  const [isHighlighted, setIsHighlighted] = useState(false)
+  const [isTaskInSelectedScope, setIsTaskInSelectedScope] = useState(false)
 
   useEffect(() => {
     setCornernote(task.cornernote)
@@ -168,21 +168,21 @@ const Task: React.FC<TaskProps> = ({ task }) => {
 
   useEffect(() => {
     if (task.scopes.some((scope) => scope.scopeid === selectedScope?.scopeid)) {
-      setIsHighlighted(true)
+      setIsTaskInSelectedScope(true)
     } else {
-      setIsHighlighted(false)
+      setIsTaskInSelectedScope(false)
     }
   }, [task.scopes, selectedScope])
 
   const handleDoubleClick = () => {
     if (!isScopeSelected) {
-      setIsEditing(true)
+      setIsEditingCornerNote(true)
     }
   }
 
   const handleClick = () => {
     if (isScopeSelected) {
-      if (!isHighlighted) {
+      if (!isTaskInSelectedScope) {
         addTaskToScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
       } else {
         deleteTaskFromScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
@@ -195,7 +195,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
       ...task,
       cornernote: cornernote
     }
-    setIsEditing(false)
+    setIsEditingCornerNote(false)
     if (cornernote === task.cornernote) return
     await updateTask({ task: updatedTaskObject })
 
@@ -225,12 +225,15 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                 padding: "4px",
                 backgroundColor: snapshot.isDraggingOver
                   ? "rgba(22, 95, 199, 0.2)"
-                  : isHighlighted
-                    ? "lightgreen"
+                  : isTaskInSelectedScope
+                    ? "#C0EE90"
                     : "white",
                 height: "100px",
                 marginBottom: "5px",
-                borderColor: task.color, // !isScopeSelected ? task.color : isHighlighted ? "lightgreen" : task.color,
+                borderColor:
+                  (task.color === "white" || task.color === "#ffffff") && isTaskInSelectedScope
+                    ? "#C0EE90"
+                    : task.color,
                 borderBottomWidth: "7px",
                 borderBottomStyle: "solid",
                 borderLeftWidth: "2px",
@@ -245,7 +248,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
               <Box sx={{ display: "flex", justifyContent: "space-between", flexDirection: "column", height: "100%" }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", overflow: "hidden" }}>
                   <Box sx={{ overflow: "hidden", flexGrow: 1 }} onDoubleClick={handleDoubleClick}>
-                    {isEditing ? (
+                    {isEditingCornerNote ? (
                       <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={handleBlur}>
                         <input
                           autoFocus
