@@ -48,8 +48,8 @@ const DeleteScopeButton: React.FC<DeleteScopeButtonProps> = ({ scope }) => {
   }
 
   const handleDelete = () => {
-    deleteScope({ boardid: scope.boardid, scopeid: scope.scopeid })
     setOpen(false)
+    deleteScope({ boardid: scope.boardid, scopeid: scope.scopeid })
     dispatch(disableScope())
   }
 
