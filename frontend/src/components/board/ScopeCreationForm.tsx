@@ -37,8 +37,7 @@ const ScopeCreationForm: React.FC<ScopeCreationFormProps> = (props) => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Typography gutterBottom variant="h6">
-            {" "}
-            Create Scope{" "}
+            Create Scope
           </Typography>
           <Divider />
         </Grid>

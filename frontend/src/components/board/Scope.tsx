@@ -172,7 +172,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
             </Grid>
             <Grid item sx={{ display: "flex", alignItems: "center", height: "100%" }}>
               <Tooltip
-                title="Saves the scope forecast with the currently selected tickets. If the scope changes afterwards, it does not affect the forecast. Used for the velocity chart"
+                title="Saves the scope forecast with the currently selected tickets. If the scope changes afterwards, it does not affect the forecast. Used for the velocity chart."
                 placement="right"
               >
                 <Info sx={{ fontSize: 24 }} />

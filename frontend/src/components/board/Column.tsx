@@ -318,7 +318,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
           deleteTaskFromScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
         })
       } else {
-        tasks.forEach(async (task: TaskType) => {
+        tasks.forEach((task: TaskType) => {
           addTaskToScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
         })
       }

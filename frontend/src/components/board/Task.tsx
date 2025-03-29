@@ -180,7 +180,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
     }
   }
 
-  const handleClick = async () => {
+  const handleClick = () => {
     if (isScopeSelected) {
       if (!isHighlighted) {
         addTaskToScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })

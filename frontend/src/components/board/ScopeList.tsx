@@ -15,11 +15,12 @@ import {
   Typography
 } from "@mui/material"
 import React, { useState, useEffect } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 
 import { useAddScopeMutation } from "@/state/apiSlice"
 import { useGetScopesQuery } from "@/state/apiSlice"
 import { disableScope, setScope } from "@/state/scope"
+import { RootState } from "@/state/store"
 import { Scope as ScopeType } from "@/types"
 
 import Scope from "./Scope"
@@ -28,17 +29,15 @@ import ScopeCreationForm from "./ScopeCreationForm"
 interface ScopeListItemProps {
   scope: ScopeType
   onClose: () => void
-  isActive: boolean
-  deactivate: () => void
 }
 
-const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose, isActive, deactivate }) => {
-  const displayName = scope.title.length < 30 ? scope.title : scope.title.substring(0, 26) + "..."
+const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose }) => {
   const anchor = document.getElementById("scope-anchor")
+  const selectedScope = useSelector((state: RootState) => state.scope)
+  const isScopeSelected = scope.scopeid === selectedScope?.scopeid
   const dispatch = useDispatch()
 
   const handleClick = () => {
-    deactivate()
     dispatch(setScope(scope))
   }
 
@@ -49,16 +48,16 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose, isActive,
 
   return (
     <div>
-      <ListItemButton sx={{ padding: "5px" }} onClick={handleClick} selected={isActive}>
-        <EditIcon sx={{ paddingLeft: "20px", padding: "7px", color: "gray", alignSelf: "center" }} />
+      <ListItemButton sx={{ padding: 1 }} onClick={handleClick} selected={isScopeSelected}>
+        <EditIcon sx={{ paddingLeft: 1, padding: 1.5, color: "gray", alignSelf: "center", fontSize: 20 }} />
         <Tooltip title={scope.title.length < 30 ? "" : scope.title} disableInteractive>
           <Typography color="black" variant="body1">
-            {displayName}
+            {scope.title}
           </Typography>
         </Tooltip>
       </ListItemButton>
       {anchor && (
-        <Popper open={isActive} anchorEl={anchor} placement="left-end">
+        <Popper open={isScopeSelected} anchorEl={anchor} placement="left-end">
           <Scope key={scope.scopeid} scope={scope} onClose={handleCloseScope}></Scope>
         </Popper>
       )}
@@ -69,7 +68,7 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose, isActive,
 
 interface ScopeListProps {
   visible: boolean
-  closeDrawer: (event: React.MouseEvent<HTMLButtonElement>) => void
+  closeDrawer: () => void
   boardId: string
 }
 
@@ -78,8 +77,8 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, closeDrawer }) 
   const scopes = info.data ? info.data : []
   const [open, setOpen] = useState(false)
   const [addScope] = useAddScopeMutation()
-  const [activeScope, setActiveScope] = useState<string | null>(null)
   const collator = Intl.Collator(undefined, { numeric: true, sensitivity: "base" })
+  const dispatch = useDispatch()
 
   const openDialog = () => {
     setOpen(true)
@@ -95,20 +94,27 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, closeDrawer }) 
   }
 
   const handleCloseScope = () => {
-    setActiveScope(null)
+    dispatch(disableScope())
   }
 
   useEffect(() => {
     if (!visible) {
-      setActiveScope(null)
+      dispatch(disableScope())
     }
-  }, [visible])
+  }, [visible, dispatch])
 
   return (
-    <Drawer open={visible} anchor={"right"} variant="persistent">
+    <Drawer
+      open={visible}
+      anchor={"right"}
+      variant="persistent"
+      PaperProps={{
+        sx: { borderLeft: "2px solid #D1D5DB" }
+      }}
+    >
       <List sx={{ minWidth: 270, maxWidth: 270 }} disablePadding>
-        <ListItem sx={{ height: "63px" }}>
-          <IconButton onClick={closeDrawer}>
+        <ListItem sx={{ height: "63px", cursor: "pointer" }} onClick={() => closeDrawer()}>
+          <IconButton>
             <ChevronRightIcon />
           </IconButton>
           <Typography variant="h6" fontWeight="bold" sx={{ paddingLeft: "42px", height: "63%" }}>
@@ -126,15 +132,7 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, closeDrawer }) 
           scopes
             .slice()
             .sort((a, b) => collator.compare(a.title, b.title))
-            .map((scope) => (
-              <ScopeListItem
-                key={scope.scopeid}
-                scope={scope}
-                onClose={handleCloseScope}
-                isActive={activeScope === scope.scopeid}
-                deactivate={() => setActiveScope(scope.scopeid)}
-              />
-            ))
+            .map((scope) => <ScopeListItem key={scope.scopeid} scope={scope} onClose={handleCloseScope} />)
         ) : (
           <ListItem>
             <Typography sx={{ margin: "auto" }}>No scopes yet</Typography>
