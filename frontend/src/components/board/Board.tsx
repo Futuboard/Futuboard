@@ -9,7 +9,11 @@ import Column from "./Column"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
 
-const Board: React.FC = () => {
+interface BoardProps {
+  isBoardNotesOpen: boolean
+}
+
+const Board: React.FC<BoardProps> = ({ isBoardNotesOpen }) => {
   const { id = "default-id" } = useParams()
 
   const { data: columns, isLoading, isSuccess } = useGetColumnsByBoardIdQuery(id)
@@ -54,7 +58,7 @@ const Board: React.FC = () => {
           ref={provided.innerRef}
           sx={{
             display: "inline-flex",
-            margin: "25px 545px 25px 25px"
+            margin: isBoardNotesOpen ? "25px 620px 25px 545px" : "25px 620px 25px 25px"
           }}
         >
           {isSuccess && columns.map((column, index) => <Column key={column.columnid} column={column} index={index} />)}

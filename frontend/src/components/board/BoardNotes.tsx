@@ -27,10 +27,11 @@ import { useUpdateBoardNotesMutation } from "@/state/apiSlice"
 interface BoardNotesProps {
   boardId: string
   content: string
+  open: boolean
+  handleSetOpen: (value: boolean) => void
 }
 
-const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
-  const [open, setOpen] = useState(false)
+const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleSetOpen }) => {
   const [updateBoardNotes] = useUpdateBoardNotesMutation()
   const [notes, setNotes] = useState("")
 
@@ -46,11 +47,11 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
         console.error(error)
       }
     }
-    setOpen(false)
+    handleSetOpen(false)
   }
 
   const handleClose = () => {
-    setOpen(false)
+    handleSetOpen(false)
     setNotes(content)
   }
 
@@ -62,10 +63,10 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
             sx={{
               position: "fixed",
               bottom: "calc(100% - 100vh + 1.5rem)",
-              right: "calc(100% - 100vw + 1.5rem)",
+              left: "calc(100% - 100vw + 1.5rem)",
               zIndex: 1001
             }}
-            onClick={() => setOpen(true)}
+            onClick={() => handleSetOpen(true)}
             color="info"
           >
             <StickyNote2 />
@@ -78,7 +79,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
           sx={{
             width: "520px",
             position: "fixed",
-            right: "calc(100% - 100vw + 1.75rem)",
+            left: "calc(100% - 100vw + 1.75rem)",
             top: "calc(65px + 1.5rem)",
             zIndex: 1000,
             display: "flex",
