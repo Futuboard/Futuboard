@@ -24,6 +24,7 @@ const DoneColumnSelector: React.FC<DoneColumnSelectorProps> = ({ columns, scope 
       id="tags-outlined"
       options={columns}
       disableCloseOnSelect
+      disableClearable
       onChange={handleChange}
       value={scope.done_columns}
       filterSelectedOptions
