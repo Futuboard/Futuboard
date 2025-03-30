@@ -15,7 +15,6 @@ interface BoardProps {
 
 const Board: React.FC<BoardProps> = ({ isBoardNotesOpen }) => {
   const { id = "default-id" } = useParams()
-
   const { data: columns, isLoading, isSuccess } = useGetColumnsByBoardIdQuery(id)
 
   if (isLoading) {
@@ -58,7 +57,8 @@ const Board: React.FC<BoardProps> = ({ isBoardNotesOpen }) => {
           ref={provided.innerRef}
           sx={{
             display: "inline-flex",
-            margin: isBoardNotesOpen ? "25px 620px 25px 545px" : "25px 620px 25px 25px"
+            margin: isBoardNotesOpen ? "25px 620px 25px 545px" : "25px 620px 25px 25px",
+            transition: "0.4s"
           }}
         >
           {isSuccess && columns.map((column, index) => <Column key={column.columnid} column={column} index={index} />)}

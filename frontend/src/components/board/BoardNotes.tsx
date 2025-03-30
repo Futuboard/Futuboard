@@ -19,7 +19,7 @@ import {
 } from "@mdxeditor/editor"
 import { StickyNote2 } from "@mui/icons-material"
 import CloseIcon from "@mui/icons-material/Close"
-import { Box, Button, ButtonGroup, Divider, Fab, Fade, Paper, Tooltip } from "@mui/material"
+import { Box, Button, ButtonGroup, Divider, Fab, Fade, Paper, Slide, Tooltip } from "@mui/material"
 import { useEffect, useState } from "react"
 
 import { useUpdateBoardNotesMutation } from "@/state/apiSlice"
@@ -62,9 +62,8 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleS
           <Fab
             sx={{
               position: "fixed",
-              bottom: "calc(100% - 100vh + 1.5rem)",
-              left: "calc(100% - 100vw + 1.5rem)",
-              zIndex: 1001
+              bottom: " 1rem",
+              left: "1rem"
             }}
             onClick={() => handleSetOpen(true)}
             color="info"
@@ -74,18 +73,18 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleS
         </Tooltip>
       </Fade>
 
-      <Fade in={open} unmountOnExit>
+      <Slide in={open} unmountOnExit direction="right" timeout={400} easing={"ease"}>
         <Paper
           sx={{
             width: "520px",
             position: "fixed",
-            left: "calc(100% - 100vw + 1.75rem)",
-            top: "calc(65px + 1.5rem)",
-            zIndex: 1000,
+            left: "0",
+            top: "65px",
             display: "flex",
             flexDirection: "column"
           }}
           elevation={16}
+          variant="outlined"
         >
           <Box>
             <MDXEditor
@@ -133,7 +132,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleS
             </ButtonGroup>
           </Box>
         </Paper>
-      </Fade>
+      </Slide>
     </>
   )
 }

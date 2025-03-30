@@ -1,5 +1,5 @@
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
-import { Backdrop } from "@mui/material"
+import { Backdrop, Box } from "@mui/material"
 import { produce } from "immer"
 import { useState } from "react"
 import { useSelector } from "react-redux"
@@ -233,20 +233,30 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
 
   return (
     <DragDropContext onDragEnd={handleOnDragEnd}>
-      <Backdrop open={isScopeSelected} sx={{ backgroundColor: "rgba(0, 0, 0, 0.3)", zIndex: -999 }} />
-      <ToolBar
-        boardId={boardId}
-        title={board.title}
-        taskTemplate={taskTemplateValues}
-        boardBackgroundColor={board.background_color}
-      />
-      <Board isBoardNotesOpen={isNotesOpen} />
-      <BoardNotes
-        content={board.notes}
-        boardId={board.boardid}
-        open={isNotesOpen}
-        handleSetOpen={(value) => setIsNotesOpen(value)}
-      />
+      <Box
+        sx={{
+          height: "100%",
+          width: "100%",
+          overflow: "scroll" //checklist in ticket descriptions break if removed.
+        }}
+      >
+        <Backdrop open={isScopeSelected} sx={{ backgroundColor: "rgba(0, 0, 0, 0.3)", zIndex: -999 }} />
+        <ToolBar
+          boardId={boardId}
+          title={board.title}
+          taskTemplate={taskTemplateValues}
+          boardBackgroundColor={board.background_color}
+        />
+        <Board isBoardNotesOpen={isNotesOpen} />
+        <BoardNotes
+          content={board.notes}
+          boardId={board.boardid}
+          open={isNotesOpen}
+          handleSetOpen={(value) => {
+            setIsNotesOpen(value)
+          }}
+        />
+      </Box>
     </DragDropContext>
   )
 }
