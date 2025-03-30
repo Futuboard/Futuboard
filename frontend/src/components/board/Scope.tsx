@@ -89,6 +89,14 @@ const Scope: React.FC<ScopeProps> = (props) => {
   const [title, setTitle] = useState(scope.title)
   const [tickets, setTickets] = useState(scope.tickets.length)
   const [size, setSize] = useState(scope.tickets.reduce((sum, task) => sum + (task.size || 0), 0))
+  const [doneSize, setDoneSize] = useState(
+    scope.done_columns.length > 0
+      ? scope.tickets.reduce(
+          (sum, task) => sum + (scope.done_columns.some((done) => task.columnid === done.columnid) ? task.size : 0),
+          0
+        )
+      : -1
+  )
 
   const handleSubmitTitle = async () => {
     if (title !== "") {
@@ -116,6 +124,17 @@ const Scope: React.FC<ScopeProps> = (props) => {
     setTickets(scope.tickets.length)
     setSize(scope.tickets.reduce((sum, task) => sum + (task.size || 0), 0))
   }, [scope.title, scope.tickets])
+
+  useEffect(() => {
+    if (scope.done_columns.length > 0) {
+      setDoneSize(
+        scope.tickets.reduce(
+          (sum, task) => sum + (scope.done_columns.some((done) => task.columnid === done.columnid) ? task.size : 0),
+          0
+        )
+      )
+    }
+  }, [scope.tickets, scope.done_columns])
 
   return (
     <Grid container spacing={2} width={350}>
@@ -161,6 +180,17 @@ const Scope: React.FC<ScopeProps> = (props) => {
               <b>{size}</b>
             </Typography>
           </Grid>
+
+          {doneSize == -1 ? (
+            <div></div>
+          ) : (
+            <Grid item xs={12}>
+              <Typography gutterBottom variant="h6">
+                {"Done:   "}
+                <b>{doneSize}</b>
+              </Typography>
+            </Grid>
+          )}
 
           <Grid item xs={12} marginTop={3} marginBottom={2}>
             <DoneColumnSelector scope={scope} columns={columns ? columns : []} />

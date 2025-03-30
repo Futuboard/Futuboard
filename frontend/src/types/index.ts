@@ -49,6 +49,7 @@ export type TaskTemplate = Omit<Task, "ticketid" | "columnid" | "users" | "scope
 export type TaskWithOnlySize = {
   ticketid: string
   size: number
+  columnid: string
 }
 
 export type User = {

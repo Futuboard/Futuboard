@@ -119,6 +119,7 @@ class TicketSizeSerializer(serializers.ModelSerializer):
         fields = [
             "ticketid",
             "size",
+            "columnid",
         ]
 
 
