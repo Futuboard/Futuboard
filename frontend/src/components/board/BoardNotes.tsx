@@ -83,7 +83,6 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleS
             display: "flex",
             flexDirection: "column"
           }}
-          elevation={16}
           variant="outlined"
         >
           <Box>
