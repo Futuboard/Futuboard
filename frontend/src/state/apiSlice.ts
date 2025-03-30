@@ -317,7 +317,8 @@ export const boardsApi = createApi({
       onQueryStarted({ columnId, tasks }, apiActions) {
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Columns", id: columnId },
-          { type: "Ticket", id: "LIST" }
+          { type: "Ticket", id: "LIST" },
+          { type: "Scopes", id: "LIST"}
         ]
 
         updateCache(
