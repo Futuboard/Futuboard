@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material"
 import { useParams } from "react-router"
 
 import { useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
-import { AddUserButton } from "../general/Toolbar"
+import { AddMagnetButton } from "../general/Toolbar"
 
 import Column from "./Column"
 import CopyToClipboardButton from "./CopyToClipBoardButton"
@@ -38,8 +38,8 @@ const Board: React.FC<BoardProps> = ({ isBoardNotesOpen }) => {
         </Box>
 
         <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 1, marginBottom: 1 }}>
-          <Typography>Add a user:</Typography>
-          <AddUserButton />
+          <Typography>Add a magnet:</Typography>
+          <AddMagnetButton />
         </Box>
         <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 1, marginBottom: 1 }}>
           <Typography>Copy board link:</Typography>

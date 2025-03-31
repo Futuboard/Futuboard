@@ -14,7 +14,7 @@ interface AddPasswordFieldProps {
   label?: string
 }
 
-const PasswordField: React.FC<AddPasswordFieldProps> = ({ register, errorText, label = "Password" }) => {
+const PasswordField: React.FC<AddPasswordFieldProps> = ({ register, errorText, label = "Board Password" }) => {
   const [showPassword, setShowPassword] = useState(false)
 
   const handleClickShowPassword = () => setShowPassword((show) => !show)

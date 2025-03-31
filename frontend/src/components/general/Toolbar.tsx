@@ -39,6 +39,7 @@ import BoardPasswordChangeForm from "../board/BoardPasswordChangeForm"
 import BoardTitleChangeForm from "../board/BoardTitleChangeForm"
 import CopyToClipboardButton from "../board/CopyToClipBoardButton"
 import CreateColumnButton from "../board/CreateColumnButton"
+import MagnetIcon from "../board/MagnetIcon"
 import ScopeList from "../board/ScopeList"
 import TaskForm from "../board/TaskForm"
 import UserCreationForm from "../board/UserCreationForm"
@@ -50,7 +51,7 @@ interface FormData {
   name: string
 }
 
-export const AddUserButton: React.FC = () => {
+export const AddMagnetButton: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const { id = "default-id" } = useParams()
   const [addUser] = usePostUserToBoardMutation()
@@ -74,21 +75,9 @@ export const AddUserButton: React.FC = () => {
 
   return (
     <div>
-      <Tooltip title="Add User">
+      <Tooltip title="Add Magnet">
         <IconButton onClick={handleClick} aria-label="add user">
-          <svg
-            style={{ width: "1.5rem", height: "1.5rem", color: "#2D3748" }}
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              fillRule="evenodd"
-              d="M9 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4H7Zm8-1c0-.6.4-1 1-1h1v-1a1 1 0 1 1 2 0v1h1a1 1 0 1 1 0 2h-1v1a1 1 0 1 1-2 0v-1h-1a1 1 0 0 1-1-1Z"
-              clipRule="evenodd"
-            />
-          </svg>
+          <MagnetIcon />
         </IconButton>
       </Tooltip>
       <Popover
@@ -247,7 +236,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       sx={{ minWidth: 0, flexGrow: 1, marginRight: "calc(100% - 100vw + 3rem)" }}
     >
       {isSuccess && users.length > 0 && <UserList users={users} />}
-      <AddUserButton />
+      <AddMagnetButton />
       <CopyToClipboardButton />
       <CreateColumnButton boardId={boardId} />
       <OpenScopeListButton handler={handleScopeList} />

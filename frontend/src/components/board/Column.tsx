@@ -357,8 +357,8 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
             <div
               {...provided.dragHandleProps}
               style={{
-                display: "flex",
-                justifyContent: "space-between",
+                display: "grid",
+                gridTemplateColumns: isSwimlaneColumn ? "1fr auto auto" : "1fr auto",
                 alignItems: "center",
                 padding: "3px",
                 marginBottom: "2px",
