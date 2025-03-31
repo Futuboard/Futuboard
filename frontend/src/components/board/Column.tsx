@@ -326,6 +326,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
   }
 
   let bgColor = isScopeSelected ? "#beb7b5" : "#e5dbd9"
+  let titleBgColor = "#e5dbd9"
 
   // change border color when task or size limit is exceeded
   if (
@@ -333,6 +334,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
     (column.wip_limit_story && sizeSum > column.wip_limit_story)
   ) {
     bgColor = isScopeSelected ? "#d63838" : "#ff4747"
+    titleBgColor = isScopeSelected ? "#fa9b9b" : "#ff4747"
   }
   return (
     <Draggable draggableId={column.columnid} index={index}>
@@ -360,7 +362,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
                 alignItems: "center",
                 padding: "3px",
                 marginBottom: "2px",
-                backgroundColor: "#e6dcda",
+                backgroundColor: titleBgColor,
                 cursor: isScopeSelected ? "pointer" : "default",
                 borderRadius: "3px"
               }}
