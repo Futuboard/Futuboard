@@ -218,7 +218,7 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
                   width: "100%",
                   maxHeight: 125,
                   wordWrap: "break-word",
-                  overflowY: "hidden",
+                  overflowY: "auto",
                   textOverflow: "ellipsis",
                   fontWeight: "bold"
                 }}

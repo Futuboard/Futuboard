@@ -5,8 +5,7 @@ import {
   Edit,
   Gradient,
   ColorLens,
-  AnalyticsOutlined
-  Analytics,
+  AnalyticsOutlined,
   ViewWeek,
   AllOut
 } from "@mui/icons-material"
