@@ -104,7 +104,7 @@ const BurnUpChart: React.FC<BurnUpChartProps> = ({ boardId }) => {
               )}
             />
             <Line
-              type="monotone"
+              type="linear"
               dataKey="scope"
               stroke="#03a9f4"
               fill="#03a9f4"
@@ -112,7 +112,7 @@ const BurnUpChart: React.FC<BurnUpChartProps> = ({ boardId }) => {
               onMouseLeave={() => setHighlightedLine("")}
             />
             <Line
-              type="monotone"
+              type="linear"
               dataKey="done"
               fill="#f44336"
               stroke="#f44336"
