@@ -37,8 +37,6 @@ const BurnUpChart: React.FC<BurnUpChartProps> = ({ boardId }) => {
     { skip: !selectedScope }
   )
 
-  const [highlightedLine, setHighlightedLine] = useState("")
-
   useEffect(() => {
     if (selectedScope) {
       refetch()
@@ -104,26 +102,11 @@ const BurnUpChart: React.FC<BurnUpChartProps> = ({ boardId }) => {
                   payload={payload as Array<{ [key: string]: string }>}
                   label={label}
                   labelFormatter={tickFormatter}
-                  highlightedItem={highlightedLine}
                 />
               )}
             />
-            <Line
-              type="linear"
-              dataKey="scope"
-              stroke="#03a9f4"
-              fill="#03a9f4"
-              onMouseEnter={() => setHighlightedLine("scope")}
-              onMouseLeave={() => setHighlightedLine("")}
-            />
-            <Line
-              type="linear"
-              dataKey="done"
-              fill="#f44336"
-              stroke="#f44336"
-              onMouseEnter={() => setHighlightedLine("done")}
-              onMouseLeave={() => setHighlightedLine("")}
-            />
+            <Line type="linear" dataKey="scope" stroke="#03a9f4" fill="#03a9f4" />
+            <Line type="linear" dataKey="done" fill="#f44336" stroke="#f44336" />
           </LineChart>
         </ChartContainer>
       )}
