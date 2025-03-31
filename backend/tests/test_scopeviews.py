@@ -95,7 +95,7 @@ def test_add_ticket_to_scope():
 
     data = response.json()
 
-    assert data[0]["tickets"] == [{"ticketid": str(ticket_id), "size": 3}]
+    assert data[0]["tickets"] == [{"ticketid": str(ticket_id), "size": 3, "columnid": str(column_id)}]
 
     ticket_change_event = TicketEvent.objects.get(ticketid=ticket_id)
     serializer = TicketEventSerializer(ticket_change_event)
@@ -199,7 +199,9 @@ def test_set_scope_forecast():
 
     assert response.json()[0]["forecast_set_date"] == "2024-01-05T00:00:00Z"
     assert response.json()[0]["forecast_size"] == 2
-    assert response.json()[0]["forecast_tickets"] == [{"ticketid": str(ticket_id), "size": 2}]
+    assert response.json()[0]["forecast_tickets"] == [
+        {"ticketid": str(ticket_id), "size": 2, "columnid": str(column_id)}
+    ]
 
     response = api_client.delete(reverse("update_ticket", args=[column_id, ticket_id]))
     assert response.status_code == 200

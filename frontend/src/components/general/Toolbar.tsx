@@ -6,7 +6,8 @@ import {
   Gradient,
   ColorLens,
   Analytics,
-  ViewWeek
+  ViewWeek,
+  AllOut
 } from "@mui/icons-material"
 import {
   AppBar,
@@ -24,10 +25,12 @@ import {
   Tooltip,
   Typography
 } from "@mui/material"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
+import { useDispatch } from "react-redux"
 import { Link, useParams } from "react-router-dom"
 
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
+import { disableScope } from "@/state/scope"
 import { TaskTemplate } from "@/types"
 
 import BoardBackgroundColorForm from "../board/BoardBackgroundColorForm"
@@ -37,6 +40,7 @@ import BoardTitleChangeForm from "../board/BoardTitleChangeForm"
 import CopyToClipboardButton from "../board/CopyToClipBoardButton"
 import CreateColumnButton from "../board/CreateColumnButton"
 import MagnetIcon from "../board/MagnetIcon"
+import ScopeList from "../board/ScopeList"
 import TaskForm from "../board/TaskForm"
 import UserCreationForm from "../board/UserCreationForm"
 import UserList from "../board/UserList"
@@ -115,6 +119,20 @@ const OpenAnalyticsButton: React.FC<OpenAnalyticsButtonProps> = ({ boardId }) =>
   )
 }
 
+interface OpenScopeListButtonProps {
+  handler: (event: React.MouseEvent<HTMLButtonElement>) => void
+}
+
+const OpenScopeListButton: React.FC<OpenScopeListButtonProps> = ({ handler }) => {
+  return (
+    <Tooltip title="View and Set Scopes">
+      <IconButton onClick={handler}>
+        <AllOut sx={{ color: "black" }} />
+      </IconButton>
+    </Tooltip>
+  )
+}
+
 type BoardToolBarProps = {
   title: string
   boardId: string
@@ -140,6 +158,14 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   const [titleFormOpen, setTitleFormOpen] = useState(false)
   const [colorFormOpen, setColorFormOpen] = useState(false)
   const [taskFormOpen, setTaskFormOpen] = useState(false)
+  const [scopeListOpen, setScopeListOpen] = useState(false)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (!scopeListOpen) {
+      dispatch(disableScope())
+    }
+  }, [scopeListOpen, dispatch])
 
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -152,6 +178,10 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   const handleExportAndClose = () => {
     handleExport()
     handleClose()
+  }
+
+  const handleScopeList = () => {
+    setScopeListOpen(!scopeListOpen)
   }
 
   const handleSubmitTaskFormData = async (data: TaskFormData | null) => {
@@ -209,6 +239,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       <AddMagnetButton />
       <CopyToClipboardButton />
       <CreateColumnButton boardId={boardId} />
+      <OpenScopeListButton handler={handleScopeList} />
       <OpenAnalyticsButton boardId={boardId} />
       <IconButton
         aria-label="more"
@@ -219,6 +250,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       >
         <MoreVert />
       </IconButton>
+      <ScopeList visible={scopeListOpen} boardId={boardId} closeDrawer={handleScopeList} />
       <Menu
         id="long-menu"
         anchorEl={anchorEl}
