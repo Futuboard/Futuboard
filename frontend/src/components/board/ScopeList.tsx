@@ -50,7 +50,11 @@ const ScopeListItem: React.FC<ScopeListItemProps> = ({ scope, onClose }) => {
     <div>
       <ListItemButton sx={{ padding: 1 }} onClick={handleClick} selected={isScopeSelected}>
         <EditIcon sx={{ paddingLeft: 1, padding: 1.5, color: "gray", alignSelf: "center", fontSize: 20 }} />
-        <Typography color="black" variant="body1" sx={{ textWrap: "stable" }}>
+        <Typography
+          color="black"
+          variant="body1"
+          sx={{ textWrap: "stable", overflowWrap: "break-word", overflowX: "hidden" }}
+        >
           {scope.title}
         </Typography>
       </ListItemButton>

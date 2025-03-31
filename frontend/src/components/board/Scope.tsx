@@ -141,7 +141,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
       <Paper sx={{ padding: "18px", marginTop: "7px" }}>
         <Grid item xs={12}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Edit sx={{ paddingRight: "3px" }} />
+            <Edit sx={{ paddingRight: "3px", color: "gray" }} />
             <TextField
               placeholder="Enter scope name"
               value={title}

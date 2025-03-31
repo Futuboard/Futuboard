@@ -46,7 +46,7 @@ export type NewTask = Omit<Task, "users" | "scopes">
 
 export type TaskTemplate = Omit<Task, "ticketid" | "columnid" | "users" | "scopes">
 
-export type TaskWithOnlySize = {
+export type TaskWithOnlySizeAndColumnid = {
   ticketid: string
   size: number
   columnid: string
@@ -137,9 +137,9 @@ export type Scope = {
   creation_date: string
   forecast_set_date: string
   forecast_size: number
-  forecast_tickets: TaskWithOnlySize[]
+  forecast_tickets: TaskWithOnlySizeAndColumnid[]
   done_columns: Column[]
-  tickets: TaskWithOnlySize[]
+  tickets: TaskWithOnlySizeAndColumnid[]
 }
 
 export type SimpleScope = {
