@@ -206,7 +206,9 @@ def get_column_sizes_at_times(columns, time_unit, count_unit, start_time=None, e
 
 def get_time_delta(time_unit):
     time_delta = timedelta(minutes=1)
-    if time_unit == "hour":
+    if time_unit == "minute":
+        time_delta = timedelta(minutes=1)
+    elif time_unit == "hour":
         time_delta = timedelta(hours=1)
     elif time_unit == "day":
         time_delta = timedelta(days=1)
