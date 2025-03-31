@@ -7,6 +7,7 @@ from ..serializers import TicketEventSerializer
 import rest_framework.request
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
+from django.db.models import Q
 
 DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
@@ -106,14 +107,13 @@ def velocity(request: rest_framework.request.Request, board_id):
 
 
 def get_column_sizes_at_times(columns, time_unit, count_unit, start_time=None, end_time=None, scope_id=None):
-    ticket_events = (
-        TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
-    ).order_by("event_time")
+    event_in_columns = Q(old_columnid__in=columns) | Q(new_columnid__in=columns)
+    event_in_scope = Q(old_scopes__in=[scope_id]) | Q(new_scopes__in=[scope_id])
 
     if scope_id is not None:
-        ticket_events = ticket_events.filter(old_scopes__in=[scope_id]) | ticket_events.filter(
-            new_scopes__in=[scope_id]
-        )
+        ticket_events = TicketEvent.objects.filter(event_in_columns & event_in_scope).order_by("event_time").distinct()
+    else:
+        ticket_events = TicketEvent.objects.filter(event_in_columns).order_by("event_time").distinct()
 
     if len(ticket_events) == 0:
         return []
