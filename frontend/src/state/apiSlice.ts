@@ -729,7 +729,11 @@ export const boardsApi = createApi({
         url: `scopes/${boardId}/`,
         method: "GET"
       }),
-      providesTags: [{ type: "Scopes", id: "LIST" }]
+      providesTags: [
+        { type: "Scopes", id: "LIST" },
+        { type: "Columns", id: "LIST" },
+        { type: "Ticket", id: "LIST" }
+      ]
     }),
 
     addScope: builder.mutation<Scope, { boardId: string; title: string }>({
