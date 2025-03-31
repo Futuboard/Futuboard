@@ -18,8 +18,8 @@ import {
   NewBoardTemplate,
   TaskTemplate,
   ChartData,
-  Scope,
-  SimpleScope
+  SimpleScope,
+  Scope
 } from "@/types"
 
 import { getAdminPassword, getAuth, setToken } from "./auth"
@@ -729,7 +729,11 @@ export const boardsApi = createApi({
         url: `scopes/${boardId}/`,
         method: "GET"
       }),
-      providesTags: [{ type: "Scopes", id: "LIST" }]
+      providesTags: [
+        { type: "Scopes", id: "LIST" },
+        { type: "Columns", id: "LIST" },
+        { type: "Ticket", id: "LIST" }
+      ]
     }),
 
     addScope: builder.mutation<Scope, { boardId: string; title: string }>({
@@ -889,6 +893,21 @@ export const boardsApi = createApi({
         { type: "Ticket", id: "LIST" },
         { type: "Scopes", id: "LIST" }
       ]
+    }),
+    getBurnUpChartData: builder.query<
+      ChartData,
+      { boardId: string; scopeId: string; timeUnit?: string; countUnit?: string }
+    >({
+      query: ({ boardId, scopeId, timeUnit, countUnit }) => ({
+        url: `charts/${boardId}/${scopeId}/burnup`,
+        method: "GET",
+        params: { time_unit: timeUnit, count_unit: countUnit }
+      }),
+      providesTags: [
+        { type: "Columns", id: "LIST" },
+        { type: "Ticket", id: "LIST" },
+        { type: "Scopes", id: "LIST" }
+      ]
     })
   })
 })
@@ -942,5 +961,6 @@ export const {
   useSetScopeForecastMutation,
   useSetScopeTitleMutation,
   useGetScopesQuery,
-  useGetVelocityChartDataQuery
+  useGetVelocityChartDataQuery,
+  useGetBurnUpChartDataQuery
 } = boardsApi
