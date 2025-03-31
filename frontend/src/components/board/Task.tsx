@@ -7,13 +7,15 @@ import {
   DroppableStateSnapshot
 } from "@hello-pangea/dnd"
 import { EditNote } from "@mui/icons-material"
-import { IconButton, Paper, Popover, Tooltip, Typography } from "@mui/material"
+import { Box, IconButton, Paper, Popover, Tooltip, Typography } from "@mui/material"
 import ClickAwayListener from "@mui/material/ClickAwayListener"
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { useSelector } from "react-redux"
 
-import { Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
+import { RootState } from "@/state/store"
+import { SimpleScope, Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
 
-import { useUpdateTaskMutation } from "../../state/apiSlice"
+import { useAddTaskToScopeMutation, useDeleteTaskFromScopeMutation, useUpdateTaskMutation } from "../../state/apiSlice"
 
 import TaskForm from "./TaskForm"
 import UserMagnet from "./UserMagnet"
@@ -61,10 +63,11 @@ interface FormData {
   color?: string
 }
 
-const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetStateAction<boolean>> }> = ({
-  task,
-  setTaskSelected
-}) => {
+const EditTaskButton: React.FC<{
+  task: TaskType
+  setTaskSelected: Dispatch<SetStateAction<boolean>>
+  disabled?: boolean
+}> = ({ task, setTaskSelected, disabled }) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
   const [updateTask] = useUpdateTaskMutation()
 
@@ -106,9 +109,11 @@ const EditTaskButton: React.FC<{ task: TaskType; setTaskSelected: Dispatch<SetSt
   return (
     <div>
       <Tooltip title="Edit card">
-        <IconButton size="small" onClick={handleClick}>
-          <EditNote />
-        </IconButton>
+        <span>
+          <IconButton size="small" onClick={handleClick} disabled={disabled}>
+            <EditNote />
+          </IconButton>
+        </span>
       </Tooltip>
       <Popover
         disableRestoreFocus
@@ -145,18 +150,44 @@ interface TaskProps {
 }
 
 const Task: React.FC<TaskProps> = ({ task }) => {
+  const selectedScope = useSelector((state: RootState) => state.scope)
+  const isScopeSelected = Boolean(selectedScope)
+
   const [updateTask] = useUpdateTaskMutation()
+  const [addTaskToScope] = useAddTaskToScopeMutation()
+  const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
 
   const [selected, setSelected] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditingCornerNote, setIsEditingCornerNote] = useState(false)
   const [cornernote, setCornernote] = useState(task.cornernote)
+  const [isTaskInSelectedScope, setIsTaskInSelectedScope] = useState(false)
 
   useEffect(() => {
     setCornernote(task.cornernote)
   }, [task.cornernote])
 
+  useEffect(() => {
+    if (task.scopes.some((scope) => scope.scopeid === selectedScope?.scopeid)) {
+      setIsTaskInSelectedScope(true)
+    } else {
+      setIsTaskInSelectedScope(false)
+    }
+  }, [task.scopes, selectedScope])
+
   const handleDoubleClick = () => {
-    setIsEditing(true)
+    if (!isScopeSelected) {
+      setIsEditingCornerNote(true)
+    }
+  }
+
+  const handleClick = () => {
+    if (isScopeSelected) {
+      if (!isTaskInSelectedScope) {
+        addTaskToScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
+      } else {
+        deleteTaskFromScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
+      }
+    }
   }
 
   const handleBlur = async () => {
@@ -164,7 +195,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
       ...task,
       cornernote: cornernote
     }
-    setIsEditing(false)
+    setIsEditingCornerNote(false)
     if (cornernote === task.cornernote) return
     await updateTask({ task: updatedTaskObject })
 
@@ -186,15 +217,23 @@ const Task: React.FC<TaskProps> = ({ task }) => {
     <Droppable droppableId={task.ticketid + "/ticket"} type="user" direction="vertical">
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => {
         return (
-          <div ref={provided.innerRef}>
+          <Box ref={provided.innerRef}>
             <Paper
               elevation={selected ? 24 : 4}
+              onClick={handleClick}
               sx={{
                 padding: "4px",
-                backgroundColor: snapshot.isDraggingOver ? "rgba(22, 95, 199, 0.2)" : "white",
+                backgroundColor: snapshot.isDraggingOver
+                  ? "rgba(22, 95, 199, 0.2)"
+                  : isTaskInSelectedScope
+                    ? "#C0EE90"
+                    : "white",
                 height: "100px",
                 marginBottom: "5px",
-                borderColor: task.color,
+                borderColor:
+                  (task.color === "white" || task.color === "#ffffff") && isTaskInSelectedScope
+                    ? "#C0EE90"
+                    : task.color,
                 borderBottomWidth: "7px",
                 borderBottomStyle: "solid",
                 borderLeftWidth: "2px",
@@ -202,15 +241,14 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                 borderRightWidth: "2px",
                 borderRightStyle: "solid",
                 borderTopWidth: "2px",
-                borderTopStyle: "solid"
+                borderTopStyle: "solid",
+                cursor: isScopeSelected ? "pointer" : "auto"
               }}
             >
-              <div
-                style={{ display: "flex", justifyContent: "space-between", flexDirection: "column", height: "100%" }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", overflow: "visible" }}>
-                  <div style={{ overflow: "hidden", flexGrow: 1 }} onDoubleClick={handleDoubleClick}>
-                    {isEditing ? (
+              <Box sx={{ display: "flex", justifyContent: "space-between", flexDirection: "column", height: "100%" }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", overflow: "hidden" }}>
+                  <Box sx={{ overflow: "hidden", flexGrow: 1 }} onDoubleClick={handleDoubleClick}>
+                    {isEditingCornerNote ? (
                       <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={handleBlur}>
                         <input
                           autoFocus
@@ -232,14 +270,14 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                         {cornernote}
                       </Typography>
                     )}
-                  </div>
-                  <div>
-                    <EditTaskButton task={task} setTaskSelected={setSelected} />
-                  </div>
-                </div>
-                <div>
-                  <div
-                    style={{
+                  </Box>
+                  <Box>
+                    <EditTaskButton task={task} setTaskSelected={setSelected} disabled={isScopeSelected} />
+                  </Box>
+                </Box>
+                <Box>
+                  <Box
+                    sx={{
                       display: "flex",
                       justifyContent: "space-between",
                       overflow: "hidden",
@@ -247,8 +285,8 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                       alignItems: "center"
                     }}
                   >
-                    <div
-                      style={{
+                    <Box
+                      sx={{
                         display: "-webkit-box",
                         WebkitBoxOrient: "vertical",
                         WebkitLineClamp: 2,
@@ -261,15 +299,15 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                       <Typography variant={"body2"} gutterBottom sx={{ color: "#2D3748", wordWrap: "break-word" }}>
                         <strong>{task.title}</strong>
                       </Typography>
-                    </div>
-                  </div>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <div style={{ overflow: "hidden", width: "90%" }}>
+                    </Box>
+                  </Box>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Box sx={{ overflow: "hidden", width: "90%" }}>
                     <TaskUserList users={task.users} taskid={task.ticketid} />
-                  </div>
-                  <div
-                    style={{
+                  </Box>
+                  <Box
+                    sx={{
                       display: "flex",
                       justifyContent: "flex-end",
                       alignItems: "flex-end",
@@ -278,17 +316,17 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                       paddingBottom: "3px"
                     }}
                   >
-                    <div>
+                    <Box>
                       <Typography sx={{ fontWeight: "bold", fontSize: "17px", color: "#2D3748" }}>
                         {task.size}
                       </Typography>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
               {provided.placeholder}
             </Paper>
-          </div>
+          </Box>
         )
       }}
     </Droppable>

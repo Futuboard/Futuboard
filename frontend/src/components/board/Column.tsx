@@ -10,7 +10,7 @@ import { useSelector } from "react-redux"
 import { useParams } from "react-router"
 
 import { RootState } from "@/state/store"
-import type { Column, Task as TaskType, User, TaskTemplate } from "@/types"
+import type { Column, Task as TaskType, User, TaskTemplate, SimpleScope } from "@/types"
 
 import { getId } from "../../services/Utils"
 import {
@@ -18,7 +18,9 @@ import {
   useAddTaskMutation,
   useGetTaskListByColumnIdQuery,
   useUpdateColumnMutation,
-  useGetBoardQuery
+  useGetBoardQuery,
+  useAddTaskToScopeMutation,
+  useDeleteTaskFromScopeMutation
 } from "../../state/apiSlice"
 
 import ColumnEditForm from "./ColumnEditForm"
@@ -223,7 +225,7 @@ interface ColumnFormData {
   columnWipLimitStory: number | null
 }
 
-const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
+const EditColumnButton: React.FC<{ column: Column; disabled: boolean }> = ({ column, disabled }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [updateColumn] = useUpdateColumnMutation()
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -253,7 +255,7 @@ const EditColumnButton: React.FC<{ column: Column }> = ({ column }) => {
   return (
     <div>
       <Tooltip title="Edit column">
-        <IconButton size="small" onClick={handleClick}>
+        <IconButton size="small" onClick={handleClick} disabled={disabled}>
           <Edit />
         </IconButton>
       </Tooltip>
@@ -288,6 +290,9 @@ interface ColumnProps {
 const defaultTasks: TaskType[] = []
 
 const Column: React.FC<ColumnProps> = ({ column, index }) => {
+  const [addTaskToScope] = useAddTaskToScopeMutation()
+  const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
+
   const [showSwimlanes, setShowSwimlanes] = useState(false)
 
   const isSwimlaneColumn = column.swimlane || false // change this to column.swimlane boolean
@@ -298,19 +303,38 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
   const tasks = useSelector(
     (state: RootState) => selectTasksByColumnId({ boardId: id, columnId: column.columnid })(state).data || defaultTasks
   )
+  const selectedScope = useSelector((state: RootState) => state.scope)
+  const isScopeSelected = Boolean(selectedScope)
 
   const sizeSum = useMemo(() => tasks.reduce((sum, task) => sum + Number(task.size), 0), [tasks])
-
   const taskNum = useMemo(() => tasks.length, [tasks])
 
-  let bgColor = "#E5DBD9"
+  const handleClick = () => {
+    if (tasks && isScopeSelected) {
+      // Check if selectedScope is in every task
+      if (tasks.every((task: TaskType) => task.scopes.some((scope) => scope.scopeid === selectedScope?.scopeid))) {
+        // Remove every task in column from selectedScope
+        tasks.forEach((task: TaskType) => {
+          deleteTaskFromScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
+        })
+      } else {
+        tasks.forEach((task: TaskType) => {
+          addTaskToScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
+        })
+      }
+    }
+  }
+
+  let bgColor = isScopeSelected ? "#beb7b5" : "#e5dbd9"
+  let titleBgColor = "#e5dbd9"
 
   // change border color when task or size limit is exceeded
   if (
     (column.wip_limit && taskNum > column.wip_limit) ||
     (column.wip_limit_story && sizeSum > column.wip_limit_story)
   ) {
-    bgColor = "#FF4747"
+    bgColor = isScopeSelected ? "#d63838" : "#ff4747"
+    titleBgColor = isScopeSelected ? "#fa9b9b" : "#ff4747"
   }
   return (
     <Draggable draggableId={column.columnid} index={index}>
@@ -330,16 +354,30 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
               borderColor: "rgba(0, 0, 0, 0.12)"
             }}
           >
-            <div {...provided.dragHandleProps} style={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant={"h5"} noWrap gutterBottom sx={{ paddingLeft: "3px", color: "#2D3748" }}>
+            <div
+              {...provided.dragHandleProps}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "3px",
+                marginBottom: "2px",
+                backgroundColor: titleBgColor,
+                cursor: isScopeSelected ? "pointer" : "default",
+                borderRadius: "3px"
+              }}
+              onClick={handleClick}
+            >
+              <Typography variant={"h5"} noWrap sx={{ paddingLeft: "3px", color: "#2D3748" }}>
                 {column.title}
               </Typography>
-              <EditColumnButton column={column} />
+              <EditColumnButton column={column} disabled={isScopeSelected} />
               {isSwimlaneColumn && (
                 <IconButton
                   color="primary"
                   aria-label="expand swimlane"
                   onClick={() => setShowSwimlanes(!showSwimlanes)}
+                  disabled={isScopeSelected}
                 >
                   {showSwimlanes ? <ArrowBackIosIcon /> : <ArrowForwardIosIcon />}
                 </IconButton>

@@ -60,5 +60,5 @@ Cypress.Commands.add("editTaskTemplate", ({ title, size, description, cornerNote
   cy.get('input[name="cornerNote"]').type(cornerNote)
   cy.get(`input[type="radio"][value="${color}"]`).check()
   cy.get("button").contains("Save Changes").click()
-  cy.get(".MuiBackdrop-root").first().click()
+  cy.get(".MuiBackdrop-root").last().click()
 })

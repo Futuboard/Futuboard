@@ -17,7 +17,9 @@ import {
   BoardTemplate,
   NewBoardTemplate,
   TaskTemplate,
-  ChartData
+  ChartData,
+  Scope,
+  SimpleScope
 } from "@/types"
 
 import { getAdminPassword, getAuth, setToken } from "./auth"
@@ -315,7 +317,8 @@ export const boardsApi = createApi({
       onQueryStarted({ columnId, tasks }, apiActions) {
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Columns", id: columnId },
-          { type: "Ticket", id: "LIST" }
+          { type: "Ticket", id: "LIST" },
+          { type: "Scopes", id: "LIST" }
         ]
 
         updateCache(
@@ -634,7 +637,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(invalidationTags)
-          boardsApi.util.invalidateTags(invalidationTags)
+          apiActions.dispatch(boardsApi.util.invalidateTags(invalidationTags))
         })
       }
     }),
@@ -692,7 +695,7 @@ export const boardsApi = createApi({
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(invalidationTags)
-          boardsApi.util.invalidateTags(invalidationTags)
+          apiActions.dispatch(boardsApi.util.invalidateTags(invalidationTags))
         })
       }
     }),
@@ -705,6 +708,7 @@ export const boardsApi = createApi({
         body: { password }
       })
     }),
+
     getCumulativeFlowDiagramData: builder.query<
       ChartData,
       { boardId: string; timeUnit?: string; start?: string; end?: string; countUnit?: string }
@@ -719,6 +723,162 @@ export const boardsApi = createApi({
         { type: "Ticket", id: "LIST" }
       ]
     }),
+
+    getScopes: builder.query<Scope[], string>({
+      query: (boardId) => ({
+        url: `scopes/${boardId}/`,
+        method: "GET"
+      }),
+      providesTags: [{ type: "Scopes", id: "LIST" }]
+    }),
+
+    addScope: builder.mutation<Scope, { boardId: string; title: string }>({
+      query: ({ boardId, title }) => ({
+        url: `scopes/${boardId}/`,
+        method: "POST",
+        body: { title }
+      }),
+      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+    }),
+
+    deleteScope: builder.mutation<Scope, { boardid: string; scopeid: string }>({
+      query: ({ boardid, scopeid }) => ({
+        url: `scopes/${boardid}/`,
+        method: "DELETE",
+        body: { scopeid }
+      }),
+      //update optimistically
+      onQueryStarted({ scopeid }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Scopes", id: "LIST" }]
+        updateCache(
+          "getScopes",
+          tagsToInvalidate,
+          (draft) => {
+            const scopes = draft as Scope[]
+            return scopes.filter((scope) => scope.scopeid !== scopeid)
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
+        })
+      }
+    }),
+
+    setDoneColumns: builder.mutation<Scope, { scope: Scope; columns: Column[] }>({
+      query: ({ scope, columns }) => ({
+        url: `scopes/${scope.scopeid}/set_done_columns`,
+        method: "POST",
+        body: { done_columns: columns.map((c) => c.columnid) }
+      }),
+      //update optimistically
+      onQueryStarted({ scope, columns }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Scopes", id: "LIST" }]
+        updateCache(
+          "getScopes",
+          tagsToInvalidate,
+          (draft) => {
+            const scopes = draft as Scope[]
+            const updatedScope = scopes.find((previousScope) => previousScope.scopeid === scope.scopeid)
+            if (updatedScope) {
+              updatedScope.done_columns = columns
+            }
+            return scopes
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+
+          // We don't invalidate the local cache, because the optimisitic update is already done, and doing a refetch would cause the UI to be very slow.
+
+          // apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
+        })
+      }
+    }),
+
+    setScopeForecast: builder.mutation<Scope, { scopeid: string }>({
+      query: ({ scopeid }) => ({
+        url: `scopes/${scopeid}/set_scope_forecast`,
+        method: "POST"
+      }),
+      invalidatesTags: () => invalidateRemoteCache(["Scopes"])
+    }),
+
+    setScopeTitle: builder.mutation<{ success: boolean }, { scopeid: string; title: string }>({
+      query: ({ scopeid, title }) => ({
+        url: `scopes/${scopeid}/set_title`,
+        method: "POST",
+        body: { title: title }
+      }),
+      invalidatesTags: () => invalidateRemoteCache(["Ticket", "Scopes"])
+    }),
+
+    addTaskToScope: builder.mutation<{ success: boolean }, { scope: SimpleScope; ticketid: string }>({
+      query: ({ scope, ticketid }) => ({
+        url: `scopes/${scope.scopeid}/tickets`,
+        method: "POST",
+        body: { ticketid }
+      }),
+      //update optimistically
+      onQueryStarted({ ticketid, scope }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
+        updateCache(
+          "getTaskListByColumnId",
+          tagsToInvalidate,
+          (draft) => {
+            const tasks = draft as Task[]
+            const task = tasks.find((task) => task.ticketid === ticketid)
+            if (task) {
+              task.scopes.push({ scopeid: scope.scopeid, title: scope.title })
+            }
+          },
+          apiActions
+        )
+
+        tagsToInvalidate.push("Scopes")
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
+        })
+      }
+    }),
+
+    deleteTaskFromScope: builder.mutation<{ success: boolean }, { scope: SimpleScope; ticketid: string }>({
+      query: ({ scope, ticketid }) => ({
+        url: `scopes/${scope.scopeid}/tickets`,
+        method: "DELETE",
+        body: { ticketid }
+      }),
+      //update optimistically
+      onQueryStarted({ ticketid, scope }, apiActions) {
+        const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
+        updateCache(
+          "getTaskListByColumnId",
+          tagsToInvalidate,
+          (draft) => {
+            const tasks = draft as Task[]
+            const task = tasks.find((task) => task.ticketid === ticketid)
+            if (task) {
+              task.scopes = task.scopes.filter((taskScope) => taskScope.scopeid !== scope.scopeid)
+            }
+          },
+          apiActions
+        )
+
+        tagsToInvalidate.push("Scopes")
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(tagsToInvalidate)
+          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
+        })
+      }
+    }),
+
     getVelocityChartData: builder.query<ChartData, { boardId: string }>({
       query: ({ boardId }) => ({
         url: `charts/${boardId}/velocity`,
@@ -726,8 +886,8 @@ export const boardsApi = createApi({
       }),
       providesTags: [
         { type: "Columns", id: "LIST" },
-        { type: "Ticket", id: "LIST" }
-        //{ type: "Scope", id: "LIST" }
+        { type: "Ticket", id: "LIST" },
+        { type: "Scopes", id: "LIST" }
       ]
     })
   })
@@ -774,5 +934,13 @@ export const {
   useCheckAdminPasswordMutation,
   useUpdateTaskTemplateMutation,
   useGetCumulativeFlowDiagramDataQuery,
+  useAddTaskToScopeMutation,
+  useDeleteTaskFromScopeMutation,
+  useAddScopeMutation,
+  useDeleteScopeMutation,
+  useSetDoneColumnsMutation,
+  useSetScopeForecastMutation,
+  useSetScopeTitleMutation,
+  useGetScopesQuery,
   useGetVelocityChartDataQuery
 } = boardsApi

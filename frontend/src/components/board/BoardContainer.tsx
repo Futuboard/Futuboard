@@ -1,11 +1,13 @@
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
-import { Box } from "@mui/material"
+import { Backdrop, Box } from "@mui/material"
 import { produce } from "immer"
+import { useState } from "react"
+import { useSelector } from "react-redux"
 
 import Board from "@/components/board/Board"
 import ToolBar from "@/components/general/Toolbar"
 import { setNotification } from "@/state/notification"
-import { store } from "@/state/store"
+import { RootState, store } from "@/state/store"
 import { Action, Task, User, Board as BoardType } from "@/types"
 
 import {
@@ -33,6 +35,9 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
   const [updateActions] = useUpdateActionListMutation()
   const [deleteUserFromTicket] = useDeleteUserFromTicketMutation()
   const [deleteUserFromAction] = useDeleteUserFromActionMutation()
+  const [isNotesOpen, setIsNotesOpen] = useState(false)
+  const selectedScope = useSelector((state: RootState) => state.scope)
+  const isScopeSelected = Boolean(selectedScope)
 
   const boardId = board.boardid
 
@@ -232,17 +237,25 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
         sx={{
           height: "100%",
           width: "100%",
-          overflow: "scroll" //Checlists in the ticket descriptions break if removed.
+          overflow: "scroll" //checklist in ticket descriptions break if removed.
         }}
       >
+        <Backdrop open={isScopeSelected} sx={{ backgroundColor: "rgba(0, 0, 0, 0.3)", zIndex: -999 }} />
         <ToolBar
           boardId={boardId}
           title={board.title}
           taskTemplate={taskTemplateValues}
           boardBackgroundColor={board.background_color}
         />
-        <Board />
-        <BoardNotes content={board.notes} boardId={board.boardid} />
+        <Board isBoardNotesOpen={isNotesOpen} />
+        <BoardNotes
+          content={board.notes}
+          boardId={board.boardid}
+          open={isNotesOpen}
+          handleSetOpen={(value) => {
+            setIsNotesOpen(value)
+          }}
+        />
       </Box>
     </DragDropContext>
   )
