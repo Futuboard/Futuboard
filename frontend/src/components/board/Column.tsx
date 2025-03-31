@@ -359,7 +359,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
               style={{
                 display: "grid",
                 gridTemplateColumns: isSwimlaneColumn ? "1fr auto auto" : "1fr auto",
-                alignItems: "center"
+                alignItems: "center",
                 padding: "3px",
                 marginBottom: "2px",
                 backgroundColor: titleBgColor,
