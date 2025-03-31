@@ -783,18 +783,19 @@ export const boardsApi = createApi({
             const scopes = draft as Scope[]
             const updatedScope = scopes.find((previousScope) => previousScope.scopeid === scope.scopeid)
             if (updatedScope) {
-              const addedColumns = columns.filter(
-                (column) => !updatedScope.done_columns.some((doneColumn) => doneColumn.columnid === column.columnid)
-              )
-              updatedScope.done_columns.push(...addedColumns)
+              updatedScope.done_columns = columns
             }
+            return scopes
           },
           apiActions
         )
 
         apiActions.queryFulfilled.finally(() => {
           invalidateRemoteCache(tagsToInvalidate)
-          apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
+
+          // We don't invalidate the local cache, because the optimisitic update is already done, and doing a refetch would cause the UI to be very slow.
+
+          // apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         })
       }
     }),
