@@ -90,16 +90,14 @@ const Scope: React.FC<ScopeProps> = (props) => {
   const [title, setTitle] = useState(scope.title)
   const [tickets, setTickets] = useState(scope.tickets.length)
   const [size, setSize] = useState(scope.tickets.reduce((sum, task) => sum + (task.size || 0), 0))
-  const [doneTickets, setDoneTickets] = useState(
-    scope.tickets.filter((ticket) => scope.done_columns.some((done) => done.columnid === ticket.columnid)).length
-  )
-  const [doneSize, setDoneSize] = useState(
-    scope.done_columns.length > 0
-      ? scope.tickets.reduce(
-          (sum, task) => sum + (scope.done_columns.some((done) => task.columnid === done.columnid) ? task.size : 0),
-          0
-        )
-      : -1
+
+  const doneTicketsCount = scope.tickets.filter((ticket) =>
+    scope.done_columns.some((done) => done.columnid === ticket.columnid)
+  ).length
+
+  const doneTicketsSize = scope.tickets.reduce(
+    (sum, task) => sum + (scope.done_columns.some((done) => task.columnid === done.columnid) ? task.size : 0),
+    0
   )
 
   const handleSubmitTitle = async () => {
@@ -128,25 +126,6 @@ const Scope: React.FC<ScopeProps> = (props) => {
     setTickets(scope.tickets.length)
     setSize(scope.tickets.reduce((sum, task) => sum + (task.size || 0), 0))
   }, [scope.title, scope.tickets])
-
-  useEffect(() => {
-    if (scope.done_columns.length > 0) {
-      setDoneSize(
-        scope.tickets.reduce(
-          (sum, task) => sum + (scope.done_columns.some((done) => task.columnid === done.columnid) ? task.size : 0),
-          0
-        )
-      )
-    }
-  }, [scope.tickets, scope.done_columns])
-
-  useEffect(() => {
-    if (scope.done_columns.length > 0) {
-      setDoneTickets(
-        scope.tickets.filter((ticket) => scope.done_columns.some((done) => done.columnid === ticket.columnid)).length
-      )
-    }
-  }, [scope.tickets, scope.done_columns])
 
   const handleEditClick = () => {
     if (textFieldRef.current) {
@@ -188,40 +167,16 @@ const Scope: React.FC<ScopeProps> = (props) => {
         </Grid>
 
         <Grid item xs={12} marginTop={1}>
-          <Grid item xs={12}>
-            <Typography gutterBottom variant="h6">
-              {"Tickets:  "}
-              <b>{tickets}</b>
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Typography gutterBottom variant="h6">
-              {"Size:   "}
-              <b>{size}</b>
-            </Typography>
-          </Grid>
-
-          {doneSize == -1 ? (
-            <div></div>
-          ) : (
-            <div>
-              <Grid item xs={12}>
-                <Typography gutterBottom variant="h6">
-                  {"Done Tickets:   "}
-                  <b>{doneTickets}</b>
-                </Typography>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Typography gutterBottom variant="h6">
-                  {"Done size:  "}
-                  <b>{doneSize}</b>
-                </Typography>
-              </Grid>
-            </div>
-          )}
-
+          <Box sx={{ display: "grid", gridTemplateColumns: "7rem 1fr", gap: 0, fontSize: "1.25rem" }}>
+            <span>
+              Tickets: <b>{tickets}</b>
+            </span>
+            <span>{scope.done_columns.length > 0 && `(${doneTicketsCount} done)`}</span>
+            <span>
+              Size: <b>{size}</b>
+            </span>
+            <span>{scope.done_columns.length > 0 && `(${doneTicketsSize} done)`}</span>
+          </Box>
           <Grid item xs={12} marginTop={3} marginBottom={2}>
             <DoneColumnSelector scope={scope} columns={columns ? columns : []} />
           </Grid>
