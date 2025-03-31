@@ -17,7 +17,7 @@ const UserMagnet: React.FC<UserMagnetProps> = ({ user, editable }) => {
   }
 
   return (
-    <div title={user.name}>
+    <div title={user.name} style={{ cursor: "grab" }}>
       <Card
         sx={{
           display: "flex",
