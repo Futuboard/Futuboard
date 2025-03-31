@@ -52,11 +52,6 @@ export type TaskWithOnlySizeAndColumnid = {
   columnid: string
 }
 
-export type TaskSize = {
-  ticketid: string
-  size: number
-}
-
 export type User = {
   userid: string
   name: string
@@ -155,15 +150,3 @@ export type SimpleScope = {
 export type TimeUnit = (typeof timeUnitOptions)[number]
 
 export type CountUnit = (typeof countUnitOptions)[number]
-
-export type Scope = {
-  scopeid: string
-  boardid: string
-  title: string
-  creation_date: string
-  forecast_set_date: string
-  forecast_size: number
-  forecast_tickets: TaskSize[]
-  done_columns: Column[]
-  tickets: TaskSize[]
-}

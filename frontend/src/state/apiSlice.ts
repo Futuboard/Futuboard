@@ -904,13 +904,6 @@ export const boardsApi = createApi({
         { type: "Ticket", id: "LIST" },
         { type: "Scopes", id: "LIST" }
       ]
-    }),
-    getScopes: builder.query<Scope[], string>({
-      query: (boardId) => ({
-        url: `scopes/${boardId}`,
-        method: "GET"
-      }),
-      providesTags: [{ type: "Scopes", id: "LIST" }]
     })
   })
 })
