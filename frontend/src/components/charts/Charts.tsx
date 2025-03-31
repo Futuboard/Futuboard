@@ -73,6 +73,7 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
         </Box>
         {Object.entries(charts).map(([name, { displayName, Icon }]) => (
           <Box
+            key={name}
             sx={{
               ":hover": { filter: "brightness(0.96)" },
               backgroundColor: name === chartName ? "#e0e0e2" : "white"
