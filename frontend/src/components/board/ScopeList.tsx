@@ -90,9 +90,13 @@ const ScopeList: React.FC<ScopeListProps> = ({ visible, boardId, closeDrawer }) 
     setOpen(false)
   }
 
-  const handleSubmit = (data: { scopeTitle: string }) => {
-    addScope({ boardId, title: data.scopeTitle })
+  const handleSubmit = async (data: { scopeTitle: string }) => {
     setOpen(false)
+    const response = await addScope({ boardId, title: data.scopeTitle })
+
+    if ("data" in response) {
+      dispatch(setScope(response.data))
+    }
   }
 
   const handleCloseScope = () => {
