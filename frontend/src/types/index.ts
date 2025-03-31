@@ -39,11 +39,18 @@ export type Task = {
   size?: number
   columnid: string
   users: UserWithoutTicketsOrActions[]
+  scopes: SimpleScope[]
 }
 
-export type NewTask = Omit<Task, "users">
+export type NewTask = Omit<Task, "users" | "scopes">
 
-export type TaskTemplate = Omit<Task, "ticketid" | "columnid" | "users">
+export type TaskTemplate = Omit<Task, "ticketid" | "columnid" | "users" | "scopes">
+
+export type TaskWithOnlySizeAndColumnid = {
+  ticketid: string
+  size: number
+  columnid: string
+}
 
 export type User = {
   userid: string
@@ -121,6 +128,23 @@ export type NewBoardTemplate = Omit<BoardTemplate, "boardtemplateid">
 export type ChartData = {
   columns: string[]
   data: { [key: string]: number }[]
+}
+
+export type Scope = {
+  scopeid: string
+  boardid: string
+  title: string
+  creation_date: string
+  forecast_set_date: string
+  forecast_size: number
+  forecast_tickets: TaskWithOnlySizeAndColumnid[]
+  done_columns: Column[]
+  tickets: TaskWithOnlySizeAndColumnid[]
+}
+
+export type SimpleScope = {
+  scopeid: string
+  title: string
 }
 
 export type TimeUnit = (typeof timeUnitOptions)[number]

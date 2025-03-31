@@ -19,7 +19,7 @@ import {
 } from "@mdxeditor/editor"
 import { StickyNote2 } from "@mui/icons-material"
 import CloseIcon from "@mui/icons-material/Close"
-import { Box, Button, ButtonGroup, Divider, Fab, Fade, Paper, Tooltip } from "@mui/material"
+import { Box, Button, ButtonGroup, Divider, Fab, Fade, Paper, Slide, Tooltip } from "@mui/material"
 import { useEffect, useState } from "react"
 
 import { useUpdateBoardNotesMutation } from "@/state/apiSlice"
@@ -27,10 +27,11 @@ import { useUpdateBoardNotesMutation } from "@/state/apiSlice"
 interface BoardNotesProps {
   boardId: string
   content: string
+  open: boolean
+  handleSetOpen: (value: boolean) => void
 }
 
-const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
-  const [open, setOpen] = useState(false)
+const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleSetOpen }) => {
   const [updateBoardNotes] = useUpdateBoardNotesMutation()
   const [notes, setNotes] = useState("")
 
@@ -46,11 +47,11 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
         console.error(error)
       }
     }
-    setOpen(false)
+    handleSetOpen(false)
   }
 
   const handleClose = () => {
-    setOpen(false)
+    handleSetOpen(false)
     setNotes(content)
   }
 
@@ -61,11 +62,10 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
           <Fab
             sx={{
               position: "fixed",
-              bottom: "calc(100% - 100vh + 1.5rem)",
-              right: "calc(100% - 100vw + 1.5rem)",
-              zIndex: 1001
+              bottom: " 1rem",
+              left: "1rem"
             }}
-            onClick={() => setOpen(true)}
+            onClick={() => handleSetOpen(true)}
             color="info"
           >
             <StickyNote2 />
@@ -73,18 +73,17 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
         </Tooltip>
       </Fade>
 
-      <Fade in={open} unmountOnExit>
+      <Slide in={open} unmountOnExit direction="right" timeout={400} easing={"ease"}>
         <Paper
           sx={{
             width: "520px",
             position: "fixed",
-            right: "calc(100% - 100vw + 1.75rem)",
-            top: "calc(65px + 1.5rem)",
-            zIndex: 1000,
+            left: "0",
+            top: "65px",
             display: "flex",
             flexDirection: "column"
           }}
-          elevation={16}
+          variant="outlined"
         >
           <Box>
             <MDXEditor
@@ -132,7 +131,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content }) => {
             </ButtonGroup>
           </Box>
         </Paper>
-      </Fade>
+      </Slide>
     </>
   )
 }
