@@ -7,6 +7,7 @@ from ..serializers import TicketEventSerializer
 import rest_framework.request
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
+from django.db.models import Q
 
 DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
@@ -44,6 +45,41 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
 
 
 @api_view(["GET"])
+def burn_up(request: rest_framework.request.Request, board_id, scope_id):
+    if request.method == "GET":
+        possible_time_units = ["minute", "hour", "day", "week", "month", "year"]
+        time_unit = request.query_params.get("time_unit", "day")  # Default to day
+        count_unit = request.query_params.get("count_unit", "size")  # Default to size
+
+        if time_unit not in possible_time_units:
+            return JsonResponse({"error": "Invalid time unit"}, status=400)
+
+        scope = Scope.objects.get(scopeid=scope_id)
+
+        if not scope or scope.boardid.boardid != board_id:
+            return JsonResponse({"error": "Invalid scope"}, status=400)
+
+        columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
+
+        data_with_column_ids = get_column_sizes_at_times(columns, time_unit, count_unit, scope_id=scope_id)
+
+        done_column_ids = [str(column.columnid) for column in scope.done_columns.all()]
+
+        data = []
+
+        for timestamp, column_data in data_with_column_ids:
+            scope_size = 0
+            done_size = 0
+            for column_id in column_data:
+                if column_id in done_column_ids:
+                    done_size += column_data[column_id]
+                scope_size += column_data[column_id]
+            data.append({"name": timestamp, "scope": scope_size, "done": done_size})
+
+        return JsonResponse({"data": data}, safe=False)
+
+
+@api_view(["GET"])
 def velocity(request: rest_framework.request.Request, board_id):
     if request.method == "GET":
         scopes = Scope.objects.filter(boardid=board_id).order_by("title")
@@ -70,10 +106,14 @@ def velocity(request: rest_framework.request.Request, board_id):
         return JsonResponse({"data": data}, safe=False)
 
 
-def get_column_sizes_at_times(columns, time_unit, count_unit, start_time=None, end_time=None):
-    ticket_events = (
-        TicketEvent.objects.filter(old_columnid__in=columns) | TicketEvent.objects.filter(new_columnid__in=columns)
-    ).order_by("event_time")
+def get_column_sizes_at_times(columns, time_unit, count_unit, start_time=None, end_time=None, scope_id=None):
+    event_in_columns = Q(old_columnid__in=columns) | Q(new_columnid__in=columns)
+    event_in_scope = Q(old_scopes__in=[scope_id]) | Q(new_scopes__in=[scope_id])
+
+    if scope_id is not None:
+        ticket_events = TicketEvent.objects.filter(event_in_columns & event_in_scope).order_by("event_time").distinct()
+    else:
+        ticket_events = TicketEvent.objects.filter(event_in_columns).order_by("event_time").distinct()
 
     if len(ticket_events) == 0:
         return []
@@ -131,25 +171,27 @@ def get_column_sizes_at_times(columns, time_unit, count_unit, start_time=None, e
 
         if events_at_time is not None:
             for event in events_at_time:
-                if count_unit == "size":
-                    if event.event_type == TicketEvent.CREATE:
-                        setSize(column_sizes, event.new_columnid.columnid, event.new_size)
-                    elif event.event_type == TicketEvent.DELETE:
-                        setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
-                    elif event.event_type == TicketEvent.MOVE:
-                        setSize(column_sizes, event.old_columnid.columnid, -event.old_size)
-                        setSize(column_sizes, event.new_columnid.columnid, event.new_size)
-                    elif event.event_type == TicketEvent.UPDATE:
-                        setSize(column_sizes, event.new_columnid.columnid, event.new_size - event.old_size)
+                event_old_size = event.old_size if count_unit == "size" else 1
+                event_new_size = event.new_size if count_unit == "size" else 1
 
-                elif count_unit == "cards":
-                    if event.event_type == TicketEvent.CREATE:
-                        setSize(column_sizes, event.new_columnid.columnid, 1)
-                    elif event.event_type == TicketEvent.DELETE:
-                        setSize(column_sizes, event.old_columnid.columnid, -1)
-                    elif event.event_type == TicketEvent.MOVE:
-                        setSize(column_sizes, event.old_columnid.columnid, -1)
-                        setSize(column_sizes, event.new_columnid.columnid, 1)
+                if event.event_type == TicketEvent.CREATE:
+                    setSize(column_sizes, event.new_columnid.columnid, event_new_size)
+                elif event.event_type == TicketEvent.DELETE:
+                    setSize(column_sizes, event.old_columnid.columnid, -event_old_size)
+                elif event.event_type == TicketEvent.MOVE:
+                    setSize(column_sizes, event.old_columnid.columnid, -event_old_size)
+                    setSize(column_sizes, event.new_columnid.columnid, event_new_size)
+                elif event.event_type == TicketEvent.UPDATE:
+                    setSize(column_sizes, event.new_columnid.columnid, event_new_size - event_old_size)
+                elif event.event_type == TicketEvent.SCOPE_CHANGE:
+                    is_in_old_scopes = event.old_scopes.filter(scopeid=scope_id).exists()
+                    is_in_new_scopes = event.new_scopes.filter(scopeid=scope_id).exists()
+                    if is_in_old_scopes and not is_in_new_scopes:
+                        # Scope was removed from ticket
+                        setSize(column_sizes, event.old_columnid.columnid, -event_old_size)
+                    elif not is_in_old_scopes and is_in_new_scopes:
+                        # Scope was added to ticket
+                        setSize(column_sizes, event.new_columnid.columnid, event_new_size)
 
         prev_column_sizes = column_sizes.copy()
         time += time_delta
@@ -164,7 +206,9 @@ def get_column_sizes_at_times(columns, time_unit, count_unit, start_time=None, e
 
 def get_time_delta(time_unit):
     time_delta = timedelta(minutes=1)
-    if time_unit == "hour":
+    if time_unit == "minute":
+        time_delta = timedelta(minutes=1)
+    elif time_unit == "hour":
         time_delta = timedelta(hours=1)
     elif time_unit == "day":
         time_delta = timedelta(days=1)
