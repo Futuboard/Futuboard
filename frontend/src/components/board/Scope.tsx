@@ -17,7 +17,7 @@ import {
   Paper
 } from "@mui/material"
 import dayjs from "dayjs"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useDispatch } from "react-redux"
 
 import { useDeleteScopeMutation, useSetScopeTitleMutation } from "@/state/apiSlice"
@@ -86,6 +86,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
   const { scope, onClose } = props
   const { data: columns } = useGetColumnsByBoardIdQuery(scope?.boardid)
   const [setScopeTitle] = useSetScopeTitleMutation()
+  const textFieldRef = useRef<HTMLInputElement | null>(null)
   const [title, setTitle] = useState(scope.title)
   const [tickets, setTickets] = useState(scope.tickets.length)
   const [size, setSize] = useState(scope.tickets.reduce((sum, task) => sum + (task.size || 0), 0))
@@ -136,13 +137,22 @@ const Scope: React.FC<ScopeProps> = (props) => {
     }
   }, [scope.tickets, scope.done_columns])
 
+  const handleEditClick = () => {
+    if (textFieldRef.current) {
+      const length = textFieldRef.current.value.length
+      textFieldRef.current.focus()
+      textFieldRef.current.setSelectionRange(length, length)
+    }
+  }
+
   return (
     <Grid container spacing={2} width={350}>
       <Paper sx={{ padding: "18px", marginTop: "7px" }}>
         <Grid item xs={12}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Edit sx={{ paddingRight: "3px", color: "gray" }} />
+            <Edit onClick={handleEditClick} sx={{ paddingRight: "3px", color: "gray" }} />
             <TextField
+              inputRef={textFieldRef}
               placeholder="Enter scope name"
               value={title}
               onChange={handleTextFieldChange}
