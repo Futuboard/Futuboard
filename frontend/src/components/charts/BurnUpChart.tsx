@@ -47,9 +47,14 @@ const BurnUpChart: React.FC<BurnUpChartProps> = ({ boardId }) => {
 
   useEffect(() => {
     if (scopeData && scopeData.length > 0) {
-      setSelectedScope(scopeData[0])
+      const updatedSelectedScope = scopeData.find((scope) => scope.scopeid == selectedScope?.scopeid)
+      if (updatedSelectedScope) {
+        setSelectedScope(updatedSelectedScope)
+      } else {
+        setSelectedScope(scopeData[0])
+      }
     }
-  }, [scopeData])
+  }, [scopeData]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const setTimeUnit = (timeUnit: TimeUnit) => {
     setQueryparams((params) => ({ ...params, timeUnit }))
