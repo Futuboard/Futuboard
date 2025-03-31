@@ -90,6 +90,9 @@ const Scope: React.FC<ScopeProps> = (props) => {
   const [title, setTitle] = useState(scope.title)
   const [tickets, setTickets] = useState(scope.tickets.length)
   const [size, setSize] = useState(scope.tickets.reduce((sum, task) => sum + (task.size || 0), 0))
+  const [doneTickets, setDoneTickets] = useState(
+    scope.tickets.filter((ticket) => scope.done_columns.some((done) => done.columnid === ticket.columnid)).length
+  )
   const [doneSize, setDoneSize] = useState(
     scope.done_columns.length > 0
       ? scope.tickets.reduce(
@@ -133,6 +136,14 @@ const Scope: React.FC<ScopeProps> = (props) => {
           (sum, task) => sum + (scope.done_columns.some((done) => task.columnid === done.columnid) ? task.size : 0),
           0
         )
+      )
+    }
+  }, [scope.tickets, scope.done_columns])
+
+  useEffect(() => {
+    if (scope.done_columns.length > 0) {
+      setDoneTickets(
+        scope.tickets.filter((ticket) => scope.done_columns.some((done) => done.columnid === ticket.columnid)).length
       )
     }
   }, [scope.tickets, scope.done_columns])
@@ -194,12 +205,21 @@ const Scope: React.FC<ScopeProps> = (props) => {
           {doneSize == -1 ? (
             <div></div>
           ) : (
-            <Grid item xs={12}>
-              <Typography gutterBottom variant="h6">
-                {"Done:   "}
-                <b>{doneSize}</b>
-              </Typography>
-            </Grid>
+            <div>
+              <Grid item xs={12}>
+                <Typography gutterBottom variant="h6">
+                  {"Done Tickets:   "}
+                  <b>{doneTickets}</b>
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Typography gutterBottom variant="h6">
+                  {"Done size:  "}
+                  <b>{doneSize}</b>
+                </Typography>
+              </Grid>
+            </div>
           )}
 
           <Grid item xs={12} marginTop={3} marginBottom={2}>
