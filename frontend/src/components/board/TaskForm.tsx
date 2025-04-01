@@ -316,7 +316,7 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
                 }}
               >
                 {colorOptions.map((val) => (
-                  <FormControlLabel value={val} control={<Radio style={{ color: val }} />} label={null} />
+                  <FormControlLabel key={val} value={val} control={<Radio style={{ color: val }} />} label={null} />
                 ))}
               </RadioGroup>
             </FormControl>
