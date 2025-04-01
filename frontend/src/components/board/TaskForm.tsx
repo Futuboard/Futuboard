@@ -2,6 +2,7 @@ import { DeleteForever } from "@mui/icons-material"
 import {
   Box,
   Button,
+  ButtonGroup,
   ClickAwayListener,
   Dialog,
   DialogActions,
@@ -15,6 +16,7 @@ import {
   IconButton,
   Radio,
   RadioGroup,
+  Stack,
   TextField,
   Tooltip,
   Typography
@@ -172,6 +174,8 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
     defaultValues: initialFormValues
   })
 
+  const colorOptions = ["#ffffff", "#ffeb3b", "#8bc34a", "#ff4081", "#03a9f4"]
+
   const selectedColor = watch("color")
 
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -207,8 +211,19 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Typography gutterBottom variant="h6">
-                <b>{formTitle}</b>
+              <Typography
+                gutterBottom
+                variant="h6"
+                sx={{
+                  width: "100%",
+                  maxHeight: 125,
+                  wordWrap: "break-word",
+                  overflowY: "auto",
+                  textOverflow: "ellipsis",
+                  fontWeight: "bold"
+                }}
+              >
+                {formTitle}
               </Typography>
             </Box>
             <Divider />
@@ -225,6 +240,7 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
               inputRef={inputRef}
               inputProps={{ spellCheck: "false" }}
               multiline
+              maxRows={4}
               fullWidth
               helperText={errors.taskTitle?.message}
               error={Boolean(errors.taskTitle)}
@@ -299,26 +315,23 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
                   }
                 }}
               >
-                <FormControlLabel value="#ffffff" control={<Radio style={{ color: "#ffffff" }} />} label={null} />
-                <FormControlLabel value="#ffeb3b" control={<Radio style={{ color: "#ffeb3b" }} />} label={null} />
-                <FormControlLabel value="#8bc34a" control={<Radio style={{ color: "#8bc34a" }} />} label={null} />
-                <FormControlLabel value="#ff4081" control={<Radio style={{ color: "#ff4081" }} />} label={null} />
-                <FormControlLabel value="#03a9f4" control={<Radio style={{ color: "#03a9f4" }} />} label={null} />
+                {colorOptions.map((val) => (
+                  <FormControlLabel key={val} value={val} control={<Radio style={{ color: val }} />} label={null} />
+                ))}
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item container spacing={4} xs={12}>
-            <Grid item xs={10}>
-              <Button type="submit" color="primary" variant="contained">
-                {isTaskCreationForm ? "Submit" : "Save Changes"}
-              </Button>
-              <Button onClick={onCancel}>Cancel</Button>
-            </Grid>
-            {defaultValues && isTaskEditForm && (
-              <Grid item xs={1}>
-                <DeleteTaskButton task={defaultValues as Task} />
-              </Grid>
-            )}
+          <Grid item xs={12}>
+            <Divider sx={{ marginBottom: 2 }} />
+            <Stack direction="row" justifyContent="space-between">
+              <ButtonGroup color="primary">
+                <Button type="submit" variant="contained">
+                  {isTaskCreationForm ? "Submit" : "Save Changes"}
+                </Button>
+                <Button onClick={onCancel}>Cancel</Button>
+              </ButtonGroup>
+              {defaultValues && isTaskEditForm && <DeleteTaskButton task={defaultValues as Task} />}
+            </Stack>
           </Grid>
         </Grid>
       </form>

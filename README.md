@@ -336,6 +336,12 @@ ESLint helps developers identify and fix code quality and style issues, ensure c
 
 [ESLint documentation](https://eslint.org/docs/latest/)
 
+### MDXEditor
+
+MDXEditor is an open-source React component for editing markdown components. Used under the MIT license © Petyo Ivanov.
+
+[MDXEditor GitHub](https://github.com/mdx-editor/editor)
+
 ## Other Technologies
 
 ### Backend technology: Django
