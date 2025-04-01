@@ -363,7 +363,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
                 padding: "3px",
                 marginBottom: "2px",
                 backgroundColor: titleBgColor,
-                cursor: isScopeSelected ? "pointer" : "default",
+                cursor: isScopeSelected ? "pointer" : "grab",
                 borderRadius: "3px"
               }}
               onClick={handleClick}

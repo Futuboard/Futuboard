@@ -1,4 +1,3 @@
-import { Grid } from "@mui/material"
 import { ReactElement } from "react"
 import { ResponsiveContainer } from "recharts"
 
@@ -8,9 +7,9 @@ type ChartContainerProps = {
 
 const ChartContainer: React.FC<ChartContainerProps> = ({ children }) => {
   return (
-    <Grid item sx={{ width: "1100px", height: "650px" }}>
+    <div className="chart-container">
       <ResponsiveContainer>{children}</ResponsiveContainer>
-    </Grid>
+    </div>
   )
 }
 

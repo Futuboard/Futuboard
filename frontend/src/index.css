@@ -69,3 +69,8 @@ button:focus-visible {
   overflow: auto;
   height: calc(100vh - 165px);
 }
+
+.chart-container {
+  height: calc(100vh - 30rem);
+  width: calc(100vw - 65rem);
+}

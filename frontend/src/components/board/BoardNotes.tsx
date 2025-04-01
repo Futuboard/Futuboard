@@ -121,11 +121,11 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleS
           </Box>
           <Divider variant="middle" />
           <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "flex-end", padding: 1 }}>
-            <ButtonGroup variant="contained" color="info">
-              <Button onClick={saveNotes} endIcon={<StickyNote2 />}>
+            <ButtonGroup color="primary">
+              <Button onClick={saveNotes} endIcon={<StickyNote2 />} variant="contained">
                 Save
               </Button>
-              <Button onClick={handleClose} endIcon={<CloseIcon />}>
+              <Button onClick={handleClose} endIcon={<CloseIcon />} variant="outlined">
                 Cancel
               </Button>
             </ButtonGroup>
