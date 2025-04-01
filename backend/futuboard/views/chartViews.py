@@ -72,23 +72,30 @@ def burn_up(request: rest_framework.request.Request, board_id, scope_id):
 
         data = []
 
-        len_diff = len(done_data_with_column_ids) - len(scope_data_with_column_ids)
+        len_done = len(done_data_with_column_ids)
+        len_scope = len(scope_data_with_column_ids)
+
+        # Pad the shorter list, so both start at same date, so that dates match up (end date is always the same, i.e., the current date)
+        if len_done > len_scope:
+            len_diff = len_done - len_scope
+            scope_data_with_column_ids = [(None, {})] * len_diff + scope_data_with_column_ids
+        elif len_scope > len_done:
+            len_diff = len_scope - len_done
+            done_data_with_column_ids = [(None, {})] * len_diff + done_data_with_column_ids
 
         for i in range(len(done_data_with_column_ids)):
             scope_size = 0
             done_size = 0
 
-            scope_index = i - len_diff
-            if scope_index >= 0:
-                scope_column_data = scope_data_with_column_ids[scope_index][1]
-                for column_id in scope_column_data:
-                    scope_size += scope_column_data[column_id]
+            (timestamp_scope, scope_column_data) = scope_data_with_column_ids[i]
+            for column_id in scope_column_data:
+                scope_size += scope_column_data[column_id]
 
-            done_column_data = done_data_with_column_ids[i][1]
+            (timestamp_done, done_column_data) = done_data_with_column_ids[i]
             for column_id in done_column_data:
                 done_size += done_column_data[column_id]
 
-            timestamp = done_data_with_column_ids[i][0]
+            timestamp = timestamp_scope if timestamp_scope is not None else timestamp_done
 
             data.append({"name": timestamp, "scope": scope_size, "done": done_size})
 
