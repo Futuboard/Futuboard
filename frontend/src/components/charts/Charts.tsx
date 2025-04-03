@@ -103,7 +103,8 @@ const Charts: React.FC<ChartsProps> = ({ board }) => {
           justifyContent: "center",
           alignItems: "center",
           height: "100%",
-          marginLeft: "220px"
+          marginLeft: "220px",
+          minWidth: "1200px"
         }}
       >
         <Paper>
