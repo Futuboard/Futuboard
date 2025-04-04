@@ -8,6 +8,11 @@ from .test_utils import addBoard, addColumn, addTicket, resetDB
 from ..futuboard.verification import verify_password
 
 
+@pytest.fixture()
+def enable_auth_token_checking(settings):
+    settings.DISABLE_AUTH_TOKEN_CHECKING = False
+
+
 ############################################################################################################
 ############################################# VIEW TESTS ###################################################
 ############################################################################################################
@@ -106,7 +111,7 @@ def test_board_by_id():
 
 
 @pytest.mark.django_db
-def test_getting_board_requires_auth():
+def test_getting_board_requires_auth(enable_auth_token_checking):
     api_client = APIClient()
 
     creation_response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
