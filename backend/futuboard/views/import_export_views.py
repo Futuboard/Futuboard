@@ -6,7 +6,7 @@ from datetime import datetime
 import uuid
 from django.http import HttpResponse
 
-from ..verification import hash_password
+from ..verification import check_if_access_token_incorrect, hash_password
 
 from ..models import Action, Board, Column, Scope, Swimlanecolumn, Ticket, TicketEvent, User
 
@@ -33,6 +33,8 @@ def export_board_data(request, board_id):
     Export board data to a json file
     """
     if request.method == "GET":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
         data = create_data_dict_from_board(board_id)
         response = JsonResponse(data, safe=False)
         filename = slugify(data["board"]["title"] + "-" + datetime.now().strftime("%d-%m-%Y"))

@@ -13,7 +13,6 @@ from ..verification import (
 )
 
 
-# Create your views here.
 @api_view(["GET", "POST"])
 def all_boards(request: rest_framework.request.Request, format=None):
     if request.method == "POST":
