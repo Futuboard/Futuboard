@@ -229,12 +229,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   }
 
   return (
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="flex-end"
-      sx={{ minWidth: 0, flexGrow: 1, marginRight: "calc(100% - 100vw + 3rem)" }}
-    >
+    <Box sx={{ display: "flex", flexDirection: "row", overflowX: "auto", alignItems: "center", maxWidth: "100vw" }}>
       {isSuccess && users.length > 0 && <UserList users={users} />}
       <AddMagnetButton />
       <CopyToClipboardButton />
@@ -352,7 +347,8 @@ const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor, chartTool
             display: "flex",
             alignItems: "center",
             flexGrow: 1,
-            fontSize: 24
+            fontSize: 24,
+            paddingRight: 1
           }}
         >
           {title}

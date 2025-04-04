@@ -77,6 +77,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleS
         <Paper
           sx={{
             width: "520px",
+            maxWidth: "100vw",
             position: "fixed",
             left: "0",
             top: "65px",
