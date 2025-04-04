@@ -134,11 +134,12 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
         open={open}
         onClose={handleCloseDialog}
         PaperProps={{
-          style: {
+          sx: {
             position: "absolute",
             top: "50%",
             left: "50%",
-            transform: "translate(-50%, -50%)"
+            transform: "translate(-50%, -50%)",
+            maxWidth: "600px"
           }
         }}
       >
