@@ -8,15 +8,15 @@ from django.utils.timezone import now
 
 
 @api_view(["GET", "POST", "DELETE"])
-def scopes_on_board(request: rest_framework.request.Request, boardid: str):
+def scopes_on_board(request: rest_framework.request.Request, board_id: str):
     if request.method == "GET":
-        board = Board.objects.get(boardid=boardid)
+        board = Board.objects.get(boardid=board_id)
         query_set = Scope.objects.filter(boardid=board)
         serializer = ScopeSerializerWithRelationInfo(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":
-        board = Board.objects.get(boardid=boardid)
+        board = Board.objects.get(boardid=board_id)
         new_scope = Scope(
             boardid=board,
             title=request.data["title"],
