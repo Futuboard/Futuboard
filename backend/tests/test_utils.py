@@ -3,6 +3,7 @@ from django.utils import timezone
 import django.apps
 from ..futuboard.verification import hash_password
 
+
 # Utility functions
 
 
