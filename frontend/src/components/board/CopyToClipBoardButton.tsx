@@ -6,7 +6,7 @@ interface CopyToClipboardButtonProps {
   copyTooltip: string
 }
 
-const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({copyContent, copyTooltip}) => {
+const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({ copyContent, copyTooltip }) => {
   const [open, setOpen] = useState(false)
   const handleClick = () => {
     setOpen(true)
