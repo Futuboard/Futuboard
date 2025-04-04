@@ -30,6 +30,7 @@ import { useDispatch } from "react-redux"
 import { Link, useParams } from "react-router-dom"
 
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
+import { getAuth } from "@/state/auth"
 import { disableScope } from "@/state/scope"
 import { TaskTemplate } from "@/types"
 
@@ -204,7 +205,11 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
 
   const handleExport = async () => {
     const response = await fetch(`${import.meta.env.VITE_DB_ADDRESS}export/${boardId}`, {
-      method: "GET"
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getAuth(boardId) || ""
+      }
     })
 
     if (!response.ok) {

@@ -34,6 +34,7 @@ def export_board_data(request, board_id):
     if request.method == "GET":
         if token_incorrect := check_if_access_token_incorrect(board_id, request):
             return token_incorrect
+
         data = create_data_dict_from_board(board_id)
         response = JsonResponse(data, safe=False)
         filename = data["board"]["title"].replace(" ", "-") + "-" + datetime.now().strftime("%d-%m-%Y")
