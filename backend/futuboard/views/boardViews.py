@@ -1,5 +1,4 @@
 from django.http import Http404
-import jwt
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from ..models import Board
@@ -10,7 +9,7 @@ from ..verification import (
     encode_token,
     hash_password,
     verify_password,
-    token_access_failed,
+    incorrect_access_token,
 )
 
 
@@ -56,7 +55,7 @@ def board_by_id(request, board_id):
             return JsonResponse({"success": False})
     if request.method == "GET":
         try:
-            if result := token_access_failed(board_id, request):
+            if result := incorrect_access_token(board_id, request):
                 return result
 
             board = Board.objects.get(pk=board_id)
@@ -65,14 +64,10 @@ def board_by_id(request, board_id):
 
         except Board.DoesNotExist:
             raise Http404("Board does not exist")
-        except jwt.ExpiredSignatureError:
-            return JsonResponse({"message": "Access token expired"}, status=401)
-        except jwt.InvalidTokenError:
-            return JsonResponse({"message": "Access token invalid"}, status=401)
 
     if request.method == "PUT":
         try:
-            if result := token_access_failed(board_id, request):
+            if result := incorrect_access_token(board_id, request):
                 return result
 
             board = Board.objects.get(pk=board_id)
@@ -83,10 +78,6 @@ def board_by_id(request, board_id):
             return JsonResponse(serializer.data, safe=False)
         except Board.DoesNotExist:
             raise Http404("Board does not exist")
-        except jwt.ExpiredSignatureError:
-            return JsonResponse({"message": "Access token expired"}, status=401)
-        except jwt.InvalidTokenError:
-            return JsonResponse({"message": "Access token invalid"}, status=401)
 
     if request.method == "DELETE":
         try:
@@ -100,7 +91,7 @@ def board_by_id(request, board_id):
 @api_view(["PUT"])
 def update_board_title(request, board_id):
     try:
-        if result := token_access_failed(board_id, request):
+        if result := incorrect_access_token(board_id, request):
             return result
 
         board = Board.objects.get(pk=board_id)
@@ -112,18 +103,12 @@ def update_board_title(request, board_id):
 
     except Board.DoesNotExist:
         raise Http404("Board does not exist")
-    except jwt.ExpiredSignatureError:
-        return JsonResponse({"message": "Access token expired"}, status=401)
-    except jwt.InvalidTokenError:
-        return JsonResponse({"message": "Access token invalid"}, status=401)
-    except Exception:
-        return JsonResponse({"message": "An unexpected error occurred"}, status=500)
 
 
 @api_view(["PUT"])
 def update_board_password(request, board_id):
     try:
-        if result := token_access_failed(board_id, request):
+        if result := incorrect_access_token(board_id, request):
             return result
 
         board = Board.objects.get(pk=board_id)
@@ -145,10 +130,6 @@ def update_board_password(request, board_id):
 
     except Board.DoesNotExist:
         raise Http404("Board does not exist")
-    except jwt.ExpiredSignatureError:
-        return JsonResponse({"message": "Access token expired"}, status=401)
-    except jwt.InvalidTokenError:
-        return JsonResponse({"message": "Access token invalid"}, status=401)
     except Exception:
         return JsonResponse({"message": "An unexpected error occurred"}, status=500)
 
@@ -156,7 +137,7 @@ def update_board_password(request, board_id):
 @api_view(["PUT"])
 def update_ticket_template(request, board_id):
     try:
-        if result := token_access_failed(board_id, request):
+        if result := incorrect_access_token(board_id, request):
             return result
 
         board = Board.objects.get(pk=board_id)
@@ -172,18 +153,12 @@ def update_ticket_template(request, board_id):
 
     except Board.DoesNotExist:
         raise Http404("Board does not exist")
-    except jwt.ExpiredSignatureError:
-        return JsonResponse({"message": "Access token expired"}, status=401)
-    except jwt.InvalidTokenError:
-        return JsonResponse({"message": "Access token invalid"}, status=401)
-    except Exception:
-        return JsonResponse({"message": "An unexpected error occurred"}, status=500)
 
 
 @api_view(["PUT"])
 def update_board_notes(request, board_id):
     try:
-        if result := token_access_failed(board_id, request):
+        if result := incorrect_access_token(board_id, request):
             return result
         board = Board.objects.get(pk=board_id)
         board.notes = request.data.get("notes")
@@ -193,9 +168,3 @@ def update_board_notes(request, board_id):
 
     except Board.DoesNotExist:
         raise Http404("Board does not exist")
-    except jwt.ExpiredSignatureError:
-        return JsonResponse({"message": "Access token expired"}, status=401)
-    except jwt.InvalidTokenError:
-        return JsonResponse({"message": "Access token invalid"}, status=401)
-    except Exception:
-        return JsonResponse({"message": "An unexpected error occurred"}, status=500)
