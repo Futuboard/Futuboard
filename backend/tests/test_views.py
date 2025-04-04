@@ -123,6 +123,27 @@ def test_getting_board_requires_auth(enable_auth_token_checking):
 
 
 @pytest.mark.django_db
+def test_most_endpoints_require_auth(enable_auth_token_checking):
+    api_client = APIClient()
+
+    creation_response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
+    assert creation_response.status_code == 200
+    boardid = creation_response.json()["boardid"]
+
+    get_response_unauthenticated = api_client.get(reverse("board_by_id", args=[boardid]))
+    assert get_response_unauthenticated.status_code == 401
+
+    get_response_authenticated = api_client.get(reverse("columns_on_board", args=[boardid]))
+    assert get_response_authenticated.status_code == 401
+
+    get_response_authenticated = api_client.get(reverse("cumulative_flow", args=[boardid]))
+    assert get_response_authenticated.status_code == 401
+
+    get_response_authenticated = api_client.get(reverse("scopes_on_board", args=[boardid]))
+    assert get_response_authenticated.status_code == 401
+
+
+@pytest.mark.django_db
 def test_columns_on_board():
     """
     Test the columns_on_board function in backend/futuboard/views/views.py
