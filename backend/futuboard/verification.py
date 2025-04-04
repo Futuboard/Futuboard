@@ -5,7 +5,7 @@ from django.http import Http404, JsonResponse
 from django.utils import timezone
 import jwt
 
-from futuboard.models import Action, Column, Scope, Swimlanecolumn, Ticket, User
+from futuboard.models import Action, Column, Swimlanecolumn, Ticket
 from django.conf import settings
 
 
@@ -78,9 +78,8 @@ def check_if_access_token_incorrect(board_id, request):
         return JsonResponse({"message": "Access token invalid"}, status=401)
 
 
-def check_if_acces_token_incorrect_using_other_id(
-    model: type[Column] | type[Scope] | type[Ticket] | type[Swimlanecolumn] | type[Action] | type[User], id, request
-):
+# model type is type[Column] | type[Scope] | type[Ticket] | type[Swimlanecolumn] | type[Action] | type[User]
+def check_if_acces_token_incorrect_using_other_id(model, id, request):
     try:
         item = model.objects.get(pk=id)
 
