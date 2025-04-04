@@ -1,9 +1,11 @@
 import os
 from uuid import UUID
 from argon2 import PasswordHasher
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.utils import timezone
 import jwt
+
+from .models import Action, Column, Scope, Swimlanecolumn, Ticket, User
 
 
 def verify_password(password: str, hash: str):
@@ -61,12 +63,37 @@ def check_if_access_token_incorrect(board_id, request):
 
         if decoded_token["board_id"] != str(board_id):
             return JsonResponse({"message": "Access token to wrong board"}, status=405)
+
+        # Token is valid, return None to indicate no error
         return None
 
     except jwt.ExpiredSignatureError:
         return JsonResponse({"message": "Access token expired"}, status=401)
     except jwt.InvalidTokenError:
         return JsonResponse({"message": "Access token invalid"}, status=401)
+
+
+def check_if_acces_token_incorrect_using_other_id(
+    model: type[Column] | type[Scope] | type[Ticket] | type[Swimlanecolumn] | type[Action] | type[User], id, request
+):
+    try:
+        item = model.objects.get(pk=id)
+
+        # Ticket and Swimlanecolumns don't have boardid, so we need to get it from their parent column
+        if model is Ticket or model is Swimlanecolumn:
+            return check_if_acces_token_incorrect_using_other_id(Column, item.columnid.columnid, request)
+
+        # Action doesn't have boardid, so we need to get it from it's parent ticket
+        if model is Action:
+            return check_if_acces_token_incorrect_using_other_id(Ticket, item.ticketid.ticketid, request)
+
+        # If User, Scope or Column, we can get the boardid directly from the item
+        board_id = item.boardid.boardid
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
+
+    except model.DoesNotExist:
+        raise Http404(f"{model.__name__} not found")
 
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
