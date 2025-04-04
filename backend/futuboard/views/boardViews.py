@@ -9,7 +9,7 @@ from ..verification import (
     encode_token,
     hash_password,
     verify_password,
-    incorrect_access_token,
+    check_if_access_token_incorrect,
 )
 
 
@@ -55,8 +55,8 @@ def board_by_id(request, board_id):
             return JsonResponse({"success": False})
     if request.method == "GET":
         try:
-            if result := incorrect_access_token(board_id, request):
-                return result
+            if token_incorrect := check_if_access_token_incorrect(board_id, request):
+                return token_incorrect
 
             board = Board.objects.get(pk=board_id)
             serializer = BoardSerializer(board)
@@ -67,7 +67,7 @@ def board_by_id(request, board_id):
 
     if request.method == "PUT":
         try:
-            if result := incorrect_access_token(board_id, request):
+            if result := check_if_access_token_incorrect(board_id, request):
                 return result
 
             board = Board.objects.get(pk=board_id)
@@ -91,8 +91,8 @@ def board_by_id(request, board_id):
 @api_view(["PUT"])
 def update_board_title(request, board_id):
     try:
-        if result := incorrect_access_token(board_id, request):
-            return result
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
 
         board = Board.objects.get(pk=board_id)
         board.title = request.data.get("title", board.title)
@@ -108,8 +108,8 @@ def update_board_title(request, board_id):
 @api_view(["PUT"])
 def update_board_password(request, board_id):
     try:
-        if result := incorrect_access_token(board_id, request):
-            return result
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
 
         board = Board.objects.get(pk=board_id)
 
@@ -137,8 +137,8 @@ def update_board_password(request, board_id):
 @api_view(["PUT"])
 def update_ticket_template(request, board_id):
     try:
-        if result := incorrect_access_token(board_id, request):
-            return result
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
 
         board = Board.objects.get(pk=board_id)
         board.default_ticket_title = request.data.get("title", board.default_ticket_title)
@@ -158,8 +158,9 @@ def update_ticket_template(request, board_id):
 @api_view(["PUT"])
 def update_board_notes(request, board_id):
     try:
-        if result := incorrect_access_token(board_id, request):
-            return result
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
+
         board = Board.objects.get(pk=board_id)
         board.notes = request.data.get("notes")
         board.save()
