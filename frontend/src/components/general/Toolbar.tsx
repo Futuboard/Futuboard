@@ -229,7 +229,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "row", overflowX: "auto", alignItems: "center", maxWidth: "100vw" }}>
+    <Box sx={{ display: "flex", flexDirection: "row", overflowX: "auto", alignItems: "center" }}>
       {isSuccess && users.length > 0 && <UserList users={users} />}
       <AddMagnetButton />
       <CopyToClipboardButton />
