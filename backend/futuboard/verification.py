@@ -5,7 +5,7 @@ from django.http import Http404, JsonResponse
 from django.utils import timezone
 import jwt
 
-from .models import Action, Column, Scope, Swimlanecolumn, Ticket, User
+from futuboard.models import Action, Column, Scope, Swimlanecolumn, Ticket, User
 
 
 def verify_password(password: str, hash: str):
