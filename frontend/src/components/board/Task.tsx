@@ -129,7 +129,7 @@ const EditTaskButton: React.FC<{
           horizontal: -50
         }}
       >
-        <Paper sx={{ height: "fit-content", padding: "20px", width: "400px" }}>
+        <Paper sx={{ height: "fit-content", padding: "20px", maxWidth: "400px" }}>
           <TaskForm
             formTitle={task.title}
             formType={"TaskEdit"}
@@ -246,7 +246,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
               }}
             >
               <Box sx={{ display: "flex", justifyContent: "space-between", flexDirection: "column", height: "100%" }}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", overflow: "visible" }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", overflow: "visible", marginBottom: -0.5 }}>
                   <Box sx={{ overflow: "hidden", flexGrow: 1 }} onDoubleClick={handleDoubleClick}>
                     {isEditingCornerNote ? (
                       <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={handleBlur}>
