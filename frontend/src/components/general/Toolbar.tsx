@@ -37,13 +37,13 @@ import BoardBackgroundColorForm from "../board/BoardBackgroundColorForm"
 import BoardDeletionComponent from "../board/BoardDeletionComponent"
 import BoardPasswordChangeForm from "../board/BoardPasswordChangeForm"
 import BoardTitleChangeForm from "../board/BoardTitleChangeForm"
-import CopyToClipboardButton from "../board/CopyToClipBoardButton"
 import CreateColumnButton from "../board/CreateColumnButton"
 import MagnetIcon from "../board/MagnetIcon"
 import ScopeList from "../board/ScopeList"
 import TaskForm from "../board/TaskForm"
 import UserCreationForm from "../board/UserCreationForm"
 import UserList from "../board/UserList"
+import BoardLinks from "../general/BoardLinks"
 
 import HomeButton from "./HomeButton"
 
@@ -237,7 +237,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
     >
       {isSuccess && users.length > 0 && <UserList users={users} />}
       <AddMagnetButton />
-      <CopyToClipboardButton />
+      <BoardLinks />
       <CreateColumnButton boardId={boardId} />
       <OpenScopeListButton handler={handleScopeList} />
       <OpenAnalyticsButton boardId={boardId} />

@@ -1,16 +1,21 @@
 import { IconButton, Snackbar, Tooltip } from "@mui/material"
 import { useState } from "react"
 
-const CopyToClipboardButton = () => {
+interface CopyToClipboardButtonProps {
+  copyContent: string
+  copyTooltip: string
+}
+
+const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({copyContent, copyTooltip}) => {
   const [open, setOpen] = useState(false)
   const handleClick = () => {
     setOpen(true)
-    navigator.clipboard.writeText(window.location.toString())
+    navigator.clipboard.writeText(copyContent)
   }
 
   return (
     <>
-      <Tooltip title="Copy Board Link">
+      <Tooltip title={`Copy ${copyTooltip}`} disableInteractive>
         <IconButton onClick={handleClick}>
           <svg
             style={{ width: "1.5rem", height: "1.5rem", color: "#2D3748" }}
@@ -29,7 +34,12 @@ const CopyToClipboardButton = () => {
           </svg>
         </IconButton>
       </Tooltip>
-      <Snackbar open={open} onClose={() => setOpen(false)} autoHideDuration={2000} message="Copied to clipboard" />
+      <Snackbar
+        open={open}
+        onClose={() => setOpen(false)}
+        autoHideDuration={2000}
+        message={`Copied ${copyTooltip} to clipboard`}
+      />
     </>
   )
 }
