@@ -6,6 +6,7 @@ from django.utils import timezone
 import jwt
 
 from futuboard.models import Action, Column, Scope, Swimlanecolumn, Ticket, User
+from django.conf import settings
 
 
 def verify_password(password: str, hash: str):
@@ -54,6 +55,10 @@ def decode_token(token: str):
 
 
 def check_if_access_token_incorrect(board_id, request):
+    # Check if the token checking is disabled in settings, this can be done for testing purposes
+    if hasattr(settings, "DISABLE_AUTH_TOKEN_CHECKING") and settings.DISABLE_AUTH_TOKEN_CHECKING:
+        return None
+
     try:
         token = get_token_from_request(request)
         if token is None:
