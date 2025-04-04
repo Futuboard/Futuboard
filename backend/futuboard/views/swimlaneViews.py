@@ -3,20 +3,21 @@ from rest_framework.decorators import api_view
 from django.utils import timezone
 from django.http import JsonResponse
 
+from ..verification import check_if_acces_token_incorrect_using_other_id
+
 from ..models import Board, Column, Swimlanecolumn, Action, Ticket, User
 from ..serializers import SwimlaneColumnSerializer, ActionSerializer, UserSerializer
 
 
 @api_view(["GET", "POST"])
 def swimlanecolumns_on_column(request, column_id):
-    if request.method == "GET":
-        try:
-            query_set = Swimlanecolumn.objects.filter(columnid=column_id).order_by("ordernum")
-            serializer = SwimlaneColumnSerializer(query_set, many=True)
-            return JsonResponse(serializer.data, safe=False)
+    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Column, column_id, request):
+        return token_incorrect
 
-        except Board.DoesNotExist:
-            raise Http404("Error getting swimlane columns")
+    if request.method == "GET":
+        query_set = Swimlanecolumn.objects.filter(columnid=column_id).order_by("ordernum")
+        serializer = SwimlaneColumnSerializer(query_set, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":
         length = len(Swimlanecolumn.objects.filter(columnid=column_id))
@@ -34,6 +35,9 @@ def swimlanecolumns_on_column(request, column_id):
 
 @api_view(["GET"])
 def get_actions_by_columnId(request, column_id):
+    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Column, column_id, request):
+        return token_incorrect
+
     if request.method == "GET":
         try:
             ticketIds_query_set = Ticket.objects.filter(columnid=column_id)
@@ -49,6 +53,9 @@ def get_actions_by_columnId(request, column_id):
 
 @api_view(["GET", "POST", "PUT"])
 def action_on_swimlane(request, swimlanecolumn_id, ticket_id):
+    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Ticket, ticket_id, request):
+        return token_incorrect
+
     if request.method == "PUT":
         actions_data = request.data
 
@@ -92,6 +99,9 @@ def action_on_swimlane(request, swimlanecolumn_id, ticket_id):
 
 @api_view(["PUT"])
 def update_swimlanecolumn(request, swimlanecolumn_id):
+    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Swimlanecolumn, swimlanecolumn_id, request):
+        return token_incorrect
+
     try:
         swimlanecolumn = Swimlanecolumn.objects.get(pk=swimlanecolumn_id)
     except Column.DoesNotExist:
@@ -107,6 +117,9 @@ def update_swimlanecolumn(request, swimlanecolumn_id):
 
 @api_view(["PUT", "DELETE"])
 def update_action(request, action_id):
+    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Action, action_id, request):
+        return token_incorrect
+
     try:
         action = Action.objects.get(pk=action_id)
     except Action.DoesNotExist:
@@ -126,6 +139,9 @@ def update_action(request, action_id):
 
 @api_view(["GET", "POST", "DELETE"])
 def users_on_action(request, action_id):
+    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Action, action_id, request):
+        return token_incorrect
+
     if request.method == "GET":
         try:
             users = User.objects.filter(actions__actionid=action_id)

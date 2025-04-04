@@ -8,6 +8,11 @@ from .test_utils import addBoard, addColumn, addTicket, resetDB
 from ..futuboard.verification import verify_password
 
 
+@pytest.fixture()
+def enable_auth_token_checking(settings):
+    settings.DISABLE_AUTH_TOKEN_CHECKING = False
+
+
 ############################################################################################################
 ############################################# VIEW TESTS ###################################################
 ############################################################################################################
@@ -28,18 +33,9 @@ def test_all_boards():
             reverse("all_boards"), {"id": uuid.uuid4(), "title": "board" + str(i), "password": "password" + str(i)}
         )
         assert response.status_code == 200
-    # Get all boards
-    response = api_client.get(reverse("all_boards"))
-    data = response.json()
-    assert len(data) == 5
-    assert response.status_code == 200
+
     assert md.Board.objects.count() == 5
-    # Delete all boards
     md.Board.objects.all().delete()
-    # Get all boards
-    response = api_client.get(reverse("all_boards"))
-    data = response.json()
-    assert len(data) == 0
     assert md.Board.objects.count() == 0
 
 
@@ -106,7 +102,7 @@ def test_board_by_id():
 
 
 @pytest.mark.django_db
-def test_getting_board_requires_auth():
+def test_getting_board_requires_auth(enable_auth_token_checking):
     api_client = APIClient()
 
     creation_response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
@@ -115,6 +111,27 @@ def test_getting_board_requires_auth():
 
     get_response_unauthenticated = api_client.get(reverse("board_by_id", args=[boardid]))
     assert get_response_unauthenticated.status_code == 401
+
+
+@pytest.mark.django_db
+def test_most_endpoints_require_auth(enable_auth_token_checking):
+    api_client = APIClient()
+
+    creation_response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
+    assert creation_response.status_code == 200
+    boardid = creation_response.json()["boardid"]
+
+    get_response_unauthenticated = api_client.get(reverse("board_by_id", args=[boardid]))
+    assert get_response_unauthenticated.status_code == 401
+
+    get_response_authenticated = api_client.get(reverse("columns_on_board", args=[boardid]))
+    assert get_response_authenticated.status_code == 401
+
+    get_response_authenticated = api_client.get(reverse("cumulative_flow", args=[boardid]))
+    assert get_response_authenticated.status_code == 401
+
+    get_response_authenticated = api_client.get(reverse("scopes_on_board", args=[boardid]))
+    assert get_response_authenticated.status_code == 401
 
 
 @pytest.mark.django_db

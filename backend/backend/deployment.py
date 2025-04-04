@@ -1,5 +1,5 @@
 import os
-from .settings import *  # noqa: F403
+from .common_settings import *  # noqa: F403
 
 ALLOWED_HOSTS = [os.environ["WEBSITE_HOSTNAME"]] if "WEBSITE_HOSTNAME" in os.environ else []
 allowed_origins = ["https://" + os.environ["FRONTEND_HOSTNAME"]] if "FRONTEND_HOSTNAME" in os.environ else []

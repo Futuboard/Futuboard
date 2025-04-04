@@ -1,6 +1,8 @@
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 
+from ..verification import check_if_access_token_incorrect
+
 
 from ..models import Column, Scope, TicketEvent
 from ..serializers import TicketEventSerializer
@@ -26,6 +28,9 @@ def events(request: rest_framework.request.Request, board_id):
 @api_view(["GET"])
 def cumulative_flow(request: rest_framework.request.Request, board_id):
     if request.method == "GET":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
+
         possible_time_units = ["minute", "hour", "day", "week", "month", "year"]
         time_unit = request.query_params.get("time_unit", "day")  # Default to day
         start_time = request.query_params.get("start_time")
@@ -47,6 +52,8 @@ def cumulative_flow(request: rest_framework.request.Request, board_id):
 @api_view(["GET"])
 def burn_up(request: rest_framework.request.Request, board_id, scope_id):
     if request.method == "GET":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
         possible_time_units = ["minute", "hour", "day", "week", "month", "year"]
         time_unit = request.query_params.get("time_unit", "day")  # Default to day
         count_unit = request.query_params.get("count_unit", "size")  # Default to size
@@ -105,6 +112,9 @@ def burn_up(request: rest_framework.request.Request, board_id, scope_id):
 @api_view(["GET"])
 def velocity(request: rest_framework.request.Request, board_id):
     if request.method == "GET":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
+
         scopes = Scope.objects.filter(boardid=board_id).order_by("title")
 
         data = []
