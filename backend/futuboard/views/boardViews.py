@@ -28,10 +28,10 @@ def all_boards(request: rest_framework.request.Request, format=None):
         serializer = BoardSerializer(new_board)
         return JsonResponse(serializer.data, safe=False)
 
-    if request.method == "GET":
-        query_set = Board.objects.all()
-        serializer = BoardSerializer(query_set, many=True)
-        return JsonResponse(serializer.data, safe=False)
+    # if request.method == "GET":
+    #    query_set = Board.objects.all()
+    #    serializer = BoardSerializer(query_set, many=True)
+    #    return JsonResponse(serializer.data, safe=False)
 
 
 @api_view(["GET", "POST", "PUT", "DELETE"])
