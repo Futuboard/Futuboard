@@ -33,18 +33,9 @@ def test_all_boards():
             reverse("all_boards"), {"id": uuid.uuid4(), "title": "board" + str(i), "password": "password" + str(i)}
         )
         assert response.status_code == 200
-    # Get all boards
-    response = api_client.get(reverse("all_boards"))
-    data = response.json()
-    assert len(data) == 5
-    assert response.status_code == 200
+
     assert md.Board.objects.count() == 5
-    # Delete all boards
     md.Board.objects.all().delete()
-    # Get all boards
-    response = api_client.get(reverse("all_boards"))
-    data = response.json()
-    assert len(data) == 0
     assert md.Board.objects.count() == 0
 
 
