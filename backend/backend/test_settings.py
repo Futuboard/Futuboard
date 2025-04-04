@@ -2,8 +2,8 @@
 Settings for running tests. Creates test database and uses it for running tests.
 """
 
-from .settings import *  # noqa: F403
-from .settings import BASE_DIR
+from .common_settings import *  # noqa: F403
+from .common_settings import BASE_DIR
 
 DISABLE_AUTH_TOKEN_CHECKING = True  # Disable authentication for testing purposes
 
