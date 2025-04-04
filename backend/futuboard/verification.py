@@ -51,7 +51,7 @@ def decode_token(token: str):
     return jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
 
 
-def incorrect_access_token(board_id, request):
+def check_if_access_token_incorrect(board_id, request):
     try:
         token = get_token_from_request(request)
         if token is None:
@@ -67,8 +67,6 @@ def incorrect_access_token(board_id, request):
         return JsonResponse({"message": "Access token expired"}, status=401)
     except jwt.InvalidTokenError:
         return JsonResponse({"message": "Access token invalid"}, status=401)
-    except Exception:
-        return JsonResponse({"message": "An unexpected error occurred"}, status=500)
 
 
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
