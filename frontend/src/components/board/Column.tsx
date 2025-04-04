@@ -133,15 +133,7 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
         disableRestoreFocus
         open={open}
         onClose={handleCloseDialog}
-        PaperProps={{
-          sx: {
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            maxWidth: "600px"
-          }
-        }}
+        PaperProps={{ sx: { maxWidth: "600px", margin: 1 } }}
       >
         <DialogContent>
           <TaskForm
