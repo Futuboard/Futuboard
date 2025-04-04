@@ -93,12 +93,12 @@ ASGI_APPLICATION = "backend.asgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "OPTIONS": {"options": f"-c search_path={config('DB_SCHEMA')}"},
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT"),
+        "OPTIONS": {"options": f"-c search_path={config('DB_SCHEMA', "")}"},
+        "NAME": config("DB_NAME", ""),
+        "USER": config("DB_USER", ""),
+        "PASSWORD": config("DB_PASSWORD", ""),
+        "HOST": config("DB_HOST", ""),
+        "PORT": config("DB_PORT", ""),
     }
 }
 
