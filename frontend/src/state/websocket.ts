@@ -1,4 +1,4 @@
-import { getId } from "@/services/Utils"
+import { getId } from "@/services/utils"
 import { CacheInvalidationTag } from "@/types"
 
 type CacheInvalidationMessage = {

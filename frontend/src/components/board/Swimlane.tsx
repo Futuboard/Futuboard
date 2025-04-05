@@ -3,7 +3,7 @@ import { Add } from "@mui/icons-material"
 import { Box, IconButton, Paper, Popover } from "@mui/material"
 import { useState } from "react"
 
-import { getId } from "@/services/Utils"
+import { getId } from "@/services/utils"
 import { usePostActionMutation } from "@/state/apiSlice"
 import { Action as ActionType, NewAction, SwimlaneColumn, Task } from "@/types"
 
