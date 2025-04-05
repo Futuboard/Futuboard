@@ -13,11 +13,9 @@ export const getVisitedBoards = (): BoardWithOnlyIdAndTitle[] => {
 }
 
 export const addVisitedBoard = (board: Board) => {
-  // updates board name if changed
   const oldVisitedBoards: BoardWithOnlyIdAndTitle[] = JSON.parse(localStorage.getItem("visited-boards") || "[]").filter(
     (visitedBoard: BoardWithOnlyIdAndTitle) => visitedBoard.boardid !== board.boardid
   )
-  // puts the last visited board first
   const newVisitedBoards: BoardWithOnlyIdAndTitle[] = [{ boardid: board.boardid, title: board.title }].concat(
     oldVisitedBoards
   )
