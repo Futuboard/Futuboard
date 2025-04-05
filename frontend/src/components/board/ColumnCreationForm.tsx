@@ -1,7 +1,6 @@
-import { Checkbox } from "@mui/material"
+import { Box, ButtonGroup, Checkbox, Stack } from "@mui/material"
 import Button from "@mui/material/Button"
 import Divider from "@mui/material/Divider"
-import Grid from "@mui/material/Grid"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { useEffect, useRef, useState } from "react"
@@ -44,48 +43,40 @@ const ColumnCreationForm: React.FC<AddColumnCreationFormProps> = (props) => {
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography gutterBottom variant="h6">
-            {" "}
-            Create Column{" "}
-          </Typography>
-          <Divider />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            inputRef={inputRef}
-            label={
-              <span>
-                Name <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>
-              </span>
+      <Stack spacing={1.5} sx={{ alignItems: "center" }}>
+        <Typography gutterBottom variant="h6">
+          Create Column
+        </Typography>
+        <Divider flexItem />
+        <TextField
+          inputRef={inputRef}
+          label={
+            <span>
+              Name <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>
+            </span>
+          }
+          helperText={errors.columnTitle?.message}
+          error={Boolean(errors.columnTitle)}
+          {...register("columnTitle", {
+            required: {
+              value: true,
+              message: "Column name is required"
             }
-            helperText={errors.columnTitle?.message}
-            error={Boolean(errors.columnTitle)}
-            {...register("columnTitle", {
-              required: {
-                value: true,
-                message: "Column name is required"
-              }
-            })}
-          />
-        </Grid>
-        <Grid item xs={4}>
+          })}
+        />
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
           <Typography variant="h6">Add swimlanes</Typography>
-        </Grid>
-        <Grid item xs={8}>
           <Checkbox checked={swimlane} onChange={handleCheckboxChange} />
-        </Grid>
-        <Grid item xs={12}>
-          <Divider />
-        </Grid>
-        <Grid item xs={6}>
+        </Box>
+        <Divider flexItem />
+
+        <ButtonGroup>
           <Button type="submit" color="primary" variant="contained">
             Submit
           </Button>
           <Button onClick={onCancel}>Cancel</Button>
-        </Grid>
-      </Grid>
+        </ButtonGroup>
+      </Stack>
     </form>
   )
 }
