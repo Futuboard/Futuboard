@@ -1,3 +1,4 @@
+import { ButtonGroup } from "@mui/material"
 import Button from "@mui/material/Button"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
@@ -9,7 +10,6 @@ import { useParams } from "react-router-dom"
 
 import { boardsApi } from "@/state/apiSlice"
 import { store } from "@/state/store"
-import { ButtonGroup } from "@mui/material"
 
 interface AddUserCreationFormProps {
   onSubmit: ({ name }: { name: string }) => void

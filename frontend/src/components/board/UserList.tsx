@@ -1,11 +1,11 @@
 import { Draggable, DraggableStateSnapshot, DraggableStyle, Droppable, DroppableProvided } from "@hello-pangea/dnd"
+import { DeleteForever, DeleteOutline } from "@mui/icons-material"
 import { Box, IconButton, Tooltip } from "@mui/material"
 import { useState } from "react"
 
 import { User } from "@/types"
 
 import UserMagnet from "./UserMagnet"
-import { DeleteForever, DeleteOutline } from "@mui/icons-material"
 
 interface UserListProps {
   users: User[]
