@@ -267,7 +267,7 @@ const EditColumnButton: React.FC<{ column: Column; disabled: boolean }> = ({ col
           horizontal: -20
         }}
       >
-        <Paper sx={{ height: "fit-content", padding: "20px", width: "200px" }}>
+        <Paper sx={{ height: "fit-content", padding: "20px", width: "220px" }}>
           <ColumnEditForm onSubmit={handleOnSubmit} onCancel={handleClose} column={column} />
         </Paper>
       </Popover>
