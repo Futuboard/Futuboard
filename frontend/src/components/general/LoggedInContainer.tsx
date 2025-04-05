@@ -10,7 +10,7 @@ import { setBoardId } from "@/state/auth"
 import { setNotification } from "@/state/notification"
 import { webSocketContainer } from "@/state/websocket"
 import { Board } from "@/types"
-import { addBoardLink } from "@/services/utils"
+import { addVisitedBoard } from "@/services/utils"
 
 type LoggedInContainerProps = {
   children: ({ board }: { board: Board }) => React.ReactNode
@@ -62,7 +62,7 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
 
   useEffect(() => {
     if (isLoggedIn) {
-      addBoardLink(board)
+      addVisitedBoard(board)
     }
   }, [id, isLoggedIn, board?.title])
 

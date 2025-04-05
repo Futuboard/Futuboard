@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography"
 import { useEffect } from "react"
 
 import ModalFrameCv from "@/components/home/ModalFrameCv"
+import VisitedBoardsList from "@/components/home/VisitedBoardsList"
 
 const Home: React.FC = () => {
   useEffect(() => {
@@ -72,6 +73,13 @@ const Home: React.FC = () => {
             </Grid>
             <Grid item>
               <ModalFrameCv cvFileName="Team_Kasipallot_CV.png" />
+            </Grid>
+          </Grid>
+          <Grid item xs={12} marginTop={"20px"}>
+            <Grid container spacing={1} justifyContent="center">
+              <Grid item>
+                <VisitedBoardsList />
+              </Grid>
             </Grid>
           </Grid>
         </Grid>

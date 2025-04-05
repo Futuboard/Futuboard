@@ -7,19 +7,20 @@ export const getId = (): string => {
   return uuidv4()
 }
 
-export const getBoardLinks = () => {
+export const getVisitedBoards = (): BoardWithOnlyIdAndTitle[] => {
   const boardLinks = localStorage.getItem("visited-boards")
   return boardLinks ? JSON.parse(boardLinks) : []
 }
 
-export const addBoardLink = (board: Board) => {
-  const oldVisitedBoards: BoardWithOnlyIdAndTitle[] = JSON.parse(localStorage.getItem("visited-boards") || "[]")
-    .filter((visitedBoard: BoardWithOnlyIdAndTitle) => visitedBoard.boardid !== board.boardid) // updates board name if changed
-  const newVisitedBoards: BoardWithOnlyIdAndTitle[] = [{ boardid: board.boardid, title: board.title }]
-    .concat(oldVisitedBoards) // puts the last visited board first
+export const addVisitedBoard = (board: Board) => {
+  const oldVisitedBoards: BoardWithOnlyIdAndTitle[] = JSON.parse(localStorage.getItem("visited-boards") || "[]").filter(
+    (visitedBoard: BoardWithOnlyIdAndTitle) => visitedBoard.boardid !== board.boardid
+  ) // updates board name if changed
+  const newVisitedBoards: BoardWithOnlyIdAndTitle[] = [{ boardid: board.boardid, title: board.title }].concat(
+    oldVisitedBoards
+  ) // puts the last visited board first
   localStorage.setItem("visited-boards", JSON.stringify(newVisitedBoards))
 }
-
 
 //unused
 export const getBoardData = (id: string) => {
