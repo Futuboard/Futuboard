@@ -10,6 +10,7 @@ import { setBoardId } from "@/state/auth"
 import { setNotification } from "@/state/notification"
 import { webSocketContainer } from "@/state/websocket"
 import { Board } from "@/types"
+import { addBoardLink } from "@/services/utils"
 
 type LoggedInContainerProps = {
   children: ({ board }: { board: Board }) => React.ReactNode
@@ -58,6 +59,12 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
     const prefix = titlePrefix ? titlePrefix + " - " : ""
     document.title = board?.title ? prefix + board?.title + "- Futuboard" : "Futuboard"
   }, [board, titlePrefix])
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      addBoardLink(board)
+    }
+  }, [id, isLoggedIn, board?.title])
 
   if (isLoading || !hasTriedEmptyPasswordLogin) {
     return null

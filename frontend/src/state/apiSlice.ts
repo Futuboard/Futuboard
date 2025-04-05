@@ -25,6 +25,7 @@ import {
 import { getAdminPassword, getAuth, setToken } from "./auth"
 import { RootState } from "./store"
 import { webSocketContainer } from "./websocket"
+import { addBoardLink } from "@/services/utils"
 
 const invalidateRemoteCache = (tags: CacheInvalidationTag[]) => {
   webSocketContainer.invalidateCacheOfOtherUsers(tags)

@@ -15,6 +15,11 @@ export type Board = {
   notes: string
 }
 
+export type BoardWithOnlyIdAndTitle = {
+  boardid: string
+  title: string
+}
+
 export type Column = {
   columnid: string
   title: string
