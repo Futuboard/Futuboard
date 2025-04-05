@@ -1,8 +1,9 @@
-import { getVisitedBoards } from "@/services/utils"
-import { BoardWithOnlyIdAndTitle } from "@/types"
 import { Box, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+
+import { getVisitedBoards } from "@/services/utils"
+import { BoardWithOnlyIdAndTitle } from "@/types"
 
 const VisitedBoardList: React.FC = () => {
   const [visitedBoards, setVisitedBoards] = useState<BoardWithOnlyIdAndTitle[]>([])

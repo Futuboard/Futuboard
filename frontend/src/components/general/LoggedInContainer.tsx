@@ -5,12 +5,12 @@ import { useParams } from "react-router-dom"
 
 import AccessBoardForm from "@/components/board/AccessBoardForm"
 import { cacheTagTypes } from "@/constants"
+import { addVisitedBoard } from "@/services/utils"
 import { boardsApi, useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
 import { setBoardId } from "@/state/auth"
 import { setNotification } from "@/state/notification"
 import { webSocketContainer } from "@/state/websocket"
 import { Board } from "@/types"
-import { addVisitedBoard } from "@/services/utils"
 
 type LoggedInContainerProps = {
   children: ({ board }: { board: Board }) => React.ReactNode
@@ -64,7 +64,7 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
     if (isLoggedIn) {
       addVisitedBoard(board)
     }
-  }, [id, isLoggedIn, board?.title])
+  }, [id, isLoggedIn, board])
 
   if (isLoading || !hasTriedEmptyPasswordLogin) {
     return null
