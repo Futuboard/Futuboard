@@ -195,7 +195,7 @@ describe("When exporting and/or importing a board", () => {
     const dateString = date
       .toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" })
       .replace(/[^a-zA-Z0-9]/g, "-")
-    const fileName = `${defaultBoard.title.replace(/\s/g, "-")}-${dateString}.json`
+    const fileName = `${defaultBoard.title.replace(/\s/g, "-").toLowerCase()}-${dateString}.json`
     const filePath = `downloads/${fileName}`
 
     cy.readFile(filePath).should("exist")

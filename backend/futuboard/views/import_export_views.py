@@ -24,6 +24,7 @@ from rest_framework.decorators import api_view
 from django.http import JsonResponse
 import json
 from django.db import models
+from django.template.defaultfilters import slugify
 
 
 @api_view(["GET"])
@@ -34,7 +35,7 @@ def export_board_data(request, board_id):
     if request.method == "GET":
         data = create_data_dict_from_board(board_id)
         response = JsonResponse(data, safe=False)
-        filename = data["board"]["title"].replace(" ", "-") + "-" + datetime.now().strftime("%d-%m-%Y")
+        filename = slugify(data["board"]["title"] + "-" + datetime.now().strftime("%d-%m-%Y"))
         response["Content-Disposition"] = f'attachment; filename="{filename}.json"'
 
         return response
