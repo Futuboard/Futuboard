@@ -10,7 +10,7 @@ import { useSelector } from "react-redux"
 import { useParams } from "react-router"
 
 import { RootState } from "@/state/store"
-import type { Column, Task as TaskType, User, TaskTemplate, SimpleScope } from "@/types"
+import type { Column, Task as TaskType, User, TaskTemplate, SimpleScope, NewAction } from "@/types"
 
 import { getId } from "../../services/Utils"
 import {
@@ -20,7 +20,9 @@ import {
   useUpdateColumnMutation,
   useGetBoardQuery,
   useAddTaskToScopeMutation,
-  useDeleteTaskFromScopeMutation
+  useDeleteTaskFromScopeMutation,
+  useGetSwimlaneColumnsByColumnIdQuery,
+  usePostActionMutation
 } from "../../state/apiSlice"
 
 import ColumnEditForm from "./ColumnEditForm"
@@ -47,6 +49,8 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
   const [taskTemplate, setTaskTemplate] = useState<TaskTemplate | null>(null)
 
   const [addTask] = useAddTaskMutation()
+  const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(columnid)
+  const [createAction] = usePostActionMutation()
 
   const [open, setOpen] = useState(false)
 
@@ -95,11 +99,12 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
     setOpen(false)
   }
 
-  const handleSubmit = (data: FormData) => {
+  const handleSubmit = async (data: FormData) => {
     //task object cant be give type Task yet- problem with caretaker types
     //the object creation should be refactored to the TaskCreationForm component
+    const id = getId()
     const taskObject = {
-      ticketid: getId(),
+      ticketid: id,
       title: data.taskTitle,
       description: data.description,
       caretakers: data.corners,
@@ -109,16 +114,31 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
       color: data.color,
       cornernote: data.cornerNote
     }
+    await addTask({ boardId: id, columnId: columnid, task: taskObject })
 
-    const add$ = addTask({ boardId: id, columnId: columnid, task: taskObject })
-    add$
-      .unwrap()
-      .then(() => {
-        setOpen(false)
+    let criteria: string[] = []
+    data.description?.split("\n").forEach((line) => {
+      if (line.charAt(2) == "[" && line.charAt(4) == "]") {
+        criteria.push(line.slice(5).trim())
+      }
+    })
+
+    if (isSuccess && swimlaneColumns.length) {
+      console.log(criteria)
+      criteria.forEach(async (title) => {
+        const action: NewAction = {
+          title: title,
+          columnid: columnid,
+          actionid: getId(),
+          ticketid: id,
+          swimlanecolumnid: swimlaneColumns[0].swimlanecolumnid,
+          order: 0
+        }
+        console.log(action)
+        await createAction({ action })
       })
-      .catch((error) => {
-        console.error(error)
-      })
+    }
+
     setOpen(false)
     setDefaultValues(null)
   }

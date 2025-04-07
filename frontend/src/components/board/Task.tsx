@@ -7,7 +7,7 @@ import {
   DroppableStateSnapshot
 } from "@hello-pangea/dnd"
 import { EditNote } from "@mui/icons-material"
-import { Box, IconButton, Paper, Popover, Tooltip, Typography } from "@mui/material"
+import { Box, CircularProgress, IconButton, Paper, Popover, Tooltip, Typography } from "@mui/material"
 import ClickAwayListener from "@mui/material/ClickAwayListener"
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { useSelector } from "react-redux"
@@ -30,6 +30,80 @@ const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSn
     transform: "scale(0)",
     transition: `all  ${0.01}s`
   }
+}
+
+const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) => {
+  let done = 0
+  let all = 0
+  description.split("\n").forEach((line) => {
+    if (line.charAt(2) == "[" && line.charAt(4) == "]") {
+      all += 1
+      if (line.charAt(3) == "x") done += 1
+    }
+  })
+
+  if (all <= 0) return null
+
+  const progress = (done / all) * 100
+
+  return (
+    <Box sx={{ position: "relative", display: "inline-flex" }}>
+      <CircularProgress
+        variant="determinate"
+        value={progress}
+        size={35}
+        color={progress == 100 ? "success" : "primary"}
+      />
+      <Box
+        sx={{
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          position: "absolute",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        {all >= 100 ? (
+          <Typography sx={{ color: "text.secondary", fontSize: 16, fontWeight: "bold" }}> :D </Typography>
+        ) : (
+          <>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "text.secondary",
+                fontSize: 12,
+                fontWeight: "bold",
+                maxWidth: "18px",
+                wordBreak: "break-word",
+                overflow: "hidden",
+                marginBottom: -0.75,
+                textDecoration: "underline"
+              }}
+            >
+              {done}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "text.secondary",
+                fontSize: 12,
+                fontWeight: "bold",
+                maxWidth: "18px",
+                wordBreak: "break-word",
+                overflow: "hidden"
+              }}
+            >
+              {all}
+            </Typography>
+          </>
+        )}
+      </Box>
+    </Box>
+  )
 }
 
 const TaskUserList: React.FC<{ users: UserWithoutTicketsOrActions[]; taskid: string }> = ({ users, taskid }) => {
@@ -299,6 +373,9 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                       <Typography variant={"body2"} gutterBottom sx={{ color: "#2D3748", wordWrap: "break-word" }}>
                         <strong>{task.title}</strong>
                       </Typography>
+                    </Box>
+                    <Box sx={{ position: "absolute", right: 7, top: 50 }}>
+                      <AcceptanceCriteria description={task.description || ""} />
                     </Box>
                   </Box>
                 </Box>
