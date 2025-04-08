@@ -6,7 +6,7 @@ import {
   DroppableProvided,
   DroppableStateSnapshot
 } from "@hello-pangea/dnd"
-import { Box, Divider, Paper, Popover, Typography } from "@mui/material"
+import { Box, CircularProgress, Divider, Paper, Popover, Typography } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
@@ -17,7 +17,7 @@ import { useAddTaskToScopeMutation, useDeleteTaskFromScopeMutation, useUpdateTas
 
 import TaskForm from "./TaskForm"
 import UserMagnet from "./UserMagnet"
-import { EditNote, Info, Subject } from "@mui/icons-material"
+import { Subject } from "@mui/icons-material"
 
 const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSnapshot) => {
   if (!snapshot.isDropAnimating) {
@@ -43,25 +43,30 @@ const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) 
 
   if (all <= 0) return null
 
+  const progress = Math.round((done / all) * 100)
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        position: "relative"
-      }}
-    >
-      {all >= 100 ? (
-        <Typography sx={{ fontSize: 16, fontWeight: 600 }}>:D </Typography>
-      ) : (
-        <>
-          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
-            <sup style={{ marginRight: -4 }}>{done}</sup>⟋<sub style={{ marginLeft: -5 }}>{all}</sub>
-          </Typography>
-        </>
-      )}
+    <Box sx={{ position: "relative", display: "inline-flex" }}>
+      <CircularProgress
+        variant="determinate"
+        value={progress}
+        size={30}
+        color={progress == 100 ? "success" : "primary"}
+      />
+      <Box
+        sx={{
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          position: "absolute",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <Typography sx={{ fontSize: 9, fontWeight: 700 }}>{`${progress}%`}</Typography>
+      </Box>
     </Box>
   )
 }
@@ -207,8 +212,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                 alignItems: "center",
                 justifyContent: "flex-start",
                 ":hover": {
-                  filter: isTaskInSelectedScope ? null : "brightness(0.97)",
-                  backgroundColor: isScopeSelected ? (isTaskInSelectedScope ? "#C0EE90" : "#ebfae8") : "white"
+                  filter: "brightness(0.97)"
                 }
               }}
             >
