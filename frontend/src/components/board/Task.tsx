@@ -50,60 +50,15 @@ const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) 
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        position: "relative",
-        top: -9,
-        right: 8.5
+        position: "relative"
       }}
     >
       {all >= 100 ? (
-        <Typography sx={{ fontSize: 16, fontWeight: "bold", position: "absolute", top: -2, right: -16 }}>:D</Typography>
+        <Typography sx={{ fontSize: 16, fontWeight: 600 }}>:D </Typography>
       ) : (
         <>
-          <Typography
-            variant="caption"
-            sx={{
-              fontSize: 14,
-              fontWeight: 550,
-              width: "18px",
-              textAlign: "right",
-              wordBreak: "break-word",
-              overflow: "hidden",
-              marginBottom: -1.15
-            }}
-          >
-            {done}
-          </Typography>
-
-          <Typography
-            variant="caption"
-            sx={{
-              fontSize: 25,
-              fontWeight: 700,
-              wordBreak: "break-word",
-              overflow: "hidden",
-
-              position: "absolute",
-              right: -10,
-              top: -3
-            }}
-          >
-            ⟋
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{
-              fontSize: 14,
-              fontWeight: 550,
-              width: "18px",
-              wordBreak: "break-word",
-              overflow: "hidden",
-              position: "absolute",
-              textAlign: "left",
-              right: -17,
-              top: 14
-            }}
-          >
-            {10}
+          <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
+            <sup style={{ marginRight: -4 }}>{done}</sup>⟋<sub style={{ marginLeft: -5 }}>{all}</sub>
           </Typography>
         </>
       )}
@@ -334,7 +289,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                   textAlign: "center"
                 }}
               >
-                <Typography sx={{ fontWeight: "bold", fontSize: "18px", color: "#2D3748", width: "100%" }}>
+                <Typography sx={{ fontWeight: "bold", fontSize: "16px", color: "#2D3748", width: "100%" }}>
                   {task.size}
                 </Typography>
                 <AcceptanceCriteria description={task.description || ""} />
