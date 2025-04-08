@@ -116,15 +116,14 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
     }
     await addTask({ boardId: id, columnId: columnid, task: taskObject })
 
-    let criteria: string[] = []
-    data.description?.split("\n").forEach((line) => {
-      if (line.charAt(2) == "[" && line.charAt(4) == "]") {
-        criteria.push(line.slice(5).trim())
-      }
-    })
-
     if (isSuccess && swimlaneColumns.length) {
-      console.log(criteria)
+      let criteria: string[] = []
+      data.description?.split("\n").forEach((line) => {
+        if (line.charAt(2) == "[" && line.charAt(4) == "]") {
+          criteria.push(line.slice(5).trim().replace("&#x20;", ""))
+        }
+      })
+
       criteria.forEach(async (title) => {
         const action: NewAction = {
           title: title,

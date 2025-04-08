@@ -6,9 +6,8 @@ import {
   DroppableProvided,
   DroppableStateSnapshot
 } from "@hello-pangea/dnd"
-import { EditNote } from "@mui/icons-material"
-import { Box, CircularProgress, Divider, IconButton, Paper, Popover, Stack, Tooltip, Typography } from "@mui/material"
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { Box, Divider, Paper, Popover, Typography } from "@mui/material"
+import React, { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
 import { RootState } from "@/state/store"
@@ -18,6 +17,7 @@ import { useAddTaskToScopeMutation, useDeleteTaskFromScopeMutation, useUpdateTas
 
 import TaskForm from "./TaskForm"
 import UserMagnet from "./UserMagnet"
+import { EditNote } from "@mui/icons-material"
 
 const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSnapshot) => {
   if (!snapshot.isDropAnimating) {
@@ -43,8 +43,6 @@ const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) 
 
   if (all <= 0) return null
 
-  const progress = (done / all) * 100
-
   return (
     <Box
       sx={{
@@ -63,7 +61,7 @@ const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) 
             sx={{
               fontSize: 15,
               fontWeight: "bold",
-              maxWidth: "35px",
+              maxWidth: "100%",
               wordBreak: "break-word",
               overflow: "hidden",
               marginBottom: -1.15,
@@ -77,7 +75,7 @@ const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) 
             sx={{
               fontSize: 15,
               fontWeight: "bold",
-              maxWidth: "35px",
+              maxWidth: "100%",
               wordBreak: "break-word",
               overflow: "hidden"
             }}
@@ -121,22 +119,6 @@ interface FormData {
   color?: string
 }
 
-const EditTaskButton: React.FC<{
-  task: TaskType
-  setTaskSelected: Dispatch<SetStateAction<boolean>>
-  disabled?: boolean
-  anchorEl: HTMLDivElement | null
-  setAnchorEl: Dispatch<SetStateAction<HTMLDivElement | null>>
-}> = ({ task, setTaskSelected, disabled, anchorEl, setAnchorEl }) => {
-  return (
-    <div>
-      <Tooltip title="Edit card">
-        <EditNote />
-      </Tooltip>
-    </div>
-  )
-}
-
 interface TaskProps {
   task: TaskType
   index: number
@@ -162,7 +144,11 @@ const Task: React.FC<TaskProps> = ({ task }) => {
   }
 
   const handleClose = async (data: FormData | null) => {
-    handleCancel()
+    if (data) {
+      handleSubmit(data)
+    } else {
+      handleCancel()
+    }
   }
 
   const handleSubmit = async (data: FormData) => {
@@ -203,6 +189,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
         deleteTaskFromScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
       }
     } else {
+      setSelected(true)
       setAnchorEl(e.currentTarget)
     }
   }
@@ -242,7 +229,8 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                 alignItems: "center",
                 justifyContent: "flex-start",
                 ":hover": {
-                  filter: "brightness(0.97)"
+                  filter: isTaskInSelectedScope ? null : "brightness(0.97)",
+                  backgroundColor: isScopeSelected ? (isTaskInSelectedScope ? "#C0EE90" : "#ebfae8") : "white"
                 }
               }}
             >
@@ -252,14 +240,14 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                   justifyContent: "flex-start",
                   flexDirection: "column",
                   height: "100%",
-                  width: "215px",
+                  width: "202px",
                   marginBottom: 0.5
                 }}
               >
                 <Box
                   sx={{
                     display: "flex",
-                    height: "25px",
+                    height: "27px",
                     justifyContent: "space-between",
                     alignItems: "center"
                   }}
@@ -271,25 +259,21 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                     sx={{
                       color: "#2D3748",
                       width: "80%",
-                      textOverflow: "ellipsis"
+                      textOverflow: "ellipsis",
+                      marginLeft: "2px",
+                      marginTop: "2px"
                     }}
                   >
                     {cornernote}
                   </Typography>
-                  <EditTaskButton
-                    task={task}
-                    setTaskSelected={setSelected}
-                    disabled={isScopeSelected}
-                    anchorEl={anchorEl}
-                    setAnchorEl={setAnchorEl}
-                  />
+                  <EditNote color="disabled" />
                 </Box>
                 <Box
                   sx={{
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    height: "100%"
+                    height: "50px"
                   }}
                 >
                   <Typography
@@ -298,23 +282,22 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                     sx={{
                       color: "#2D3748",
                       wordBreak: "break-word",
-                      width: "95%",
+                      width: "195px",
                       textOverflow: "ellipsis",
                       overflow: "hidden",
                       textAlign: "center",
                       display: "-webkit-box",
-                      "-webkit-line-clamp": "2",
-                      "-webkit-box-orient": "vertical"
+                      WebkitLineClamp: "2",
+                      WebkitBoxOrient: "vertical"
                     }}
                   >
                     <strong>{task.title}</strong>
                   </Typography>
                 </Box>
-                <Box sx={{ width: "100%", height: "25px" }}>
+                <Box sx={{ width: "100%", height: "24px" }}>
                   <TaskUserList users={task.users} taskid={task.ticketid} />
                 </Box>
               </Box>
-
               <Divider orientation="vertical" />
               <Box
                 sx={{
@@ -331,37 +314,36 @@ const Task: React.FC<TaskProps> = ({ task }) => {
               >
                 <AcceptanceCriteria description={task.description || ""} />
 
-                <Typography sx={{ fontWeight: "bold", fontSize: "17px", color: "#2D3748" }}>{task.size}</Typography>
+                <Typography sx={{ fontWeight: "bold", fontSize: "16px", color: "#2D3748" }}>{task.size}</Typography>
               </Box>
-              <Popover
-                disableRestoreFocus
-                id={popOverid}
-                open={open}
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: "center",
-                  horizontal: "right"
-                }}
-                transformOrigin={{
-                  vertical: 100,
-                  horizontal: -50
-                }}
-                onClose={handleCancel}
-              >
-                <Paper sx={{ height: "fit-content", padding: "20px", maxWidth: "400px" }}>
-                  <TaskForm
-                    formTitle={task.title}
-                    formType={"TaskEdit"}
-                    onSubmit={handleSubmit}
-                    onCancel={handleCancel}
-                    onClose={handleClose}
-                    defaultValues={task}
-                  />
-                </Paper>
-              </Popover>
 
               {provided.placeholder}
             </Paper>
+            <Popover
+              disableRestoreFocus
+              id={popOverid}
+              open={open}
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right"
+              }}
+              transformOrigin={{
+                vertical: 100,
+                horizontal: -40
+              }}
+            >
+              <Paper sx={{ height: "fit-content", padding: "20px", maxWidth: "400px" }}>
+                <TaskForm
+                  formTitle={task.title}
+                  formType={"TaskEdit"}
+                  onSubmit={handleSubmit}
+                  onCancel={handleCancel}
+                  onClose={handleClose}
+                  defaultValues={task}
+                />
+              </Paper>
+            </Popover>
           </Box>
         )
       }}
