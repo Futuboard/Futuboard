@@ -6,6 +6,7 @@ import {
   DroppableProvided,
   DroppableStateSnapshot
 } from "@hello-pangea/dnd"
+import { Subject } from "@mui/icons-material"
 import { Box, CircularProgress, Divider, Paper, Popover, Typography } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
@@ -17,7 +18,6 @@ import { useAddTaskToScopeMutation, useDeleteTaskFromScopeMutation, useUpdateTas
 
 import TaskForm from "./TaskForm"
 import UserMagnet from "./UserMagnet"
-import { Subject } from "@mui/icons-material"
 
 const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSnapshot) => {
   if (!snapshot.isDropAnimating) {
@@ -183,6 +183,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
         return (
           <Box ref={provided.innerRef}>
             <Paper
+              className="task"
               elevation={selected ? 24 : 4}
               onClick={(e) => handleClick(e)}
               sx={{
