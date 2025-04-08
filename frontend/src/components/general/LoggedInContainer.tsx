@@ -62,9 +62,9 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
 
   useEffect(() => {
     if (isLoggedIn) {
-      addVisitedBoard(board)
+      addVisitedBoard({ boardid: id, title: board.title })
     }
-  }, [id, isLoggedIn, board])
+  }, [id, isLoggedIn, board?.title])
 
   if (isLoading || !hasTriedEmptyPasswordLogin) {
     return null

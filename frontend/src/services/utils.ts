@@ -12,13 +12,11 @@ export const getVisitedBoards = (): BoardWithOnlyIdAndTitle[] => {
   return boardLinks ? JSON.parse(boardLinks) : []
 }
 
-export const addVisitedBoard = (board: Board) => {
+export const addVisitedBoard = ({ boardid, title }: BoardWithOnlyIdAndTitle) => {
   const oldVisitedBoards: BoardWithOnlyIdAndTitle[] = JSON.parse(localStorage.getItem("visited-boards") || "[]").filter(
-    (visitedBoard: BoardWithOnlyIdAndTitle) => visitedBoard.boardid !== board.boardid
+    (visitedBoard: BoardWithOnlyIdAndTitle) => visitedBoard.boardid !== boardid
   )
-  const newVisitedBoards: BoardWithOnlyIdAndTitle[] = [{ boardid: board.boardid, title: board.title }].concat(
-    oldVisitedBoards
-  )
+  const newVisitedBoards: BoardWithOnlyIdAndTitle[] = [{ boardid, title }].concat(oldVisitedBoards)
   localStorage.setItem("visited-boards", JSON.stringify(newVisitedBoards))
 }
 
