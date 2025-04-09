@@ -102,18 +102,6 @@ def test_board_by_id():
 
 
 @pytest.mark.django_db
-def test_getting_board_requires_auth(enable_auth_token_checking):
-    api_client = APIClient()
-
-    creation_response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
-    assert creation_response.status_code == 200
-    boardid = creation_response.json()["boardid"]
-
-    get_response_unauthenticated = api_client.get(reverse("board_by_id", args=[boardid]))
-    assert get_response_unauthenticated.status_code == 401
-
-
-@pytest.mark.django_db
 def test_most_endpoints_require_auth(enable_auth_token_checking):
     api_client = APIClient()
 
