@@ -25,6 +25,7 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
   const id = params.id || ""
   const [checkAuth, { isSuccess: hasAuth, isLoading: hasNotYetTriedAuth }] = useCheckAuthTokenMutation()
   const { data: board, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
+  const [isOpenInReadOnly, setIsOpenInReadOnly] = useState(false)
 
   useEffect(() => {
     const inner = async () => {
@@ -59,7 +60,7 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
     return null
   }
 
-  if (!hasAuth && !loginTryData?.success) {
+  if (!hasAuth && !loginTryData?.success && !isOpenInReadOnly) {
     return (
       <>
         <Box
@@ -71,7 +72,7 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
             height: "100vh"
           }}
         >
-          <AccessBoardForm id={id} tryLogin={tryLogin} />
+          <AccessBoardForm board={board} tryLogin={tryLogin} handleOpenInReadOnly={() => setIsOpenInReadOnly(true)} />
         </Box>
       </>
     )

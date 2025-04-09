@@ -20,7 +20,7 @@ const PasswordField: React.FC<AddPasswordFieldProps> = ({ register, errorText, l
   const handleClickShowPassword = () => setShowPassword((show) => !show)
 
   return (
-    <FormControl sx={{ width: "90%" }}>
+    <FormControl>
       <InputLabel htmlFor="outlined-adornment-password">{label}</InputLabel>
       <OutlinedInput
         type={showPassword ? "Text" : "Password"}
