@@ -1,25 +1,29 @@
+import logging
 import os
 from uuid import UUID
 from argon2 import PasswordHasher
+import argon2
 from django.http import Http404, JsonResponse
 from django.utils import timezone
 import jwt
 
-from futuboard.models import Action, Column, Swimlanecolumn, Ticket
+from futuboard.models import Action, Board, Column, Swimlanecolumn, Ticket
 from django.conf import settings
+
+ph = PasswordHasher()
+
+logger = logging.getLogger(__name__)
 
 
 def verify_password(password: str, hash: str):
-    ph = PasswordHasher()
     try:
         ph.verify(hash, password)
         return True
-    except:  # noqa: E722
+    except argon2.exceptions.VerificationError:
         return False
 
 
 def hash_password(password):
-    ph = PasswordHasher()
     hash = ph.hash(password)
     return hash
 
@@ -59,6 +63,12 @@ def check_if_access_token_incorrect(board_id, request):
     if hasattr(settings, "DISABLE_AUTH_TOKEN_CHECKING") and settings.DISABLE_AUTH_TOKEN_CHECKING:
         return None
 
+    board = Board.objects.get(boardid=board_id)
+
+    if check_if_password_hash_is_empty(board.passwordhash):
+        # If the board has no password, we don't need to check the token
+        return None
+
     try:
         token = get_token_from_request(request)
         if token is None:
@@ -76,6 +86,12 @@ def check_if_access_token_incorrect(board_id, request):
         return JsonResponse({"message": "Access token expired"}, status=401)
     except jwt.InvalidTokenError:
         return JsonResponse({"message": "Access token invalid"}, status=401)
+    except Board.DoesNotExist:
+        return JsonResponse({"message": "Associated board not found"}, status=404)
+
+
+def check_if_password_hash_is_empty(password_hash: str):
+    return verify_password("", password_hash)
 
 
 # model type is type[Column] | type[Scope] | type[Ticket] | type[Swimlanecolumn] | type[Action] | type[User]
