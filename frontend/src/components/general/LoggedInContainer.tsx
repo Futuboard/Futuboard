@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom"
 
 import AccessBoardForm from "@/components/board/AccessBoardForm"
 import { cacheTagTypes } from "@/constants"
-import { boardsApi, useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
+import { boardsApi, useCheckAuthTokenMutation, useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
 import { setBoardId } from "@/state/auth"
 import { setNotification } from "@/state/notification"
 import { webSocketContainer } from "@/state/websocket"
@@ -20,11 +20,11 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
   const dispatch = useDispatch()
   const params = useParams()
   const [isBoardIdSet, setIsBoardIdset] = useState(false)
-  const [tryLogin] = useLoginMutation()
-  const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
+  const [tryLogin, { data: loginTryData }] = useLoginMutation()
 
   const id = params.id || ""
-  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
+  const [checkAuth, { isSuccess: hasAuth, isLoading: hasNotYetTriedAuth }] = useCheckAuthTokenMutation()
+  const { data: board, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
 
   useEffect(() => {
     const inner = async () => {
@@ -47,23 +47,19 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
 
   useEffect(() => {
     if (!id) return
-    const inner = async () => {
-      await tryLogin({ boardId: id, password: "" })
-      setHasTriedEmptyPasswordLogin(true)
-    }
-    inner()
-  }, [id, tryLogin])
+    checkAuth(id)
+  }, [id, checkAuth])
 
   useEffect(() => {
     const prefix = titlePrefix ? titlePrefix + " - " : ""
-    document.title = board?.title ? prefix + board?.title + "- Futuboard" : "Futuboard"
+    document.title = board?.title ? prefix + board?.title + " - Futuboard" : "Futuboard"
   }, [board, titlePrefix])
 
-  if (isLoading || !hasTriedEmptyPasswordLogin) {
+  if (isLoading || !board || hasNotYetTriedAuth) {
     return null
   }
 
-  if (!isLoggedIn) {
+  if (!hasAuth && !loginTryData?.success) {
     return (
       <>
         <Box
@@ -75,7 +71,7 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
             height: "100vh"
           }}
         >
-          <AccessBoardForm id={id} />
+          <AccessBoardForm id={id} tryLogin={tryLogin} />
         </Box>
       </>
     )

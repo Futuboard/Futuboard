@@ -14,13 +14,14 @@ import PasswordField from "../home/PasswordField"
 
 interface AccessBoardFormProps {
   id: string
+  tryLogin: ReturnType<typeof useLoginMutation>[0]
 }
 
 interface FormData {
   password: string
 }
 
-const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id }) => {
+const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id, tryLogin }) => {
   const {
     register,
     handleSubmit,
@@ -33,8 +34,6 @@ const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ id }) => {
   })
   const navigate = useNavigate()
   const dispatch = useDispatch()
-
-  const [tryLogin] = useLoginMutation()
 
   const onSubmit = async (data: FormData) => {
     const loginResponse = await tryLogin({ boardId: id, password: data.password })

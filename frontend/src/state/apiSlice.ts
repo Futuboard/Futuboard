@@ -368,13 +368,14 @@ export const boardsApi = createApi({
           }
           return data
         }
-      }),
-      invalidatesTags: (result) => {
-        if (result?.success) {
-          return ["Boards"]
-        }
-        return []
-      }
+      })
+    }),
+
+    checkAuthToken: builder.mutation<{ success: boolean }, string>({
+      query: (boardId) => ({
+        url: `boards/${boardId}/checkauthtoken/`,
+        method: "POST"
+      })
     }),
 
     postUserToTicket: builder.mutation<User, { ticketId: string; userid: string }>({
@@ -936,6 +937,7 @@ export const {
   useUpdateColumnOrderMutation,
   useDeleteColumnMutation,
   useLoginMutation,
+  useCheckAuthTokenMutation,
   useUpdateTaskListByColumnIdMutation,
   usePostUserToBoardMutation,
   usePostUserToTicketMutation,

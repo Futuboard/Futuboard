@@ -67,6 +67,7 @@ urlpatterns = [
         boardTemplateViews.create_board_from_template,
         name="create_board_from_template",
     ),
+    path("api/boards/<uuid:board_id>/checkauthtoken/", views.check_auth_token, name="check_auth_token"),
     path("api/checkadminpassword/", views.check_admin_password, name="check_admin_password"),
     path("api/events/<uuid:board_id>/", chartViews.events, name="events"),  # Endpoint for debugging
     # Cumulativeflow has url parameters, e.g. ?time_unit=day&start_time=2021-01-01&end_time=2021-01-10&count_unit=cards
