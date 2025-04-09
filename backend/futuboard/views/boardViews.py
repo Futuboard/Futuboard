@@ -54,9 +54,6 @@ def board_by_id(request, board_id):
             return JsonResponse({"success": False})
     if request.method == "GET":
         try:
-            if token_incorrect := check_if_access_token_incorrect(board_id, request):
-                return token_incorrect
-
             board = Board.objects.get(pk=board_id)
             serializer = BoardSerializer(board)
             return JsonResponse(serializer.data, safe=False)

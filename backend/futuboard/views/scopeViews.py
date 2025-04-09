@@ -11,9 +11,6 @@ from django.utils.timezone import now
 
 @api_view(["GET", "POST", "DELETE"])
 def scopes_on_board(request: rest_framework.request.Request, board_id: str):
-    if token_incorrect := check_if_access_token_incorrect(board_id, request):
-        return token_incorrect
-
     if request.method == "GET":
         board = Board.objects.get(boardid=board_id)
         query_set = Scope.objects.filter(boardid=board)
@@ -21,6 +18,8 @@ def scopes_on_board(request: rest_framework.request.Request, board_id: str):
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
         board = Board.objects.get(boardid=board_id)
         new_scope = Scope(
             boardid=board,
@@ -32,6 +31,8 @@ def scopes_on_board(request: rest_framework.request.Request, board_id: str):
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "DELETE":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
         scope = Scope.objects.get(scopeid=request.data["scopeid"])
         scope.delete()
         return JsonResponse({"success": True})

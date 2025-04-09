@@ -14,9 +14,6 @@ from django.utils import timezone
 
 @api_view(["GET", "POST", "PUT"])
 def columns_on_board(request, board_id):
-    if token_incorrect := check_if_access_token_incorrect(board_id, request):
-        return token_incorrect
-
     if request.method == "GET":
         try:
             query_set = Column.objects.filter(boardid=board_id).order_by("ordernum")
@@ -26,6 +23,9 @@ def columns_on_board(request, board_id):
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
+
         length = len(Column.objects.filter(boardid=board_id))
         new_column = Column(
             columnid=request.data["columnid"],
@@ -51,6 +51,8 @@ def columns_on_board(request, board_id):
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "PUT":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
         columns_data = request.data
         for index, column_data in enumerate(columns_data):
             column = Column.objects.get(columnid=column_data["columnid"])
@@ -61,10 +63,10 @@ def columns_on_board(request, board_id):
 
 @api_view(["GET", "POST", "PUT"])
 def tickets_on_column(request, board_id, column_id):
-    if token_incorrect := check_if_access_token_incorrect(board_id, request):
-        return token_incorrect
-
     if request.method == "PUT":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
+
         try:
             tickets_data = request.data
 
@@ -101,6 +103,9 @@ def tickets_on_column(request, board_id, column_id):
             raise Http404("Task does not exist")
 
     if request.method == "POST":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
+
         column = Column.objects.get(pk=column_id)
         new_ticket = Ticket(
             ticketid=request.data["ticketid"],
@@ -221,15 +226,15 @@ def update_column(request, board_id, column_id):
 
 @api_view(["GET", "POST"])
 def users_on_board(request, board_id):
-    if token_incorrect := check_if_access_token_incorrect(board_id, request):
-        return token_incorrect
-
     if request.method == "GET":
         users = User.objects.filter(boardid=board_id)
         serializer = UserSerializer(users, many=True)
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
+
         board = Board.objects.get(pk=board_id)
         new_user = User(name=request.data["name"], boardid=board)
         new_user.save()
@@ -239,21 +244,22 @@ def users_on_board(request, board_id):
 
 @api_view(["GET", "POST", "DELETE"])
 def users_on_ticket(request, ticket_id):
-    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Ticket, ticket_id, request):
-        return token_incorrect
-
     if request.method == "GET":
         users = User.objects.filter(tickets__ticketid=ticket_id)
         serializer = UserSerializer(users, many=True)
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":
+        if token_incorrect := check_if_acces_token_incorrect_using_other_id(Ticket, ticket_id, request):
+            return token_incorrect
         userid = request.data["userid"]
         user = User.objects.get(pk=userid)
         user.tickets.add(ticket_id)
         return JsonResponse({"message": "User added to ticket successfully"}, status=200)
 
     if request.method == "DELETE":
+        if token_incorrect := check_if_acces_token_incorrect_using_other_id(Ticket, ticket_id, request):
+            return token_incorrect
         userid = request.data["userid"]
         user = User.objects.get(pk=userid)
         user.tickets.remove(ticket_id)
