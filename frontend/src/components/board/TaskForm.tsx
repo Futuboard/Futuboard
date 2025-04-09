@@ -174,7 +174,7 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
     defaultValues: initialFormValues
   })
 
-  const colorOptions = ["#ffffff", "#ffeb3b", "#8bc34a", "#ff4081", "#03a9f4"]
+  const colorOptions = ["#ffffff", "#ffeb3b", "#8bc34a", "#ff4081", "#03a9f4", "#a01aff", "#ff9b30"]
 
   const selectedColor = watch("color")
 
