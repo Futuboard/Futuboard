@@ -82,7 +82,8 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleS
             left: "0",
             top: "65px",
             display: "flex",
-            flexDirection: "column"
+            flexDirection: "column",
+            zIndex: 1100
           }}
           variant="outlined"
         >

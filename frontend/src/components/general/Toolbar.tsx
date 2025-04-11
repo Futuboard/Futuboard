@@ -30,6 +30,7 @@ import { useDispatch } from "react-redux"
 import { Link, useParams } from "react-router-dom"
 
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
+import { getIsInReadMode } from "@/state/auth"
 import { disableScope } from "@/state/scope"
 import { TaskTemplate } from "@/types"
 
@@ -327,6 +328,8 @@ interface ToolBarProps {
 }
 
 const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor, chartToolbar }: ToolBarProps) => {
+  const isReadOnly = getIsInReadMode(boardId)
+
   return (
     <AppBar
       position="fixed"
@@ -363,6 +366,30 @@ const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor, chartTool
         )}
         {boardId && chartToolbar && <ChartToolbar boardId={boardId} />}
       </Toolbar>
+      {isReadOnly && (
+        <div
+          title="You are currently in read-only mode. Log out and log back in with the board password to edit."
+          style={{
+            position: "fixed",
+            top: "65px",
+            width: "100%",
+            height: "20px",
+            backgroundColor: "rgb(202, 103, 10)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            fontSize: "12px",
+            fontWeight: "bold",
+            fontFamily: "monospace",
+            flexWrap: "nowrap",
+            overflow: "hidden",
+            whiteSpace: "nowrap"
+          }}
+        >
+          {Array.from(Array(100)).map(() => "READ-ONLY · ")}
+        </div>
+      )}
     </AppBar>
   )
 }
