@@ -9,6 +9,10 @@ export const setToken = ({ token, boardId }: { token: string; boardId: string })
   localStorage.setItem(`board-${boardId}-token`, token)
 }
 
+export const logOutOfBoard = (boardId: string) => {
+  setToken({ token: "", boardId })
+}
+
 export const getAuth = (boardId: string) => {
   const token = getToken(boardId)
   return token ? `Bearer ${token}` : null
