@@ -91,7 +91,12 @@ const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, Fetch
   const tokenIsInvalid = result.error && result.error.status === 401
   const boardId = (api.getState() as RootState).auth.boardId
 
-  if (tokenIsInvalid) {
+  const url = typeof args === "string" ? args : args.url
+
+  const isUpdatePasswordRequest = url.includes("password") && url.includes("boards")
+  const isBoardTemplateRequest = url.includes("boardtemplates")
+
+  if (tokenIsInvalid && !isUpdatePasswordRequest && !isBoardTemplateRequest) {
     if (isLoggedInWithReadOnly(api)) {
       api.dispatch(
         setNotification({
