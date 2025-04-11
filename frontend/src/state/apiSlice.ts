@@ -1,4 +1,6 @@
+import { MutationLifecycleApi } from "@reduxjs/toolkit/dist/query/endpointDefinitions"
 import {
+  BaseQueryApi,
   BaseQueryFn,
   FetchArgs,
   FetchBaseQueryError,
@@ -33,6 +35,14 @@ import { getAdminPassword, getAuth, getIsInReadMode, logOutOfBoard, setToken } f
 import { setNotification } from "./notification"
 import { RootState } from "./store"
 import { webSocketContainer } from "./websocket"
+
+const isLoggedInWithReadOnly = (
+  api: MutationLifecycleApi<unknown, BaseQueryFn, unknown, "boardsApi"> | BaseQueryApi
+) => {
+  const boardId = (api.getState() as RootState)?.auth?.boardId
+  if (!boardId) return false
+  return getIsInReadMode(boardId)
+}
 
 const invalidateRemoteCache = (tags: CacheInvalidationTag[]) => {
   webSocketContainer.invalidateCacheOfOtherUsers(tags)
@@ -80,10 +90,9 @@ const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, Fetch
   const result = await baseQuery(args, api, extraOptions)
   const tokenIsInvalid = result.error && result.error.status === 401
   const boardId = (api.getState() as RootState).auth.boardId
-  const isInReadMode = getIsInReadMode(boardId)
 
   if (tokenIsInvalid) {
-    if (isInReadMode) {
+    if (isLoggedInWithReadOnly(api)) {
       api.dispatch(
         setNotification({
           text: "No changes allowed in read-only mode.",
@@ -334,6 +343,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ columns }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const invalidationTags: CacheInvalidationTag[] = [{ type: "Columns", id: "LIST" }]
         updateCache(
           "getColumnsByBoardId",
@@ -367,6 +378,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ columnId, tasks }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Columns", id: columnId },
           { type: "Ticket", id: "LIST" },
@@ -431,6 +444,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ ticketId, userid }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: ticketId },
           { type: "Users", id: userid },
@@ -481,6 +496,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ ticketId, userid }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: ticketId },
           { type: "Users", id: userid },
@@ -528,6 +545,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ actionId, userid }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: actionId },
           { type: "Users", id: userid },
@@ -578,6 +597,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ actionId, userid }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: actionId },
           { type: "Users", id: userid },
@@ -670,6 +691,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ action }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const invalidationTags: CacheInvalidationTag[] = [{ type: "Action", id: action.columnid }]
         updateCache(
           "getActionsByColumnId",
@@ -718,6 +741,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ columnid, swimlaneColumnId, actions: newActions }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const invalidationTags: CacheInvalidationTag[] = [{ type: "Action", id: columnid }]
         updateCache(
           "getActionsByColumnId",
@@ -799,6 +824,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ scopeid }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Scopes", id: "LIST" }]
         updateCache(
           "getScopes",
@@ -825,6 +852,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ scope, columns }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Scopes", id: "LIST" }]
         updateCache(
           "getScopes",
@@ -875,6 +904,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ ticketid, scope }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
         updateCache(
           "getTaskListByColumnId",
@@ -906,6 +937,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ ticketid, scope }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
         updateCache(
           "getTaskListByColumnId",
