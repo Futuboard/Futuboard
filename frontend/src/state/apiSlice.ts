@@ -1,4 +1,11 @@
-import { TagDescription, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import {
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+  TagDescription,
+  createApi,
+  fetchBaseQuery
+} from "@reduxjs/toolkit/query/react"
 
 import { cacheTagTypes } from "@/constants"
 import {
@@ -49,24 +56,41 @@ const updateCache = (
   }
 }
 
-//TODO: refactor
+const baseQuery = fetchBaseQuery({
+  baseUrl: import.meta.env.VITE_DB_ADDRESS,
+
+  prepareHeaders: (headers, { getState }) => {
+    const boardId = (getState() as RootState).auth.boardId
+    if (boardId) {
+      const auth = getAuth(boardId)
+      if (auth) {
+        headers.set("Authorization", auth)
+      }
+    }
+    return headers
+  }
+})
+
+const baseQueryWithLogoutOnInvalidToken: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+  args,
+  api,
+  extraOptions
+) => {
+  const result = await baseQuery(args, api, extraOptions)
+  const tokenIsInvalid = result.error && result.error.status === 401
+  if (tokenIsInvalid) {
+    console.log("TOKEN IS INVALID")
+    const boardId = (api.getState() as RootState).auth.boardId
+    if (boardId) {
+      api.dispatch(boardsApi.util.resetApiState())
+    }
+  }
+  return result
+}
+
 export const boardsApi = createApi({
   reducerPath: "boardsApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_DB_ADDRESS,
-
-    prepareHeaders: (headers, { getState }) => {
-      const boardId = (getState() as RootState).auth.boardId
-      if (boardId) {
-        const auth = getAuth(boardId)
-        if (auth) {
-          headers.set("Authorization", auth)
-        }
-      }
-      return headers
-    }
-  }),
-
+  baseQuery: baseQueryWithLogoutOnInvalidToken,
   tagTypes: cacheTagTypes,
 
   endpoints: (builder) => ({
@@ -368,13 +392,6 @@ export const boardsApi = createApi({
           }
           return data
         }
-      })
-    }),
-
-    checkAuthToken: builder.mutation<{ success: boolean }, string>({
-      query: (boardId) => ({
-        url: `boards/${boardId}/checkauthtoken/`,
-        method: "POST"
       })
     }),
 
@@ -937,7 +954,6 @@ export const {
   useUpdateColumnOrderMutation,
   useDeleteColumnMutation,
   useLoginMutation,
-  useCheckAuthTokenMutation,
   useUpdateTaskListByColumnIdMutation,
   usePostUserToBoardMutation,
   usePostUserToTicketMutation,

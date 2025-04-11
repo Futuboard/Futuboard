@@ -279,15 +279,6 @@ def update_user(request, user_id):
 
 
 @api_view(["POST"])
-def check_auth_token(request, board_id):
-    if request.method == "POST":
-        if token_incorrect := check_if_access_token_incorrect(board_id, request):
-            return token_incorrect
-
-        return JsonResponse({"success": True}, status=200)
-
-
-@api_view(["POST"])
 def check_admin_password(request):
     if request.method == "POST":
         password = request.data["password"]

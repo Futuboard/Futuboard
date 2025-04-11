@@ -5,8 +5,8 @@ import { useParams } from "react-router-dom"
 
 import AccessBoardForm from "@/components/board/AccessBoardForm"
 import { cacheTagTypes } from "@/constants"
-import { boardsApi, useCheckAuthTokenMutation, useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
-import { setBoardId } from "@/state/auth"
+import { boardsApi, useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
+import { getAuth, setBoardId } from "@/state/auth"
 import { setNotification } from "@/state/notification"
 import { webSocketContainer } from "@/state/websocket"
 import { Board } from "@/types"
@@ -23,7 +23,6 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
   const [tryLogin, { data: loginTryData }] = useLoginMutation()
 
   const id = params.id || ""
-  const [checkAuth, { isSuccess: hasAuth, isLoading: hasNotYetTriedAuth }] = useCheckAuthTokenMutation()
   const { data: board, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
   const [isOpenInReadOnly, setIsOpenInReadOnly] = useState(false)
 
@@ -47,16 +46,13 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
   }, [id, dispatch])
 
   useEffect(() => {
-    if (!id) return
-    checkAuth(id)
-  }, [id, checkAuth])
-
-  useEffect(() => {
     const prefix = titlePrefix ? titlePrefix + " - " : ""
     document.title = board?.title ? prefix + board?.title + " - Futuboard" : "Futuboard"
   }, [board, titlePrefix])
 
-  if (isLoading || !board || hasNotYetTriedAuth) {
+  const hasAuth = Boolean(getAuth(id))
+
+  if (isLoading || !board) {
     return null
   }
 
