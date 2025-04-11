@@ -65,7 +65,7 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
     return null
   }
 
-  const shouldShowContent = hasAuth || loginTryData?.success || isInReadMode
+  const shouldShowContent = hasAuth || loginTryData?.success || isInReadMode || !board.needs_password
 
   return (
     <Box sx={{ height: "calc(100vh - 65px)", paddingTop: "65px" }}>

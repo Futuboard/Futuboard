@@ -6,6 +6,7 @@ from ..serializers import BoardSerializer
 import rest_framework.request
 from django.utils import timezone
 from ..verification import (
+    check_if_password_hash_is_empty,
     encode_token,
     hash_password,
     verify_password,
@@ -51,7 +52,11 @@ def board_by_id(request, board_id):
         try:
             board = Board.objects.get(pk=board_id)
             serializer = BoardSerializer(board)
-            return JsonResponse(serializer.data, safe=False)
+            needs_password = not check_if_password_hash_is_empty(board.passwordhash)
+            serializer_data = serializer.data
+            serializer_data["needs_password"] = needs_password
+
+            return JsonResponse(serializer_data, safe=False)
 
         except Board.DoesNotExist:
             raise Http404("Board does not exist")
