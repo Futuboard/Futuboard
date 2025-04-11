@@ -1,4 +1,4 @@
-import { Box, ButtonGroup, Checkbox, Stack } from "@mui/material"
+import { Box, Checkbox } from "@mui/material"
 import Button from "@mui/material/Button"
 import Divider from "@mui/material/Divider"
 import TextField from "@mui/material/TextField"
@@ -43,12 +43,22 @@ const ColumnCreationForm: React.FC<AddColumnCreationFormProps> = (props) => {
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
-      <Stack spacing={1.5} sx={{ alignItems: "center" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "start",
+          justifyContent: "space-between",
+          height: "220px",
+          width: "300px"
+        }}
+      >
         <Typography gutterBottom variant="h6">
           Create Column
         </Typography>
         <Divider flexItem />
         <TextField
+          fullWidth
           inputRef={inputRef}
           label={
             <span>
@@ -64,19 +74,28 @@ const ColumnCreationForm: React.FC<AddColumnCreationFormProps> = (props) => {
             }
           })}
         />
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
           <Typography variant="h6">Add swimlanes</Typography>
           <Checkbox checked={swimlane} onChange={handleCheckboxChange} />
         </Box>
         <Divider flexItem />
-
-        <ButtonGroup>
-          <Button type="submit" color="primary" variant="contained">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%"
+          }}
+        >
+          <Button type="submit" color="primary" variant="contained" sx={{ marginRight: 3 }}>
             Submit
           </Button>
-          <Button onClick={onCancel}>Cancel</Button>
-        </ButtonGroup>
-      </Stack>
+          <Button onClick={onCancel} variant="outlined">
+            Cancel
+          </Button>
+        </Box>
+      </Box>
     </form>
   )
 }

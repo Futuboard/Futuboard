@@ -7,7 +7,7 @@ import {
   DroppableStateSnapshot
 } from "@hello-pangea/dnd"
 import { Subject } from "@mui/icons-material"
-import { Box, CircularProgress, Divider, Paper, Popover, Typography } from "@mui/material"
+import { Box, Divider, Paper, Popover, Typography } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
@@ -45,35 +45,12 @@ const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) 
 
   const progress = Math.round((done / all) * 100)
 
-  return (
-    <Box sx={{ position: "relative", display: "inline-flex" }}>
-      <CircularProgress
-        variant="determinate"
-        value={progress}
-        size={30}
-        color={progress == 100 ? "success" : "primary"}
-      />
-      <Box
-        sx={{
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          position: "absolute",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
-        <Typography sx={{ fontSize: 9, fontWeight: 700 }}>{`${progress}%`}</Typography>
-      </Box>
-    </Box>
-  )
+  return <Typography sx={{ fontSize: "13px", fontWeight: "bold", marginBottom: "-4px" }}>{`${progress}%`}</Typography>
 }
 
 const TaskUserList: React.FC<{ users: UserWithoutTicketsOrActions[]; taskid: string }> = ({ users, taskid }) => {
   return (
-    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+    <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
       {users.map((user, index) => (
         <Draggable key={user.userid + "/ticket"} draggableId={user.userid + "/" + taskid} index={index}>
           {(provided, snapshot) => {
@@ -105,9 +82,10 @@ interface FormData {
 interface TaskProps {
   task: TaskType
   index: number
+  templateDescription: string
 }
 
-const Task: React.FC<TaskProps> = ({ task }) => {
+const Task: React.FC<TaskProps> = ({ task, templateDescription }) => {
   const selectedScope = useSelector((state: RootState) => state.scope)
   const isScopeSelected = Boolean(selectedScope)
 
@@ -178,7 +156,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
   }
 
   return (
-    <Droppable droppableId={task.ticketid + "/ticket"} type="user">
+    <Droppable droppableId={task.ticketid + "/ticket"} type="user" direction="horizontal">
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => {
         return (
           <Box ref={provided.innerRef}>
@@ -223,8 +201,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                   justifyContent: "flex-start",
                   flexDirection: "column",
                   height: "100%",
-                  width: "202px",
-                  marginBottom: 0.5
+                  width: "202px"
                 }}
               >
                 <Box
@@ -260,7 +237,6 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                 >
                   <Typography
                     variant={"body2"}
-                    gutterBottom
                     sx={{
                       color: "#2D3748",
                       wordBreak: "break-word",
@@ -276,7 +252,14 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                     <strong>{task.title}</strong>
                   </Typography>
                 </Box>
-                <Box sx={{ width: "100%", height: "24px" }}>
+                <Box
+                  sx={{
+                    width: "204px",
+                    height: "29px",
+                    marginBottom: "-4px",
+                    overflow: "hidden"
+                  }}
+                >
                   <TaskUserList users={task.users} taskid={task.ticketid} />
                 </Box>
               </Box>
@@ -294,11 +277,13 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                   textAlign: "center"
                 }}
               >
-                <Typography sx={{ fontWeight: "bold", fontSize: "16px", color: "#2D3748", width: "100%" }}>
+                <Typography sx={{ fontWeight: "bold", fontSize: "16px", color: "#2D3748", width: "35px" }}>
                   {task.size}
                 </Typography>
                 <AcceptanceCriteria description={task.description || ""} />
-                {task.description != "" && <Subject fontSize="small" color="disabled" />}
+                {task.description != "" && task.description != templateDescription && (
+                  <Subject fontSize="small" color="disabled" />
+                )}
               </Box>
 
               {provided.placeholder}

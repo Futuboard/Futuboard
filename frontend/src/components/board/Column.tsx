@@ -10,7 +10,7 @@ import { useSelector } from "react-redux"
 import { useParams } from "react-router"
 
 import { RootState } from "@/state/store"
-import type { Column, Task as TaskType, User, TaskTemplate, SimpleScope, NewAction } from "@/types"
+import type { Column, Task as TaskType, User, TaskTemplate, SimpleScope, NewAction, Board } from "@/types"
 
 import { getId } from "../../services/Utils"
 import {
@@ -41,10 +41,10 @@ interface FormData {
 
 interface CreateTaskButtonProps {
   columnid: string
+  board: Board | undefined
 }
 
-const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
-  const { id = "default-id" } = useParams()
+const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) => {
   const [defaultValues, setDefaultValues] = useState<TaskTemplate | null>(null)
   const [taskTemplate, setTaskTemplate] = useState<TaskTemplate | null>(null)
 
@@ -53,8 +53,6 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
   const [createAction] = usePostActionMutation()
 
   const [open, setOpen] = useState(false)
-
-  const { data: board } = useGetBoardQuery(id)
 
   const handleOpenDialog = () => {
     if ((!defaultValues && board) || JSON.stringify(defaultValues) === JSON.stringify(taskTemplate)) {
@@ -170,9 +168,10 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
 
 interface TaskListProps {
   column: Column
+  templateDescription: string
 }
 
-const TaskList: React.FC<TaskListProps> = ({ column }) => {
+const TaskList: React.FC<TaskListProps> = ({ column, templateDescription }) => {
   //get task list from server
   const { data: taskList, isLoading } = useGetTaskListByColumnIdQuery({
     boardId: column.boardid,
@@ -207,7 +206,7 @@ const TaskList: React.FC<TaskListProps> = ({ column }) => {
                   {(provided) => {
                     return (
                       <List ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                        <Task key={task.ticketid} task={task} index={index} />
+                        <Task key={task.ticketid} task={task} index={index} templateDescription={templateDescription} />
                       </List>
                     )
                   }}
@@ -314,6 +313,8 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
   const tasks = useSelector(
     (state: RootState) => selectTasksByColumnId({ boardId: id, columnId: column.columnid })(state).data || defaultTasks
   )
+  const { data: board } = useGetBoardQuery(id)
+
   const selectedScope = useSelector((state: RootState) => state.scope)
   const isScopeSelected = Boolean(selectedScope)
 
@@ -347,6 +348,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
     bgColor = isScopeSelected ? "#d63838" : "#ff4747"
     titleBgColor = isScopeSelected ? "#fa9b9b" : "#ff4747"
   }
+
   return (
     <Draggable draggableId={column.columnid} index={index}>
       {(provided) => (
@@ -406,7 +408,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
                 paddingTop: "4px"
               }}
             >
-              <CreateTaskButton columnid={column.columnid} />
+              <CreateTaskButton columnid={column.columnid} board={board} />
               <Typography title={"Number of tasks"} sx={{ fontSize: "17px", color: "#2D3748" }}>
                 {column.wip_limit ? `${taskNum} / ${column.wip_limit}` : taskNum}
               </Typography>
@@ -416,7 +418,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
             </div>
             <Divider />
             <div>
-              <TaskList column={column} />
+              <TaskList column={column} templateDescription={board?.default_ticket_description || ""} />
             </div>
           </Paper>
           <Box sx={{ overflowX: "hidden", height: "fit-content" }}>
