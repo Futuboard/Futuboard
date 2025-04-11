@@ -1,6 +1,7 @@
 import { DeleteForever } from "@mui/icons-material"
 import {
   Box,
+  ButtonGroup,
   Dialog,
   DialogActions,
   DialogContent,
@@ -116,86 +117,98 @@ const ColumnEditForm: React.FC<AddColumnCreationFormProps> = (props) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={1}>
-        <Grid item xs={12}>
+      <Grid container spacing={2} direction="column">
+        <Grid item>
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h6" sx={{ width: 150, wordWrap: "break-word", maxHeight: 125, overflow: "auto" }}>
+            <Typography
+              variant="h6"
+              sx={{
+                width: "100%",
+                wordBreak: "break-word",
+                wordWrap: "break-word",
+                maxHeight: 100,
+                overflow: "auto"
+              }}
+            >
               {column.title}
             </Typography>
-            <DeleteColumnButton column={column} />
           </Box>
-          <Divider />
+          <Divider flexItem />
         </Grid>
-        <Divider />
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              inputRef={inputRefName}
-              label={
-                <span>
-                  Name <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>
-                </span>
+        <Grid item>
+          <TextField
+            inputRef={inputRefName}
+            label={
+              <span>
+                Name <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>
+              </span>
+            }
+            helperText={errors.columnTitle?.message}
+            error={Boolean(errors.columnTitle)}
+            {...register("columnTitle", {
+              minLength: {
+                value: 3,
+                message: "Column name must be at least 3 characters"
+              },
+              required: {
+                value: true,
+                message: "Column name is required"
               }
-              helperText={errors.columnTitle?.message}
-              error={Boolean(errors.columnTitle)}
-              {...register("columnTitle", {
-                minLength: {
-                  value: 3,
-                  message: "Column name must be at least 3 characters"
-                },
-                required: {
-                  value: true,
-                  message: "Column name is required"
-                }
-              })}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              type="number"
-              inputRef={inputRefWipLimit}
-              label="Ticket count limit"
-              helperText={errors.columnWipLimit?.message}
-              error={Boolean(errors.columnWipLimit)}
-              {...register("columnWipLimit", {
-                valueAsNumber: true,
-                min: {
-                  value: 1,
-                  message: "Limit must be at least 1"
-                },
-                max: {
-                  value: 99,
-                  message: "Limit must be smaller than 100"
-                }
-              })}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              type="number"
-              inputRef={inputRefWipLimitStory}
-              label="Story point limit"
-              helperText={errors.columnWipLimitStory?.message}
-              error={Boolean(errors.columnWipLimitStory)}
-              {...register("columnWipLimitStory", {
-                valueAsNumber: true,
-                min: {
-                  value: 1,
-                  message: "Limit must be at least 1"
-                },
-                max: {
-                  value: 999900,
-                  message: "Limit can not exceed 999900"
-                }
-              })}
-            />
-          </Grid>
+            })}
+          />
         </Grid>
-        <Grid item xs={12}>
-          <Button type="submit" color="primary" variant="contained">
-            Submit
-          </Button>
-          <Button onClick={onCancel}>Cancel</Button>
+        <Grid item>
+          <TextField
+            type="number"
+            inputRef={inputRefWipLimit}
+            label="Ticket count limit"
+            helperText={errors.columnWipLimit?.message}
+            error={Boolean(errors.columnWipLimit)}
+            {...register("columnWipLimit", {
+              valueAsNumber: true,
+              min: {
+                value: 1,
+                message: "Limit must be at least 1"
+              },
+              max: {
+                value: 99,
+                message: "Limit must be smaller than 100"
+              }
+            })}
+          />
+        </Grid>
+        <Grid item>
+          <TextField
+            type="number"
+            inputRef={inputRefWipLimitStory}
+            label="Story point limit"
+            helperText={errors.columnWipLimitStory?.message}
+            error={Boolean(errors.columnWipLimitStory)}
+            {...register("columnWipLimitStory", {
+              valueAsNumber: true,
+              min: {
+                value: 1,
+                message: "Limit must be at least 1"
+              },
+              max: {
+                value: 999900,
+                message: "Limit can not exceed 999900"
+              }
+            })}
+          />
+        </Grid>
+        <Grid item sx={{ marginBottom: -1 }}>
+          <Divider flexItem />
+        </Grid>
+
+        <Grid item container sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <ButtonGroup>
+            <Button type="submit" color="primary" variant="contained">
+              Submit
+            </Button>
+            <Button onClick={onCancel}>Cancel</Button>
+          </ButtonGroup>
+          <DeleteColumnButton column={column} />
         </Grid>
       </Grid>
     </form>

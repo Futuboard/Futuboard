@@ -1,3 +1,4 @@
+import { ButtonGroup } from "@mui/material"
 import Button from "@mui/material/Button"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
@@ -46,9 +47,8 @@ const UserCreationForm: React.FC<AddUserCreationFormProps> = (props) => {
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          <Typography gutterBottom variant="body2">
-            {" "}
-            Add User{" "}
+          <Typography gutterBottom variant="body1">
+            Add Magnet
           </Typography>
           <Divider />
         </Grid>
@@ -82,10 +82,12 @@ const UserCreationForm: React.FC<AddUserCreationFormProps> = (props) => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Button type="submit" size="small" color="primary" variant="contained">
-            Submit
-          </Button>
-          <Button onClick={onCancel}>Cancel</Button>
+          <ButtonGroup size="small">
+            <Button type="submit" color="primary" variant="contained">
+              Submit
+            </Button>
+            <Button onClick={onCancel}>Cancel</Button>
+          </ButtonGroup>
         </Grid>
       </Grid>
     </form>

@@ -43,7 +43,6 @@ const CreateColumnButton: React.FC<CreateColumnButtonProps> = ({ boardId }) => {
             <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
             <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
             <g id="SVGRepo_iconCarrier">
-              {" "}
               <g id="Edit / Add_Column">
                 <path
                   id="Vector"
@@ -52,8 +51,8 @@ const CreateColumnButton: React.FC<CreateColumnButtonProps> = ({ boardId }) => {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                ></path>{" "}
-              </g>{" "}
+                ></path>
+              </g>
             </g>
           </svg>
         </IconButton>

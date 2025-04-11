@@ -1,7 +1,6 @@
-import { Checkbox } from "@mui/material"
+import { Box, Checkbox } from "@mui/material"
 import Button from "@mui/material/Button"
 import Divider from "@mui/material/Divider"
-import Grid from "@mui/material/Grid"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { useEffect, useRef, useState } from "react"
@@ -44,48 +43,59 @@ const ColumnCreationForm: React.FC<AddColumnCreationFormProps> = (props) => {
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography gutterBottom variant="h6">
-            {" "}
-            Create Column{" "}
-          </Typography>
-          <Divider />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            inputRef={inputRef}
-            label={
-              <span>
-                Name <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>
-              </span>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "start",
+          justifyContent: "space-between",
+          height: "220px",
+          width: "300px"
+        }}
+      >
+        <Typography gutterBottom variant="h6">
+          Create Column
+        </Typography>
+        <Divider flexItem />
+        <TextField
+          fullWidth
+          inputRef={inputRef}
+          label={
+            <span>
+              Name <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>
+            </span>
+          }
+          helperText={errors.columnTitle?.message}
+          error={Boolean(errors.columnTitle)}
+          {...register("columnTitle", {
+            required: {
+              value: true,
+              message: "Column name is required"
             }
-            helperText={errors.columnTitle?.message}
-            error={Boolean(errors.columnTitle)}
-            {...register("columnTitle", {
-              required: {
-                value: true,
-                message: "Column name is required"
-              }
-            })}
-          />
-        </Grid>
-        <Grid item xs={4}>
+          })}
+        />
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
           <Typography variant="h6">Add swimlanes</Typography>
-        </Grid>
-        <Grid item xs={8}>
           <Checkbox checked={swimlane} onChange={handleCheckboxChange} />
-        </Grid>
-        <Grid item xs={12}>
-          <Divider />
-        </Grid>
-        <Grid item xs={6}>
-          <Button type="submit" color="primary" variant="contained">
+        </Box>
+        <Divider flexItem />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%"
+          }}
+        >
+          <Button type="submit" color="primary" variant="contained" sx={{ marginRight: 3 }}>
             Submit
           </Button>
-          <Button onClick={onCancel}>Cancel</Button>
-        </Grid>
-      </Grid>
+          <Button onClick={onCancel} variant="outlined">
+            Cancel
+          </Button>
+        </Box>
+      </Box>
     </form>
   )
 }
