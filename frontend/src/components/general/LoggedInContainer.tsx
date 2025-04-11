@@ -60,28 +60,16 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
     return null
   }
 
-  if (!hasAuth && !loginTryData?.success && !isOpenInReadOnly) {
-    return (
-      <>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh"
-          }}
-        >
-          <AccessBoardForm board={board} tryLogin={tryLogin} handleOpenInReadOnly={() => setIsOpenInReadOnly(true)} />
-        </Box>
-      </>
-    )
-  }
+  const shouldShowContent = hasAuth || loginTryData?.success || isOpenInReadOnly
 
   return (
     <Box sx={{ height: "calc(100vh - 65px)", paddingTop: "65px" }}>
       <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
-      {children({ board })}
+      {shouldShowContent ? (
+        children({ board })
+      ) : (
+        <AccessBoardForm board={board} tryLogin={tryLogin} handleOpenInReadOnly={() => setIsOpenInReadOnly(true)} />
+      )}
     </Box>
   )
 }
