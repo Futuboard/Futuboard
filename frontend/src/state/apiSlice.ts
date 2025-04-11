@@ -29,7 +29,7 @@ import {
   Scope
 } from "@/types"
 
-import { getAdminPassword, getAuth, logOutOfBoard, setToken } from "./auth"
+import { getAdminPassword, getAuth, getIsInReadMode, logOutOfBoard, setToken } from "./auth"
 import { setNotification } from "./notification"
 import { RootState } from "./store"
 import { webSocketContainer } from "./websocket"
@@ -72,27 +72,53 @@ const baseQuery = fetchBaseQuery({
   }
 })
 
-const baseQueryWithLogoutOnInvalidToken: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
   args,
   api,
   extraOptions
 ) => {
   const result = await baseQuery(args, api, extraOptions)
   const tokenIsInvalid = result.error && result.error.status === 401
+  const boardId = (api.getState() as RootState).auth.boardId
+  const isInReadMode = getIsInReadMode(boardId)
+
   if (tokenIsInvalid) {
-    const boardId = (api.getState() as RootState).auth.boardId
-    logOutOfBoard(boardId)
-    api.dispatch(boardsApi.util.resetApiState())
-    api.dispatch(
-      setNotification({ text: "Your login has expired, so you were logged out.", type: "warning", duration: 60000 })
-    )
+    if (isInReadMode) {
+      api.dispatch(
+        setNotification({
+          text: "No changes allowed in read-only mode.",
+          type: "warning",
+          duration: 5000
+        })
+      )
+    } else {
+      logOutOfBoard(boardId)
+      api.dispatch(boardsApi.util.resetApiState())
+      api.dispatch(
+        setNotification({
+          text: "Your login expired or was invalid, so you were logged out.",
+          type: "warning",
+          duration: 60000
+        })
+      )
+    }
   }
+
+  /*
+  Django sometimes gives errors in HTML, so this cant really be used
+  
+  if (result.error) {
+    const errorMessage = (result.error.data as string) || "An unknown error occurred"
+    api.dispatch(setNotification({ text: errorMessage, type: "error", duration: 10000 }))
+  }
+  */
+
   return result
 }
 
 export const boardsApi = createApi({
   reducerPath: "boardsApi",
-  baseQuery: baseQueryWithLogoutOnInvalidToken,
+  baseQuery: baseQueryWithErrorHandling,
   tagTypes: cacheTagTypes,
 
   endpoints: (builder) => ({
