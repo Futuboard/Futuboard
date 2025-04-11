@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useDispatch } from "react-redux"
 
 import { boardsApi } from "@/state/apiSlice"
-import { logOutOfBoard } from "@/state/auth"
+import { logOutOfBoard, setIsInReadMode } from "@/state/auth"
 
 type Props = {
   boardId: string
@@ -16,6 +16,7 @@ const LogoutButton = ({ boardId }: Props) => {
 
   const handleLogOut = () => {
     logOutOfBoard(boardId)
+    setIsInReadMode(boardId, false)
     dispatch(boardsApi.util.resetApiState())
   }
 

@@ -34,6 +34,15 @@ const authSlice = createSlice({
   }
 })
 
+export const getIsInReadMode = (boardId: string) => {
+  const token = localStorage.getItem(`board-${boardId}-readmode`)
+  return token === "true"
+}
+
+export const setIsInReadMode = (boardId: string, isInReadMode: boolean) => {
+  localStorage.setItem(`board-${boardId}-readmode`, String(isInReadMode))
+}
+
 export const getAdminPassword = () => {
   return localStorage.getItem("admin-password")
 }

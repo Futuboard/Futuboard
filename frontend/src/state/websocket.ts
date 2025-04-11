@@ -12,6 +12,7 @@ class WebSocketContainer {
   private onMessageHandler: (event: MessageEvent) => void
   private onResetHandler: () => void
   private sendNotification: (message: string) => void
+  private lastConnectionFailed: boolean
 
   constructor() {
     this.clientId = getId()
@@ -20,6 +21,7 @@ class WebSocketContainer {
     this.onMessageHandler = () => null
     this.onResetHandler = () => null
     this.sendNotification = () => null
+    this.lastConnectionFailed = false
 
     // Automatically reconnect to the websocket if the connection is lost. Check every 10 seconds.
     setInterval(async () => {
@@ -34,7 +36,12 @@ class WebSocketContainer {
           this.socket.onmessage = this.onMessageHandler
           this.onResetHandler()
         } catch (error) {
-          this.sendNotification("Failed to connect to the board. Please check your internet connection.")
+          // Send notification only if if notification fails twice in a row.
+          if (this.lastConnectionFailed) {
+            this.sendNotification("Failed to connect to the board. Please check your internet connection.")
+          } else {
+            this.lastConnectionFailed = true
+          }
         }
       }
     }, 10_000)
