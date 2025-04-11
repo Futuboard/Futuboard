@@ -218,7 +218,7 @@ const Task: React.FC<TaskProps> = ({ task, templateDescription }) => {
                     gutterBottom
                     sx={{
                       color: "#2D3748",
-                      width: "80%",
+                      width: "90%",
                       textOverflow: "ellipsis",
                       marginLeft: "2px",
                       marginTop: "2px"
@@ -254,9 +254,10 @@ const Task: React.FC<TaskProps> = ({ task, templateDescription }) => {
                 </Box>
                 <Box
                   sx={{
-                    width: "204px",
+                    width: "206px",
                     height: "29px",
-                    marginBottom: "-4px",
+                    marginBottom: "-3px",
+                    marginLeft: "-2px",
                     overflow: "hidden"
                   }}
                 >
@@ -272,12 +273,13 @@ const Task: React.FC<TaskProps> = ({ task, templateDescription }) => {
                   alignItems: "center",
                   width: "35px",
                   height: "100%",
-                  marginLeft: 0.25,
-                  marginRight: -0.25,
-                  textAlign: "center"
+                  textAlign: "center",
+                  marginLeft: "1px"
                 }}
               >
-                <Typography sx={{ fontWeight: "bold", fontSize: "16px", color: "#2D3748", width: "35px" }}>
+                <Typography
+                  sx={{ fontWeight: "bold", fontSize: "16px", color: "#2D3748", width: "35px", textAlign: "center" }}
+                >
                   {task.size}
                 </Typography>
                 <AcceptanceCriteria description={task.description || ""} />
