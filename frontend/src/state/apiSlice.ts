@@ -29,7 +29,8 @@ import {
   Scope
 } from "@/types"
 
-import { getAdminPassword, getAuth, setToken } from "./auth"
+import { getAdminPassword, getAuth, logOutOfBoard, setToken } from "./auth"
+import { setNotification } from "./notification"
 import { RootState } from "./store"
 import { webSocketContainer } from "./websocket"
 
@@ -79,11 +80,12 @@ const baseQueryWithLogoutOnInvalidToken: BaseQueryFn<string | FetchArgs, unknown
   const result = await baseQuery(args, api, extraOptions)
   const tokenIsInvalid = result.error && result.error.status === 401
   if (tokenIsInvalid) {
-    console.log("TOKEN IS INVALID")
     const boardId = (api.getState() as RootState).auth.boardId
-    if (boardId) {
-      api.dispatch(boardsApi.util.resetApiState())
-    }
+    logOutOfBoard(boardId)
+    api.dispatch(boardsApi.util.resetApiState())
+    api.dispatch(
+      setNotification({ text: "Your login has expired, so you were logged out.", type: "warning", duration: 60000 })
+    )
   }
   return result
 }

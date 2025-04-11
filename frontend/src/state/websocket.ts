@@ -27,7 +27,8 @@ class WebSocketContainer {
         !this.socket ||
         (this.socket.readyState !== WebSocket.OPEN && this.socket.readyState !== WebSocket.CONNECTING)
       ) {
-        this.sendNotification("Board connection interrupted. Reconnecting...")
+        // This notification was mostly just annoying, and doesn't really matter to the user, so disabled it for now.
+        // this.sendNotification("Board connection interrupted. Reconnecting automatically...")
         try {
           this.socket = await this.getNewWebSocket()
           this.socket.onmessage = this.onMessageHandler
