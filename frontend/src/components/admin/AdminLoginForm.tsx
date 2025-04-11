@@ -66,7 +66,11 @@ const AdminLoginForm = ({ setIsAuthenticated }: Props) => {
         </Grid>
         <Grid item xs={12}>
           <Grid item xs={12}>
-            <PasswordField register={register("password")} errorText={errors.password?.message} />
+            <PasswordField
+              register={register("password")}
+              errorText={errors.password?.message}
+              label="Admin password"
+            />
           </Grid>
         </Grid>
         <Grid item xs={12}>

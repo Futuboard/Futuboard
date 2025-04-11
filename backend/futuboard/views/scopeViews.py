@@ -1,6 +1,8 @@
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 
+from ..verification import check_if_access_token_incorrect
+
 from ..models import Board, Column, Scope, Ticket, TicketEvent
 from ..serializers import ScopeSerializerWithRelationInfo
 import rest_framework.request
@@ -8,15 +10,17 @@ from django.utils.timezone import now
 
 
 @api_view(["GET", "POST", "DELETE"])
-def scopes_on_board(request: rest_framework.request.Request, boardid: str):
+def scopes_on_board(request: rest_framework.request.Request, board_id: str):
     if request.method == "GET":
-        board = Board.objects.get(boardid=boardid)
+        board = Board.objects.get(boardid=board_id)
         query_set = Scope.objects.filter(boardid=board)
         serializer = ScopeSerializerWithRelationInfo(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":
-        board = Board.objects.get(boardid=boardid)
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
+        board = Board.objects.get(boardid=board_id)
         new_scope = Scope(
             boardid=board,
             title=request.data["title"],
@@ -27,6 +31,8 @@ def scopes_on_board(request: rest_framework.request.Request, boardid: str):
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "DELETE":
+        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+            return token_incorrect
         scope = Scope.objects.get(scopeid=request.data["scopeid"])
         scope.delete()
         return JsonResponse({"success": True})
@@ -36,10 +42,15 @@ def scopes_on_board(request: rest_framework.request.Request, boardid: str):
 
 @api_view(["POST", "DELETE"])
 def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
-    if request.method == "POST":
-        scope = Scope.objects.get(scopeid=scopeid)
-        ticket = Ticket.objects.get(ticketid=request.data["ticketid"])
+    scope = Scope.objects.get(scopeid=scopeid)
 
+    board_id = scope.boardid.boardid
+    if token_incorrect := check_if_access_token_incorrect(board_id, request):
+        return token_incorrect
+
+    ticket = Ticket.objects.get(ticketid=request.data["ticketid"])
+
+    if request.method == "POST":
         ticket_add_to_scope_event = TicketEvent(
             ticketid=ticket,
             event_type=TicketEvent.SCOPE_CHANGE,
@@ -63,9 +74,6 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
         return JsonResponse({"success": True})
 
     if request.method == "DELETE":
-        scope = Scope.objects.get(scopeid=scopeid)
-        ticket = Ticket.objects.get(ticketid=request.data["ticketid"])
-
         ticket_remove_from_scope_event = TicketEvent(
             ticketid=ticket,
             event_type=TicketEvent.SCOPE_CHANGE,
@@ -93,6 +101,11 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
 @api_view(["POST"])
 def set_scope_forecast(request: rest_framework.request.Request, scopeid: str):
     scope = Scope.objects.get(scopeid=scopeid)
+
+    board_id = scope.boardid.boardid
+    if token_incorrect := check_if_access_token_incorrect(board_id, request):
+        return token_incorrect
+
     scope.forecast_set_date = now()
     scope_size = 0
     for ticket in scope.tickets.all():
@@ -106,6 +119,11 @@ def set_scope_forecast(request: rest_framework.request.Request, scopeid: str):
 @api_view(["POST"])
 def set_scope_title(request: rest_framework.request.Request, scopeid: str):
     scope = Scope.objects.get(scopeid=scopeid)
+
+    board_id = scope.boardid.boardid
+    if token_incorrect := check_if_access_token_incorrect(board_id, request):
+        return token_incorrect
+
     scope.title = request.data["title"]
     scope.save()
     return JsonResponse({"success": True})
@@ -114,6 +132,11 @@ def set_scope_title(request: rest_framework.request.Request, scopeid: str):
 @api_view(["POST"])
 def set_scope_done_columns(request: rest_framework.request.Request, scopeid: str):
     scope = Scope.objects.get(scopeid=scopeid)
+
+    board_id = scope.boardid.boardid
+    if token_incorrect := check_if_access_token_incorrect(board_id, request):
+        return token_incorrect
+
     columns = Column.objects.filter(columnid__in=request.data["done_columns"])
     scope.done_columns.set(columns)
     scope.save()

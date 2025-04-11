@@ -12,6 +12,7 @@
   "description": "",
   "dependencies": {
     "cypress": "^14.2.0",
+    "dayjs": "^1.11.13",
     "puppeteer": "^23.9.0",
     "puppeteer-cluster": "^0.24.0"
   },

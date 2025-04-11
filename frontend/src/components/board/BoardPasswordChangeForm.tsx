@@ -58,7 +58,7 @@ const BoardPasswordChangeForm = ({ onClose, open }: BoardPasswordChangeFormProps
     <Dialog open={open} onClose={onClose}>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={3} flexDirection="column" width="400px">
+          <Grid container spacing={3} flexDirection="column">
             <Grid item>
               <Typography gutterBottom variant="h6">
                 Enter a New Password
