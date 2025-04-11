@@ -59,7 +59,7 @@ const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ board, tryLogin, hand
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "75vh"
+        minHeight: "80vh"
       }}
     >
       <ToolBar boardId={board.boardid} title={board.title} />
