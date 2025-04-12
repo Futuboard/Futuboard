@@ -49,7 +49,7 @@
 - Allows for automatic visualizations and statistics about the progress of work.
 - Allows for an easier to use platform then alternative tools with the same features.
 
-This README includes a users manual, instructions for setting up development, information about what we've used to create this project with documentation links and guides on deploying your own instance.
+This README includes instructions for setting up development, information about what we've used to create this project with documentation links and guides on deploying your own instance.
 
 ### Features
 
