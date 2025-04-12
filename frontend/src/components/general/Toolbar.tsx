@@ -39,6 +39,7 @@ import BoardPasswordChangeForm from "../board/BoardPasswordChangeForm"
 import BoardTitleChangeForm from "../board/BoardTitleChangeForm"
 import CopyToClipboardButton from "../board/CopyToClipBoardButton"
 import CreateColumnButton from "../board/CreateColumnButton"
+import LogoutButton from "../board/LogoutButton"
 import MagnetIcon from "../board/MagnetIcon"
 import ScopeList from "../board/ScopeList"
 import TaskForm from "../board/TaskForm"
@@ -276,6 +277,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
           <Typography variant="body2">Download Board JSON</Typography>
         </MenuItem>
         <BoardDeletionComponent />
+        <LogoutButton boardId={id} />
       </Menu>
       <Box>
         <BoardTitleChangeForm title={title} onClose={() => setTitleFormOpen(false)} open={titleFormOpen} />
