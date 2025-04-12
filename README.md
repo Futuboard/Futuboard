@@ -1,4 +1,46 @@
-# Introduction
+# Futuboard
+
+- [Introduction](#introduction)
+  - [Features](#features)
+- [Instructions for local development](#instructions-for-local-development)
+  - [Step 1: Environment variables](#step-1-environment-variables)
+  - [Step 2: Installing dependencies](#step-2-installing-dependencies)
+    - [Frontend dependencies](#frontend-dependencies)
+    - [Backend dependencies](#backend-dependencies)
+  - [Step 3: Running the project](#step-3-running-the-project)
+    - [Option 1: Fully Dockerized development environment](#option-1-fully-dockerized-development-environment)
+    - [Option 2: Running frontend, backend and database separately](#option-2-running-frontend-backend-and-database-separately)
+      - [Option 2.1: Using the Restore Terminals extension in VS Code](#option-21-using-the-restore-terminals-extension-in-vs-code)
+      - [Option 2.2: Running the backend and frontend manually](#option-22-running-the-backend-and-frontend-manually)
+  - [Linting and code style](#linting-and-code-style)
+    - [Linting in frontend](#linting-in-frontend)
+    - [Linting in backend](#linting-in-backend)
+  - [Testing](#testing)
+    - [Frontend testing](#frontend-testing)
+    - [Backend testing](#backend-testing)
+    - [E2E testing](#e2e-testing)
+- [Technologies](#technologies)
+  - [Frontend](#frontend)
+    - [React - TypeScript](#react---typescript)
+    - [Vite](#vite)
+    - [Redux Toolkit - RTK Query](#redux-toolkit---rtk-query)
+    - [Style Library: MaterialUI](#style-library-materialui)
+    - [React-beautiful-dnd](#react-beautiful-dnd)
+    - [ESLint](#eslint)
+    - [MDXEditor](#mdxeditor)
+  - [Backend](#backend)
+    - [Django](#django)
+    - [PyTest](#pytest)
+  - [Other technologies](#other-technologies)
+    - [Cloud Service: Azure](#cloud-service-azure)
+    - [Database: PostgreSQL](#database-postgresql)
+- [Deployment instructions](#deployment-instructions)
+  - [Frontend deployment](#frontend-deployment)
+  - [Backend deployment](#backend-deployment)
+    - [Database creation](#database-creation)
+    - [Common issues](#common-issues)
+
+## Introduction
 
 - Our goal is to make a free, easy to use and open source web tool for team workflow management
 - The tool has all the required features required for managing workflows without over complicating the tool
@@ -9,7 +51,7 @@
 
 This README includes a users manual, instructions for setting up development, information about what we've used to create this project with documentation links and guides on deploying your own instance.
 
-## Features
+### Features
 
 - The user can create a board with a name and optional password
 - The user gets a link to the board, which they have to store personally
@@ -29,20 +71,20 @@ This README includes a users manual, instructions for setting up development, in
 - A board can be deleted
 - A new board can be imported from a previously exported JSON file
 
-# Instructions for local development
+## Instructions for local development
 
 The following sections include information about how to start using the tool in a local development environment and about how the project file structure and libraries work.
 
-## Step 1: Environment variables
+### Step 1: Environment variables
 
 You will need two `.env` files, one for the frontend (located in the `frontend/` folder) and one for the backend (located in the root folder of the project).
 You can look at the `.env.example` files in the frontend and root folders for the required variables.
 
 The simplest development setup is to just make a copy of the two `.env.example` files in the same folders they are already in, and rename them to `.env`.
 
-## Step 2: Installing dependencies
+### Step 2: Installing dependencies
 
-### Frontend
+#### Frontend dependencies
 
 First make sure that you have at least v20 of node installed on your computer.
 
@@ -56,7 +98,7 @@ npm install
 >[!NOTE]
 > If you have multiple versions of node installed, run `nvm use 20` before installing the dependencies.
 
-### Backend
+#### Backend dependencies
 
 First make sure python 3.x is installed. Next we recommend creating a virtual environment to avoid installing required packages globally. In the root folder of the project, run
 
@@ -86,11 +128,11 @@ pip install -r requirements.txt
 
 If you will [run the project with Docker](#option-1-fully-dockerized-development-environment), you can close the virtual environment.
 
-## Step 3: Running the project
+### Step 3: Running the project
 
 You can either run the frontend and backend separately or use the fully dockerized development environment.
 
-### Option 1: Fully Dockerized development environment
+#### Option 1: Fully Dockerized development environment
 
 You need to install [Docker](https://docs.docker.com/get-started/get-docker/) to your machine. After the installation simply run:
 
@@ -100,7 +142,7 @@ docker compose up --watch --build
 
 The frontend will be available at `localhost:5173` and the backend at `localhost:8000`.
 
-### Option 2: Running frontend, backend and database separately
+#### Option 2: Running frontend, backend and database separately
 
 You can use the following command to start a local PostgreSQL database using Docker (you need to have Docker installed):
 
@@ -110,7 +152,7 @@ docker compose up database
 
 The data in the local database is stored in the db/ folder. You can delete the folder, if you want to reset the database.
 
-#### Option 2.1: Using the Restore Terminals extension in VS Code
+##### Option 2.1: Using the Restore Terminals extension in VS Code
 
 If you're using VS Code, you can use the [Restore Terminals](https://marketplace.visualstudio.com/items?itemName=EthanSK.restore-terminals) extension to automatically start the backend and frontend servers when you open the folder. .
 
@@ -119,7 +161,7 @@ If you're using VS Code, you can use the [Restore Terminals](https://marketplace
 3. Press `Ctrl+Shift+P` and run the `Restore Terminals` command
 4. You might need to restart some of the services, if e.g. the database was not running when the backend tries to connect to it.
 
-#### Option 2.2: Running the backend and frontend manually
+##### Option 2.2: Running the backend and frontend manually
 
 You need to run the database migrations, so the local database has the correct tables.  
 You can do this by running (in the backend folder, with .venv activated):
@@ -150,9 +192,9 @@ cd frontend/
 npm run dev
 ```
 
-## Linting and code style
+### Linting and code style
 
-### Frontend
+#### Linting in frontend
 
 The easiest way to lint and format frontend code is to install the [Prettier VS Code extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) and edit your VSCode settings to include
 
@@ -176,7 +218,7 @@ To automatically fix detected errors run:
 npm run lint:fix && npm run prettier:fix
 ```
 
-### Backend
+#### Linting in backend
 
 The easiest way to lint and format backend code is to install [Ruff VS Code extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) and edit your VSCode settings to include
 
@@ -201,13 +243,13 @@ To automatically fix detected errors run:
 ruff check --fix && ruff format
 ```
 
-## Testing
+### Testing
 
-### Frontend
+#### Frontend testing
 
 Currently no unit-tests
 
-### Backend
+#### Backend testing
 
 Pytest unit tests can be run with the commands:
 
@@ -228,7 +270,7 @@ Running all tests in a file:
 pytest PATH_TO_TEST_FILE
 ```
 
-### E2E tests
+#### E2E testing
 
 To run all E2E tests with cypress:
 
@@ -246,15 +288,13 @@ npm install
 npm start
 ```
 
-## Instructions for future developers
-
-# Technologies
+## Technologies
 
 Here are some technologies used in the project and brief justifications:
 
-## Frontend
+### Frontend
 
-### React - TypeScript
+#### React - TypeScript
 
 React is a popular JavaScript library that offers extensive documentation and flexible interoperability with other libraries.
 
@@ -262,13 +302,13 @@ TypeScript provides type safety and improves the readability and understanding o
 
 [React - Typescript documentation](https://www.typescriptlang.org/docs/handbook/react.html)
 
-### Vite
+#### Vite
 
 Vite provides a fast and efficient development environment and an optimized production process for the frontend.
 
 [Vite Guide](https://vitejs.dev/guide/)
 
-### Redux Toolkit - RTK Query
+#### Redux Toolkit - RTK Query
 
 Redux is a state management method familiar to many team members, suitable for scalable project state management needs. Because using Redux can be complex, the Redux Toolkit and RTK Query have been adopted to make the use of Redux smoother and more efficient.
 
@@ -276,33 +316,33 @@ Redux is a state management method familiar to many team members, suitable for s
 
 [RTK Query Overview](https://redux-toolkit.js.org/rtk-query/overview)
 
-### Style Library: MaterialUI
+#### Style Library: MaterialUI
 
 We decided to use a ready-made component library to avoid unnecessary time wastage on styling. MaterialUI allows us to easily give our application a proper appearance.
 
 [MaterialUI documentation](https://mui.com/material-ui/getting-started/)
 
-### React-beautiful-dnd
+#### React-beautiful-dnd
 
 React beautiful dnd makes it easy to move elements in lists, which should be well-suited for this project. It provides neat animations and extensive documentation.
 
 [React-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd)
 
-### ESLint
+#### ESLint
 
 ESLint helps developers identify and fix code quality and style issues, ensure compliance with coding standards, and detect errors and bugs in early development stages. It allows teams to define a consistent code style and maintain code quality in their projects.
 
 [ESLint documentation](https://eslint.org/docs/latest/)
 
-### MDXEditor
+#### MDXEditor
 
 MDXEditor is an open-source React component for editing markdown components. Used under the MIT license © Petyo Ivanov.
 
 [MDXEditor GitHub](https://github.com/mdx-editor/editor)
 
-## Other Technologies
+### Backend
 
-### Backend technology: Django
+#### Django
 
 Django offers comprehensive documentation and support, scalability, a fast and dynamic framework for software development, and tools for database management and logic building. More specifically the project uses the django-rest-framework.
 
@@ -310,31 +350,33 @@ Django offers comprehensive documentation and support, scalability, a fast and d
 
 [Rest Framework](https://www.django-rest-framework.org/)
 
-### Cloud Service: Azure
-
-Azure provides a scalable and secure cloud for project development. It offers the necessary database options and tools for maintaining web applications. The price level also seems to be affordable in Azure, where there are many free features and $100 free credits are offered to students. The documentation also appeared to be clear.
-
-[Azure Documentation](https://learn.microsoft.com/en-us/azure/?product=popular)
-
-### Database: PostgreSQL
-
-Since we chose Django as our framework, it is natural to select PostgreSQL as our database, as Django provides PostgreSQL-specific tools for communication and numerous data types that operate only in PostgreSQL. Additionally, PostgreSQL offers diverse features that Django supports.
-
-[PostgreSQL documentation](https://www.postgresql.org/docs/)
-
-### Backend Unit Testing: PyTest
+#### PyTest
 
 We decided to use PyTest for backend unit testing due to its simplicity and previous experience using it.
 
 [PyTest documentation](https://docs.pytest.org/en/7.1.x/contents.html)
 
-# Deployment instructions
+### Other Technologies
+
+#### Cloud Service: Azure
+
+Azure provides a scalable and secure cloud for project development. It offers the necessary database options and tools for maintaining web applications. The price level also seems to be affordable in Azure, where there are many free features and $100 free credits are offered to students. The documentation also appeared to be clear.
+
+[Azure Documentation](https://learn.microsoft.com/en-us/azure/?product=popular)
+
+#### Database: PostgreSQL
+
+Since we chose Django as our framework, it is natural to select PostgreSQL as our database, as Django provides PostgreSQL-specific tools for communication and numerous data types that operate only in PostgreSQL. Additionally, PostgreSQL offers diverse features that Django supports.
+
+[PostgreSQL documentation](https://www.postgresql.org/docs/)
+
+## Deployment instructions
 
 Deployment instructions:
 
 Deployment to Azure and other PaaS platforms
 
-## Frontend
+### Frontend deployment
 
 Create a new static web app
 
@@ -349,7 +391,7 @@ After this, you can create the application and follow Azure's instructions to co
 In order for the frontend to function as desired, you still need to add environment variables. For the backend, you need to add the variable VITE_DB_ADDRESS: "your backend address". For websockets, you need to add the variable VITE_WEBSOCKET_ADDRESS: "your websocket address"
 These variables can be set, for example, in the GitHub workflow file. Once Azure has completed the deployment, a new workflow file will appear in GitHub (/.github/workflows). An env section needs to be added to this file.
 
-## Backend
+### Backend deployment
 
 Deployment of the backend can be accomplished through Azure's App Service Web App. Create a new Web App. Choose the subscription and resource group you prefer. Also, name your application.
 
@@ -362,7 +404,7 @@ In the environment variables section, you need to include all the used env varia
 
 DB-prefixed variables are database variables. The value of SCM_DO_BUILD_DURING_DEPLOYMENT should be 1 to ensure the deployment works as intended. After this, restart the application from Azure.
 
-### Database creation
+#### Database creation
 
 You can create database migrations in django using
 
@@ -384,10 +426,6 @@ To setup the database in Azure, follow this guide:
 
 [Azure database creation guide](https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal)
 
-### Common issues:
+#### Common issues
 
 If changes are not visible in the backend or it does not work for some reason, it is advisable in Azure to "kill" the application and keep it turned off for about 10 minutes. Then restart it. If you do not wait long enough, the application may not actually have shut down.
-
-```
-
-```
