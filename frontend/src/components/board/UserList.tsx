@@ -1,5 +1,5 @@
 import { Draggable, DraggableStateSnapshot, DraggableStyle, Droppable, DroppableProvided } from "@hello-pangea/dnd"
-import { DeleteForever, DeleteOutline } from "@mui/icons-material"
+import { DeleteOutline, DeleteTwoTone } from "@mui/icons-material"
 import { Box, IconButton, Tooltip } from "@mui/material"
 import { useState } from "react"
 
@@ -65,7 +65,7 @@ const UserList: React.FC<UserListProps> = ({ users }) => {
             {provided.placeholder}
             <Tooltip title="toggle delete" sx={{ marginLeft: "auto" }}>
               <IconButton onClick={() => setShowEditable(!showEditable)}>
-                {showEditable ? <DeleteForever color="error" /> : <DeleteOutline />}
+                {showEditable ? <DeleteTwoTone color="error" /> : <DeleteOutline />}
               </IconButton>
             </Tooltip>
           </Box>
