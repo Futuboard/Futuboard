@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material"
+import { Box, Grid, List, ListItemButton, Typography, ListItem, Divider } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 
@@ -13,23 +13,42 @@ const VisitedBoardList: React.FC = () => {
   }, [])
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "10em",
-        width: "20em",
-        borderStyle: "solid",
-        borderWidth: "2px",
-        borderColor: "black"
-      }}
-    >
-      {visitedBoards.map((visitedBoard) => (
-        <Link key={visitedBoard.boardid} to={"/board/" + visitedBoard.boardid}>
-          <Typography>{visitedBoard.title}</Typography>
-        </Link>
-      ))}
-    </Box>
+    visitedBoards.length > 0 && (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minWidth: "18em",
+          maxWidth: "25em",
+          borderStyle: "solid",
+          borderWidth: "0px",
+          borderColor: "black",
+          gap: 1
+        }}
+      >
+        <Typography variant="h6" color={"black"} marginTop={2} sx={{ fontWeight: "bold" }}>
+          Recently viewed boards:
+        </Typography>
+
+        <List sx={{ maxHeight: "200px", overflowY: "auto" }}>
+          <Divider />
+          {visitedBoards.map((visitedBoard) => (
+            <>
+              <ListItemButton
+                component={Link}
+                key={visitedBoard.boardid}
+                to={"/board/" + visitedBoard.boardid}
+                sx={{ "&:hover": { color: "#646cff" } }}
+                disableRipple
+              >
+                <Typography>{visitedBoard.title}</Typography>
+              </ListItemButton>
+              <Divider />
+            </>
+          ))}
+        </List>
+      </Box>
+    )
   )
 }
 
