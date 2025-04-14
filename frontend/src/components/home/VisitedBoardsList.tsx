@@ -1,7 +1,8 @@
-import { Box, List, ListItemButton, Typography, Divider, InputAdornment, TextField } from "@mui/material"
 import SearchIcon from "@mui/icons-material/Search"
+import { Box, List, ListItemButton, Typography, Divider, InputAdornment, TextField } from "@mui/material"
 import { Fragment, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+
 import { getVisitedBoards } from "@/services/utils"
 import { BoardWithOnlyIdAndTitle } from "@/types"
 
