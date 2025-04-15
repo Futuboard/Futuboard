@@ -1,5 +1,5 @@
 import SearchIcon from "@mui/icons-material/Search"
-import { Box, List, ListItemButton, Typography, Divider, InputAdornment, TextField } from "@mui/material"
+import { Box, List, ListItemButton, Typography, Divider, InputAdornment, TextField, useMediaQuery } from "@mui/material"
 import { Fragment, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 
@@ -9,6 +9,8 @@ import { BoardWithOnlyIdAndTitle } from "@/types"
 const VisitedBoardList: React.FC = () => {
   const [visitedBoards, setVisitedBoards] = useState<BoardWithOnlyIdAndTitle[]>([])
   const [visibleBoards, setVisibleBoards] = useState<BoardWithOnlyIdAndTitle[]>([])
+
+  const screenIsTooNarrow = useMediaQuery("(min-width:900px)")
 
   useEffect(() => {
     setVisitedBoards(getVisitedBoards())
@@ -22,7 +24,8 @@ const VisitedBoardList: React.FC = () => {
   }
 
   return (
-    visitedBoards.length > 0 && (
+    visitedBoards.length > 0 &&
+    screenIsTooNarrow && (
       <Box
         sx={{
           display: "flex",
@@ -51,13 +54,13 @@ const VisitedBoardList: React.FC = () => {
           onChange={handleChange}
           autoComplete="off"
         />
-        <List disablePadding sx={{ height: "200px", overflowY: "auto" }}>
+        <List disablePadding sx={{ maxHeight: "200px", overflowY: "auto", backgroundColor: "#ffffff" }}>
           {visibleBoards.map((board) => (
             <Fragment key={board.boardid}>
               <ListItemButton
                 component={Link}
                 to={"/board/" + board.boardid}
-                sx={{ "&:hover": { color: "#646cff" } }}
+                sx={{ "&:hover": { color: "#646cff", backgroundColor: "#f5f5f5" } }}
                 disableRipple
               >
                 <Typography>{board.title}</Typography>
