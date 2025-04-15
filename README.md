@@ -27,10 +27,13 @@
     - [Style Library: MaterialUI](#style-library-materialui)
     - [React-beautiful-dnd](#react-beautiful-dnd)
     - [ESLint](#eslint)
+    - [Prettier](#prettier)
     - [MDXEditor](#mdxeditor)
+    - [Recharts](#recharts)
   - [Backend](#backend)
     - [Django](#django)
     - [PyTest](#pytest)
+    - [Ruff](#ruff)
   - [Other technologies](#other-technologies)
     - [Cloud Service: Azure](#cloud-service-azure)
     - [Database: PostgreSQL](#database-postgresql)
@@ -334,11 +337,23 @@ ESLint helps developers identify and fix code quality and style issues, ensure c
 
 [ESLint documentation](https://eslint.org/docs/latest/)
 
+#### Prettier
+
+Prettier is a code formatter that helps the development team to stay consistent with the code format.
+
+[Prettier documentation](https://prettier.io/docs/)
+
 #### MDXEditor
 
 MDXEditor is an open-source React component for editing markdown components. Used under the MIT license © Petyo Ivanov.
 
 [MDXEditor GitHub](https://github.com/mdx-editor/editor)
+
+#### Recharts
+
+Recharts is a library that allows us to add different charts to the project.
+
+[Recharts](https://recharts.org/en-US)
 
 ### Backend
 
@@ -355,6 +370,12 @@ Django offers comprehensive documentation and support, scalability, a fast and d
 We decided to use PyTest for backend unit testing due to its simplicity and previous experience using it.
 
 [PyTest documentation](https://docs.pytest.org/en/7.1.x/contents.html)
+
+#### Ruff
+
+Ruff is a code linter and formatter for Python. We selected it because Ruff can do both linting and styling and is pretty straight-forward to use.
+
+[Ruff](https://docs.astral.sh/ruff/)
 
 ### Other Technologies
 
