@@ -45,6 +45,8 @@ interface CreateTaskButtonProps {
 }
 
 const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) => {
+  const { boardId = "default-id" } = useParams()
+
   const [defaultValues, setDefaultValues] = useState<TaskTemplate | null>(null)
   const [taskTemplate, setTaskTemplate] = useState<TaskTemplate | null>(null)
 
@@ -100,19 +102,18 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) 
   const handleSubmit = async (data: FormData) => {
     //task object cant be give type Task yet- problem with caretaker types
     //the object creation should be refactored to the TaskCreationForm component
-    const id = getId()
+    const taskId = getId()
     const taskObject = {
-      ticketid: id,
+      ticketid: taskId,
       title: data.taskTitle,
       description: data.description,
       caretakers: data.corners,
       size: data.size,
       columnid: columnid,
-      boardid: id,
       color: data.color,
       cornernote: data.cornerNote
     }
-    await addTask({ boardId: id, columnId: columnid, task: taskObject })
+    await addTask({ boardId: boardId, columnId: columnid, task: taskObject })
 
     if (isSuccess && swimlaneColumns.length) {
       const criteria: string[] = []
@@ -127,7 +128,7 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) 
           title: title,
           columnid: columnid,
           actionid: getId(),
-          ticketid: id,
+          ticketid: taskId,
           swimlanecolumnid: swimlaneColumns[0].swimlanecolumnid,
           order: 0
         }
