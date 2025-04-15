@@ -54,7 +54,20 @@ const VisitedBoardList: React.FC = () => {
           onChange={handleChange}
           autoComplete="off"
         />
-        <List disablePadding sx={{ maxHeight: "200px", overflowY: "auto", backgroundColor: "#ffffff" }}>
+        <List
+          disablePadding
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            maxHeight: "204px",
+            overflowY: "auto",
+            backgroundColor: "#ffffff",
+            borderStyle: "solid",
+            borderWidth: "1px",
+            borderRadius: 1,
+            borderColor: "#c4c4c4"
+          }}
+        >
           {visibleBoards.map((board) => (
             <Fragment key={board.boardid}>
               <ListItemButton
@@ -65,7 +78,7 @@ const VisitedBoardList: React.FC = () => {
               >
                 <Typography>{board.title}</Typography>
               </ListItemButton>
-              <Divider />
+              <Divider sx={{ width: "97%", alignSelf: "center" }} />
             </Fragment>
           ))}
         </List>

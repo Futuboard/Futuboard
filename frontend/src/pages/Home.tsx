@@ -18,11 +18,9 @@ const Home: React.FC = () => {
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" height="100vh" width="100%" bgcolor="white">
-      <Grid item xs={12}>
-        <Box textAlign="center" sx={{ position: "absolute", top: 0, left: 0, p: 2, alignItems: "center" }}>
-          <VisitedBoardsList />
-        </Box>
-      </Grid>
+      <Box textAlign="center" sx={{ position: "absolute", top: 0, left: 0, p: 2, alignItems: "center" }}>
+        <VisitedBoardsList />
+      </Box>
 
       <Grid textAlign="center" container spacing={1}>
         <Grid item xs={12}>
