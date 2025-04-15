@@ -18,6 +18,7 @@ import { useAddTaskToScopeMutation, useDeleteTaskFromScopeMutation, useUpdateTas
 
 import TaskForm from "./TaskForm"
 import UserMagnet from "./UserMagnet"
+import { parseAcceptanceCriteriaFromDescription } from "@/services/Utils"
 
 const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSnapshot) => {
   if (!snapshot.isDropAnimating) {
@@ -32,18 +33,15 @@ const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSn
 }
 
 const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) => {
+  const all = parseAcceptanceCriteriaFromDescription(description)
   let done = 0
-  let all = 0
-  description.split("\n").forEach((line) => {
-    if (line.charAt(2) == "[" && line.charAt(4) == "]") {
-      all += 1
-      if (line.charAt(3) == "x") done += 1
-    }
+  all.forEach((line) => {
+    if (line.charAt(3) == "x") done += 1
   })
 
-  if (all <= 0) return null
+  if (all.length <= 0) return null
 
-  const progress = Math.round((done / all) * 100)
+  const progress = Math.round((done / all.length) * 100)
 
   return (
     <Typography

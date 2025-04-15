@@ -12,7 +12,7 @@ import { useParams } from "react-router"
 import { RootState } from "@/state/store"
 import type { Column, Task as TaskType, User, TaskTemplate, SimpleScope, NewAction, Board } from "@/types"
 
-import { getId } from "../../services/Utils"
+import { getId, parseAcceptanceCriteriaFromDescription } from "../../services/Utils"
 import {
   boardsApi,
   useAddTaskMutation,
@@ -41,12 +41,10 @@ interface FormData {
 
 interface CreateTaskButtonProps {
   columnid: string
-  board: Board | undefined
+  board: Board
 }
 
 const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) => {
-  const { boardId = "default-id" } = useParams()
-
   const [defaultValues, setDefaultValues] = useState<TaskTemplate | null>(null)
   const [taskTemplate, setTaskTemplate] = useState<TaskTemplate | null>(null)
 
@@ -113,17 +111,13 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) 
       color: data.color,
       cornernote: data.cornerNote
     }
-    await addTask({ boardId: boardId, columnId: columnid, task: taskObject })
+    await addTask({ boardId: board?.boardid || "", columnId: columnid, task: taskObject })
 
     if (isSuccess && swimlaneColumns.length) {
-      const criteria: string[] = []
-      data.description?.split("\n").forEach((line) => {
-        if (line.charAt(2) == "[" && line.charAt(4) == "]") {
-          criteria.push(line.slice(5).trim().replace("&#x20;", ""))
-        }
-      })
+      const criteria: string[] = parseAcceptanceCriteriaFromDescription(data?.description)
+      const cleanedCriteria = criteria.map((line) => line.slice(5).trim().replace("&#x20;", ""))
 
-      criteria.forEach(async (title) => {
+      cleanedCriteria.forEach(async (title) => {
         const action: NewAction = {
           title: title,
           columnid: columnid,
@@ -337,6 +331,8 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
       }
     }
   }
+
+  if (!board) return null
 
   let bgColor = isScopeSelected ? "#beb7b5" : "#e5dbd9"
   let titleBgColor = "#e5dbd9"
