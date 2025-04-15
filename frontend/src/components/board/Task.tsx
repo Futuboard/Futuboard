@@ -54,7 +54,7 @@ const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) 
 
 const TaskUserList: React.FC<{ users: UserWithoutTicketsOrActions[]; taskid: string }> = ({ users, taskid }) => {
   return (
-    <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+    <div style={{ display: "flex", alignItems: "center" }}>
       {users.map((user, index) => (
         <Draggable key={user.userid + "/ticket"} draggableId={user.userid + "/" + taskid} index={index}>
           {(provided, snapshot) => {
@@ -258,10 +258,10 @@ const Task: React.FC<TaskProps> = ({ task, templateDescription }) => {
                 </Box>
                 <Box
                   sx={{
-                    width: "206px",
-                    height: "32px",
-                    marginBottom: "-3px",
-                    marginLeft: "-2px",
+                    width: "210px",
+                    height: "30px",
+                    marginBottom: "-2px",
+                    marginLeft: "-6px",
                     overflow: "hidden"
                   }}
                 >
