@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material"
+import { ButtonGroup, Divider, Typography } from "@mui/material"
 import Button from "@mui/material/Button"
 import Grid from "@mui/material/Grid"
 import TextField from "@mui/material/TextField"
@@ -45,13 +45,14 @@ const ActionEditForm: React.FC<AddActionCreationFormProps> = (props) => {
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <Typography>Add action</Typography>
+          <Divider flexItem />
         </Grid>
         <Grid item xs={12}>
           <TextField
             inputRef={inputRef}
             label={
               <span>
-                Name <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>
+                Content <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>
               </span>
             }
             size={"small"}
@@ -66,12 +67,14 @@ const ActionEditForm: React.FC<AddActionCreationFormProps> = (props) => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Button type="submit" color="primary" variant="contained" aria-label="submit action">
-            Submit
-          </Button>
-          <Button onClick={onCancel} aria-label="cancel action">
-            Cancel
-          </Button>
+          <ButtonGroup size="small">
+            <Button type="submit" color="primary" variant="contained" aria-label="submit action">
+              Submit
+            </Button>
+            <Button onClick={onCancel} aria-label="cancel action">
+              Cancel
+            </Button>
+          </ButtonGroup>
         </Grid>
       </Grid>
     </form>
