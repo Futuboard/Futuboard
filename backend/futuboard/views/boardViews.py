@@ -76,12 +76,13 @@ def board_by_id(request, board_id):
             raise Http404("Board does not exist")
 
     if request.method == "DELETE":
-        try:
-            board = Board.objects.get(pk=board_id)
-            board.delete()
-            return JsonResponse({"message": "Board deleted successfully"}, status=200)
-        except:  # noqa: E722
-            raise Http404("Board deletion failed")
+        if result := check_if_access_token_incorrect(board_id, request):
+            return result
+    
+        board = Board.objects.get(pk=board_id)
+        board.delete()
+        return JsonResponse({"message": "Board deleted successfully"}, status=200)
+
 
 
 @api_view(["PUT"])
