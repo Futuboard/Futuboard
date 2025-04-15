@@ -134,7 +134,7 @@ You can either run the frontend and backend separately or use the fully dockeriz
 
 #### Option 1: Fully Dockerized development environment
 
-You need to install [Docker](https://docs.docker.com/get-started/get-docker/) to your machine. After the installation simply run:
+You need to install [Docker](https://docs.docker.com/get-started/get-docker/) to your machine. After the installation in the root folder simply run:
 
 ```
 docker compose up --watch --build
@@ -251,7 +251,7 @@ Currently no unit-tests
 
 #### Backend testing
 
-Pytest unit tests can be run with the commands:
+Pytest unit tests can be run with the commands (locally, inside the virtual environment or docker container):
 
 ```
 cd backend/
