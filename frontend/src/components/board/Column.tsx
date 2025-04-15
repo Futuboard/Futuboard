@@ -168,10 +168,7 @@ interface TaskListProps {
 
 const TaskList: React.FC<TaskListProps> = ({ column, templateDescription }) => {
   //get task list from server
-  const { data: taskList, isLoading } = useGetTaskListByColumnIdQuery({
-    boardId: column.boardid,
-    columnId: column.columnid
-  })
+  const { data: taskList, isLoading } = useGetTaskListByColumnIdQuery({ columnId: column.columnid })
 
   const tasks = taskList
   if (isLoading) {
@@ -301,12 +298,11 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
   const [showSwimlanes, setShowSwimlanes] = useState(false)
 
   const isSwimlaneColumn = column.swimlane || false // change this to column.swimlane boolean
-  const { id = "default-id" } = useParams()
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
 
   const tasks = useSelector(
-    (state: RootState) => selectTasksByColumnId({ boardId: id, columnId: column.columnid })(state).data || defaultTasks
+    (state: RootState) => selectTasksByColumnId({ columnId: column.columnid })(state).data || defaultTasks
   )
   const { data: board } = useGetBoardQuery(id)
 

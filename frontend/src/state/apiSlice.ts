@@ -259,7 +259,7 @@ export const boardsApi = createApi({
       providesTags: [{ type: "Columns", id: "LIST" }]
     }),
 
-    getTaskListByColumnId: builder.query<Task[], { boardId: string; columnId: string }>({
+    getTaskListByColumnId: builder.query<Task[], { columnId: string }>({
       query: ({ columnId }) => {
         return `columns/${columnId}/tickets`
       },
@@ -375,7 +375,7 @@ export const boardsApi = createApi({
       invalidatesTags: () => invalidateRemoteCache(["Columns"])
     }),
 
-    updateTaskListByColumnId: builder.mutation<Task[], { boardId: string; columnId: string; tasks: Task[] }>({
+    updateTaskListByColumnId: builder.mutation<Task[], { columnId: string; tasks: Task[] }>({
       query: ({ columnId, tasks }) => ({
         url: `columns/${columnId}/tickets`,
         method: "PUT",
