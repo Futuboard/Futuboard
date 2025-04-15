@@ -1,5 +1,7 @@
 # Futuboard
 
+![Futuboard logo](frontend/public/futuboard-logo.svg)
+
 - [Introduction](#introduction)
   - [Features](#features)
 - [Instructions for local development](#instructions-for-local-development)
@@ -45,12 +47,7 @@
 
 ## Introduction
 
-- Our goal is to make a free, easy to use and open source web tool for team workflow management
-- The tool has all the required features required for managing workflows without over complicating the tool
-- The tool allows for more efficient work in teams where all members are not often in the same space
-- Team members can access the team's board remotely.
-- Allows for automatic visualizations and statistics about the progress of work.
-- Allows for an easier to use platform then alternative tools with the same features.
+[Futuboard](https://futuboard.live/) is free, easy to use and open-source web tool for workflow management that requires no registration. It can be used to manage individual or team work efficiently and remotely. Futuboard allows for an easier to use platform than alternative tools with the same features. It includes automatic visualizations and statistics about the progress of work. Use on the web or set up your on instance of Futuboard, it's all up to you. To get started, just create a board, save (and share) the link and start managing your work, it's that simple!
 
 This README includes instructions for setting up development, information about what we've used to create this project with documentation links and guides on deploying your own instance.
 
