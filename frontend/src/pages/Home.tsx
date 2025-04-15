@@ -10,15 +10,33 @@ import { useEffect } from "react"
 
 import ModalFrameCv from "@/components/home/ModalFrameCv"
 import VisitedBoardsList from "@/components/home/VisitedBoardsList"
+import { useMediaQuery } from "@mui/material"
 
 const Home: React.FC = () => {
   useEffect(() => {
     document.title = "Futuboard"
   })
 
+  const isScreenWideEnoughForBoardList = useMediaQuery("(min-width:900px)")
+
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" height="100vh" width="100%" bgcolor="white">
-      <Box textAlign="center" sx={{ position: "absolute", top: 0, left: 0, p: 2, alignItems: "center" }}>
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+      width="100%"
+      bgcolor="white"
+      sx={{ overflowY: "auto" }}
+    >
+      <Box
+        sx={{
+          position: "absolute",
+          top: 10,
+          left: isScreenWideEnoughForBoardList ? 25 : "50%",
+          transform: isScreenWideEnoughForBoardList ? "none" : "translate(-50%, 0)"
+        }}
+      >
         <VisitedBoardsList />
       </Box>
 
@@ -80,6 +98,13 @@ const Home: React.FC = () => {
             </Grid>
           </Grid>
         </Grid>
+        {/* {!isScreenWideEnoughForBoardList && (
+          <Grid container justifyContent="center" alignItems="center" marginTop={"20px"}>
+            <Box sx={{ alignItems: "center" }}>
+              <VisitedBoardsList />
+            </Box>
+          </Grid>
+        )} */}
       </Grid>
       <IconButton href="/admin" sx={{ position: "absolute", right: 10, top: 10 }} title="Manage Board Templates">
         <SettingsIcon fontSize="large" />

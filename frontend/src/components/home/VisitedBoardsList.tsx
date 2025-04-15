@@ -10,8 +10,6 @@ const VisitedBoardList: React.FC = () => {
   const [visitedBoards, setVisitedBoards] = useState<BoardWithOnlyIdAndTitle[]>([])
   const [visibleBoards, setVisibleBoards] = useState<BoardWithOnlyIdAndTitle[]>([])
 
-  const screenIsTooNarrow = useMediaQuery("(min-width:900px)")
-
   useEffect(() => {
     setVisitedBoards(getVisitedBoards())
     setVisibleBoards(getVisitedBoards())
@@ -24,8 +22,7 @@ const VisitedBoardList: React.FC = () => {
   }
 
   return (
-    visitedBoards.length > 0 &&
-    screenIsTooNarrow && (
+    visitedBoards.length > 0 && (
       <Box
         sx={{
           display: "flex",
@@ -37,12 +34,13 @@ const VisitedBoardList: React.FC = () => {
           borderColor: "black"
         }}
       >
-        <Typography variant="h6" color={"black"} marginY={2} sx={{ fontWeight: "bold" }}>
+        <Typography textAlign="center" variant="h6" color={"black"} marginY={2} sx={{ fontWeight: "bold" }}>
           Recently viewed boards
         </Typography>
         <TextField
           placeholder="Search..."
           type="search"
+          sx={{ backgroundColor: "#ffffff" }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
