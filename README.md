@@ -1,6 +1,6 @@
 # Futuboard
 
-![Futuboard logo](frontend/public/futuboard-logo.svg)
+<img src="frontend/public/futuboard-logo.svg" width="100">
 
 - [Introduction](#introduction)
   - [Features](#features)
