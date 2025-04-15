@@ -1,9 +1,9 @@
-import os
 from uuid import UUID
 from argon2 import PasswordHasher
 from django.http import JsonResponse
 from django.utils import timezone
 import jwt
+from decouple import config
 
 
 def verify_password(password: str, hash: str):
@@ -30,7 +30,7 @@ def get_token_from_request(request):
         return None
 
 
-JWT_SECRET = os.environ.get("JWT_SECRET")
+JWT_SECRET = str(config("JWT_SECRET"))
 
 
 def encode_token(board_id: UUID):
@@ -64,7 +64,7 @@ def token_access_failed(board_id, request):
     return None
 
 
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+ADMIN_PASSWORD = config("ADMIN_PASSWORD")
 
 
 def is_admin_password_correct(password: str):
