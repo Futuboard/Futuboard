@@ -20,6 +20,10 @@ export type BoardWithOnlyIdAndTitle = {
   title: string
 }
 
+export type BoardWithOnlyId = {
+  boardid: string
+}
+
 export type Column = {
   columnid: string
   title: string
