@@ -111,7 +111,7 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) 
       color: data.color,
       cornernote: data.cornerNote
     }
-    await addTask({ boardId: board?.boardid || "", columnId: columnid, task: taskObject })
+    await addTask({ boardId: board.boardid, columnId: columnid, task: taskObject })
 
     if (isSuccess && swimlaneColumns.length) {
       const criteria: string[] = parseAcceptanceCriteriaFromDescription(data?.description)
