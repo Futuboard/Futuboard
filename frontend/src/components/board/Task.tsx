@@ -45,7 +45,11 @@ const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) 
 
   const progress = Math.round((done / all) * 100)
 
-  return <Typography sx={{ fontSize: "13px", fontWeight: "bold", marginBottom: "-4px" }}>{`${progress}%`}</Typography>
+  return (
+    <Typography
+      sx={{ fontSize: "13px", fontWeight: "bold", marginBottom: "-4px", color: "#7f7f80" }}
+    >{`${progress}%`}</Typography>
+  )
 }
 
 const TaskUserList: React.FC<{ users: UserWithoutTicketsOrActions[]; taskid: string }> = ({ users, taskid }) => {
@@ -255,7 +259,7 @@ const Task: React.FC<TaskProps> = ({ task, templateDescription }) => {
                 <Box
                   sx={{
                     width: "206px",
-                    height: "29px",
+                    height: "32px",
                     marginBottom: "-3px",
                     marginLeft: "-2px",
                     overflow: "hidden"
