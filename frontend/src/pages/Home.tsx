@@ -18,6 +18,12 @@ const Home: React.FC = () => {
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" height="100vh" width="100%" bgcolor="white">
+      <Grid item xs={12}>
+        <Box textAlign="center" sx={{ position: "absolute", top: 0, left: 0, p: 2, alignItems: "center" }}>
+          <VisitedBoardsList />
+        </Box>
+      </Grid>
+
       <Grid textAlign="center" container spacing={1}>
         <Grid item xs={12}>
           <img
@@ -73,13 +79,6 @@ const Home: React.FC = () => {
             </Grid>
             <Grid item>
               <ModalFrameCv cvFileName="Team_Kasipallot_CV.png" />
-            </Grid>
-          </Grid>
-          <Grid item xs={12} marginTop={"20px"}>
-            <Grid container spacing={1} justifyContent="center">
-              <Grid item>
-                <VisitedBoardsList />
-              </Grid>
             </Grid>
           </Grid>
         </Grid>
