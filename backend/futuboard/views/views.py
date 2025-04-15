@@ -62,9 +62,9 @@ def columns_on_board(request, board_id):
 
 
 @api_view(["GET", "POST", "PUT"])
-def tickets_on_column(request, board_id, column_id):
+def tickets_on_column(request, column_id):
     if request.method == "PUT":
-        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+        if token_incorrect := check_if_acces_token_incorrect_using_other_id(Column, column_id, request):
             return token_incorrect
 
         try:
@@ -103,7 +103,7 @@ def tickets_on_column(request, board_id, column_id):
             raise Http404("Task does not exist")
 
     if request.method == "POST":
-        if token_incorrect := check_if_access_token_incorrect(board_id, request):
+        if token_incorrect := check_if_acces_token_incorrect_using_other_id(Column, column_id, request):
             return token_incorrect
 
         column = Column.objects.get(pk=column_id)
@@ -147,12 +147,12 @@ def tickets_on_column(request, board_id, column_id):
 
 
 @api_view(["PUT", "DELETE"])
-def update_ticket(request, column_id, ticket_id):
-    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Column, column_id, request):
+def update_ticket(request, ticket_id):
+    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Ticket, ticket_id, request):
         return token_incorrect
 
     try:
-        ticket = Ticket.objects.get(pk=ticket_id, columnid=column_id)
+        ticket = Ticket.objects.get(pk=ticket_id)
     except Ticket.DoesNotExist:
         raise Http404("Ticket not found")
 
@@ -201,12 +201,13 @@ def update_ticket(request, column_id, ticket_id):
 
 
 @api_view(["PUT", "DELETE"])
-def update_column(request, board_id, column_id):
-    if token_incorrect := check_if_access_token_incorrect(board_id, request):
+def update_column(request, column_id):
+    # Have to check using column id, because board id could basically be anything
+    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Column, column_id, request):
         return token_incorrect
 
     try:
-        column = Column.objects.get(pk=column_id, boardid=board_id)
+        column = Column.objects.get(pk=column_id)
     except Column.DoesNotExist:
         raise Http404("Column not found")
 

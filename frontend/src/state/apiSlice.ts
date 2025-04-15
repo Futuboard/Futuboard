@@ -260,8 +260,8 @@ export const boardsApi = createApi({
     }),
 
     getTaskListByColumnId: builder.query<Task[], { boardId: string; columnId: string }>({
-      query: ({ boardId, columnId }) => {
-        return `boards/${boardId}/columns/${columnId}/tickets`
+      query: ({ columnId }) => {
+        return `columns/${columnId}/tickets`
       },
       providesTags: (result, _error, args) => {
         const tags: TagDescription<"Ticket" | "Users">[] = []
@@ -293,9 +293,9 @@ export const boardsApi = createApi({
       invalidatesTags: () => invalidateRemoteCache(["Columns"])
     }),
 
-    addTask: builder.mutation<Task, { boardId: string; columnId: string; task: NewTask }>({
-      query: ({ boardId, columnId, task }) => ({
-        url: `boards/${boardId}/columns/${columnId}/tickets`,
+    addTask: builder.mutation<Task, { columnId: string; task: NewTask }>({
+      query: ({ columnId, task }) => ({
+        url: `columns/${columnId}/tickets`,
         method: "POST",
         body: task
       }),
@@ -308,7 +308,7 @@ export const boardsApi = createApi({
 
     updateTask: builder.mutation<Task, { task: NewTask }>({
       query: ({ task }) => ({
-        url: `columns/${task.columnid}/tickets/${task.ticketid}/`,
+        url: `tickets/${task.ticketid}/`,
         method: "PUT",
         body: task
       }),
@@ -321,7 +321,7 @@ export const boardsApi = createApi({
 
     deleteTask: builder.mutation<Task, { task: Task }>({
       query: ({ task }) => ({
-        url: `columns/${task.columnid}/tickets/${task.ticketid}/`,
+        url: `tickets/${task.ticketid}/`,
         method: "DELETE"
       }),
       invalidatesTags: (_result, _error, { task }) =>
@@ -333,7 +333,7 @@ export const boardsApi = createApi({
 
     updateColumn: builder.mutation<Column, { column: Column; ticketIds?: string[] }>({
       query: ({ column, ticketIds }) => ({
-        url: `boards/${column.boardid}/columns/${column.columnid}/`,
+        url: `columns/${column.columnid}/`,
         method: "PUT",
         body: { ...column, ticket_ids: ticketIds }
       }),
@@ -369,15 +369,15 @@ export const boardsApi = createApi({
 
     deleteColumn: builder.mutation<Column, { column: Column }>({
       query: ({ column }) => ({
-        url: `boards/${column.boardid}/columns/${column.columnid}/`,
+        url: `columns/${column.columnid}/`,
         method: "DELETE"
       }),
       invalidatesTags: () => invalidateRemoteCache(["Columns"])
     }),
 
     updateTaskListByColumnId: builder.mutation<Task[], { boardId: string; columnId: string; tasks: Task[] }>({
-      query: ({ boardId, columnId, tasks }) => ({
-        url: `boards/${boardId}/columns/${columnId}/tickets`,
+      query: ({ columnId, tasks }) => ({
+        url: `columns/${columnId}/tickets`,
         method: "PUT",
         body: tasks
       }),

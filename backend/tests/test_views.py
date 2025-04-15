@@ -217,13 +217,13 @@ def test_tickets_on_column():
             "size": 5,
         }
         response = api_client.post(
-            reverse("tickets_on_column", args=[boardid, columnid]),
+            reverse("tickets_on_column", args=[columnid]),
             data=json.dumps(data),
             content_type="application/json",
         )
         assert response.status_code == 200
     # Get tickets from column
-    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[columnid]))
     data = response.json()
     assert len(data) == 5
     assert response.status_code == 200
@@ -250,18 +250,18 @@ def test_tickets_on_column():
     ]
 
     response = api_client.put(
-        reverse("tickets_on_column", args=[boardid, newcolumnid]),
+        reverse("tickets_on_column", args=[newcolumnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
     assert response.status_code == 200
     # Get tickets from new column
-    response = api_client.get(reverse("tickets_on_column", args=[boardid, newcolumnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[newcolumnid]))
     data = response.json()
     assert len(data) == 2
     assert response.status_code == 200
     # Get tickets from old column
-    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[columnid]))
     data = response.json()
     assert len(data) == 3
     assert response.status_code == 200
@@ -299,7 +299,7 @@ def test_update_ticket():
         "size": 5,
     }
     response = api_client.post(
-        reverse("tickets_on_column", args=[boardid, columnid]),
+        reverse("tickets_on_column", args=[columnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
@@ -314,12 +314,12 @@ def test_update_ticket():
         "size": 5,
     }
     response = api_client.put(
-        reverse("update_ticket", args=[columnid, ticketid]), data=json.dumps(data), content_type="application/json"
+        reverse("update_ticket", args=[ticketid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
 
     # Get ticket by id
-    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[columnid]))
     data = response.json()
     print(data)
     assert data[0]["title"] == "updatedticket"
@@ -354,7 +354,7 @@ def test_update_column():
     # Test PUT request to update column
     data = {"columnid": str(columnid), "title": "updatedcolumn", "position": 0, "swimlane": False}
     response = api_client.put(
-        reverse("update_column", args=[boardid, columnid]), data=json.dumps(data), content_type="application/json"
+        reverse("update_column", args=[columnid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
 
@@ -434,7 +434,7 @@ def test_users_on_ticket():
         "size": 5,
     }
     response = api_client.post(
-        reverse("tickets_on_column", args=[boardid, columnid]),
+        reverse("tickets_on_column", args=[columnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
@@ -516,7 +516,7 @@ def test_deleting_column():
     columnid = addColumn(boardid, uuid.uuid4()).columnid
     columnid2 = addColumn(boardid, uuid.uuid4()).columnid
 
-    response = api_client.delete(reverse("update_column", args=[boardid, columnid]))
+    response = api_client.delete(reverse("update_column", args=[columnid]))
 
     assert response.status_code == 200
     assert md.Column.objects.all()[0].columnid == columnid2
@@ -538,7 +538,7 @@ def test_deleting_ticket():
     ticketid = addTicket(columnid, uuid.uuid4()).ticketid
     ticketid2 = addTicket(columnid, uuid.uuid4()).ticketid
 
-    response = api_client.delete(reverse("update_ticket", args=[columnid, ticketid]))
+    response = api_client.delete(reverse("update_ticket", args=[ticketid]))
 
     assert response.status_code == 200
     assert md.Ticket.objects.all()[0].ticketid == ticketid2

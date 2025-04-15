@@ -110,7 +110,7 @@ def test_add_ticket_to_scope():
     assert change_event_data["new_scopes"] == [uuid.UUID(scope_data["scopeid"])]
     assert change_event_data["title"] == "Ticket 1"
 
-    response = api_client.get(reverse("tickets_on_column", args=[boardid, column_id]))
+    response = api_client.get(reverse("tickets_on_column", args=[column_id]))
     assert response.status_code == 200
     assert len(response.json()) == 1
 
@@ -168,7 +168,7 @@ def test_delete_ticket_from_scope():
     assert change_events_data[1]["new_scopes"] == []
     assert change_events_data[1]["title"] == "Ticket 1"
 
-    response = api_client.get(reverse("tickets_on_column", args=[boardid, column_id]))
+    response = api_client.get(reverse("tickets_on_column", args=[column_id]))
     assert response.status_code == 200
     assert len(response.json()) == 1
 
@@ -203,7 +203,7 @@ def test_set_scope_forecast():
         {"ticketid": str(ticket_id), "size": 2, "columnid": str(column_id)}
     ]
 
-    response = api_client.delete(reverse("update_ticket", args=[column_id, ticket_id]))
+    response = api_client.delete(reverse("update_ticket", args=[ticket_id]))
     assert response.status_code == 200
 
     response = api_client.get(reverse("scopes_on_board", args=[boardid]))

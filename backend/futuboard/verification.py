@@ -1,4 +1,3 @@
-import logging
 import os
 from uuid import UUID
 from argon2 import PasswordHasher
@@ -11,8 +10,6 @@ from futuboard.models import Action, Board, Column, Swimlanecolumn, Ticket
 from django.conf import settings
 
 ph = PasswordHasher()
-
-logger = logging.getLogger(__name__)
 
 
 def verify_password(password: str, hash: str):
