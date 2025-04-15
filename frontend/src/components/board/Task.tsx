@@ -11,6 +11,7 @@ import { Box, Divider, Paper, Popover, Typography } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
+import { parseAcceptanceCriteriaFromDescription } from "@/services/Utils"
 import { RootState } from "@/state/store"
 import { SimpleScope, Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
 
@@ -18,7 +19,6 @@ import { useAddTaskToScopeMutation, useDeleteTaskFromScopeMutation, useUpdateTas
 
 import TaskForm from "./TaskForm"
 import UserMagnet from "./UserMagnet"
-import { parseAcceptanceCriteriaFromDescription } from "@/services/Utils"
 
 const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSnapshot) => {
   if (!snapshot.isDropAnimating) {
