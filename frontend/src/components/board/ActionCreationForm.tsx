@@ -52,7 +52,7 @@ const ActionEditForm: React.FC<AddActionCreationFormProps> = (props) => {
             inputRef={inputRef}
             label={
               <span>
-                Name <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>
+                Content <span style={{ color: "red", fontSize: "1.2rem" }}>*</span>
               </span>
             }
             size={"small"}
