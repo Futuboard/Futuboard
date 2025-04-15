@@ -78,11 +78,10 @@ def board_by_id(request, board_id):
     if request.method == "DELETE":
         if result := check_if_access_token_incorrect(board_id, request):
             return result
-    
+
         board = Board.objects.get(pk=board_id)
         board.delete()
         return JsonResponse({"message": "Board deleted successfully"}, status=200)
-
 
 
 @api_view(["PUT"])
