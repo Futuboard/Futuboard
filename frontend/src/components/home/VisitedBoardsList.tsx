@@ -67,11 +67,10 @@ const VisitedBoardList: React.FC = () => {
           flexDirection: "row",
           alignItems: "center",
           position: "fixed",
-          maxWidth: "100vw",
           top: 10,
-          left: 25,
-          transform: isVisitedBoardListOpen ? "translateX(0)" : "translateX(-333px)",
-          transition: "transform 270ms"
+          left: isVisitedBoardListOpen ? 25 : -320,
+          /* transform: isVisitedBoardListOpen ? "translateX(0)" : "translateX(-333px)", */
+          transition: "left 270ms"
         }}
       >
         <Box
@@ -148,7 +147,10 @@ const VisitedBoardList: React.FC = () => {
           <Button
             variant="contained"
             sx={{
-              marginLeft: "0px",
+              position: "fixed",
+              top: 85,
+              left: isVisitedBoardListOpen ? "333px" : 0,
+              transition: "left 270ms",
               transform: "rotate(90deg)",
               backgroundColor: "#cfcfcf",
               boxShadow: 0,
