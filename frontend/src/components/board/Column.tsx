@@ -42,14 +42,17 @@ interface FormData {
 interface CreateTaskButtonProps {
   columnid: string
   board: Board
+  hasSwimLaneColumns: boolean
 }
 
-const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) => {
+const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board, hasSwimLaneColumns }) => {
   const [defaultValues, setDefaultValues] = useState<TaskTemplate | null>(null)
   const [taskTemplate, setTaskTemplate] = useState<TaskTemplate | null>(null)
 
   const [addTask] = useAddTaskMutation()
-  const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(columnid)
+  const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(columnid, {
+    skip: !hasSwimLaneColumns
+  })
   const [createAction] = usePostActionMutation()
 
   const [open, setOpen] = useState(false)
@@ -403,7 +406,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
                 paddingTop: "4px"
               }}
             >
-              <CreateTaskButton columnid={column.columnid} board={board} />
+              <CreateTaskButton columnid={column.columnid} board={board} hasSwimLaneColumns={isSwimlaneColumn} />
               <Typography title={"Number of tasks"} sx={{ fontSize: "17px", color: "#2D3748" }}>
                 {column.wip_limit ? `${taskNum} / ${column.wip_limit}` : taskNum}
               </Typography>
