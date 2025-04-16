@@ -42,14 +42,17 @@ interface FormData {
 interface CreateTaskButtonProps {
   columnid: string
   board: Board
+  isSwimlaneColumn: boolean
 }
 
-const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) => {
+const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board, isSwimlaneColumn }) => {
   const [defaultValues, setDefaultValues] = useState<TaskTemplate | null>(null)
   const [taskTemplate, setTaskTemplate] = useState<TaskTemplate | null>(null)
 
   const [addTask] = useAddTaskMutation()
-  const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(columnid)
+  const { data: swimlaneColumns, isSuccess } = isSwimlaneColumn
+    ? useGetSwimlaneColumnsByColumnIdQuery(columnid)
+    : { data: null, isSuccess: null }
   const [createAction] = usePostActionMutation()
 
   const [open, setOpen] = useState(false)
@@ -113,7 +116,7 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) 
     }
     await addTask({ boardId: board.boardid, columnId: columnid, task: taskObject })
 
-    if (isSuccess && swimlaneColumns.length) {
+    if (isSwimlaneColumn && isSuccess && swimlaneColumns.length) {
       const criteria: string[] = parseAcceptanceCriteriaFromDescription(data?.description)
       const cleanedCriteria = criteria.map((line) => line.slice(5).trim().replace("&#x20;", ""))
 
@@ -405,7 +408,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
                 paddingTop: "4px"
               }}
             >
-              <CreateTaskButton columnid={column.columnid} board={board} />
+              <CreateTaskButton columnid={column.columnid} board={board} isSwimlaneColumn={isSwimlaneColumn} />
               <Typography title={"Number of tasks"} sx={{ fontSize: "17px", color: "#2D3748" }}>
                 {column.wip_limit ? `${taskNum} / ${column.wip_limit}` : taskNum}
               </Typography>
