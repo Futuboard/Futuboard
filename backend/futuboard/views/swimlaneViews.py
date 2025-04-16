@@ -11,15 +11,14 @@ from ..serializers import SwimlaneColumnSerializer, ActionSerializer, UserSerial
 
 @api_view(["GET", "POST"])
 def swimlanecolumns_on_column(request, column_id):
-    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Column, column_id, request):
-        return token_incorrect
-
     if request.method == "GET":
         query_set = Swimlanecolumn.objects.filter(columnid=column_id).order_by("ordernum")
         serializer = SwimlaneColumnSerializer(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":
+        if token_incorrect := check_if_acces_token_incorrect_using_other_id(Column, column_id, request):
+            return token_incorrect
         length = len(Swimlanecolumn.objects.filter(columnid=column_id))
         new_swimlanecolumn = Swimlanecolumn(
             swimlanecolumnid=request.data["swimlanecolumnid"],
