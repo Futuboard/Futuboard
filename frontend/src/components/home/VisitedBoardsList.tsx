@@ -52,7 +52,11 @@ const VisitedBoardList: React.FC = () => {
     deleteVisitedBoard({ boardid: id })
     const updatedBoards = getVisitedBoards()
     setVisitedBoards(updatedBoards)
-    setVisibleBoards(updatedBoards.filter((board) => board.title.toUpperCase().includes(boardTitleFilter)))
+    setVisibleBoards(
+      updatedBoards
+        .filter((board) => board.title.toUpperCase().includes(boardTitleFilter))
+        .sort(boardTitleFilter ? (a, b) => collator.compare(a.title, b.title) : undefined)
+    )
   }
 
   return (
