@@ -8,8 +8,8 @@ import {
   InputAdornment,
   TextField,
   useMediaQuery,
-  Fab,
-  IconButton
+  IconButton,
+  Button
 } from "@mui/material"
 import { Fragment, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
@@ -17,7 +17,7 @@ import { Link } from "react-router-dom"
 import { getVisitedBoards } from "@/services/utils"
 import { deleteVisitedBoard } from "@/services/utils"
 import { BoardWithOnlyIdAndTitle } from "@/types"
-import { ChevronLeft, ChevronRight } from "@mui/icons-material"
+import { Menu } from "@mui/icons-material"
 
 const VisitedBoardList: React.FC = () => {
   const [isVisitedBoardListOpenState, setIsVisitedBoardListOpenState] = useState(false)
@@ -61,10 +61,12 @@ const VisitedBoardList: React.FC = () => {
         sx={{
           display: "flex",
           flexDirection: "row",
+          alignItems: "center",
           position: "fixed",
+          maxWidth: "100vw",
           top: 10,
           left: 25,
-          transform: isVisitedBoardListOpen ? "translateX(0)" : "translateX(-320px)",
+          transform: isVisitedBoardListOpen ? "translateX(0)" : "translateX(-333px)",
           transition: "transform 270ms"
         }}
       >
@@ -72,7 +74,7 @@ const VisitedBoardList: React.FC = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            minWidth: "18em",
+            minWidth: "16em",
             maxWidth: "27em",
             borderStyle: "solid",
             borderWidth: "0px",
@@ -139,16 +141,19 @@ const VisitedBoardList: React.FC = () => {
           </List>
         </Box>
         {!isScreenWideEnoughForBoardList && (
-          <Fab
+          <Button
+            variant="contained"
             sx={{
-              marginTop: "0.25rem",
-              marginLeft: "1.5rem"
+              marginLeft: "0px",
+              transform: "rotate(90deg)",
+              backgroundColor: "#cfcfcf",
+              boxShadow: 0,
+              "&:hover": { backgroundColor: "#757575", boxShadow: 0 }
             }}
             onClick={() => setIsVisitedBoardListOpenState(!isVisitedBoardListOpenState)}
-            color="info"
           >
-            {isVisitedBoardListOpen ? <ChevronLeft /> : <ChevronRight />}
-          </Fab>
+            <Menu />
+          </Button>
         )}
       </Box>
     )
