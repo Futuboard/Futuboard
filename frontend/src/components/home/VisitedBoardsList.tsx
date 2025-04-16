@@ -1,4 +1,4 @@
-import SearchIcon from "@mui/icons-material/Search"
+import { Search, Close } from "@mui/icons-material"
 import {
   Box,
   List,
@@ -8,12 +8,14 @@ import {
   InputAdornment,
   TextField,
   useMediaQuery,
-  Fab
+  Fab,
+  IconButton
 } from "@mui/material"
 import { Fragment, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 
 import { getVisitedBoards } from "@/services/utils"
+import { deleteVisitedBoard } from "@/services/utils"
 import { BoardWithOnlyIdAndTitle } from "@/types"
 import { ChevronLeft, ChevronRight } from "@mui/icons-material"
 
@@ -21,6 +23,7 @@ const VisitedBoardList: React.FC = () => {
   const [isVisitedBoardListOpenState, setIsVisitedBoardListOpenState] = useState(false)
   const [visitedBoards, setVisitedBoards] = useState<BoardWithOnlyIdAndTitle[]>([])
   const [visibleBoards, setVisibleBoards] = useState<BoardWithOnlyIdAndTitle[]>([])
+  const [boardTitleFilter, setBoardTitleFilter] = useState("")
 
   const collator = Intl.Collator(undefined, { numeric: true, sensitivity: "base" })
 
@@ -36,12 +39,20 @@ const VisitedBoardList: React.FC = () => {
   }, [])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value
+    const inputValue = event.target.value.toUpperCase()
+    setBoardTitleFilter(inputValue)
     setVisibleBoards(
       visitedBoards
-        .filter((board) => board.title.toUpperCase().includes(inputValue.toUpperCase()))
+        .filter((board) => board.title.toUpperCase().includes(inputValue))
         .sort(inputValue ? (a, b) => collator.compare(a.title, b.title) : undefined)
     )
+  }
+
+  const handleRemoveFromList = (id: string) => {
+    deleteVisitedBoard({ boardid: id })
+    const updatedBoards = getVisitedBoards()
+    setVisitedBoards(updatedBoards)
+    setVisibleBoards(updatedBoards.filter((board) => board.title.toUpperCase().includes(boardTitleFilter)))
   }
 
   return (
@@ -62,7 +73,7 @@ const VisitedBoardList: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             minWidth: "18em",
-            maxWidth: "25em",
+            maxWidth: "27em",
             borderStyle: "solid",
             borderWidth: "0px",
             borderColor: "black"
@@ -78,7 +89,7 @@ const VisitedBoardList: React.FC = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon />
+                  <Search />
                 </InputAdornment>
               )
             }}
@@ -91,7 +102,7 @@ const VisitedBoardList: React.FC = () => {
             sx={{
               display: "flex",
               flexDirection: "column",
-              maxHeight: "204px",
+              maxHeight: "234px",
               overflowY: "auto",
               backgroundColor: "#ffffff",
               borderStyle: "solid",
@@ -105,10 +116,22 @@ const VisitedBoardList: React.FC = () => {
                 <ListItemButton
                   component={Link}
                   to={"/board/" + board.boardid}
-                  sx={{ "&:hover": { color: "#646cff", backgroundColor: "#f5f5f5" } }}
+                  sx={{
+                    justifyContent: "space-between",
+                    "&:hover": { color: "#646cff", backgroundColor: "#f5f5f5" }
+                  }}
                   disableRipple
                 >
                   <Typography>{board.title}</Typography>
+                  <IconButton
+                    size="small"
+                    onClick={(event) => {
+                      event.preventDefault()
+                      handleRemoveFromList(board.boardid)
+                    }}
+                  >
+                    <Close fontSize="small" />
+                  </IconButton>
                 </ListItemButton>
                 <Divider sx={{ width: "97%", alignSelf: "center" }} />
               </Fragment>
