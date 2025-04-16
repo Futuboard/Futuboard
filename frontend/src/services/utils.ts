@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid"
 
-import { Board, BoardWithOnlyId, BoardWithOnlyIdAndTitle } from "../types"
+import { BoardWithOnlyId, BoardWithOnlyIdAndTitle } from "../types"
 
 export const getId = (): string => {
   //might switch later to redux-toolkit nanoId
@@ -27,12 +27,14 @@ export const deleteVisitedBoard = ({ boardid }: BoardWithOnlyId) => {
   localStorage.setItem("visited-boards", JSON.stringify(visitedBoard))
 }
 
-//unused
-export const getBoardData = (id: string) => {
-  const item = localStorage.getItem(id)
-  return item ? JSON.parse(item) : null // Return null or a default value if item is null
-}
+export const parseAcceptanceCriteriaFromDescription = (description: string | undefined): string[] => {
+  if (description == undefined) return []
+  const all: string[] = []
 
-export const addBoard = (board: Board, id: string) => {
-  localStorage.setItem(id, JSON.stringify(board))
+  description.split("\n").forEach((line) => {
+    if (line.charAt(2) == "[" && line.charAt(4) == "]") {
+      all.push(line)
+    }
+  })
+  return all
 }

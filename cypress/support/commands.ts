@@ -29,7 +29,7 @@ Cypress.Commands.add("createTask", ({ title, size, description, cornerNote }, co
 })
 
 Cypress.Commands.add("editTask", ({ title, size, description, cornerNote }) => {
-  cy.get('[data-testid="EditNoteIcon"]').click()
+  cy.get(".task").click()
   title && cy.get('textarea[name="taskTitle"]').clear().type(title)
   size && cy.get('input[name="size"]').clear().type(size)
   description && cy.get(".description").type("{ctrl+a}+{del}").type(description)
