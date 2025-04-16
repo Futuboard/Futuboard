@@ -295,7 +295,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
   const [addTaskToScope] = useAddTaskToScopeMutation()
   const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
 
-  const { boardId = "default-id" } = useParams()
+  const { id = "default-id" } = useParams()
 
   const [showSwimlanes, setShowSwimlanes] = useState(false)
 
@@ -306,7 +306,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
   const tasks = useSelector(
     (state: RootState) => selectTasksByColumnId({ columnId: column.columnid })(state).data || defaultTasks
   )
-  const { data: board } = useGetBoardQuery(boardId)
+  const { data: board } = useGetBoardQuery(id)
 
   const selectedScope = useSelector((state: RootState) => state.scope)
   const isScopeSelected = Boolean(selectedScope)
