@@ -17,6 +17,7 @@ import { useDispatch } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
 
 import { useDeleteBoardMutation, useLoginMutation } from "@/state/apiSlice"
+import { getIsInReadMode } from "@/state/auth"
 import { setNotification } from "@/state/notification"
 
 const BoardDeletionComponent = () => {
@@ -28,6 +29,8 @@ const BoardDeletionComponent = () => {
   const [passwordError, setPasswordError] = useState("")
   const [tryLogin, { isLoading }] = useLoginMutation()
   const [deleteBoard] = useDeleteBoardMutation()
+
+  const isReadOnly = getIsInReadMode(id)
 
   const dispatch = useDispatch()
 
@@ -47,13 +50,8 @@ const BoardDeletionComponent = () => {
   }
 
   const handleDeleteBoard = async () => {
-    try {
-      //might later want to add password to this call as well, to make sure the user is authenticated
-      await deleteBoard(id).unwrap()
-      navigate("/")
-    } catch (error) {
-      console.error("Failed to delete board:", error)
-    }
+    await deleteBoard(id)
+    navigate("/")
   }
 
   const handleSubmitPassword = async () => {
@@ -69,6 +67,11 @@ const BoardDeletionComponent = () => {
       setPasswordError("Wrong password")
     }
   }
+
+  if (isReadOnly) {
+    return null
+  }
+
   return (
     <Box>
       <MenuItem onClick={handleOpenModal} sx={{ py: 1 }}>
