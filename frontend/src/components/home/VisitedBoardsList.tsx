@@ -1,4 +1,5 @@
 import { Search, Close } from "@mui/icons-material"
+import { Menu } from "@mui/icons-material"
 import {
   Box,
   List,
@@ -17,7 +18,6 @@ import { Link } from "react-router-dom"
 import { getVisitedBoards } from "@/services/utils"
 import { deleteVisitedBoard } from "@/services/utils"
 import { BoardWithOnlyIdAndTitle } from "@/types"
-import { Menu } from "@mui/icons-material"
 
 const VisitedBoardList: React.FC = () => {
   const [isVisitedBoardListOpenState, setIsVisitedBoardListOpenState] = useState(false)
