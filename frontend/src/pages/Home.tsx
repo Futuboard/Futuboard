@@ -10,14 +10,11 @@ import { useEffect } from "react"
 
 import ModalFrameCv from "@/components/home/ModalFrameCv"
 import VisitedBoardsList from "@/components/home/VisitedBoardsList"
-import { useMediaQuery } from "@mui/material"
 
 const Home: React.FC = () => {
   useEffect(() => {
     document.title = "Futuboard"
   })
-
-  const isScreenWideEnoughForBoardList = useMediaQuery("(min-width:900px)")
 
   return (
     <Box
@@ -29,16 +26,7 @@ const Home: React.FC = () => {
       bgcolor="white"
       sx={{ overflowY: "auto" }}
     >
-      <Box
-        sx={{
-          position: "absolute",
-          top: 10,
-          left: isScreenWideEnoughForBoardList ? 25 : "50%",
-          transform: isScreenWideEnoughForBoardList ? "none" : "translate(-50%, 0)"
-        }}
-      >
-        <VisitedBoardsList />
-      </Box>
+      <VisitedBoardsList />
 
       <Grid textAlign="center" container spacing={1}>
         <Grid item xs={12}>
