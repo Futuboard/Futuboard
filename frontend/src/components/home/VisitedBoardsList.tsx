@@ -22,6 +22,8 @@ const VisitedBoardList: React.FC = () => {
   const [visitedBoards, setVisitedBoards] = useState<BoardWithOnlyIdAndTitle[]>([])
   const [visibleBoards, setVisibleBoards] = useState<BoardWithOnlyIdAndTitle[]>([])
 
+  const collator = Intl.Collator(undefined, { numeric: true, sensitivity: "base" })
+
   const isScreenWideEnoughForBoardList = useMediaQuery("(min-width:900px)")
 
   const isVisitedBoardListOpen = isScreenWideEnoughForBoardList
@@ -34,8 +36,11 @@ const VisitedBoardList: React.FC = () => {
   }, [])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value
     setVisibleBoards(
-      visitedBoards.filter((board) => board.title.toUpperCase().includes(event.target.value.toUpperCase()))
+      visitedBoards
+        .filter((board) => board.title.toUpperCase().includes(inputValue.toUpperCase()))
+        .sort(inputValue ? (a, b) => collator.compare(a.title, b.title) : undefined)
     )
   }
 
