@@ -50,9 +50,9 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board, is
   const [taskTemplate, setTaskTemplate] = useState<TaskTemplate | null>(null)
 
   const [addTask] = useAddTaskMutation()
-  const { data: swimlaneColumns, isSuccess } = isSwimlaneColumn
-    ? useGetSwimlaneColumnsByColumnIdQuery(columnid)
-    : { data: null, isSuccess: null }
+  const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(columnid, {
+    skip: !isSwimlaneColumn
+  })
   const [createAction] = usePostActionMutation()
 
   const [open, setOpen] = useState(false)
