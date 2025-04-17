@@ -92,22 +92,22 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1, paddingX: 4, textAlign: "center" }}>
-          <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
+        <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
           <Typography paddingLeft="40px" variant="h5">
-              Create board
-            </Typography>
-            <Tooltip
-              title={
-                "Boards have a name, a link, and optionally a password." +
-                " Anyone with the link can modify and delete a board without a password." +
-                " Names and passwords can be changed later."
-              }
-              disableInteractive
-              placement="right"
-            >
-              <InfoIcon sx={{ color: "gray" }} />
-            </Tooltip>
-          </Stack>
+            Create board
+          </Typography>
+          <Tooltip
+            title={
+              "Boards have a name, a link, and optionally a password." +
+              " Anyone with the link can modify and delete a board without a password." +
+              " Names and passwords can be changed later."
+            }
+            disableInteractive
+            placement="right"
+          >
+            <InfoIcon sx={{ color: "gray" }} />
+          </Tooltip>
+        </Stack>
         <Divider sx={{ marginX: 6, marginY: 2 }} />
         <TextField
           label="Board Name"

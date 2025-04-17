@@ -56,7 +56,7 @@ const InvitePopover = () => {
         open={Boolean(anchorEl)}
         onClose={handleOpenAndClosePopper}
         anchorEl={anchorEl}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left"}}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
         <Paper
           elevation={10}
@@ -65,32 +65,29 @@ const InvitePopover = () => {
             padding: "10px",
             paddingBottom: "16px",
             borderRadius: 2,
-            maxWidth: 350,
+            maxWidth: 350
           }}
         >
-        <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-start">
-          <Typography variant="h6" fontWeight="lighter" >
-            Invite Collaborators
-          </Typography>
-          <Tooltip
-            disableInteractive title={
-              <Typography variant="body2">
-                {infoString}
-              </Typography>
-            }
-            slotProps={{
-              tooltip: {
-                sx: {
-                  color: "rgb(80, 78, 78)",
-                  backgroundColor: " #FFFF",
-                  border: "2px solid #D1D5DB"
+          <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-start">
+            <Typography variant="h6" fontWeight="lighter">
+              Invite Collaborators
+            </Typography>
+            <Tooltip
+              disableInteractive
+              title={<Typography variant="body2">{infoString}</Typography>}
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    color: "rgb(80, 78, 78)",
+                    backgroundColor: " #FFFF",
+                    border: "2px solid #D1D5DB"
+                  }
                 }
-              }
-            }}
-          >
-            <InfoIcon sx={{ color: "gray" }}/>
-          </Tooltip>
-        </Stack>
+              }}
+            >
+              <InfoIcon sx={{ color: "gray" }} />
+            </Tooltip>
+          </Stack>
           <Stack spacing={1}>
             <Divider sx={{ borderBottom: "2px solid #D1D5DB", padding: "2px" }} />
             <CopyTextComponent copyContent={window.location.toString()} copyTooltip={"board link"} />

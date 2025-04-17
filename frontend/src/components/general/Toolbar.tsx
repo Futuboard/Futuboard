@@ -7,7 +7,7 @@ import {
   ColorLens,
   AnalyticsOutlined,
   ViewWeek,
-  AllOut,
+  AllOut
 } from "@mui/icons-material"
 import {
   AppBar,
