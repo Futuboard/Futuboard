@@ -7,7 +7,7 @@ import {
   ColorLens,
   AnalyticsOutlined,
   ViewWeek,
-  AllOut
+  AllOut,
 } from "@mui/icons-material"
 import {
   AppBar,
@@ -38,12 +38,12 @@ import BoardDeletionComponent from "../board/BoardDeletionComponent"
 import BoardPasswordChangeForm from "../board/BoardPasswordChangeForm"
 import BoardTitleChangeForm from "../board/BoardTitleChangeForm"
 import CreateColumnButton from "../board/CreateColumnButton"
+import InvitePopover from "../board/InvitePopover"
 import MagnetIcon from "../board/MagnetIcon"
 import ScopeList from "../board/ScopeList"
 import TaskForm from "../board/TaskForm"
 import UserCreationForm from "../board/UserCreationForm"
 import UserList from "../board/UserList"
-import BoardLinks from "../general/BoardLinks"
 
 import HomeButton from "./HomeButton"
 
@@ -237,10 +237,10 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
     >
       {isSuccess && users.length > 0 && <UserList users={users} />}
       <AddMagnetButton />
-      <BoardLinks />
       <CreateColumnButton boardId={boardId} />
       <OpenScopeListButton handler={handleScopeList} />
       <OpenAnalyticsButton boardId={boardId} />
+      <InvitePopover />
       <IconButton
         aria-label="more"
         aria-controls="long-menu"
