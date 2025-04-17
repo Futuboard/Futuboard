@@ -241,7 +241,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
         aria-controls="long-menu"
         aria-haspopup="true"
         onClick={handleMenu}
-        sx={{ color: "#2d3748" }}
+        sx={{ padding: "5px", color: "#2d3748" }}
       >
         <MoreVert />
       </IconButton>
