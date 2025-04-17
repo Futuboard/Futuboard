@@ -16,9 +16,9 @@ import { SetStateAction, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
 
+import { removeVisitedBoard } from "@/services/utils"
 import { useDeleteBoardMutation, useLoginMutation } from "@/state/apiSlice"
 import { setNotification } from "@/state/notification"
-import { removeVisitedBoard } from "@/services/utils"
 
 const BoardDeletionComponent = () => {
   const navigate = useNavigate()
