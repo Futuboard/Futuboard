@@ -54,17 +54,17 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
     const state = store.getState()
 
     if (type === "task") {
-      const selectDestinationTasks = selectTasksByColumnId({ boardId, columnId: destination.droppableId })
+      const selectDestinationTasks = selectTasksByColumnId({ columnId: destination.droppableId })
       const destinationTasks = selectDestinationTasks(state).data || []
 
-      const selectSourceTasks = selectTasksByColumnId({ boardId, columnId: source.droppableId })
+      const selectSourceTasks = selectTasksByColumnId({ columnId: source.droppableId })
       const sourceTasks = selectSourceTasks(state).data || []
 
       //dragging tasks in the same column
       if (destination.droppableId === source.droppableId) {
         const dataCopy = [...(destinationTasks ?? [])]
         const newOrdered = reorder<Task>(dataCopy, source.index, destination.index)
-        await updateTaskList({ boardId, columnId: source.droppableId, tasks: newOrdered })
+        await updateTaskList({ columnId: source.droppableId, tasks: newOrdered })
       }
       //dragging tasks to different columns
       if (destination.droppableId !== source.droppableId) {
@@ -80,8 +80,8 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
           draft?.splice(destination!.index, 0, sourceTasks![source.index])
         })
         await Promise.all([
-          updateTaskList({ boardId, columnId: destination.droppableId, tasks: nextDestinationTasks ?? [] }),
-          updateTaskList({ boardId, columnId: source.droppableId, tasks: nextSourceTasks ?? [] })
+          updateTaskList({ columnId: destination.droppableId, tasks: nextDestinationTasks ?? [] }),
+          updateTaskList({ columnId: source.droppableId, tasks: nextSourceTasks ?? [] })
         ])
       }
     }

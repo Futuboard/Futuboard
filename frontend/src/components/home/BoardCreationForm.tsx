@@ -88,41 +88,33 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
-      <Grid container spacing={1} textAlign="center">
-        <Grid item xs={12}>
-          <Typography variant="h5">Create board</Typography>
-          <Divider sx={{ marginX: 6, marginY: 2 }} />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            sx={{ width: "90%" }}
-            label="Board Name"
-            helperText={errors.title?.message}
-            error={Boolean(errors.title)}
-            {...register("title", {
-              minLength: {
-                value: 3,
-                message: "Board name must be at least 3 characters"
-              },
-              maxLength: {
-                value: 40,
-                message: "Board name can be up to 40 characters"
-              },
-              required: {
-                value: true,
-                message: "Board name is required"
-              }
-            })}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <PasswordField register={register("password")} />
-        </Grid>
-        <Grid item xs={12} sx={{ marginTop: 2 }}>
-          <Typography variant="h6" color="text.primary" sx={{ marginY: 1 }}>
-            Choose a template
-          </Typography>
-        </Grid>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1, paddingX: 4, textAlign: "center" }}>
+        <Typography variant="h5">Create board</Typography>
+        <Divider sx={{ marginX: 6, marginY: 2 }} />
+        <TextField
+          label="Board Name"
+          helperText={errors.title?.message}
+          error={Boolean(errors.title)}
+          {...register("title", {
+            minLength: {
+              value: 3,
+              message: "Board name must be at least 3 characters"
+            },
+            maxLength: {
+              value: 40,
+              message: "Board name can be up to 40 characters"
+            },
+            required: {
+              value: true,
+              message: "Board name is required"
+            }
+          })}
+        />
+        <PasswordField register={register("password")} />
+
+        <Typography variant="h6" color="text.primary" sx={{ marginTop: 2 }}>
+          Choose a template
+        </Typography>
 
         <Grid
           item
@@ -134,8 +126,8 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
               display: "flex",
               flexDirection: "column",
               gap: 1,
-              paddingBottom: 1,
-              paddingRight: 1
+              paddingX: 1,
+              paddingBottom: 1
             }}
           >
             {templates.map((card, index) => (
@@ -207,13 +199,13 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
             disabled={isProcessingSubmit}
             startIcon={isProcessingSubmit && <CircularProgress sx={{ color: "white" }} size={16} />}
           >
-            Submit
+            Create
           </Button>
           <Button onClick={onCancel} sx={{ marginLeft: 2, border: 1 }}>
             Cancel
           </Button>
         </Grid>
-      </Grid>
+      </Box>
     </form>
   )
 }

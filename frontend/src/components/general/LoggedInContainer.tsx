@@ -1,12 +1,12 @@
 import { Box, GlobalStyles } from "@mui/material"
-import { useEffect, useState } from "react"
+import { useEffect, useReducer, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useParams } from "react-router-dom"
 
 import AccessBoardForm from "@/components/board/AccessBoardForm"
 import { cacheTagTypes } from "@/constants"
 import { boardsApi, useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
-import { setBoardId } from "@/state/auth"
+import { getAuth, getIsInReadMode, setBoardId, setIsInReadMode } from "@/state/auth"
 import { setNotification } from "@/state/notification"
 import { webSocketContainer } from "@/state/websocket"
 import { Board } from "@/types"
@@ -20,11 +20,13 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
   const dispatch = useDispatch()
   const params = useParams()
   const [isBoardIdSet, setIsBoardIdset] = useState(false)
-  const [tryLogin] = useLoginMutation()
-  const [hasTriedEmptyPasswordLogin, setHasTriedEmptyPasswordLogin] = useState(false)
+  const [tryLogin, { data: loginTryData }] = useLoginMutation()
+  const [, forceUpdateComponent] = useReducer((x) => x + 1, 0)
 
   const id = params.id || ""
-  const { data: board, isSuccess: isLoggedIn, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
+  const { data: board, isLoading } = useGetBoardQuery(id || "", { skip: !id || !isBoardIdSet })
+
+  const isInReadMode = getIsInReadMode(id)
 
   useEffect(() => {
     const inner = async () => {
@@ -46,45 +48,33 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
   }, [id, dispatch])
 
   useEffect(() => {
-    if (!id) return
-    const inner = async () => {
-      await tryLogin({ boardId: id, password: "" })
-      setHasTriedEmptyPasswordLogin(true)
-    }
-    inner()
-  }, [id, tryLogin])
-
-  useEffect(() => {
     const prefix = titlePrefix ? titlePrefix + " - " : ""
-    document.title = board?.title ? prefix + board?.title + "- Futuboard" : "Futuboard"
+    document.title = board?.title ? prefix + board?.title + " - Futuboard" : "Futuboard"
   }, [board, titlePrefix])
 
-  if (isLoading || !hasTriedEmptyPasswordLogin) {
+  const hasAuth = Boolean(getAuth(id))
+
+  const handleOpenInReadOnly = () => {
+    setIsInReadMode(id, true)
+
+    // Force update the component to fetch new localstorage value
+    forceUpdateComponent()
+  }
+
+  if (isLoading || !board || !id) {
     return null
   }
 
-  if (!isLoggedIn) {
-    return (
-      <>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh"
-          }}
-        >
-          <AccessBoardForm id={id} />
-        </Box>
-      </>
-    )
-  }
+  const shouldShowContent = hasAuth || loginTryData?.success || isInReadMode || !board.needs_password
 
   return (
     <Box sx={{ height: "calc(100vh - 65px)", paddingTop: "65px" }}>
       <GlobalStyles styles={{ ":root": { backgroundColor: board.background_color || "white" } }} />
-      {children({ board })}
+      {shouldShowContent ? (
+        children({ board })
+      ) : (
+        <AccessBoardForm board={board} tryLogin={tryLogin} handleOpenInReadOnly={handleOpenInReadOnly} />
+      )}
     </Box>
   )
 }

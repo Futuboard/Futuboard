@@ -28,7 +28,7 @@ def create_ticket_at_time(boardid, column_id, creation_time, title="test ticket"
     freezer = freeze_time(creation_time)
     freezer.start()
     response = api_client.post(
-        reverse("tickets_on_column", args=[boardid, column_id]),
+        reverse("tickets_on_column", args=[column_id]),
         data=json.dumps(ticket),
         content_type="application/json",
     )
@@ -45,7 +45,7 @@ def move_ticket_at_time(boardid, column_id, move_time, ticketid):
     freezer = freeze_time(move_time)
     freezer.start()
     response = api_client.put(
-        reverse("tickets_on_column", args=[boardid, column_id]),
+        reverse("tickets_on_column", args=[column_id]),
         data=json.dumps([{"ticketid": ticketid}]),
         content_type="application/json",
     )
@@ -62,7 +62,7 @@ def edit_ticket_at_time(column_id, edit_time, new_ticket):
     freezer = freeze_time(edit_time)
     freezer.start()
     response = api_client.put(
-        reverse("update_ticket", args=[column_id, new_ticket["ticketid"]]),
+        reverse("update_ticket", args=[new_ticket["ticketid"]]),
         data=json.dumps(new_ticket),
         content_type="application/json",
     )
@@ -79,7 +79,7 @@ def delete_ticket_at_time(column_id, edit_time, ticket_id):
     freezer = freeze_time(edit_time)
     freezer.start()
     response = api_client.delete(
-        reverse("update_ticket", args=[column_id, ticket_id]),
+        reverse("update_ticket", args=[ticket_id]),
         content_type="application/json",
     )
     freezer.stop()
