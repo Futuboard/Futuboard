@@ -61,6 +61,18 @@ def columns_on_board(request, board_id):
         return JsonResponse({"message": "Columns order updated successfully"}, status=200)
 
 
+@api_view(["GET"])
+def tickets_on_board(request, board_id):
+    if request.method == "GET":
+        try:
+            query_set = Ticket.objects.filter(columnid__boardid=board_id).order_by("order")
+        except Board.DoesNotExist:
+            raise Http404("Board does not exist")
+
+        serializer = TicketSerializer(query_set, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+
 @api_view(["GET", "POST", "PUT"])
 def tickets_on_column(request, column_id):
     if request.method == "PUT":

@@ -259,6 +259,29 @@ export const boardsApi = createApi({
       providesTags: [{ type: "Columns", id: "LIST" }]
     }),
 
+    getAllTasks: builder.query<Task[], { boardId: string }>({
+      query: ({ boardId }) => `boards/${boardId}/tickets/`,
+      async onCacheEntryAdded({ boardId }, apiActions) {
+        await apiActions.cacheDataLoaded
+
+        const data = (apiActions.getState().boardsApi.queries[`getAllTasks({"boardId":"${boardId}"})`]?.data ||
+          []) as Task[]
+
+        const ticketsPerColumn: { [key: string]: Task[] } = {}
+
+        data.forEach((ticket) => {
+          if (!ticketsPerColumn[ticket.columnid]) {
+            ticketsPerColumn[ticket.columnid] = []
+          }
+          ticketsPerColumn[ticket.columnid].push(ticket)
+        })
+
+        Object.entries(ticketsPerColumn).forEach(async ([columnId, tickets]) => {
+          await apiActions.dispatch(boardsApi.util.upsertQueryData("getTaskListByColumnId", { columnId }, tickets))
+        })
+      }
+    }),
+
     getTaskListByColumnId: builder.query<Task[], { columnId: string }>({
       query: ({ columnId }) => {
         return `columns/${columnId}/tickets`
@@ -1046,5 +1069,6 @@ export const {
   useSetScopeTitleMutation,
   useGetScopesQuery,
   useGetVelocityChartDataQuery,
-  useGetBurnUpChartDataQuery
+  useGetBurnUpChartDataQuery,
+  useGetAllTasksQuery
 } = boardsApi

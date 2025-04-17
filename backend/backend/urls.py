@@ -27,6 +27,7 @@ urlpatterns = [
     ),
     path("api/boards/<uuid:board_id>/password/", boardViews.update_board_password, name="update_board_password"),
     path("api/boards/<uuid:board_id>/columns/", views.columns_on_board, name="columns_on_board"),
+    path("api/boards/<uuid:board_id>/tickets/", views.tickets_on_board, name="tickets_on_board"),
     path("api/columns/<uuid:column_id>/", views.update_column, name="update_column"),
     path(
         "api/columns/<uuid:column_id>/tickets",
