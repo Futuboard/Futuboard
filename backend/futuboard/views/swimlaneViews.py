@@ -34,9 +34,6 @@ def swimlanecolumns_on_column(request, column_id):
 
 @api_view(["GET"])
 def get_actions_by_columnId(request, column_id):
-    if token_incorrect := check_if_acces_token_incorrect_using_other_id(Column, column_id, request):
-        return token_incorrect
-
     if request.method == "GET":
         try:
             ticketIds_query_set = Ticket.objects.filter(columnid=column_id)
