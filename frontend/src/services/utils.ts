@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid"
 
-import { BoardWithOnlyId, BoardWithOnlyIdAndTitle } from "../types"
+import { BoardWithOnlyIdAndTitle } from "../types"
 
 export const getId = (): string => {
   //might switch later to redux-toolkit nanoId
@@ -20,7 +20,7 @@ export const addVisitedBoard = ({ boardid, title }: BoardWithOnlyIdAndTitle) => 
   localStorage.setItem("visited-boards", JSON.stringify(newVisitedBoards))
 }
 
-export const deleteVisitedBoard = ({ boardid }: BoardWithOnlyId) => {
+export const removeVisitedBoard = (boardid: string) => {
   const visitedBoard: BoardWithOnlyIdAndTitle[] = JSON.parse(localStorage.getItem("visited-boards") || "[]").filter(
     (visitedBoard: BoardWithOnlyIdAndTitle) => visitedBoard.boardid !== boardid
   )

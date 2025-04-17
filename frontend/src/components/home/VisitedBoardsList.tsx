@@ -8,28 +8,71 @@ import {
   InputAdornment,
   TextField,
   useMediaQuery,
-  IconButton
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  Button,
+  Stack,
+  ListItem
 } from "@mui/material"
 import { Fragment, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 
-import { getVisitedBoards } from "@/services/utils"
-import { deleteVisitedBoard } from "@/services/utils"
+import { getVisitedBoards, removeVisitedBoard } from "@/services/utils"
 import { BoardWithOnlyIdAndTitle } from "@/types"
 
+interface DeleteVisitedBoardButtonProps {
+  boardid: string
+  handleRemoveFromList: (boardid: string) => void
+}
+
+const RemoveVisitedBoardButton: React.FC<DeleteVisitedBoardButtonProps> = ({ boardid, handleRemoveFromList }) => {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <IconButton
+        size="small"
+        onClick={() => {
+          setOpen(true)
+        }}
+      >
+        <Close fontSize="small" />
+      </IconButton>
+
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <Box>
+          <DialogTitle>Are you sure you want to remove the board from the list?</DialogTitle>
+          <DialogActions>
+            <Stack direction="row" spacing={4} justifyContent="flex-end">
+              <Button variant="contained" color="error" onClick={() => handleRemoveFromList(boardid)}>
+                Remove
+              </Button>
+              <Button variant="outlined" color="primary" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+            </Stack>
+          </DialogActions>
+        </Box>
+      </Dialog>
+    </>
+  )
+}
+
 const VisitedBoardList: React.FC = () => {
-  const [isVisitedBoardListOpenState, setIsVisitedBoardListOpenState] = useState(false)
   const [visitedBoards, setVisitedBoards] = useState<BoardWithOnlyIdAndTitle[]>([])
   const [visibleBoards, setVisibleBoards] = useState<BoardWithOnlyIdAndTitle[]>([])
   const [boardTitleFilter, setBoardTitleFilter] = useState("")
-
-  const collator = Intl.Collator(undefined, { numeric: true, sensitivity: "base" })
+  const [isVisitedBoardListOpenState, setIsVisitedBoardListOpenState] = useState(false)
 
   const isScreenWideEnoughForBoardList = useMediaQuery("(min-width:900px)")
 
   const isVisitedBoardListOpen = isScreenWideEnoughForBoardList
     ? isScreenWideEnoughForBoardList
     : isVisitedBoardListOpenState
+
+  const collator = Intl.Collator(undefined, { numeric: true, sensitivity: "base" })
 
   useEffect(() => {
     setVisitedBoards(getVisitedBoards())
@@ -46,8 +89,8 @@ const VisitedBoardList: React.FC = () => {
     )
   }
 
-  const handleRemoveFromList = (id: string) => {
-    deleteVisitedBoard({ boardid: id })
+  const handleRemoveFromList = (boardid: string) => {
+    removeVisitedBoard(boardid)
     const updatedBoards = getVisitedBoards()
     setVisitedBoards(updatedBoards)
     setVisibleBoards(
@@ -63,16 +106,12 @@ const VisitedBoardList: React.FC = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          minWidth: "16em",
-          maxWidth: "27em",
-          borderStyle: "solid",
-          borderWidth: "0px",
-          borderColor: "black",
+          width: 310,
           position: "fixed",
           top: 10,
           left: isVisitedBoardListOpen ? 25 : -320,
           transition: "left 270ms",
-          marginRight: "60px"
+          marginRight: 60
         }}
       >
         <Typography textAlign="center" variant="h6" color={"black"} marginY={2} sx={{ fontWeight: "bold" }}>
@@ -98,37 +137,34 @@ const VisitedBoardList: React.FC = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            maxHeight: "234px",
+            maxHeight: 204,
             overflowY: "auto",
             backgroundColor: "#ffffff",
             borderStyle: "solid",
-            borderWidth: "1px",
+            borderWidth: 1,
             borderRadius: 1,
             borderColor: "#c4c4c4"
           }}
         >
           {visibleBoards.map((board) => (
             <Fragment key={board.boardid}>
-              <ListItemButton
-                component={Link}
-                to={"/board/" + board.boardid}
-                sx={{
-                  justifyContent: "space-between",
-                  "&:hover": { color: "#646cff", backgroundColor: "#f5f5f5" }
-                }}
-                disableRipple
+              <ListItem
+                disablePadding
+                secondaryAction={
+                  <RemoveVisitedBoardButton boardid={board.boardid} handleRemoveFromList={handleRemoveFromList} />
+                }
               >
-                <Typography>{board.title}</Typography>
-                <IconButton
-                  size="small"
-                  onClick={(event) => {
-                    event.preventDefault()
-                    handleRemoveFromList(board.boardid)
+                <ListItemButton
+                  component={Link}
+                  to={"/board/" + board.boardid}
+                  sx={{
+                    "&:hover": { color: "#646cff", backgroundColor: "#f5f5f5" }
                   }}
+                  disableRipple
                 >
-                  <Close fontSize="small" />
-                </IconButton>
-              </ListItemButton>
+                  <Typography>{board.title}</Typography>
+                </ListItemButton>
+              </ListItem>
               <Divider sx={{ width: "97%", alignSelf: "center" }} />
             </Fragment>
           ))}
@@ -138,7 +174,7 @@ const VisitedBoardList: React.FC = () => {
             sx={{
               position: "fixed",
               top: 80,
-              left: isVisitedBoardListOpen ? "340px" : "7px",
+              left: isVisitedBoardListOpen ? 340 : 7,
               transition: "left 270ms",
               backgroundColor: "#cfcfcf",
               "&:hover": { backgroundColor: "#B0B0B0" }
