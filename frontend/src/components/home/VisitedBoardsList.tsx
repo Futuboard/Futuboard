@@ -1,5 +1,4 @@
-import { Search, Close } from "@mui/icons-material"
-import { Menu } from "@mui/icons-material"
+import { Search, Close, ChevronLeft, ChevronRight } from "@mui/icons-material"
 import {
   Box,
   List,
@@ -9,8 +8,7 @@ import {
   InputAdornment,
   TextField,
   useMediaQuery,
-  IconButton,
-  Button
+  IconButton
 } from "@mui/material"
 import { Fragment, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
@@ -64,102 +62,91 @@ const VisitedBoardList: React.FC = () => {
       <Box
         sx={{
           display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
+          flexDirection: "column",
+          minWidth: "16em",
+          maxWidth: "27em",
+          borderStyle: "solid",
+          borderWidth: "0px",
+          borderColor: "black",
           position: "fixed",
           top: 10,
           left: isVisitedBoardListOpen ? 25 : -320,
-          /* transform: isVisitedBoardListOpen ? "translateX(0)" : "translateX(-333px)", */
-          transition: "left 270ms"
+          transition: "left 270ms",
+          marginRight: "60px"
         }}
       >
-        <Box
+        <Typography textAlign="center" variant="h6" color={"black"} marginY={2} sx={{ fontWeight: "bold" }}>
+          Recently viewed boards
+        </Typography>
+        <TextField
+          placeholder="Search..."
+          type="search"
+          sx={{ backgroundColor: "#ffffff" }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            )
+          }}
+          variant="outlined"
+          onChange={handleChange}
+          autoComplete="off"
+        />
+        <List
+          disablePadding
           sx={{
             display: "flex",
             flexDirection: "column",
-            minWidth: "16em",
-            maxWidth: "27em",
+            maxHeight: "234px",
+            overflowY: "auto",
+            backgroundColor: "#ffffff",
             borderStyle: "solid",
-            borderWidth: "0px",
-            borderColor: "black"
+            borderWidth: "1px",
+            borderRadius: 1,
+            borderColor: "#c4c4c4"
           }}
         >
-          <Typography textAlign="center" variant="h6" color={"black"} marginY={2} sx={{ fontWeight: "bold" }}>
-            Recently viewed boards
-          </Typography>
-          <TextField
-            placeholder="Search..."
-            type="search"
-            sx={{ backgroundColor: "#ffffff" }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              )
-            }}
-            variant="outlined"
-            onChange={handleChange}
-            autoComplete="off"
-          />
-          <List
-            disablePadding
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              maxHeight: "234px",
-              overflowY: "auto",
-              backgroundColor: "#ffffff",
-              borderStyle: "solid",
-              borderWidth: "1px",
-              borderRadius: 1,
-              borderColor: "#c4c4c4"
-            }}
-          >
-            {visibleBoards.map((board) => (
-              <Fragment key={board.boardid}>
-                <ListItemButton
-                  component={Link}
-                  to={"/board/" + board.boardid}
-                  sx={{
-                    justifyContent: "space-between",
-                    "&:hover": { color: "#646cff", backgroundColor: "#f5f5f5" }
+          {visibleBoards.map((board) => (
+            <Fragment key={board.boardid}>
+              <ListItemButton
+                component={Link}
+                to={"/board/" + board.boardid}
+                sx={{
+                  justifyContent: "space-between",
+                  "&:hover": { color: "#646cff", backgroundColor: "#f5f5f5" }
+                }}
+                disableRipple
+              >
+                <Typography>{board.title}</Typography>
+                <IconButton
+                  size="small"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    handleRemoveFromList(board.boardid)
                   }}
-                  disableRipple
                 >
-                  <Typography>{board.title}</Typography>
-                  <IconButton
-                    size="small"
-                    onClick={(event) => {
-                      event.preventDefault()
-                      handleRemoveFromList(board.boardid)
-                    }}
-                  >
-                    <Close fontSize="small" />
-                  </IconButton>
-                </ListItemButton>
-                <Divider sx={{ width: "97%", alignSelf: "center" }} />
-              </Fragment>
-            ))}
-          </List>
-        </Box>
+                  <Close fontSize="small" />
+                </IconButton>
+              </ListItemButton>
+              <Divider sx={{ width: "97%", alignSelf: "center" }} />
+            </Fragment>
+          ))}
+        </List>
         {!isScreenWideEnoughForBoardList && (
-          <Button
-            variant="contained"
+          <IconButton
             sx={{
               position: "fixed",
-              top: 85,
-              left: isVisitedBoardListOpen ? "333px" : 0,
+              top: 80,
+              left: isVisitedBoardListOpen ? "340px" : "7px",
               transition: "left 270ms",
-              transform: "rotate(90deg)",
               backgroundColor: "#cfcfcf",
-              boxShadow: 0,
-              "&:hover": { backgroundColor: "#757575", boxShadow: 0 }
+              "&:hover": { backgroundColor: "#B0B0B0" }
             }}
             onClick={() => setIsVisitedBoardListOpenState(!isVisitedBoardListOpenState)}
           >
-            <Menu />
-          </Button>
+            {isVisitedBoardListOpen ? <ChevronLeft /> : <ChevronRight />}
+          </IconButton>
         )}
       </Box>
     )
