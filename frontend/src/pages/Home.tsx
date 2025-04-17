@@ -86,13 +86,6 @@ const Home: React.FC = () => {
             </Grid>
           </Grid>
         </Grid>
-        {/* {!isScreenWideEnoughForBoardList && (
-          <Grid container justifyContent="center" alignItems="center" marginTop={"20px"}>
-            <Box sx={{ alignItems: "center" }}>
-              <VisitedBoardsList />
-            </Box>
-          </Grid>
-        )} */}
       </Grid>
       <IconButton href="/admin" sx={{ position: "absolute", right: 10, top: 10 }} title="Manage Board Templates">
         <SettingsIcon fontSize="large" />

@@ -49,7 +49,6 @@ const BoardDeletionComponent = () => {
 
   const handleDeleteBoard = async () => {
     try {
-      //might later want to add password to this call as well, to make sure the user is authenticated
       removeVisitedBoard(id)
       await deleteBoard(id).unwrap()
       navigate("/")
