@@ -6,12 +6,12 @@ import {
   DroppableProvided,
   DroppableStateSnapshot
 } from "@hello-pangea/dnd"
-import { EditNote } from "@mui/icons-material"
-import { Box, IconButton, Paper, Popover, Tooltip, Typography } from "@mui/material"
-import ClickAwayListener from "@mui/material/ClickAwayListener"
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { Subject } from "@mui/icons-material"
+import { Box, Divider, Paper, Popover, Typography } from "@mui/material"
+import React, { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
+import { parseAcceptanceCriteriaFromDescription } from "@/services/Utils"
 import { RootState } from "@/state/store"
 import { SimpleScope, Task as TaskType, UserWithoutTicketsOrActions } from "@/types"
 
@@ -32,9 +32,27 @@ const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSn
   }
 }
 
+const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) => {
+  const all = parseAcceptanceCriteriaFromDescription(description)
+  let done = 0
+  all.forEach((line) => {
+    if (line.charAt(3) == "x") done += 1
+  })
+
+  if (all.length <= 0) return null
+
+  const progress = Math.round((done / all.length) * 100)
+
+  return (
+    <Typography
+      sx={{ fontSize: "13px", fontWeight: "bold", marginBottom: "-4px", color: "#7f7f80" }}
+    >{`${progress}%`}</Typography>
+  )
+}
+
 const TaskUserList: React.FC<{ users: UserWithoutTicketsOrActions[]; taskid: string }> = ({ users, taskid }) => {
   return (
-    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+    <div style={{ display: "flex", alignItems: "center" }}>
       {users.map((user, index) => (
         <Draggable key={user.userid + "/ticket"} draggableId={user.userid + "/" + taskid} index={index}>
           {(provided, snapshot) => {
@@ -63,21 +81,28 @@ interface FormData {
   color?: string
 }
 
-const EditTaskButton: React.FC<{
+interface TaskProps {
   task: TaskType
-  setTaskSelected: Dispatch<SetStateAction<boolean>>
-  disabled?: boolean
-}> = ({ task, setTaskSelected, disabled }) => {
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
-  const [updateTask] = useUpdateTaskMutation()
+  index: number
+  templateDescription: string
+}
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setTaskSelected(true)
-    setAnchorEl(event.currentTarget)
-  }
+const Task: React.FC<TaskProps> = ({ task, templateDescription }) => {
+  const selectedScope = useSelector((state: RootState) => state.scope)
+  const isScopeSelected = Boolean(selectedScope)
+
+  const [anchorEl, setAnchorEl] = React.useState<HTMLDivElement | null>(null)
+
+  const [updateTask] = useUpdateTaskMutation()
+  const [addTaskToScope] = useAddTaskToScopeMutation()
+  const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
+
+  const [selected, setSelected] = useState(false)
+  const [cornernote, setCornernote] = useState(task.cornernote)
+  const [isTaskInSelectedScope, setIsTaskInSelectedScope] = useState(false)
 
   const handleCancel = () => {
-    setTaskSelected(false)
+    setSelected(false)
     setAnchorEl(null)
   }
 
@@ -90,7 +115,7 @@ const EditTaskButton: React.FC<{
   }
 
   const handleSubmit = async (data: FormData) => {
-    setTaskSelected(false)
+    setSelected(false)
     setAnchorEl(null)
     const taskObject = {
       ticketid: task.ticketid,
@@ -106,61 +131,6 @@ const EditTaskButton: React.FC<{
 
   const open = Boolean(anchorEl)
   const popOverid = open ? "popover" : undefined
-  return (
-    <div>
-      <Tooltip title="Edit card">
-        <span>
-          <IconButton size="small" onClick={handleClick} disabled={disabled}>
-            <EditNote />
-          </IconButton>
-        </span>
-      </Tooltip>
-      <Popover
-        disableRestoreFocus
-        id={popOverid}
-        open={open}
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: "center",
-          horizontal: "right"
-        }}
-        transformOrigin={{
-          vertical: 100,
-          horizontal: -50
-        }}
-      >
-        <Paper sx={{ height: "fit-content", padding: "20px", width: "400px" }}>
-          <TaskForm
-            formTitle={task.title}
-            formType={"TaskEdit"}
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-            onClose={handleClose}
-            defaultValues={task}
-          />
-        </Paper>
-      </Popover>
-    </div>
-  )
-}
-
-interface TaskProps {
-  task: TaskType
-  index: number
-}
-
-const Task: React.FC<TaskProps> = ({ task }) => {
-  const selectedScope = useSelector((state: RootState) => state.scope)
-  const isScopeSelected = Boolean(selectedScope)
-
-  const [updateTask] = useUpdateTaskMutation()
-  const [addTaskToScope] = useAddTaskToScopeMutation()
-  const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
-
-  const [selected, setSelected] = useState(false)
-  const [isEditingCornerNote, setIsEditingCornerNote] = useState(false)
-  const [cornernote, setCornernote] = useState(task.cornernote)
-  const [isTaskInSelectedScope, setIsTaskInSelectedScope] = useState(false)
 
   useEffect(() => {
     setCornernote(task.cornernote)
@@ -174,53 +144,28 @@ const Task: React.FC<TaskProps> = ({ task }) => {
     }
   }, [task.scopes, selectedScope])
 
-  const handleDoubleClick = () => {
-    if (!isScopeSelected) {
-      setIsEditingCornerNote(true)
-    }
-  }
-
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (isScopeSelected) {
       if (!isTaskInSelectedScope) {
         addTaskToScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
       } else {
         deleteTaskFromScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
       }
-    }
-  }
-
-  const handleBlur = async () => {
-    const updatedTaskObject = {
-      ...task,
-      cornernote: cornernote
-    }
-    setIsEditingCornerNote(false)
-    if (cornernote === task.cornernote) return
-    await updateTask({ task: updatedTaskObject })
-
-    //todo: send message to websocket
-  }
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault()
-    setCornernote(event.target.value)
-  }
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter") {
-      handleBlur()
+    } else {
+      setSelected(true)
+      setAnchorEl(e.currentTarget)
     }
   }
 
   return (
-    <Droppable droppableId={task.ticketid + "/ticket"} type="user" direction="vertical">
+    <Droppable droppableId={task.ticketid + "/ticket"} type="user" direction="horizontal">
       {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => {
         return (
           <Box ref={provided.innerRef}>
             <Paper
+              className="task"
               elevation={selected ? 24 : 4}
-              onClick={handleClick}
+              onClick={(e) => handleClick(e)}
               sx={{
                 padding: "4px",
                 backgroundColor: snapshot.isDraggingOver
@@ -242,90 +187,136 @@ const Task: React.FC<TaskProps> = ({ task }) => {
                 borderRightStyle: "solid",
                 borderTopWidth: "2px",
                 borderTopStyle: "solid",
-                cursor: isScopeSelected ? "pointer" : "auto"
+                cursor: "pointer",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                ":hover": {
+                  filter: "brightness(0.97)"
+                }
               }}
             >
-              <Box sx={{ display: "flex", justifyContent: "space-between", flexDirection: "column", height: "100%" }}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", overflow: "visible" }}>
-                  <Box sx={{ overflow: "hidden", flexGrow: 1 }} onDoubleClick={handleDoubleClick}>
-                    {isEditingCornerNote ? (
-                      <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={handleBlur}>
-                        <input
-                          autoFocus
-                          type="text"
-                          value={cornernote}
-                          onBlur={handleBlur}
-                          onChange={handleChange}
-                          onKeyDown={handleKeyDown}
-                        />
-                      </ClickAwayListener>
-                    ) : (
-                      <Typography
-                        noWrap
-                        variant={"body2"}
-                        gutterBottom
-                        width={"90%"}
-                        sx={{ paddingTop: "6px", paddingLeft: "7px", color: "#2D3748" }}
-                      >
-                        {cornernote}
-                      </Typography>
-                    )}
-                  </Box>
-                  <Box>
-                    <EditTaskButton task={task} setTaskSelected={setSelected} disabled={isScopeSelected} />
-                  </Box>
-                </Box>
-                <Box>
-                  <Box
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  flexDirection: "column",
+                  height: "100%",
+                  width: "202px"
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    height: "27px",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                  }}
+                >
+                  <Typography
+                    noWrap
+                    variant={"body2"}
+                    gutterBottom
                     sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
+                      color: "#2D3748",
+                      width: "90%",
+                      textOverflow: "ellipsis",
+                      marginLeft: "2px",
+                      marginTop: "2px"
+                    }}
+                  >
+                    {cornernote}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "50px"
+                  }}
+                >
+                  <Typography
+                    variant={"body2"}
+                    sx={{
+                      color: "#2D3748",
+                      wordBreak: "break-word",
+                      width: "195px",
+                      textOverflow: "ellipsis",
                       overflow: "hidden",
                       textAlign: "center",
-                      alignItems: "center"
+                      display: "-webkit-box",
+                      WebkitLineClamp: "2",
+                      WebkitBoxOrient: "vertical"
                     }}
                   >
-                    <Box
-                      sx={{
-                        display: "-webkit-box",
-                        WebkitBoxOrient: "vertical",
-                        WebkitLineClamp: 2,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        width: "85%",
-                        padding: "0px 20px 0px 10px"
-                      }}
-                    >
-                      <Typography variant={"body2"} gutterBottom sx={{ color: "#2D3748", wordWrap: "break-word" }}>
-                        <strong>{task.title}</strong>
-                      </Typography>
-                    </Box>
-                  </Box>
+                    <strong>{task.title}</strong>
+                  </Typography>
                 </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Box sx={{ overflow: "hidden", width: "90%" }}>
-                    <TaskUserList users={task.users} taskid={task.ticketid} />
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      alignItems: "flex-end",
-                      paddingRight: "15px",
-                      paddingLeft: "7px",
-                      paddingBottom: "3px"
-                    }}
-                  >
-                    <Box>
-                      <Typography sx={{ fontWeight: "bold", fontSize: "17px", color: "#2D3748" }}>
-                        {task.size}
-                      </Typography>
-                    </Box>
-                  </Box>
+                <Box
+                  sx={{
+                    width: "210px",
+                    height: "30px",
+                    marginBottom: "-2px",
+                    marginLeft: "-6px",
+                    overflow: "hidden"
+                  }}
+                >
+                  <TaskUserList users={task.users} taskid={task.ticketid} />
                 </Box>
               </Box>
+              <Divider orientation="vertical" />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column-reverse",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "35px",
+                  height: "100%",
+                  textAlign: "center",
+                  marginLeft: "1px"
+                }}
+              >
+                <Typography
+                  sx={{ fontWeight: "bold", fontSize: "16px", color: "#2D3748", width: "35px", textAlign: "center" }}
+                >
+                  {task.size}
+                </Typography>
+                <AcceptanceCriteria description={task.description || ""} />
+                {task.description != "" && task.description != templateDescription && (
+                  <Subject fontSize="small" color="disabled" />
+                )}
+              </Box>
+
               {provided.placeholder}
             </Paper>
+            <Popover
+              disableRestoreFocus
+              id={popOverid}
+              open={open}
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right"
+              }}
+              transformOrigin={{
+                vertical: 100,
+                horizontal: -40
+              }}
+            >
+              <Paper sx={{ height: "fit-content", padding: "20px", maxWidth: "400px" }}>
+                <TaskForm
+                  formTitle={task.title}
+                  formType={"TaskEdit"}
+                  onSubmit={handleSubmit}
+                  onCancel={handleCancel}
+                  onClose={handleClose}
+                  defaultValues={task}
+                />
+              </Paper>
+            </Popover>
           </Box>
         )
       }}

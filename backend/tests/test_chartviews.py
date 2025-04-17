@@ -28,7 +28,7 @@ def create_ticket_at_time(boardid, column_id, creation_time, title="test ticket"
     freezer = freeze_time(creation_time)
     freezer.start()
     response = api_client.post(
-        reverse("tickets_on_column", args=[boardid, column_id]),
+        reverse("tickets_on_column", args=[column_id]),
         data=json.dumps(ticket),
         content_type="application/json",
     )
@@ -45,7 +45,7 @@ def move_ticket_at_time(boardid, column_id, move_time, ticketid):
     freezer = freeze_time(move_time)
     freezer.start()
     response = api_client.put(
-        reverse("tickets_on_column", args=[boardid, column_id]),
+        reverse("tickets_on_column", args=[column_id]),
         data=json.dumps([{"ticketid": ticketid}]),
         content_type="application/json",
     )
@@ -62,7 +62,7 @@ def edit_ticket_at_time(column_id, edit_time, new_ticket):
     freezer = freeze_time(edit_time)
     freezer.start()
     response = api_client.put(
-        reverse("update_ticket", args=[column_id, new_ticket["ticketid"]]),
+        reverse("update_ticket", args=[new_ticket["ticketid"]]),
         data=json.dumps(new_ticket),
         content_type="application/json",
     )
@@ -79,7 +79,7 @@ def delete_ticket_at_time(column_id, edit_time, ticket_id):
     freezer = freeze_time(edit_time)
     freezer.start()
     response = api_client.delete(
-        reverse("update_ticket", args=[column_id, ticket_id]),
+        reverse("update_ticket", args=[ticket_id]),
         content_type="application/json",
     )
     freezer.stop()
@@ -484,13 +484,13 @@ def test_burn_up():
     ticket_done = create_ticket_at_time(boardid, other_column, creation_time_1, size=3)
     ticket_always_in_done = create_ticket_at_time(boardid, done_column, creation_time_1, size=2)
 
-    freezer = freeze_time("2024-01-01")  # Scope 16, Done 0
+    freezer = freeze_time("2024-01-01")  # Scope 16, Done 2
     freezer.start()
     api_client.post(reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_not_done["ticketid"]})
     api_client.post(reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_removed_from_scope["ticketid"]})
     freezer.stop()
 
-    freezer = freeze_time("2024-01-02")  # Scope 19, Done 0
+    freezer = freeze_time("2024-01-02")  # Scope 19, Done 2
     freezer.start()
     api_client.post(reverse("tickets_in_scope", args=[scope_id]), {"ticketid": ticket_done["ticketid"]})
     freezer.stop()
@@ -525,8 +525,8 @@ def test_burn_up():
     assert len(data) == 5
 
     assert data == [
-        {"name": "2024-01-01T00:00:00", "scope": 16, "done": 0},
-        {"name": "2024-01-02T00:00:00", "scope": 19, "done": 0},
+        {"name": "2024-01-01T00:00:00", "scope": 16, "done": 2},
+        {"name": "2024-01-02T00:00:00", "scope": 19, "done": 2},
         {"name": "2024-01-03T00:00:00", "scope": 21, "done": 2},
         {"name": "2024-01-04T00:00:00", "scope": 15, "done": 5},
         {"name": "2024-01-05T00:00:00", "scope": 15, "done": 5},

@@ -1,5 +1,6 @@
 import { Draggable, DraggableStateSnapshot, DraggableStyle, Droppable, DroppableProvided } from "@hello-pangea/dnd"
-import { Switch } from "@mui/material"
+import { DeleteOutline, DeleteTwoTone } from "@mui/icons-material"
+import { Box, IconButton, Tooltip } from "@mui/material"
 import { useState } from "react"
 
 import { User } from "@/types"
@@ -29,18 +30,19 @@ const UserList: React.FC<UserListProps> = ({ users }) => {
     <Droppable droppableId="user-list" type="user" direction="horizontal">
       {(provided: DroppableProvided) => {
         return (
-          <div
+          <Box
             ref={provided.innerRef}
             {...provided.droppableProps}
             className="user-list"
-            style={{
+            sx={{
               display: "flex",
               alignItems: "center",
               overflowX: "auto",
               border: "solid 2px #D1D5DB",
               borderRadius: "10px",
               marginRight: "3rem",
-              marginLeft: "3rem"
+              marginLeft: "3rem",
+              minWidth: "80px"
             }}
           >
             {users &&
@@ -61,10 +63,12 @@ const UserList: React.FC<UserListProps> = ({ users }) => {
                 </Draggable>
               ))}
             {provided.placeholder}
-            <div title="Toggle Delete" style={{ marginLeft: "auto" }}>
-              <Switch onClick={() => setShowEditable(!showEditable)} />
-            </div>
-          </div>
+            <Tooltip title="Toggle Delete" sx={{ marginLeft: "auto" }}>
+              <IconButton onClick={() => setShowEditable(!showEditable)}>
+                {showEditable ? <DeleteTwoTone color="error" /> : <DeleteOutline />}
+              </IconButton>
+            </Tooltip>
+          </Box>
         )
       }}
     </Droppable>

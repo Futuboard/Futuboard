@@ -10,9 +10,9 @@ import { useSelector } from "react-redux"
 import { useParams } from "react-router"
 
 import { RootState } from "@/state/store"
-import type { Column, Task as TaskType, User, TaskTemplate, SimpleScope } from "@/types"
+import type { Column, Task as TaskType, User, TaskTemplate, SimpleScope, NewAction, Board } from "@/types"
 
-import { getId } from "../../services/Utils"
+import { getId, parseAcceptanceCriteriaFromDescription } from "../../services/Utils"
 import {
   boardsApi,
   useAddTaskMutation,
@@ -20,7 +20,9 @@ import {
   useUpdateColumnMutation,
   useGetBoardQuery,
   useAddTaskToScopeMutation,
-  useDeleteTaskFromScopeMutation
+  useDeleteTaskFromScopeMutation,
+  useGetSwimlaneColumnsByColumnIdQuery,
+  usePostActionMutation
 } from "../../state/apiSlice"
 
 import ColumnEditForm from "./ColumnEditForm"
@@ -39,18 +41,21 @@ interface FormData {
 
 interface CreateTaskButtonProps {
   columnid: string
+  board: Board
+  hasSwimLaneColumns: boolean
 }
 
-const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
-  const { id = "default-id" } = useParams()
+const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board, hasSwimLaneColumns }) => {
   const [defaultValues, setDefaultValues] = useState<TaskTemplate | null>(null)
   const [taskTemplate, setTaskTemplate] = useState<TaskTemplate | null>(null)
 
   const [addTask] = useAddTaskMutation()
+  const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(columnid, {
+    skip: !hasSwimLaneColumns
+  })
+  const [createAction] = usePostActionMutation()
 
   const [open, setOpen] = useState(false)
-
-  const { data: board } = useGetBoardQuery(id)
 
   const handleOpenDialog = () => {
     if ((!defaultValues && board) || JSON.stringify(defaultValues) === JSON.stringify(taskTemplate)) {
@@ -95,30 +100,39 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
     setOpen(false)
   }
 
-  const handleSubmit = (data: FormData) => {
+  const handleSubmit = async (data: FormData) => {
     //task object cant be give type Task yet- problem with caretaker types
     //the object creation should be refactored to the TaskCreationForm component
+    const taskId = getId()
     const taskObject = {
-      ticketid: getId(),
+      ticketid: taskId,
       title: data.taskTitle,
       description: data.description,
       caretakers: data.corners,
       size: data.size,
       columnid: columnid,
-      boardid: id,
       color: data.color,
       cornernote: data.cornerNote
     }
+    await addTask({ columnId: columnid, task: taskObject })
 
-    const add$ = addTask({ boardId: id, columnId: columnid, task: taskObject })
-    add$
-      .unwrap()
-      .then(() => {
-        setOpen(false)
+    if (isSuccess && swimlaneColumns.length) {
+      const criteria: string[] = parseAcceptanceCriteriaFromDescription(data?.description)
+      const cleanedCriteria = criteria.map((line) => line.slice(5).trim().replace("&#x20;", ""))
+
+      cleanedCriteria.forEach(async (title) => {
+        const action: NewAction = {
+          title: title,
+          columnid: columnid,
+          actionid: getId(),
+          ticketid: taskId,
+          swimlanecolumnid: swimlaneColumns[0].swimlanecolumnid,
+          order: 0
+        }
+        await createAction({ action })
       })
-      .catch((error) => {
-        console.error(error)
-      })
+    }
+
     setOpen(false)
     setDefaultValues(null)
   }
@@ -133,14 +147,7 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
         disableRestoreFocus
         open={open}
         onClose={handleCloseDialog}
-        PaperProps={{
-          style: {
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)"
-          }
-        }}
+        PaperProps={{ sx: { maxWidth: "600px", margin: 1 } }}
       >
         <DialogContent>
           <TaskForm
@@ -159,14 +166,12 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid }) => {
 
 interface TaskListProps {
   column: Column
+  templateDescription: string
 }
 
-const TaskList: React.FC<TaskListProps> = ({ column }) => {
+const TaskList: React.FC<TaskListProps> = ({ column, templateDescription }) => {
   //get task list from server
-  const { data: taskList, isLoading } = useGetTaskListByColumnIdQuery({
-    boardId: column.boardid,
-    columnId: column.columnid
-  })
+  const { data: taskList, isLoading } = useGetTaskListByColumnIdQuery({ columnId: column.columnid })
 
   const tasks = taskList
   if (isLoading) {
@@ -196,7 +201,7 @@ const TaskList: React.FC<TaskListProps> = ({ column }) => {
                   {(provided) => {
                     return (
                       <List ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                        <Task key={task.ticketid} task={task} index={index} />
+                        <Task key={task.ticketid} task={task} index={index} templateDescription={templateDescription} />
                       </List>
                     )
                   }}
@@ -274,7 +279,7 @@ const EditColumnButton: React.FC<{ column: Column; disabled: boolean }> = ({ col
           horizontal: -20
         }}
       >
-        <Paper sx={{ height: "fit-content", padding: "20px", width: "200px" }}>
+        <Paper sx={{ height: "fit-content", padding: "20px", width: "220px" }}>
           <ColumnEditForm onSubmit={handleOnSubmit} onCancel={handleClose} column={column} />
         </Paper>
       </Popover>
@@ -293,16 +298,19 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
   const [addTaskToScope] = useAddTaskToScopeMutation()
   const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
 
+  const { id = "default-id" } = useParams()
+
   const [showSwimlanes, setShowSwimlanes] = useState(false)
 
   const isSwimlaneColumn = column.swimlane || false // change this to column.swimlane boolean
-  const { id = "default-id" } = useParams()
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
 
   const tasks = useSelector(
-    (state: RootState) => selectTasksByColumnId({ boardId: id, columnId: column.columnid })(state).data || defaultTasks
+    (state: RootState) => selectTasksByColumnId({ columnId: column.columnid })(state).data || defaultTasks
   )
+  const { data: board } = useGetBoardQuery(id)
+
   const selectedScope = useSelector((state: RootState) => state.scope)
   const isScopeSelected = Boolean(selectedScope)
 
@@ -325,6 +333,8 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
     }
   }
 
+  if (!board) return null
+
   let bgColor = isScopeSelected ? "#beb7b5" : "#e5dbd9"
   let titleBgColor = "#e5dbd9"
 
@@ -336,6 +346,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
     bgColor = isScopeSelected ? "#d63838" : "#ff4747"
     titleBgColor = isScopeSelected ? "#fa9b9b" : "#ff4747"
   }
+
   return (
     <Draggable draggableId={column.columnid} index={index}>
       {(provided) => (
@@ -364,7 +375,8 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
                 marginBottom: "2px",
                 backgroundColor: titleBgColor,
                 cursor: isScopeSelected ? "pointer" : "grab",
-                borderRadius: "3px"
+                borderRadius: "3px",
+                height: "40px"
               }}
               onClick={handleClick}
             >
@@ -394,7 +406,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
                 paddingTop: "4px"
               }}
             >
-              <CreateTaskButton columnid={column.columnid} />
+              <CreateTaskButton columnid={column.columnid} board={board} hasSwimLaneColumns={isSwimlaneColumn} />
               <Typography title={"Number of tasks"} sx={{ fontSize: "17px", color: "#2D3748" }}>
                 {column.wip_limit ? `${taskNum} / ${column.wip_limit}` : taskNum}
               </Typography>
@@ -404,7 +416,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
             </div>
             <Divider />
             <div>
-              <TaskList column={column} />
+              <TaskList column={column} templateDescription={board?.default_ticket_description || ""} />
             </div>
           </Paper>
           <Box sx={{ overflowX: "hidden", height: "fit-content" }}>

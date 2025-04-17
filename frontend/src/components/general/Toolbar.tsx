@@ -30,6 +30,7 @@ import { useDispatch } from "react-redux"
 import { Link, useParams } from "react-router-dom"
 
 import { useGetUsersByBoardIdQuery, usePostUserToBoardMutation, useUpdateTaskTemplateMutation } from "@/state/apiSlice"
+import { getIsInReadMode } from "@/state/auth"
 import { disableScope } from "@/state/scope"
 import { TaskTemplate } from "@/types"
 
@@ -39,6 +40,7 @@ import BoardPasswordChangeForm from "../board/BoardPasswordChangeForm"
 import BoardTitleChangeForm from "../board/BoardTitleChangeForm"
 import CreateColumnButton from "../board/CreateColumnButton"
 import InvitePopover from "../board/InvitePopover"
+import LogoutButton from "../board/LogoutButton"
 import MagnetIcon from "../board/MagnetIcon"
 import ScopeList from "../board/ScopeList"
 import TaskForm from "../board/TaskForm"
@@ -203,9 +205,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   }
 
   const handleExport = async () => {
-    const response = await fetch(`${import.meta.env.VITE_DB_ADDRESS}export/${boardId}`, {
-      method: "GET"
-    })
+    const response = await fetch(`${import.meta.env.VITE_DB_ADDRESS}export/${boardId}`, { method: "GET" })
 
     if (!response.ok) {
       throw new Error("Network response was not ok")
@@ -229,12 +229,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
   }
 
   return (
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="flex-end"
-      sx={{ minWidth: 0, flexGrow: 1, marginRight: "calc(100% - 100vw + 3rem)" }}
-    >
+    <Box sx={{ display: "flex", flexDirection: "row", overflowX: "auto", alignItems: "center" }}>
       {isSuccess && users.length > 0 && <UserList users={users} />}
       <AddMagnetButton />
       <CreateColumnButton boardId={boardId} />
@@ -246,7 +241,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
         aria-controls="long-menu"
         aria-haspopup="true"
         onClick={handleMenu}
-        sx={{ padding: "5px", color: "#2D3748" , zoom: "1.1"}}
+        sx={{ color: "#2d3748" }}
       >
         <MoreVert />
       </IconButton>
@@ -281,6 +276,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
           <Typography variant="body2">Download Board JSON</Typography>
         </MenuItem>
         <BoardDeletionComponent />
+        <LogoutButton boardId={id} />
       </Menu>
       <Box>
         <BoardTitleChangeForm title={title} onClose={() => setTitleFormOpen(false)} open={titleFormOpen} />
@@ -332,6 +328,8 @@ interface ToolBarProps {
 }
 
 const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor, chartToolbar }: ToolBarProps) => {
+  const isReadOnly = getIsInReadMode(boardId)
+
   return (
     <AppBar
       position="fixed"
@@ -352,7 +350,8 @@ const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor, chartTool
             display: "flex",
             alignItems: "center",
             flexGrow: 1,
-            fontSize: 24
+            fontSize: 24,
+            paddingRight: 1
           }}
         >
           {title}
@@ -367,6 +366,30 @@ const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor, chartTool
         )}
         {boardId && chartToolbar && <ChartToolbar boardId={boardId} />}
       </Toolbar>
+      {isReadOnly && (
+        <div
+          title="You are currently in read-only mode. Log out and log back in with the board password to edit."
+          style={{
+            position: "fixed",
+            top: "65px",
+            width: "100%",
+            height: "20px",
+            backgroundColor: "rgb(202, 103, 10)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            fontSize: "12px",
+            fontWeight: "bold",
+            fontFamily: "monospace",
+            flexWrap: "nowrap",
+            overflow: "hidden",
+            whiteSpace: "nowrap"
+          }}
+        >
+          {Array.from(Array(100)).map(() => "READ-ONLY · ")}
+        </div>
+      )}
     </AppBar>
   )
 }

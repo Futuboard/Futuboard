@@ -1,3 +1,8 @@
+import utc from "dayjs/plugin/utc.js"
+import dayjs from "dayjs"
+
+dayjs.extend(utc)
+
 beforeEach(() => {
   cy.visit("http://localhost:5173")
 })
@@ -176,6 +181,25 @@ describe("In a board", () => {
   })
 })
 
+describe("When using the board in read only mode", () => {
+  it("can only see the board and not edit it", () => {
+    cy.createBoard(defaultBoard)
+    cy.get("button").contains("View board").click()
+
+    cy.contains("No changes allowed in read-only mode").should("not.exist")
+
+    cy.contains("READ-ONLY")
+
+    cy.createColumn(defaultColumn)
+    cy.contains(defaultColumn.title).should("not.exist")
+
+    cy.createUser({ name: "Antonio", buttonIndex: 0 })
+    cy.contains("Antonio").should("not.exist")
+
+    cy.contains("No changes allowed in read-only mode")
+  })
+})
+
 describe("When exporting and/or importing a board", () => {
   it("can export and import a board", () => {
     cy.createBoard(defaultBoard)
@@ -191,11 +215,8 @@ describe("When exporting and/or importing a board", () => {
     cy.get('[data-testid="MoreVertIcon"]').click()
     cy.get('[data-testid="DownloadIcon"]').click()
 
-    const date = new Date()
-    const dateString = date
-      .toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" })
-      .replace(/[^a-zA-Z0-9]/g, "-")
-    const fileName = `${defaultBoard.title.replace(/\s/g, "-")}-${dateString}.json`
+    const dateString = dayjs.utc().format("DD-MM-YYYY")
+    const fileName = `${defaultBoard.title.replace(/\s/g, "-").toLowerCase()}-${dateString}.json`
     const filePath = `downloads/${fileName}`
 
     cy.readFile(filePath).should("exist")
@@ -207,7 +228,8 @@ describe("When exporting and/or importing a board", () => {
     cy.get("input[name='title']").type("Imported Test Board")
     cy.get("input[name='password']").type("password")
     cy.get("input[type='file']").selectFile(filePath, { force: true })
-    cy.get("button").contains("Submit").click()
+
+    cy.get("button[type='submit']").contains("Create").click()
 
     cy.loginToBoard("password")
 
@@ -222,7 +244,7 @@ describe("When exporting and/or importing a board", () => {
     cy.contains("Create board").click()
     cy.get("input[name='title']").type("Imported Test Board")
     cy.get("input[type='file']").selectFile("fixtures/two_columns_with_actions.json", { force: true })
-    cy.get("button").contains("Submit").click()
+    cy.get("button[type='submit']").contains("Create").click()
 
     cy.get('button[aria-label="expand swimlane"]').eq(0).click()
 
@@ -319,7 +341,7 @@ describe("When using board templates", () => {
 
       cy.get("input[name='title']").type("Template Board")
       cy.get("input[name='password']").type("password for template board")
-      cy.get("button").contains("Submit").click()
+      cy.get("button[type='submit']").contains("Create").click()
 
       cy.loginToBoard("password for template board")
 
@@ -345,7 +367,7 @@ describe("When working with multiple users", () => {
     cy.get("input[name='title']").type("Imported test Board")
     cy.get("input[name='password']").type("alpha123")
     cy.get("input[type='file']").selectFile("fixtures/large_board.json", { force: true })
-    cy.get("button").contains("Submit").click()
+    cy.get("button[type='submit']").contains("Create").click()
 
     cy.loginToBoard("alpha123")
 

@@ -69,7 +69,7 @@ const InvitePopover = () => {
           }}
         >
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-start">
-          <Typography variant="h6" fontWeight="lighter" sx={{ height: "33px" }}>
+          <Typography variant="h6" fontWeight="lighter" >
             Invite Collaborators
           </Typography>
           <Tooltip
@@ -84,8 +84,8 @@ const InvitePopover = () => {
                   color: "rgb(80, 78, 78)",
                   backgroundColor: " #FFFF",
                   border: "2px solid #D1D5DB"
-                },
-              },
+                }
+              }
             }}
           >
             <InfoIcon sx={{ color: "gray" }}/>

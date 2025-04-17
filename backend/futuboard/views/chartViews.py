@@ -61,19 +61,42 @@ def burn_up(request: rest_framework.request.Request, board_id, scope_id):
 
         columns = Column.objects.filter(boardid=board_id).order_by("ordernum")
 
-        data_with_column_ids = get_column_sizes_at_times(columns, time_unit, count_unit, scope_id=scope_id)
+        done_columns = scope.done_columns.all()
 
-        done_column_ids = [str(column.columnid) for column in scope.done_columns.all()]
+        tickets_in_scope = scope.tickets.all()
+
+        scope_data_with_column_ids = get_column_sizes_at_times(columns, time_unit, count_unit, scope_id=scope_id)
+        done_data_with_column_ids = get_column_sizes_at_times(
+            done_columns, time_unit, count_unit, tickets=tickets_in_scope
+        )
 
         data = []
 
-        for timestamp, column_data in data_with_column_ids:
+        len_done = len(done_data_with_column_ids)
+        len_scope = len(scope_data_with_column_ids)
+
+        # Pad the shorter list, so both start at same date, so that dates match up (end date is always the same, i.e., the current date)
+        if len_done > len_scope:
+            len_diff = len_done - len_scope
+            scope_data_with_column_ids = [(None, {})] * len_diff + scope_data_with_column_ids
+        elif len_scope > len_done:
+            len_diff = len_scope - len_done
+            done_data_with_column_ids = [(None, {})] * len_diff + done_data_with_column_ids
+
+        for i in range(len(done_data_with_column_ids)):
             scope_size = 0
             done_size = 0
-            for column_id in column_data:
-                if column_id in done_column_ids:
-                    done_size += column_data[column_id]
-                scope_size += column_data[column_id]
+
+            (timestamp_scope, scope_column_data) = scope_data_with_column_ids[i]
+            for column_id in scope_column_data:
+                scope_size += scope_column_data[column_id]
+
+            (timestamp_done, done_column_data) = done_data_with_column_ids[i]
+            for column_id in done_column_data:
+                done_size += done_column_data[column_id]
+
+            timestamp = timestamp_scope if timestamp_scope is not None else timestamp_done
+
             data.append({"name": timestamp, "scope": scope_size, "done": done_size})
 
         return JsonResponse({"data": data}, safe=False)
@@ -106,14 +129,18 @@ def velocity(request: rest_framework.request.Request, board_id):
         return JsonResponse({"data": data}, safe=False)
 
 
-def get_column_sizes_at_times(columns, time_unit, count_unit, start_time=None, end_time=None, scope_id=None):
+def get_column_sizes_at_times(
+    columns, time_unit, count_unit, start_time=None, end_time=None, scope_id=None, tickets=None
+):
     event_in_columns = Q(old_columnid__in=columns) | Q(new_columnid__in=columns)
-    event_in_scope = Q(old_scopes__in=[scope_id]) | Q(new_scopes__in=[scope_id])
+    event_in_scope = Q(old_scopes__in=[scope_id]) | Q(new_scopes__in=[scope_id]) if scope_id else Q()
+    event_has_ticket = Q(ticketid__in=tickets) if tickets else Q()
 
-    if scope_id is not None:
-        ticket_events = TicketEvent.objects.filter(event_in_columns & event_in_scope).order_by("event_time").distinct()
-    else:
-        ticket_events = TicketEvent.objects.filter(event_in_columns).order_by("event_time").distinct()
+    ticket_events = (
+        TicketEvent.objects.filter(event_in_columns & event_in_scope & event_has_ticket)
+        .order_by("event_time")
+        .distinct()
+    )
 
     if len(ticket_events) == 0:
         return []
@@ -152,7 +179,8 @@ def get_column_sizes_at_times(columns, time_unit, count_unit, start_time=None, e
     final_data = []
 
     def setSize(column_sizes, columnid, change):
-        column_sizes[str(columnid)] += change
+        if column_sizes.get(str(columnid)) is not None:
+            column_sizes[str(columnid)] += change
 
     time = start_time
     can_have_events_before_start_time = earliest_event_time < start_time

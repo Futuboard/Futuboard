@@ -58,7 +58,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleS
   return (
     <>
       <Fade in={!open} unmountOnExit>
-        <Tooltip title="open notes" placement="left" arrow>
+        <Tooltip title="Open Notes" placement="left" arrow>
           <Fab
             sx={{
               position: "fixed",
@@ -77,11 +77,13 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleS
         <Paper
           sx={{
             width: "520px",
+            maxWidth: "100vw",
             position: "fixed",
             left: "0",
             top: "65px",
             display: "flex",
-            flexDirection: "column"
+            flexDirection: "column",
+            zIndex: 1100
           }}
           variant="outlined"
         >

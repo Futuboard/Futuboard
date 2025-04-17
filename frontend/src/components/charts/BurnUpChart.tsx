@@ -105,8 +105,8 @@ const BurnUpChart: React.FC<BurnUpChartProps> = ({ boardId }) => {
                 />
               )}
             />
-            <Line type="linear" dataKey="scope" stroke="#03a9f4" fill="#03a9f4" />
-            <Line type="linear" dataKey="done" fill="#f44336" stroke="#f44336" />
+            <Line type="linear" dataKey="scope" stroke="#03a9f4" fill="#03a9f4" dot={false} strokeWidth={2} />
+            <Line type="linear" dataKey="done" fill="#f44336" stroke="#f44336" dot={false} strokeWidth={2} />
           </LineChart>
         </ChartContainer>
       )}

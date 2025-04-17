@@ -154,7 +154,7 @@ const CumulativeFlowDiagram: React.FC<CumulativeFlowDiagramProps> = ({ boardId }
             domain={[0, yAxisDomain]}
             yAxisId={0}
             allowDataOverflow={true}
-            ticks={labelYvalues}
+            ticks={sum == 0 ? [0] : labelYvalues}
             tickFormatter={(val) => {
               const label = lastTick[labelYvalues.indexOf(val)]
               return label.length > maxArealabelLength
