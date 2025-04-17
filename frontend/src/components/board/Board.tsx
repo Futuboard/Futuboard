@@ -1,12 +1,11 @@
 import { Droppable } from "@hello-pangea/dnd"
 import { Box, Typography } from "@mui/material"
-//import { AnyAction } from "@reduxjs/toolkit"
-//import { useEffect } from "react"
-//import { useDispatch } from "react-redux"
+import { AnyAction } from "@reduxjs/toolkit"
+import { useEffect, useState } from "react"
+import { useDispatch } from "react-redux"
 import { useParams } from "react-router"
 
-// boardsApi,
-import { useGetAllTasksQuery, useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
+import { boardsApi, useGetAllTasksQuery, useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
 import { AddMagnetButton } from "../general/Toolbar"
 
 import Column from "./Column"
@@ -19,18 +18,20 @@ interface BoardProps {
 
 const Board: React.FC<BoardProps> = ({ isBoardNotesOpen }) => {
   const { id = "default-id" } = useParams()
-  //const dispatch = useDispatch()
+  const dispatch = useDispatch()
   const { data: columns, isLoading, isSuccess } = useGetColumnsByBoardIdQuery(id)
   const { isSuccess: isSuccess2 } = useGetAllTasksQuery({ boardId: id })
+  const [isDone, setIsDone] = useState(false)
 
-  /*
   useEffect(() => {
-    const columnIds = columns?.map((column) => column.columnid) || []
-    for (const columnId of columnIds) {
-      dispatch(boardsApi.util.upsertQueryData("getTaskListByColumnId", { columnId }, []) as unknown as AnyAction)
+    if (columns && columns.length > 0 && !isDone) {
+      setIsDone(true)
+      const columnIds = columns?.map((column) => column.columnid) || []
+      for (const columnId of columnIds) {
+        dispatch(boardsApi.util.upsertQueryData("getTaskListByColumnId", { columnId }, []) as unknown as AnyAction)
+      }
     }
-  })
-    */
+  }, [columns, isDone, dispatch])
 
   if (isLoading || !isSuccess2) {
     return <Typography>Loading columns...</Typography>
