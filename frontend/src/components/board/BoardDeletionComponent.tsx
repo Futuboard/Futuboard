@@ -18,6 +18,7 @@ import { useNavigate, useParams } from "react-router-dom"
 
 import { useDeleteBoardMutation, useLoginMutation } from "@/state/apiSlice"
 import { setNotification } from "@/state/notification"
+import { removeVisitedBoard } from "@/services/utils"
 
 const BoardDeletionComponent = () => {
   const navigate = useNavigate()
@@ -49,6 +50,7 @@ const BoardDeletionComponent = () => {
   const handleDeleteBoard = async () => {
     try {
       //might later want to add password to this call as well, to make sure the user is authenticated
+      removeVisitedBoard(id)
       await deleteBoard(id).unwrap()
       navigate("/")
     } catch (error) {
