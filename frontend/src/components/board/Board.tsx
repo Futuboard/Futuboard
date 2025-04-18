@@ -7,7 +7,7 @@ import { AddMagnetButton } from "../general/Toolbar"
 
 import Column from "./Column"
 import CreateColumnButton from "./CreateColumnButton"
-import InvitePopover from "./InvitePopover"
+import InvitePopover from "./ShareButton"
 
 interface BoardProps {
   isBoardNotesOpen: boolean

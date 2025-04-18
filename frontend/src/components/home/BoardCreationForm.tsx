@@ -98,9 +98,9 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
           </Typography>
           <Tooltip
             title={
-              "Boards have a name, a link, and optionally a password." +
-              " Anyone with the link can modify and delete a board without a password." +
-              " Names and passwords can be changed later."
+              "Boards have a name, a link, and an optional password. " +
+              "If there’s no password, anyone with the link can edit or delete the board. " +
+              "You can change the name or password later."
             }
             disableInteractive
             placement="right"

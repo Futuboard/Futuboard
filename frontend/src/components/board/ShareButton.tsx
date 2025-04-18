@@ -3,13 +3,13 @@ import ShareIcon from "@mui/icons-material/Share"
 import { Popover, Divider, TextField, Typography, IconButton, Paper, Tooltip, Stack } from "@mui/material"
 import { useState, MouseEvent } from "react"
 
-import CopyToClipboardButton from "../board/CopyToClipBoardButton"
+import CopyToClipboardButton from "./CopyToClipBoardButton"
 
-interface ShareButtonProps {
+interface ButtonProps {
   clickHandler: (event: MouseEvent<HTMLElement>) => void
 }
 
-const ShareButton: React.FC<ShareButtonProps> = ({ clickHandler }) => {
+const Button: React.FC<ButtonProps> = ({ clickHandler }) => {
   return (
     <Tooltip title={"Invite Collaborators"} disableInteractive>
       <IconButton onClick={clickHandler}>
@@ -34,27 +34,26 @@ const CopyTextComponent: React.FC<CopyTextComponentProps> = ({ copyContent, copy
         variant="outlined"
         inputProps={{ sx: { width: 200, height: 10, backgroundColor: " #f5f5f5" } }}
       />
-      <CopyToClipboardButton copyContent={copyContent} copyTooltip={copyTooltip} />
+      <CopyToClipboardButton copyContent={copyContent} copyTooltip={copyTooltip} lowercase={true} />
     </Stack>
   )
 }
 
-const InvitePopover = () => {
+const ShareButton = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-  const handleOpenAndClosePopper = (event: MouseEvent<HTMLElement>) => {
+  const handleOpenAndClosePopover = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(anchorEl ? null : event.currentTarget)
   }
-  const infoString: string =
-    "Anyone with the link to the board can read and export the data of the board." +
-    " If they know the password or if the board doesn't have a password, " +
-    "they have full edit access to the board, including deleting the board."
 
+  const infoString: string =
+    "Anyone with the link can view and export the board. " +
+    "If they know the password, or if the board has no password, they can fully edit and delete it."
   return (
     <div>
-      <ShareButton clickHandler={handleOpenAndClosePopper} />
+      <Button clickHandler={handleOpenAndClosePopover} />
       <Popover
         open={Boolean(anchorEl)}
-        onClose={handleOpenAndClosePopper}
+        onClose={handleOpenAndClosePopover}
         anchorEl={anchorEl}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
@@ -90,7 +89,7 @@ const InvitePopover = () => {
           </Stack>
           <Stack spacing={1}>
             <Divider sx={{ borderBottom: "2px solid #D1D5DB", padding: "2px" }} />
-            <CopyTextComponent copyContent={window.location.toString()} copyTooltip={"board link"} />
+            <CopyTextComponent copyContent={window.location.toString()} copyTooltip={"Board Link"} />
           </Stack>
         </Paper>
       </Popover>
@@ -98,4 +97,4 @@ const InvitePopover = () => {
   )
 }
 
-export default InvitePopover
+export default ShareButton

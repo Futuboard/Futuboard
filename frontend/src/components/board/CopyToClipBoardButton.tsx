@@ -5,14 +5,18 @@ import { useState } from "react"
 interface CopyToClipboardButtonProps {
   copyContent: string
   copyTooltip: string
+  // Used to control snackbar casing for grammar
+  lowercase?: boolean
 }
 
-const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({ copyContent, copyTooltip }) => {
+const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({ copyContent, copyTooltip, lowercase }) => {
   const [open, setOpen] = useState(false)
   const handleClick = () => {
     setOpen(true)
     navigator.clipboard.writeText(copyContent)
   }
+
+  const adjustedTooltip = lowercase ? copyTooltip.toLowerCase() : copyTooltip
 
   return (
     <>
@@ -25,7 +29,7 @@ const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({ copyConte
         open={open}
         onClose={() => setOpen(false)}
         autoHideDuration={2000}
-        message={`Copied ${copyTooltip} to clipboard`}
+        message={`Copied ${adjustedTooltip} to clipboard.`}
       />
     </>
   )

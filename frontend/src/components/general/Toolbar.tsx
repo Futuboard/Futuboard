@@ -39,10 +39,10 @@ import BoardDeletionComponent from "../board/BoardDeletionComponent"
 import BoardPasswordChangeForm from "../board/BoardPasswordChangeForm"
 import BoardTitleChangeForm from "../board/BoardTitleChangeForm"
 import CreateColumnButton from "../board/CreateColumnButton"
-import InvitePopover from "../board/InvitePopover"
 import LogoutButton from "../board/LogoutButton"
 import MagnetIcon from "../board/MagnetIcon"
 import ScopeList from "../board/ScopeList"
+import ShareButton from "../board/ShareButton"
 import TaskForm from "../board/TaskForm"
 import UserCreationForm from "../board/UserCreationForm"
 import UserList from "../board/UserList"
@@ -235,7 +235,7 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
       <CreateColumnButton boardId={boardId} />
       <OpenScopeListButton handler={handleScopeList} />
       <OpenAnalyticsButton boardId={boardId} />
-      <InvitePopover />
+      <ShareButton />
       <IconButton
         aria-label="more"
         aria-controls="long-menu"
