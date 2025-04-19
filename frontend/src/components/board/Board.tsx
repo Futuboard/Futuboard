@@ -7,7 +7,7 @@ import { AddMagnetButton } from "../general/Toolbar"
 
 import Column from "./Column"
 import CreateColumnButton from "./CreateColumnButton"
-import InvitePopover from "./ShareButton"
+import ShareButton from "./ShareButton"
 
 interface BoardProps {
   isBoardNotesOpen: boolean
@@ -43,7 +43,7 @@ const Board: React.FC<BoardProps> = ({ isBoardNotesOpen }) => {
         </Box>
         <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 1, marginBottom: 1 }}>
           <Typography>Add collaborators:</Typography>
-          <InvitePopover />
+          <ShareButton />
         </Box>
       </Box>
     )
