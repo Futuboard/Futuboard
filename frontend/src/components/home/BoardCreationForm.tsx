@@ -1,5 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
+import InfoIcon from "@mui/icons-material/Info"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
@@ -9,7 +10,9 @@ import CircularProgress from "@mui/material/CircularProgress"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
 import IconButton from "@mui/material/IconButton"
+import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
+import Tooltip from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -89,7 +92,22 @@ const BoardCreationForm: React.FC<AddBoardCreationFormProps> = ({ onSubmit, onCa
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1, paddingX: 4, textAlign: "center" }}>
-        <Typography variant="h5">Create board</Typography>
+        <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
+          <Typography paddingLeft="40px" variant="h5">
+            Create board
+          </Typography>
+          <Tooltip
+            title={
+              "Boards have a name, a link, and an optional password. " +
+              "If there’s no password, anyone with the link can edit or delete the board. " +
+              "You can change the name or password later."
+            }
+            disableInteractive
+            placement="right"
+          >
+            <InfoIcon sx={{ color: "gray" }} />
+          </Tooltip>
+        </Stack>
         <Divider sx={{ marginX: 6, marginY: 2 }} />
         <TextField
           label="Board Name"

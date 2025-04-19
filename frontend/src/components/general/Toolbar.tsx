@@ -38,11 +38,11 @@ import BoardBackgroundColorForm from "../board/BoardBackgroundColorForm"
 import BoardDeletionComponent from "../board/BoardDeletionComponent"
 import BoardPasswordChangeForm from "../board/BoardPasswordChangeForm"
 import BoardTitleChangeForm from "../board/BoardTitleChangeForm"
-import CopyToClipboardButton from "../board/CopyToClipBoardButton"
 import CreateColumnButton from "../board/CreateColumnButton"
 import LogoutButton from "../board/LogoutButton"
 import MagnetIcon from "../board/MagnetIcon"
 import ScopeList from "../board/ScopeList"
+import ShareButton from "../board/ShareButton"
 import TaskForm from "../board/TaskForm"
 import UserCreationForm from "../board/UserCreationForm"
 import UserList from "../board/UserList"
@@ -232,16 +232,16 @@ const BoardToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor }: Bo
     <Box sx={{ display: "flex", flexDirection: "row", overflowX: "auto", alignItems: "center" }}>
       {isSuccess && users.length > 0 && <UserList users={users} />}
       <AddMagnetButton />
-      <CopyToClipboardButton />
       <CreateColumnButton boardId={boardId} />
       <OpenScopeListButton handler={handleScopeList} />
       <OpenAnalyticsButton boardId={boardId} />
+      <ShareButton />
       <IconButton
         aria-label="more"
         aria-controls="long-menu"
         aria-haspopup="true"
         onClick={handleMenu}
-        sx={{ padding: "5px", color: "#2D3748" }}
+        sx={{ padding: "5px", color: "#2d3748" }}
       >
         <MoreVert />
       </IconButton>
