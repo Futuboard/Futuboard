@@ -95,7 +95,7 @@ cd frontend/
 npm install
 ```
 
->[!NOTE]
+> [!NOTE]
 > If you have multiple versions of node installed, run `nvm use 20` before installing the dependencies.
 
 #### Backend dependencies
@@ -422,6 +422,17 @@ In the environment variables section, you need to include all the used env varia
 
 DB-prefixed variables are database variables. The value of SCM_DO_BUILD_DURING_DEPLOYMENT should be 1 to ensure the deployment works as intended. After this, restart the application from Azure.
 
+### Database creation
+
+Create a new Azure Database for PostgreSQL Flexible Server
+Choose the subscription and resource group you prefer. Also, name your server and choose the region best for you.
+
+Select PostgreSQL version 16. (NOTE: 16.8)
+
+For the cheapest hosting, choose Workload type "Development", and click "Configure server". Select "Burstable" as the Compute tier, and Standard_B1ms for the compute size. Choose 32GiB for Storage Size and P4 performance tier.
+
+For the Authentication method, select "PostgreSQL authentication only". Write a username to "Administrator login" and a password to "Password"
+
 #### Database creation
 
 You can create database migrations in django using
@@ -439,10 +450,6 @@ And then to apply made migrations run:
 python manage.py migrate
 
 ```
-
-To setup the database in Azure, follow this guide:
-
-[Azure database creation guide](https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal)
 
 #### Common issues
 
