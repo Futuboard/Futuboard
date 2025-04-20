@@ -180,8 +180,8 @@ Websocket are needed, if you want the board to update on another users browser w
 Websockets can be enabled locally using the command below. You need to run this in a separate terminal window.
 
 ```
-cd backend/
 .venv/Scripts/activate
+cd backend/
 daphne -p 5555 backend.asgi:application
 ```
 
@@ -190,6 +190,24 @@ After this the frontend can be run using:
 ```
 cd frontend/
 npm run dev
+```
+
+### Database migrations
+
+If you make changes to the Django models in `models.py`, you need to create a new migration file, so the changes are propagated to the database. Django can create these migrations automatically with the commands:
+
+```
+.venv/Scripts/activate
+cd backend/
+python manage.py makemigrations
+```
+
+If you are using Docker, the migrations should be automatically applied on restart. You can also manually apply them by running:
+
+```
+
+python manage.py migrate
+
 ```
 
 ### Linting and code style
@@ -390,9 +408,107 @@ Since we chose Django as our framework, it is natural to select PostgreSQL as ou
 
 ## Deployment instructions
 
-Deployment instructions:
+Deployment to Azure. These are settings for a development deployment. For a production deployment, additional security settings are needed.
 
-Deployment to Azure and other PaaS platforms
+### Database creation
+
+Create a new Azure Database for PostgreSQL Flexible Server
+Choose the subscription and resource group you prefer. Also, name your server and choose the region best for you.
+
+Select PostgreSQL version 16. (MATIAS NOTE: 16.8)
+
+For the cheapest hosting, choose Workload type "Development", and click "Configure server". Select "Burstable" as the Compute tier, and Standard_B1ms for the compute size. Choose 32GiB for Storage Size and P4 performance tier.
+
+![Azure_PostgreSQL_settings](https://github.com/user-attachments/assets/65efc7fb-3dc1-46e6-8f44-0788c5b12bfc)
+
+For the Authentication method, select "PostgreSQL authentication only". Write a username to "Administrator login" and a password to "Password". These must be the same environment variables you set in the backend for DB_USER and DB_PASSWORD.
+![image](https://github.com/user-attachments/assets/e9d66feb-0835-4321-8027-7993ee56ee16)
+
+On the "Networking" tab, select allow Public access, and allow all IP:s through the firewall. 
+![image](https://github.com/user-attachments/assets/1b218c7c-2242-4ddb-a4ac-3d752f7d6c95)
+
+Create database by clicking "Review + create"
+
+### Backend deployment
+
+Deployment of the backend can be accomplished through Azure's App Service Web App. Create a new Web App. Choose the subscription and resource group you prefer. Also, name your application.
+
+The publish style is code and the runtime stack is Python 3.9. Newer Python versions may not work. After this, choose your preferred region and agreement. Then, from the deployment section, continuous deployment must be activated. Choose the correct GitHub folder for this. After these settings, you are ready to proceed from this view. Leave all other values at their defaults and create the Web App. This will create a new workflow file in GitHub again. 
+
+Then you need to manually edit the `build` section in the workflow file that was generated to GitHub. You need to add `working-directory: ./backend` and `backend` to the `path` field. Your `build` section should look like this:
+```
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Create and start virtual environment
+        working-directory: ./backend
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+      
+      - name: Install dependencies
+        working-directory: ./backend
+        run: pip install -r requirements.txt
+
+      - name: Zip artifact for deployment
+        working-directory: ./backend
+        run: zip release.zip ./* -r
+
+      - name: Upload artifact for deployment jobs
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-app
+          path: |
+            backend/release.zip
+            !backend/venv/
+
+  deploy:
+    ...
+```
+Then, some important settings need be set in Azure: 
+
+In the API -> CORS section, set allowed origins to all `\*` (for development) or to the frontend's URL (for production).
+
+In the Settings -> Configuration section, set the Startup Command to be: 
+```
+python manage.py migrate && daphne -b 0.0.0.0 -p 8000 backend.asgi:application
+```
+This will run the migrations on startup, and start the backend with a websocket connection option. 
+
+In the Settings -> Environment Variables section, set all the required env-variables:
+```
+You can get these DB env-variables from the Settings -> Connect tab of the PostreSQL DB instance in Azure, that you created in previous section. 
+DB_HOST= From Azure PostreSQL Connect tab (PGHOST)
+DB_USER= From Azure PostreSQL Connect tab (PGUSER)
+DB_NAME= From Azure PostreSQL Connect tab (PGDATABASE)
+DB_PORT= From Azure PostreSQL Connect tab (PGPORT)
+DB_PASSWORD= The password you set for the PostreSQL database when creating it
+
+DB_SCHEMA=public (or something else, if you want to use the same database for multiple environments, but then you need to manually create schema in the DB)
+
+FRONTEND_HOSTNAME= The hostname (i.e. url, but without https://, e.g. futuboard.live) of the frontend, once you have deployed it. 
+
+ADMIN_PASSWORD=some password you can remember (used for editing Board Templates)
+JWT_SECRET=some robust secret, e.g. long string of random characters (used for token authentication)
+SECRET_KEY=some robust secret, e.g. long string of random characters (used by Django)
+
+SCM_DO_BUILD_DURING_DEPLOYMENT=1 (needed to deploy correctly) 
+```
+
+After setting these settings, restart the application from Azure.
+
+NOTICE: Asure can be quite slow to deploy the backend, and the logs are sometimes unreliable. 
 
 ### Frontend deployment
 
@@ -406,51 +522,28 @@ Advanced settings do not need to be changed.
 
 After this, you can create the application and follow Azure's instructions to completion.
 
-In order for the frontend to function as desired, you still need to add environment variables. For the backend, you need to add the variable VITE_DB_ADDRESS: "your backend address". For websockets, you need to add the variable VITE_WEBSOCKET_ADDRESS: "your websocket address"
-These variables can be set, for example, in the GitHub workflow file. Once Azure has completed the deployment, a new workflow file will appear in GitHub (/.github/workflows). An env section needs to be added to this file.
+Azure then creates a workflow file in your GitHub repository.
 
-### Backend deployment
+Finally, you need to add environment variables for the Frontend, by editing the workflow file that was just created. After the edit, the workflow file should look like this (except you need to replace the URL with the URL of your backend):
+```
+name: Azure Static Web Apps CI/CD
 
-Deployment of the backend can be accomplished through Azure's App Service Web App. Create a new Web App. Choose the subscription and resource group you prefer. Also, name your application.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
 
-The publish style is code and the runtime stack is Python 3.9. Newer Python versions may not work. After this, choose your preferred region and agreement. Then, from the deployment section, continuous deployment must be activated. Choose the correct GitHub folder for this. After these settings, you are ready to proceed from this view. Leave all other values at their defaults and create the Web App. This will create a new workflow file in GitHub again. At this stage, change all the initial commands in the file’s working-directory: ./backend. Also change the paths in the path to include backend.
+# New env-section for environmental variables
+env:
+  VITE_DB_ADDRESS: https://your-backend-url.com/api/
+  VITE_WEBSOCKET_ADDRESS: wss://your-backend-url.com/board/
 
-Once the Azure deployment is complete, more important settings can be set. From the CORS section, set allowed origins to all (\*). However, if the application is no longer in development, set valid CORS values here. If you want to use websockets, add the following command to the startup command section of the configuration: daphne -b 0.0.0.0 -p 8000 backend.asgi:application.
-
-In the environment variables section, you need to include all the used env variables:
-![image](https://github.com/Kasipallot/Futuboard/assets/135588324/4679f713-0983-42c3-8ef9-504e134359e3)
-
-DB-prefixed variables are database variables. The value of SCM_DO_BUILD_DURING_DEPLOYMENT should be 1 to ensure the deployment works as intended. After this, restart the application from Azure.
-
-### Database creation
-
-Create a new Azure Database for PostgreSQL Flexible Server
-Choose the subscription and resource group you prefer. Also, name your server and choose the region best for you.
-
-Select PostgreSQL version 16. (NOTE: 16.8)
-
-For the cheapest hosting, choose Workload type "Development", and click "Configure server". Select "Burstable" as the Compute tier, and Standard_B1ms for the compute size. Choose 32GiB for Storage Size and P4 performance tier.
-
-For the Authentication method, select "PostgreSQL authentication only". Write a username to "Administrator login" and a password to "Password"
-
-#### Database creation
-
-You can create database migrations in django using
-
+jobs:
+  ...
 ```
 
-python manage.py makemigrations
 
-```
-
-And then to apply made migrations run:
-
-```
-
-python manage.py migrate
-
-```
-
-#### Common issues
-
-If changes are not visible in the backend or it does not work for some reason, it is advisable in Azure to "kill" the application and keep it turned off for about 10 minutes. Then restart it. If you do not wait long enough, the application may not actually have shut down.
