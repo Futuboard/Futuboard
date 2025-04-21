@@ -9,6 +9,10 @@ export const setToken = ({ token, boardId }: { token: string; boardId: string })
   localStorage.setItem(`board-${boardId}-token`, token)
 }
 
+export const logOutOfBoard = (boardId: string) => {
+  setToken({ token: "", boardId })
+}
+
 export const getAuth = (boardId: string) => {
   const token = getToken(boardId)
   return token ? `Bearer ${token}` : null
@@ -29,6 +33,16 @@ const authSlice = createSlice({
     }
   }
 })
+
+export const getIsInReadMode = (boardId: string | null | undefined) => {
+  if (!boardId) return false
+  const token = localStorage.getItem(`board-${boardId}-readmode`)
+  return token === "true"
+}
+
+export const setIsInReadMode = (boardId: string, isInReadMode: boolean) => {
+  localStorage.setItem(`board-${boardId}-readmode`, String(isInReadMode))
+}
 
 export const getAdminPassword = () => {
   return localStorage.getItem("admin-password")

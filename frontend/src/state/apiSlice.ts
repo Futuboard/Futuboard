@@ -1,4 +1,13 @@
-import { TagDescription, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import { MutationLifecycleApi } from "@reduxjs/toolkit/dist/query/endpointDefinitions"
+import {
+  BaseQueryApi,
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+  TagDescription,
+  createApi,
+  fetchBaseQuery
+} from "@reduxjs/toolkit/query/react"
 
 import { cacheTagTypes } from "@/constants"
 import {
@@ -22,9 +31,18 @@ import {
   Scope
 } from "@/types"
 
-import { getAdminPassword, getAuth, setToken } from "./auth"
+import { getAdminPassword, getAuth, getIsInReadMode, logOutOfBoard, setToken } from "./auth"
+import { setNotification } from "./notification"
 import { RootState } from "./store"
 import { webSocketContainer } from "./websocket"
+
+const isLoggedInWithReadOnly = (
+  api: MutationLifecycleApi<unknown, BaseQueryFn, unknown, "boardsApi"> | BaseQueryApi
+) => {
+  const boardId = (api.getState() as RootState)?.auth?.boardId
+  if (!boardId) return false
+  return getIsInReadMode(boardId)
+}
 
 const invalidateRemoteCache = (tags: CacheInvalidationTag[]) => {
   webSocketContainer.invalidateCacheOfOtherUsers(tags)
@@ -49,24 +67,72 @@ const updateCache = (
   }
 }
 
-//TODO: refactor
+const baseQuery = fetchBaseQuery({
+  baseUrl: import.meta.env.VITE_DB_ADDRESS,
+
+  prepareHeaders: (headers, { getState }) => {
+    const boardId = (getState() as RootState).auth.boardId
+    if (boardId) {
+      const auth = getAuth(boardId)
+      if (auth) {
+        headers.set("Authorization", auth)
+      }
+    }
+    return headers
+  }
+})
+
+const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+  args,
+  api,
+  extraOptions
+) => {
+  const result = await baseQuery(args, api, extraOptions)
+  const tokenIsInvalid = result.error && result.error.status === 401
+  const boardId = (api.getState() as RootState).auth.boardId
+
+  const url = typeof args === "string" ? args : args.url
+
+  const isUpdatePasswordRequest = url.includes("password") && url.includes("boards")
+  const isBoardTemplateRequest = url.includes("boardtemplates")
+
+  if (tokenIsInvalid && !isUpdatePasswordRequest && !isBoardTemplateRequest) {
+    if (isLoggedInWithReadOnly(api)) {
+      api.dispatch(
+        setNotification({
+          text: "No changes allowed in read-only mode.",
+          type: "warning",
+          duration: 5000
+        })
+      )
+    } else {
+      logOutOfBoard(boardId)
+      api.dispatch(boardsApi.util.resetApiState())
+      api.dispatch(
+        setNotification({
+          text: "Your login expired or was invalid, so you were logged out.",
+          type: "warning",
+          duration: 60000
+        })
+      )
+    }
+  }
+
+  /*
+  Django sometimes gives errors in HTML, so this cant really be used
+  
+  if (result.error) {
+    const errorMessage = (result.error.data as string) || "An unknown error occurred"
+    api.dispatch(setNotification({ text: errorMessage, type: "error", duration: 10000 }))
+  }
+  */
+
+  return result
+}
+
 export const boardsApi = createApi({
   reducerPath: "boardsApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_DB_ADDRESS,
-
-    prepareHeaders: (headers, { getState }) => {
-      const boardId = (getState() as RootState).auth.boardId
-      if (boardId) {
-        const auth = getAuth(boardId)
-        if (auth) {
-          headers.set("Authorization", auth)
-        }
-      }
-      return headers
-    }
-  }),
-
+  baseQuery: baseQueryWithErrorHandling,
   tagTypes: cacheTagTypes,
 
   endpoints: (builder) => ({
@@ -193,9 +259,9 @@ export const boardsApi = createApi({
       providesTags: [{ type: "Columns", id: "LIST" }]
     }),
 
-    getTaskListByColumnId: builder.query<Task[], { boardId: string; columnId: string }>({
-      query: ({ boardId, columnId }) => {
-        return `boards/${boardId}/columns/${columnId}/tickets`
+    getTaskListByColumnId: builder.query<Task[], { columnId: string }>({
+      query: ({ columnId }) => {
+        return `columns/${columnId}/tickets`
       },
       providesTags: (result, _error, args) => {
         const tags: TagDescription<"Ticket" | "Users">[] = []
@@ -227,9 +293,9 @@ export const boardsApi = createApi({
       invalidatesTags: () => invalidateRemoteCache(["Columns"])
     }),
 
-    addTask: builder.mutation<Task, { boardId: string; columnId: string; task: NewTask }>({
-      query: ({ boardId, columnId, task }) => ({
-        url: `boards/${boardId}/columns/${columnId}/tickets`,
+    addTask: builder.mutation<Task, { columnId: string; task: NewTask }>({
+      query: ({ columnId, task }) => ({
+        url: `columns/${columnId}/tickets`,
         method: "POST",
         body: task
       }),
@@ -242,7 +308,7 @@ export const boardsApi = createApi({
 
     updateTask: builder.mutation<Task, { task: NewTask }>({
       query: ({ task }) => ({
-        url: `columns/${task.columnid}/tickets/${task.ticketid}/`,
+        url: `tickets/${task.ticketid}/`,
         method: "PUT",
         body: task
       }),
@@ -255,7 +321,7 @@ export const boardsApi = createApi({
 
     deleteTask: builder.mutation<Task, { task: Task }>({
       query: ({ task }) => ({
-        url: `columns/${task.columnid}/tickets/${task.ticketid}/`,
+        url: `tickets/${task.ticketid}/`,
         method: "DELETE"
       }),
       invalidatesTags: (_result, _error, { task }) =>
@@ -267,7 +333,7 @@ export const boardsApi = createApi({
 
     updateColumn: builder.mutation<Column, { column: Column; ticketIds?: string[] }>({
       query: ({ column, ticketIds }) => ({
-        url: `boards/${column.boardid}/columns/${column.columnid}/`,
+        url: `columns/${column.columnid}/`,
         method: "PUT",
         body: { ...column, ticket_ids: ticketIds }
       }),
@@ -282,6 +348,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ columns }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const invalidationTags: CacheInvalidationTag[] = [{ type: "Columns", id: "LIST" }]
         updateCache(
           "getColumnsByBoardId",
@@ -301,20 +369,22 @@ export const boardsApi = createApi({
 
     deleteColumn: builder.mutation<Column, { column: Column }>({
       query: ({ column }) => ({
-        url: `boards/${column.boardid}/columns/${column.columnid}/`,
+        url: `columns/${column.columnid}/`,
         method: "DELETE"
       }),
       invalidatesTags: () => invalidateRemoteCache(["Columns"])
     }),
 
-    updateTaskListByColumnId: builder.mutation<Task[], { boardId: string; columnId: string; tasks: Task[] }>({
-      query: ({ boardId, columnId, tasks }) => ({
-        url: `boards/${boardId}/columns/${columnId}/tickets`,
+    updateTaskListByColumnId: builder.mutation<Task[], { columnId: string; tasks: Task[] }>({
+      query: ({ columnId, tasks }) => ({
+        url: `columns/${columnId}/tickets`,
         method: "PUT",
         body: tasks
       }),
       //update optimistically
       onQueryStarted({ columnId, tasks }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Columns", id: columnId },
           { type: "Ticket", id: "LIST" },
@@ -368,13 +438,7 @@ export const boardsApi = createApi({
           }
           return data
         }
-      }),
-      invalidatesTags: (result) => {
-        if (result?.success) {
-          return ["Boards"]
-        }
-        return []
-      }
+      })
     }),
 
     postUserToTicket: builder.mutation<User, { ticketId: string; userid: string }>({
@@ -385,6 +449,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ ticketId, userid }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: ticketId },
           { type: "Users", id: userid },
@@ -435,6 +501,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ ticketId, userid }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: ticketId },
           { type: "Users", id: userid },
@@ -482,6 +550,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ actionId, userid }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: actionId },
           { type: "Users", id: userid },
@@ -532,6 +602,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ actionId, userid }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Users", id: actionId },
           { type: "Users", id: userid },
@@ -624,6 +696,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ action }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const invalidationTags: CacheInvalidationTag[] = [{ type: "Action", id: action.columnid }]
         updateCache(
           "getActionsByColumnId",
@@ -672,6 +746,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ columnid, swimlaneColumnId, actions: newActions }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const invalidationTags: CacheInvalidationTag[] = [{ type: "Action", id: columnid }]
         updateCache(
           "getActionsByColumnId",
@@ -753,6 +829,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ scopeid }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Scopes", id: "LIST" }]
         updateCache(
           "getScopes",
@@ -779,6 +857,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ scope, columns }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Scopes", id: "LIST" }]
         updateCache(
           "getScopes",
@@ -829,6 +909,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ ticketid, scope }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
         updateCache(
           "getTaskListByColumnId",
@@ -860,6 +942,8 @@ export const boardsApi = createApi({
       }),
       //update optimistically
       onQueryStarted({ ticketid, scope }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
         const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
         updateCache(
           "getTaskListByColumnId",

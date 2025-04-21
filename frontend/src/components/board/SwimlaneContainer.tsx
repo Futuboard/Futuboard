@@ -74,7 +74,7 @@ interface SwimlaneContainerProps {
 
 const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
   const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(column.columnid)
-  const { data: taskList } = useGetTaskListByColumnIdQuery({ boardId: column.boardid, columnId: column.columnid })
+  const { data: taskList } = useGetTaskListByColumnIdQuery({ columnId: column.columnid })
   const tasks = taskList
   const { data: actions } = useGetActionsByColumnIdQuery(column.columnid)
 

@@ -100,7 +100,7 @@ def test_action_on_swimlane():
         "size": 10,
     }
     response = client.post(
-        reverse("tickets_on_column", args=[board.boardid, columnid]),
+        reverse("tickets_on_column", args=[columnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
