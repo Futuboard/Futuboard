@@ -39,12 +39,14 @@
   - [Other technologies](#other-technologies)
     - [Cloud Service: Azure](#cloud-service-azure)
     - [Database: PostgreSQL](#database-postgresql)
-- [Deployment instructions](#deployment-instructions)
-  - [Frontend deployment](#frontend-deployment)
+- [Deployment instructions for deployment to Azure from GitHub](#deployment-instructions-for-deployment-to-azure-from-github)
+  - [Database creation and deployment](#database-creation-and-deployment)
   - [Backend deployment](#backend-deployment)
-    - [Database creation](#database-creation)
-    - [Common issues](#common-issues)
-
+  - [Frontend deployment](#frontend-deployment)
+- [Deployment troubleshooting](#deployment-troubleshooting)
+  - [Database troubleshooting](#database-troubleshooting)
+  - [Backend troubleshooting](#backend-troubleshooting)
+  - [Frontend troubleshooting](#frontend-troubleshooting)
 ## Introduction
 
 [Futuboard](https://futuboard.live/) is free, easy to use and open-source web tool for workflow management that requires no registration. It can be used to manage individual or team work efficiently and remotely. Futuboard allows for an easier to use platform than alternative tools with the same features. It includes automatic visualizations and statistics about the progress of work. Use on the web or set up your on instance of Futuboard, it's all up to you. To get started, just create a board, save (and share) the link and start managing your work, it's that simple!
@@ -406,36 +408,36 @@ Since we chose Django as our framework, it is natural to select PostgreSQL as ou
 
 [PostgreSQL documentation](https://www.postgresql.org/docs/)
 
-## Deployment instructions
+## Deployment instructions for deployment to Azure from GitHub
 
-Deployment to Azure. These are settings for a development deployment. For a production deployment, additional security settings are needed.
+These are settings for a development deployment. For a production deployment, additional security settings are needed. It is best to set up the deployment in the following order: database first, then backend and finally the frontend as this may help troubleshooting if any problems occur.
 
-### Database creation
+### Database creation and deployment
 
-Create a new Azure Database for PostgreSQL Flexible Server
-Choose the subscription and resource group you prefer. Also, name your server and choose the region best for you.
+First, in the marketplace create a new "Azure Database for PostgreSQL Flexible Server". This will open a resource creation view.
+In the view, set the "Subscription" and "Resource group" as you prefer. Then name your server and choose the best region for you.
 
-Select PostgreSQL version 16. (MATIAS NOTE: 16.8)
+Select PostgreSQL version 16. At time of writing, this should result in PostgreSQL version 16.8 in the final deployment.
 
-For the cheapest hosting, choose Workload type "Development", and click "Configure server". Select "Burstable" as the Compute tier, and Standard_B1ms for the compute size. Choose 32GiB for Storage Size and P4 performance tier.
+For the cheapest hosting, choose Workload type "Development", and click "Configure server". In the new window set "Cluster options" as "server", "Compute tier" as "Burstable", and "Compute size" as "Standard_B1ms". Set "Storage Size" as "32GiB" and "Performance tier" as "P4".
 
 ![Azure_PostgreSQL_settings](https://github.com/user-attachments/assets/65efc7fb-3dc1-46e6-8f44-0788c5b12bfc)
 
-For the Authentication method, select "PostgreSQL authentication only". Write a username to "Administrator login" and a password to "Password". These must be the same environment variables you set in the backend for DB_USER and DB_PASSWORD.
+For the Authentication method, select "PostgreSQL authentication only". Write a username to "Administrator login" and a password to "Password". These will be used for the backend deployment as the environment variables DB_USER and DB_PASSWORD.
 ![image](https://github.com/user-attachments/assets/e9d66feb-0835-4321-8027-7993ee56ee16)
 
-On the "Networking" tab, select allow Public access, and allow all IP:s through the firewall. 
+On the "Networking" tab, set allow Public access, and allow all IP:s through the firewall by clicking "+ Add 0.0.0.0 - 255.255.255.255". 
 ![image](https://github.com/user-attachments/assets/1b218c7c-2242-4ddb-a4ac-3d752f7d6c95)
 
-Create database by clicking "Review + create"
+Create the database by clicking "Review + create". The endpoint for the created database can be found by navigating to its overview.
 
 ### Backend deployment
 
-Deployment of the backend can be accomplished through Azure's App Service Web App. Create a new Web App. Choose the subscription and resource group you prefer. Also, name your application.
+Next, to deploy the backend, search for 'web app' in the marketplace. Make sure the description says "Microsoft" and "Azure service". Click "Create" on it to create a new Web App. Set the "Subscription" and "Resource group" as you prefer and then name your application.
 
-The publish style is code and the runtime stack is Python 3.9. Newer Python versions may not work. After this, choose your preferred region and agreement. Then, from the deployment section, continuous deployment must be activated. Choose the correct GitHub folder for this. After these settings, you are ready to proceed from this view. Leave all other values at their defaults and create the Web App. This will create a new workflow file in GitHub again. 
+Set "Publish style" as "Code" and "Runtime stack" as Python 3.9. Newer Python versions may not work. Set "Region" and "Pricing plan" as you prefer. Then, from the deployment section, set "Continuous deployment" as "Enabled". Next there are some GitHub settings. First you may need to connect your GitHub account. Then, set the "Organization", "Repository" and "Branch" based on your project settings. Most likely the branch is set as "main". After these settings, you may proceed from this view. Leave all other values at their defaults and create the Web App. This will create a new workflow file in the GitHub repository that was set earlier. This file can be found in .github/workflows/ and it will be edited in the next step.
 
-Then you need to manually edit the `build` section in the workflow file that was generated to GitHub. You need to add `working-directory: ./backend` and `backend` to the `path` field. Your `build` section should look like this:
+The `build` section needs to be edited in the workflow file. Add `working-directory: ./backend` and `backend` to the `path` field. Your `build` section should look like this:
 ```
 jobs:
   build:
@@ -476,11 +478,12 @@ jobs:
   deploy:
     ...
 ```
-Then, some important settings need be set in Azure: 
 
-In the API -> CORS section, set allowed origins to all `\*` (for development) or to the frontend's URL (for production).
+Saving the edited workflow file should trigger a deployment to Azure. Next a few settings must be set in Azure: 
 
-In the Settings -> Configuration section, set the Startup Command to be: 
+In the API -> CORS section, set "Allowed origins" to all `\*` (for development) or to the frontend's URL (for production).
+
+In the Settings -> Configuration section, find the "Startup Command" text field and paste: 
 ```
 python manage.py migrate && daphne -b 0.0.0.0 -p 8000 backend.asgi:application
 ```
@@ -506,25 +509,17 @@ SECRET_KEY=some robust secret, e.g. long string of random characters (used by Dj
 SCM_DO_BUILD_DURING_DEPLOYMENT=1 (needed to deploy correctly) 
 ```
 
-After setting these settings, restart the application from Azure.
-
-NOTICE: Asure can be quite slow to deploy the backend, and the logs are sometimes unreliable. 
+After applying these settings, restart the application from Azure. It may be a good time to wait 15 minutes or so, to make sure that Azure has had enough time updating the deployment.
 
 ### Frontend deployment
 
-Create a new static web app
+From the marketplace search for "static web app". Click "Create" on a "Static Web App" that has "Microsoft" and "Azure Service" in the description.
 
-Use the subscription and resource group of your choice. Name the application as you wish and select a subscription suitable for your use. Choose GitHub as the deployment style and follow Azure's instructions correctly for selecting the GitHub repository.
+Set the "Subscription" and "Resource group" as you prefer. Name the application and select a "Hosting plan" that serves your purposes. Choose GitHub as the deployment style. Again, you may need to connect your GitHub account. Set the "Organization", "Repository" and "Branch" based on your project settings. Most likely the branch is set as "main". After this, a "Build details" section should become visible. In "Build details", set "Build preset" as "React", set "App Location" as "./frontend" and "Build location" as "dist".
 
-Choose React as the build preset. Change the App Location to /frontend and the build location to dist.
+After setting the "Build details", click "review and create". In the review window, click "Create" again, which triggers Azure to create a workflow file in your selected GitHub repository. Again, this new workflow file will need some adjustments. It can be found in .github/workflows
 
-Advanced settings do not need to be changed.
-
-After this, you can create the application and follow Azure's instructions to completion.
-
-Azure then creates a workflow file in your GitHub repository.
-
-Finally, you need to add environment variables for the Frontend, by editing the workflow file that was just created. After the edit, the workflow file should look like this (except you need to replace the URL with the URL of your backend):
+For the frontend to work, environment variables must be added, by editing the workflow file that was just created. After the edit, the workflow file should look like this (except you need to replace the URL with the URL of your backend):
 ```
 name: Azure Static Web Apps CI/CD
 
@@ -546,4 +541,25 @@ jobs:
   ...
 ```
 
+## Deployment troubleshooting
+
+This section contains troubleshooting tips for these instructions only.
+
+### Database troubleshooting
+
+The database should work as is. Once the backend is successfully deployed, it will modify the database but other than that, the database should be ready once deployed.
+
+### Backend troubleshooting
+
+NOTE: Sometimes the logs provided by Azure may be unreliable and you may need to wait around 15 minutes, and possibly more, to see if the backend has been deployed successfully. It is neccessary to refresh the logs every now and then and it is advisable to copy log streams somewhere safe if looking for something specific, like responses to GET-requests.
+
+The backend is the trickiest part to configure and deploy correctly. Please make sure that all of the environment variables are set correctly in the Azure portal. A good indicator that the backend is at least partially functional is by reaching this view when visiting the backend domain:
+
+<img width="1440" alt="partial-victory" src="https://github.com/user-attachments/assets/c1157b7e-2ef8-4c84-83db-03510b7cf7e8" />
+
+The freshly created database may not contain any information, even after it is modified by the backend. An indicator for a successful connection between the database and the backend can be found by performing a GET-request to an open endpoint in the backend and recieving a most likely empty response "[]" with a "200 OK" response code.
+
+### Frontend troubleshooting
+
+If the backend and the database are set up properly, and the frontend is still not working, check that the frontend environment variables are properly set in the GitHub workflow file. At the time of writing, they can not be activated through the Azure portal and must be properly set in the GitHub workflow file according to the instructions above. A symptom of this problem, is that the frontend is sending requests to itself.
 
