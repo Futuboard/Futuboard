@@ -49,7 +49,7 @@
   - [Frontend troubleshooting](#frontend-troubleshooting)
 ## Introduction
 
-[Futuboard](https://futuboard.live/) is free, easy to use and open-source web tool for workflow management that requires no registration. It can be used to manage individual or team work efficiently and remotely. Futuboard allows for an easier to use platform than alternative tools with the same features. It includes automatic visualizations and statistics about the progress of work. Use on the web or set up your on instance of Futuboard, it's all up to you. To get started, just create a board, save (and share) the link and start managing your work, it's that simple!
+[Futuboard](https://futuboard.live/) is free, easy to use and open-source web tool for workflow management that requires no registration. It can be used to manage individual or team work efficiently and remotely. Futuboard allows for an easier to use platform than alternative tools with the same features. It includes automatic visualizations and statistics about the progress of work. Futuboard can be used for different workflows and frameworks, such as Scrum, Kanban or a simple todo list. As an example, Futuboard enables convenient support for all Scrum events and cumulative flow diagram and scope burn-ups for process optimization and progress follow-up. Use on the web or set up your on instance of Futuboard, it's all up to you. To get started, just create a board, save (and share) the link and start managing your work, it's that simple!
 
 This README includes instructions for setting up development, information about what we've used to create this project with documentation links and guides on deploying your own instance.
 
