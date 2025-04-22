@@ -47,6 +47,7 @@
   - [Database troubleshooting](#database-troubleshooting)
   - [Backend troubleshooting](#backend-troubleshooting)
   - [Frontend troubleshooting](#frontend-troubleshooting)
+
 ## Introduction
 
 [Futuboard](https://futuboard.live/) is a free, easy-to-use and open-source web tool for workflow management that requires no registration. It can be used to manage individual or team work efficiently and remotely. It allows for an easier to use platform than alternative tools with the same features, and it includes automatic visualizations and statistics about the progress of work. Different workflows and frameworks, such as Scrum, Kanban or a simple todo-list, are naturally compatible with Futuboard, and in particular, it enables convenient support for all Scrum events. It produces cumulative flow diagrams and scope burn-ups for process optimization and progress follow-up. Use it on the web or set up your own instance of Futuboard—it's all up to you. To get started, just create a board, save (and share) the link, and start managing your work—it's that simple!
@@ -56,19 +57,22 @@ This README includes instructions for setting up a development environment, info
 ### Features
 
 **Board**
+
 - The user can create a board with a name and optional password.
 - The user gets a link to the board, which they have to store personally.
 - Board password and name can be changed.
 - The data of the board can be exported in a JSON file.
-- A board can be deleted.
 - A new board can be imported from a previously exported JSON file.
+- A board can be deleted.
 
 **Column on board**
+
 - The user can create and delete Columns.
 - The column can be given a name and whether or not it contains swimlane columns.
 - After creation the name, ticket count limit and story point limit of the column can be changed.
 
 **Tickets and actions**
+
 - Tickets can be created in a column.
 - A tickets name, story points, corner notes, description and color can be chosen.
 - Tickets in Columns containing swimlanes can be given actions with descriptions.
@@ -78,16 +82,19 @@ This README includes instructions for setting up a development environment, info
 - Actions, tickets can be deleted.
 
 **User magnets on board**
+
 - A user can create new users for the board.
 - A user magnet can be placed on a ticket or action.
 - Users can be deleted from ticket or action or from the board.
 
 **Scopes and analytics**
+
 - Scopes can be created to group tickets.
 - Created scopes can be edited and deleted.
 - Board has analytics window which shows Cumulative Flow, Velocity, and Burn Up Charts-
 
 **Other**
+
 - Board has shared notes area for every board user to edit and read.
 - Frontpage has a list of visited boards.
 
@@ -444,7 +451,7 @@ For the cheapest hosting, choose Workload type "Development", and click "Configu
 For the Authentication method, select "PostgreSQL authentication only". Write a username to "Administrator login" and a password to "Password". These will be used for the backend deployment as the environment variables DB_USER and DB_PASSWORD.
 ![image](https://github.com/user-attachments/assets/e9d66feb-0835-4321-8027-7993ee56ee16)
 
-On the "Networking" tab, set allow Public access, and allow all IP:s through the firewall by clicking "+ Add 0.0.0.0 - 255.255.255.255". 
+On the "Networking" tab, set allow Public access, and allow all IP:s through the firewall by clicking "+ Add 0.0.0.0 - 255.255.255.255".
 ![image](https://github.com/user-attachments/assets/1b218c7c-2242-4ddb-a4ac-3d752f7d6c95)
 
 Create the database by clicking "Review + create". The endpoint for the created database can be found by navigating to its overview.
@@ -456,6 +463,7 @@ Next, to deploy the backend, search for 'web app' in the marketplace. Make sure 
 Set "Publish style" as "Code" and "Runtime stack" as Python 3.9. Newer Python versions may not work. Set "Region" and "Pricing plan" as you prefer. Then, from the deployment section, set "Continuous deployment" as "Enabled". Next there are some GitHub settings. First you may need to connect your GitHub account. Then, set the "Organization", "Repository" and "Branch" based on your project settings. Most likely the branch is set as "main". After these settings, you may proceed from this view. Leave all other values at their defaults and create the Web App. This will create a new workflow file in the GitHub repository that was set earlier. This file can be found in .github/workflows/ and it will be edited in the next step.
 
 The `build` section needs to be edited in the workflow file. Add `working-directory: ./backend` and `backend` to the `path` field. Your `build` section should look like this:
+
 ```
 jobs:
   build:
@@ -476,7 +484,7 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
-      
+
       - name: Install dependencies
         working-directory: ./backend
         run: pip install -r requirements.txt
@@ -497,19 +505,22 @@ jobs:
     ...
 ```
 
-Saving the edited workflow file should trigger a deployment to Azure. Next a few settings must be set in Azure: 
+Saving the edited workflow file should trigger a deployment to Azure. Next a few settings must be set in Azure:
 
 In the API -> CORS section, set "Allowed origins" to all `\*` (for development) or to the frontend's URL (for production).
 
-In the Settings -> Configuration section, find the "Startup Command" text field and paste: 
+In the Settings -> Configuration section, find the "Startup Command" text field and paste:
+
 ```
 python manage.py migrate && daphne -b 0.0.0.0 -p 8000 backend.asgi:application
 ```
-This will run the migrations on startup, and start the backend with a websocket connection option. 
+
+This will run the migrations on startup, and start the backend with a websocket connection option.
 
 In the Settings -> Environment Variables section, set all the required env-variables:
+
 ```
-You can get these DB env-variables from the Settings -> Connect tab of the PostreSQL DB instance in Azure, that you created in previous section. 
+You can get these DB env-variables from the Settings -> Connect tab of the PostreSQL DB instance in Azure, that you created in previous section.
 DB_HOST= From Azure PostreSQL Connect tab (PGHOST)
 DB_USER= From Azure PostreSQL Connect tab (PGUSER)
 DB_NAME= From Azure PostreSQL Connect tab (PGDATABASE)
@@ -518,13 +529,13 @@ DB_PASSWORD= The password you set for the PostreSQL database when creating it
 
 DB_SCHEMA=public (or something else, if you want to use the same database for multiple environments, but then you need to manually create schema in the DB)
 
-FRONTEND_HOSTNAME= The hostname (i.e. url, but without https://, e.g. futuboard.live) of the frontend, once you have deployed it. 
+FRONTEND_HOSTNAME= The hostname (i.e. url, but without https://, e.g. futuboard.live) of the frontend, once you have deployed it.
 
 ADMIN_PASSWORD=some password you can remember (used for editing Board Templates)
 JWT_SECRET=some robust secret, e.g. long string of random characters (used for token authentication)
 SECRET_KEY=some robust secret, e.g. long string of random characters (used by Django)
 
-SCM_DO_BUILD_DURING_DEPLOYMENT=1 (needed to deploy correctly) 
+SCM_DO_BUILD_DURING_DEPLOYMENT=1 (needed to deploy correctly)
 ```
 
 After applying these settings, restart the application from Azure. It may be a good time to wait 15 minutes or so, to make sure that Azure has had enough time updating the deployment.
@@ -538,6 +549,7 @@ Set the "Subscription" and "Resource group" as you prefer. Name the application 
 After setting the "Build details", click "review and create". In the review window, click "Create" again, which triggers Azure to create a workflow file in your selected GitHub repository. Again, this new workflow file will need some adjustments. It can be found in .github/workflows
 
 For the frontend to work, environment variables must be added, by editing the workflow file that was just created. After the edit, the workflow file should look like this (except you need to replace the URL with the URL of your backend):
+
 ```
 name: Azure Static Web Apps CI/CD
 
@@ -580,4 +592,3 @@ The freshly created database may not contain any information, even after it is m
 ### Frontend troubleshooting
 
 If the backend and the database are set up properly, and the frontend is still not working, check that the frontend environment variables are properly set in the GitHub workflow file. At the time of writing, they can not be activated through the Azure portal and must be properly set in the GitHub workflow file according to the instructions above. A symptom of this problem, is that the frontend is sending requests to itself.
-
