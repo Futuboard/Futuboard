@@ -54,7 +54,7 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
   }, [board, titlePrefix])
 
   useEffect(() => {
-    if (!isLoading && board && id) {
+    if (!isLoading && board?.title && id) {
       addVisitedBoard({ boardid: id, title: board.title })
     }
   }, [id, isLoading, board?.title])
