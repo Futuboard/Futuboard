@@ -12,7 +12,7 @@ import { useParams } from "react-router"
 import { RootState } from "@/state/store"
 import type { Column, Task as TaskType, User, TaskTemplate, SimpleScope, NewAction, Board } from "@/types"
 
-import { getId, parseAcceptanceCriteriaFromDescription } from "../../services/Utils"
+import { getId, parseAcceptanceCriteriaFromDescription } from "../../services/utils"
 import {
   boardsApi,
   useAddTaskMutation,

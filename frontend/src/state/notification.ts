@@ -1,7 +1,7 @@
 import { AlertColor } from "@mui/material/Alert"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-import { getId } from "@/services/Utils"
+import { getId } from "@/services/utils"
 
 type NotificationState = {
   text: string

@@ -16,6 +16,7 @@ import { SetStateAction, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
 
+import { removeVisitedBoard } from "@/services/utils"
 import { useDeleteBoardMutation, useLoginMutation } from "@/state/apiSlice"
 import { getIsInReadMode } from "@/state/auth"
 import { setNotification } from "@/state/notification"
@@ -50,6 +51,7 @@ const BoardDeletionComponent = () => {
   }
 
   const handleDeleteBoard = async () => {
+    removeVisitedBoard(id)
     await deleteBoard(id)
     navigate("/")
   }
