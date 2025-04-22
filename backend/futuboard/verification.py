@@ -34,7 +34,7 @@ def get_token_from_request(request):
         return None
 
 
-JWT_SECRET = str(config("JWT_SECRET"))
+JWT_SECRET = config("JWT_SECRET")
 
 
 def encode_token(board_id: UUID):
