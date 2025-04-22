@@ -17,15 +17,7 @@ const Home: React.FC = () => {
   })
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="100vh"
-      width="100%"
-      bgcolor="white"
-      sx={{ overflowY: "auto" }}
-    >
+    <Box display="flex" justifyContent="center" alignItems="center" height="100vh" width="100%" bgcolor="white">
       <VisitedBoardsList />
 
       <Grid textAlign="center" container spacing={1}>
