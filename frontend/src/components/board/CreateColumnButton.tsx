@@ -1,9 +1,9 @@
 import ColumnCreationForm from "@components/board/ColumnCreationForm"
 import { Dialog, DialogContent, IconButton, Tooltip } from "@mui/material"
 import Box from "@mui/material/Box"
-import { getId } from "@services/Utils"
 import { useState } from "react"
 
+import { getId } from "@/services/utils"
 import { useAddColumnMutation } from "@/state/apiSlice"
 import { ColumnData } from "@/types"
 

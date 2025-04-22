@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom"
 
 import AccessBoardForm from "@/components/board/AccessBoardForm"
 import { cacheTagTypes } from "@/constants"
+import { addVisitedBoard } from "@/services/utils"
 import { boardsApi, useGetBoardQuery, useLoginMutation } from "@/state/apiSlice"
 import { getAuth, getIsInReadMode, setBoardId, setIsInReadMode } from "@/state/auth"
 import { setNotification } from "@/state/notification"
@@ -51,6 +52,12 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
     const prefix = titlePrefix ? titlePrefix + " - " : ""
     document.title = board?.title ? prefix + board?.title + " - Futuboard" : "Futuboard"
   }, [board, titlePrefix])
+
+  useEffect(() => {
+    if (!isLoading && board?.title && id) {
+      addVisitedBoard({ boardid: id, title: board.title })
+    }
+  }, [id, isLoading, board?.title])
 
   const hasAuth = Boolean(getAuth(id))
 

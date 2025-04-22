@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography"
 import { useEffect } from "react"
 
 import ModalFrameCv from "@/components/home/ModalFrameCv"
+import VisitedBoardsList from "@/components/home/VisitedBoardsList"
 
 const Home: React.FC = () => {
   useEffect(() => {
@@ -17,6 +18,8 @@ const Home: React.FC = () => {
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" height="100vh" width="100%" bgcolor="white">
+      <VisitedBoardsList />
+
       <Grid textAlign="center" container spacing={1}>
         <Grid item xs={12}>
           <img
