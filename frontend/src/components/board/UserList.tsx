@@ -63,7 +63,7 @@ const UserList: React.FC<UserListProps> = ({ users }) => {
                 </Draggable>
               ))}
             {provided.placeholder}
-            <Tooltip title="toggle delete" sx={{ marginLeft: "auto" }}>
+            <Tooltip title="Toggle Delete" sx={{ marginLeft: "auto" }}>
               <IconButton onClick={() => setShowEditable(!showEditable)}>
                 {showEditable ? <DeleteTwoTone color="error" /> : <DeleteOutline />}
               </IconButton>

@@ -42,14 +42,17 @@ interface FormData {
 interface CreateTaskButtonProps {
   columnid: string
   board: Board
+  hasSwimLaneColumns: boolean
 }
 
-const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) => {
+const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board, hasSwimLaneColumns }) => {
   const [defaultValues, setDefaultValues] = useState<TaskTemplate | null>(null)
   const [taskTemplate, setTaskTemplate] = useState<TaskTemplate | null>(null)
 
   const [addTask] = useAddTaskMutation()
-  const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(columnid)
+  const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(columnid, {
+    skip: !hasSwimLaneColumns
+  })
   const [createAction] = usePostActionMutation()
 
   const [open, setOpen] = useState(false)
@@ -111,7 +114,7 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board }) 
       color: data.color,
       cornernote: data.cornerNote
     }
-    await addTask({ boardId: board.boardid, columnId: columnid, task: taskObject })
+    await addTask({ columnId: columnid, task: taskObject })
 
     if (isSuccess && swimlaneColumns.length) {
       const criteria: string[] = parseAcceptanceCriteriaFromDescription(data?.description)
@@ -168,10 +171,7 @@ interface TaskListProps {
 
 const TaskList: React.FC<TaskListProps> = ({ column, templateDescription }) => {
   //get task list from server
-  const { data: taskList, isLoading } = useGetTaskListByColumnIdQuery({
-    boardId: column.boardid,
-    columnId: column.columnid
-  })
+  const { data: taskList, isLoading } = useGetTaskListByColumnIdQuery({ columnId: column.columnid })
 
   const tasks = taskList
   if (isLoading) {
@@ -298,15 +298,16 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
   const [addTaskToScope] = useAddTaskToScopeMutation()
   const [deleteTaskFromScope] = useDeleteTaskFromScopeMutation()
 
+  const { id = "default-id" } = useParams()
+
   const [showSwimlanes, setShowSwimlanes] = useState(false)
 
   const isSwimlaneColumn = column.swimlane || false // change this to column.swimlane boolean
-  const { id = "default-id" } = useParams()
 
   const selectTasksByColumnId = boardsApi.endpoints.getTaskListByColumnId.select
 
   const tasks = useSelector(
-    (state: RootState) => selectTasksByColumnId({ boardId: id, columnId: column.columnid })(state).data || defaultTasks
+    (state: RootState) => selectTasksByColumnId({ columnId: column.columnid })(state).data || defaultTasks
   )
   const { data: board } = useGetBoardQuery(id)
 
@@ -405,7 +406,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
                 paddingTop: "4px"
               }}
             >
-              <CreateTaskButton columnid={column.columnid} board={board} />
+              <CreateTaskButton columnid={column.columnid} board={board} hasSwimLaneColumns={isSwimlaneColumn} />
               <Typography title={"Number of tasks"} sx={{ fontSize: "17px", color: "#2D3748" }}>
                 {column.wip_limit ? `${taskNum} / ${column.wip_limit}` : taskNum}
               </Typography>

@@ -3,17 +3,17 @@ Cypress.Commands.add("createBoard", ({ title, password }) => {
   cy.get(".MuiDialog-root").should("be.visible")
   cy.get(".MuiDialog-root").find("label").contains("Board Name").parent().find("input").type(title)
   password && cy.get(".MuiDialog-root").find("label").contains("Board Password").parent().find("input").type(password)
-  cy.get(".MuiDialog-root").contains("button", "Submit").click()
+  cy.get("button[type='submit']").contains("Create").click()
 })
 
 Cypress.Commands.add("loginToBoard", (password) => {
-  cy.get(".MuiTypography-root", { timeout: 10000 }).should("contain", "Enter Board Password")
+  cy.get(".MuiTypography-root", { timeout: 10000 }).should("contain", "Log in to edit")
   cy.get('input[name="password"]').type(password)
-  cy.get("form").submit()
+  cy.get("button").contains("Log in").click()
 })
 
 Cypress.Commands.add("createColumn", ({ title, swimlane = false }) => {
-  cy.get('button[aria-label="add column"]').click()
+  cy.get('button[aria-label="add column"]').first().click()
   cy.get(".MuiDialog-root").find('input[name="columnTitle"]').type(title)
   swimlane && cy.get(".MuiDialog-root").find('input[type="checkbox"]').click()
   cy.get(".MuiDialog-root").contains("button", "Submit").click()

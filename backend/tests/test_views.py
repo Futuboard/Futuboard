@@ -8,6 +8,11 @@ from .test_utils import addBoard, addColumn, addTicket, resetDB
 from ..futuboard.verification import verify_password
 
 
+@pytest.fixture()
+def enable_auth_token_checking(settings):
+    settings.DISABLE_AUTH_TOKEN_CHECKING = False
+
+
 ############################################################################################################
 ############################################# VIEW TESTS ###################################################
 ############################################################################################################
@@ -28,18 +33,9 @@ def test_all_boards():
             reverse("all_boards"), {"id": uuid.uuid4(), "title": "board" + str(i), "password": "password" + str(i)}
         )
         assert response.status_code == 200
-    # Get all boards
-    response = api_client.get(reverse("all_boards"))
-    data = response.json()
-    assert len(data) == 5
-    assert response.status_code == 200
+
     assert md.Board.objects.count() == 5
-    # Delete all boards
     md.Board.objects.all().delete()
-    # Get all boards
-    response = api_client.get(reverse("all_boards"))
-    data = response.json()
-    assert len(data) == 0
     assert md.Board.objects.count() == 0
 
 
@@ -106,7 +102,7 @@ def test_board_by_id():
 
 
 @pytest.mark.django_db
-def test_getting_board_requires_auth():
+def test_get_endpoints_dont_require_auth(enable_auth_token_checking):
     api_client = APIClient()
 
     creation_response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
@@ -114,7 +110,30 @@ def test_getting_board_requires_auth():
     boardid = creation_response.json()["boardid"]
 
     get_response_unauthenticated = api_client.get(reverse("board_by_id", args=[boardid]))
-    assert get_response_unauthenticated.status_code == 401
+    assert get_response_unauthenticated.status_code == 200
+
+    get_response_authenticated = api_client.get(reverse("columns_on_board", args=[boardid]))
+    assert get_response_authenticated.status_code == 200
+
+    get_response_authenticated = api_client.get(reverse("cumulative_flow", args=[boardid]))
+    assert get_response_authenticated.status_code == 200
+
+    get_response_authenticated = api_client.get(reverse("scopes_on_board", args=[boardid]))
+    assert get_response_authenticated.status_code == 200
+
+
+@pytest.mark.django_db
+def test_editingh_endpoints_require_auth(enable_auth_token_checking):
+    api_client = APIClient()
+
+    creation_response = api_client.post(reverse("all_boards"), {"title": "board", "password": "password"})
+    assert creation_response.status_code == 200
+    boardid = creation_response.json()["boardid"]
+
+    get_response_authenticated = api_client.post(
+        reverse("columns_on_board", args=[boardid]), {"columnid": "1234", "swimlane": False, "title": "title"}
+    )
+    assert get_response_authenticated.status_code == 401
 
 
 @pytest.mark.django_db
@@ -198,13 +217,13 @@ def test_tickets_on_column():
             "size": 5,
         }
         response = api_client.post(
-            reverse("tickets_on_column", args=[boardid, columnid]),
+            reverse("tickets_on_column", args=[columnid]),
             data=json.dumps(data),
             content_type="application/json",
         )
         assert response.status_code == 200
     # Get tickets from column
-    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[columnid]))
     data = response.json()
     assert len(data) == 5
     assert response.status_code == 200
@@ -231,18 +250,18 @@ def test_tickets_on_column():
     ]
 
     response = api_client.put(
-        reverse("tickets_on_column", args=[boardid, newcolumnid]),
+        reverse("tickets_on_column", args=[newcolumnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
     assert response.status_code == 200
     # Get tickets from new column
-    response = api_client.get(reverse("tickets_on_column", args=[boardid, newcolumnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[newcolumnid]))
     data = response.json()
     assert len(data) == 2
     assert response.status_code == 200
     # Get tickets from old column
-    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[columnid]))
     data = response.json()
     assert len(data) == 3
     assert response.status_code == 200
@@ -280,7 +299,7 @@ def test_update_ticket():
         "size": 5,
     }
     response = api_client.post(
-        reverse("tickets_on_column", args=[boardid, columnid]),
+        reverse("tickets_on_column", args=[columnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
@@ -295,12 +314,12 @@ def test_update_ticket():
         "size": 5,
     }
     response = api_client.put(
-        reverse("update_ticket", args=[columnid, ticketid]), data=json.dumps(data), content_type="application/json"
+        reverse("update_ticket", args=[ticketid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
 
     # Get ticket by id
-    response = api_client.get(reverse("tickets_on_column", args=[boardid, columnid]))
+    response = api_client.get(reverse("tickets_on_column", args=[columnid]))
     data = response.json()
     print(data)
     assert data[0]["title"] == "updatedticket"
@@ -335,7 +354,7 @@ def test_update_column():
     # Test PUT request to update column
     data = {"columnid": str(columnid), "title": "updatedcolumn", "position": 0, "swimlane": False}
     response = api_client.put(
-        reverse("update_column", args=[boardid, columnid]), data=json.dumps(data), content_type="application/json"
+        reverse("update_column", args=[columnid]), data=json.dumps(data), content_type="application/json"
     )
     assert response.status_code == 200
 
@@ -415,7 +434,7 @@ def test_users_on_ticket():
         "size": 5,
     }
     response = api_client.post(
-        reverse("tickets_on_column", args=[boardid, columnid]),
+        reverse("tickets_on_column", args=[columnid]),
         data=json.dumps(data),
         content_type="application/json",
     )
@@ -497,7 +516,7 @@ def test_deleting_column():
     columnid = addColumn(boardid, uuid.uuid4()).columnid
     columnid2 = addColumn(boardid, uuid.uuid4()).columnid
 
-    response = api_client.delete(reverse("update_column", args=[boardid, columnid]))
+    response = api_client.delete(reverse("update_column", args=[columnid]))
 
     assert response.status_code == 200
     assert md.Column.objects.all()[0].columnid == columnid2
@@ -519,7 +538,7 @@ def test_deleting_ticket():
     ticketid = addTicket(columnid, uuid.uuid4()).ticketid
     ticketid2 = addTicket(columnid, uuid.uuid4()).ticketid
 
-    response = api_client.delete(reverse("update_ticket", args=[columnid, ticketid]))
+    response = api_client.delete(reverse("update_ticket", args=[ticketid]))
 
     assert response.status_code == 200
     assert md.Ticket.objects.all()[0].ticketid == ticketid2

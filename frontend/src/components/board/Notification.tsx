@@ -6,10 +6,11 @@ import { useSelector } from "react-redux"
 import { setNotification } from "@/state/notification"
 import { store, RootState } from "@/state/store"
 
-const fullNotifcationTime = 5000
+// This is a large value to make sure the notification bar is full at start
+const largeValue = 1000000
 
 const Notification = () => {
-  const [notificationTime, setNotificationTime] = useState<number>(fullNotifcationTime)
+  const [notificationTime, setNotificationTime] = useState<number>(largeValue)
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
   const notification = useSelector((state: RootState) => state.notification)
 
@@ -18,7 +19,7 @@ const Notification = () => {
     if (intervalId) {
       clearInterval(intervalId)
     }
-    setNotificationTime(fullNotifcationTime)
+    setNotificationTime(largeValue)
   }
 
   useEffect(() => {
@@ -35,7 +36,7 @@ const Notification = () => {
       return
     }
 
-    setNotificationTime(fullNotifcationTime + 500)
+    setNotificationTime(notification.duration + 500)
 
     const newInterValId = setInterval(() => {
       setNotificationTime((oldTime) => oldTime - 200)
@@ -62,7 +63,7 @@ const Notification = () => {
       <LinearProgress
         variant="determinate"
         color={notification.type as AlertColor}
-        value={Math.min((notificationTime * 100) / fullNotifcationTime, 100)}
+        value={Math.min((notificationTime * 100) / notification.duration, 100)}
         sx={{ marginTop: 1 }}
       />
     </Alert>

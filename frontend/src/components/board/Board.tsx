@@ -6,8 +6,8 @@ import { useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
 import { AddMagnetButton } from "../general/Toolbar"
 
 import Column from "./Column"
-import CopyToClipboardButton from "./CopyToClipBoardButton"
 import CreateColumnButton from "./CreateColumnButton"
+import ShareButton from "./ShareButton"
 
 interface BoardProps {
   isBoardNotesOpen: boolean
@@ -42,8 +42,8 @@ const Board: React.FC<BoardProps> = ({ isBoardNotesOpen }) => {
           <AddMagnetButton />
         </Box>
         <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 1, marginBottom: 1 }}>
-          <Typography>Copy board link:</Typography>
-          <CopyToClipboardButton />
+          <Typography>Add collaborators:</Typography>
+          <ShareButton />
         </Box>
       </Box>
     )

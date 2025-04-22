@@ -18,6 +18,7 @@ import { useNavigate, useParams } from "react-router-dom"
 
 import { removeVisitedBoard } from "@/services/utils"
 import { useDeleteBoardMutation, useLoginMutation } from "@/state/apiSlice"
+import { getIsInReadMode } from "@/state/auth"
 import { setNotification } from "@/state/notification"
 
 const BoardDeletionComponent = () => {
@@ -29,6 +30,8 @@ const BoardDeletionComponent = () => {
   const [passwordError, setPasswordError] = useState("")
   const [tryLogin, { isLoading }] = useLoginMutation()
   const [deleteBoard] = useDeleteBoardMutation()
+
+  const isReadOnly = getIsInReadMode(id)
 
   const dispatch = useDispatch()
 
@@ -48,13 +51,9 @@ const BoardDeletionComponent = () => {
   }
 
   const handleDeleteBoard = async () => {
-    try {
-      removeVisitedBoard(id)
-      await deleteBoard(id).unwrap()
-      navigate("/")
-    } catch (error) {
-      console.error("Failed to delete board:", error)
-    }
+    removeVisitedBoard(id)
+    await deleteBoard(id)
+    navigate("/")
   }
 
   const handleSubmitPassword = async () => {
@@ -70,6 +69,11 @@ const BoardDeletionComponent = () => {
       setPasswordError("Wrong password")
     }
   }
+
+  if (isReadOnly) {
+    return null
+  }
+
   return (
     <Box>
       <MenuItem onClick={handleOpenModal} sx={{ py: 1 }}>
