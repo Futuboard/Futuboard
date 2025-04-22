@@ -55,23 +55,41 @@ This README includes instructions for setting up a development environment, info
 
 ### Features
 
-- The user can create a board with a name and optional password
-- The user gets a link to the board, which they have to store personally
-- The user can create a Column
-- The column can be given a name and whether or not it contains swimlane columns
-- After creation the name of the column can be changed
-- Tickets can be created in a column
+**Board**
+- The user can create a board with a name and optional password.
+- The user gets a link to the board, which they have to store personally.
+- Board password and name can be changed.
+- The data of the board can be exported in a JSON file.
+- A board can be deleted.
+- A new board can be imported from a previously exported JSON file.
+
+**Column on board**
+- The user can create and delete Columns.
+- The column can be given a name and whether or not it contains swimlane columns.
+- After creation the name, ticket count limit and story point limit of the column can be changed.
+
+**Tickets and actions**
+- Tickets can be created in a column.
 - A tickets name, story points, corner notes, description and color can be chosen.
-- Tickets in Columns containing swimlanes can be given actions with descriptions
-- Tickets can be moved between columns and columns can be moved
-- Actions can be moved between swimlane columns
-- Actions, tickets and columns can be deleted
-- A user can create new users for the board
-- A user magnet can be placed on a ticket or action
-- Users, tickets and columns can be deleted, deleting actions has not yet been implemented.
-- The data of the board can be exported in a JSON file
-- A board can be deleted
-- A new board can be imported from a previously exported JSON file
+- Tickets in Columns containing swimlanes can be given actions with descriptions.
+- Tickets can be moved between columns and columns can be moved.
+- Actions can be moved between swimlane columns.
+- After creation action descriptions can be changed.
+- Actions, tickets can be deleted.
+
+**User magnets on board**
+- A user can create new users for the board.
+- A user magnet can be placed on a ticket or action.
+- Users can be deleted from ticket or action or from the board.
+
+**Scopes and analytics**
+- Scopes can be created to group tickets.
+- Created scopes can be edited and deleted.
+- Board has analytics window which shows Cumulative Flow, Velocity, and Burn Up Charts-
+
+**Other**
+- Board has shared notes area for every board user to edit and read.
+- Frontpage has a list of visited boards.
 
 ## Instructions for local development
 
