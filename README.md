@@ -1,9 +1,12 @@
-# Futuboard
+# <img src="frontend/public/futuboard-logo.svg" width="30">utuboard
 
-<img src="frontend/public/futuboard-logo.svg" width="100">
+Futuboard is a free, easy-to-use and open-source web tool for workflow management that requires no registration. It can be used to manage individual or team work efficiently and remotely. It allows for an easier to use platform than alternative tools with the same features, and it includes automatic visualizations and statistics about the progress of work. Different workflows and frameworks, such as Scrum, Kanban or a simple todo-list, are naturally compatible with Futuboard, and in particular, it enables convenient support for all Scrum events. It produces cumulative flow diagrams and scope burn-ups for process optimization and progress follow-up. Use it on the web or set up your own instance of Futuboard—it's all up to you. To get started, just create a board, save (and share) the link, and start managing your work—it's that simple!
 
-- [Introduction](#introduction)
-  - [Features](#features)
+You can use Futuboard at [futuboard.live](https://futuboard.live/).
+
+This README includes instructions for setting up a development environment, information about what we've used to create this project, including documentation links, and guides to deploying your own instance either locally or in Azure from GitHub.
+
+- [Features](#features)
 - [Instructions for local development](#instructions-for-local-development)
   - [Step 1: Environment variables](#step-1-environment-variables)
   - [Step 2: Installing dependencies](#step-2-installing-dependencies)
@@ -48,13 +51,7 @@
   - [Backend troubleshooting](#backend-troubleshooting)
   - [Frontend troubleshooting](#frontend-troubleshooting)
 
-## Introduction
-
-[Futuboard](https://futuboard.live/) is a free, easy-to-use and open-source web tool for workflow management that requires no registration. It can be used to manage individual or team work efficiently and remotely. It allows for an easier to use platform than alternative tools with the same features, and it includes automatic visualizations and statistics about the progress of work. Different workflows and frameworks, such as Scrum, Kanban or a simple todo-list, are naturally compatible with Futuboard, and in particular, it enables convenient support for all Scrum events. It produces cumulative flow diagrams and scope burn-ups for process optimization and progress follow-up. Use it on the web or set up your own instance of Futuboard—it's all up to you. To get started, just create a board, save (and share) the link, and start managing your work—it's that simple!
-
-This README includes instructions for setting up a development environment, information about what we've used to create this project, including documentation links, and guides to deploying your own instance either locally or in Azure from GitHub.
-
-### Features
+## Features
 
 **Board**
 
