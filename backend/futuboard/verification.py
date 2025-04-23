@@ -1,10 +1,10 @@
-import os
 from uuid import UUID
 from argon2 import PasswordHasher
 import argon2
 from django.http import Http404, JsonResponse
 from django.utils import timezone
 import jwt
+from decouple import config
 
 from futuboard.models import Action, Board, Column, Swimlanecolumn, Ticket
 from django.conf import settings
@@ -34,7 +34,7 @@ def get_token_from_request(request):
         return None
 
 
-JWT_SECRET = os.environ.get("JWT_SECRET")
+JWT_SECRET = config("JWT_SECRET")
 
 
 def encode_token(board_id: UUID):
@@ -113,7 +113,7 @@ def check_if_acces_token_incorrect_using_other_id(model, id, request):
         raise Http404(f"{model.__name__} not found")
 
 
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+ADMIN_PASSWORD = config("ADMIN_PASSWORD")
 
 
 def is_admin_password_correct(password: str):
