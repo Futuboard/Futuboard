@@ -22,7 +22,7 @@ const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }>
     setCurrentTitle(swimlanecolumn.title)
   }, [swimlanecolumn.title])
 
-  const handleDoubleClick = () => {
+  const handleClick = () => {
     setIsEditing(true)
   }
 
@@ -47,8 +47,16 @@ const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }>
 
   return (
     <Box
-      onClick={handleDoubleClick}
-      sx={{ width: 210, height: 45, display: "flex", justifyContent: "center", alignItems: "center" }}
+      onClick={handleClick}
+      sx={{
+        width: 208,
+        paddingRight: 1,
+        paddingLeft: 1,
+        height: 45,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+      }}
     >
       <TextField
         variant="standard"
