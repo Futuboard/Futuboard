@@ -10,6 +10,7 @@ from ..verification import (
 from ..models import Board, Column, Ticket, TicketEvent, User, Swimlanecolumn
 from ..serializers import ColumnSerializer, TicketSerializer, UserSerializer
 from django.utils import timezone
+from django.core.cache import cache
 
 
 @api_view(["GET", "POST", "PUT"])
@@ -69,6 +70,7 @@ def tickets_on_column(request, column_id):
 
         try:
             tickets_data = request.data
+            cache.delete(f"tickets_{column_id}")
 
             # if ticket has a columnid that is not the same as the columnid from the ticket in the database, change it
             for ticket in tickets_data:
@@ -105,7 +107,7 @@ def tickets_on_column(request, column_id):
     if request.method == "POST":
         if token_incorrect := check_if_acces_token_incorrect_using_other_id(Column, column_id, request):
             return token_incorrect
-
+        cache.delete(f"tickets_{column_id}")
         column = Column.objects.get(pk=column_id)
         new_ticket = Ticket(
             ticketid=request.data["ticketid"],
@@ -141,8 +143,14 @@ def tickets_on_column(request, column_id):
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "GET":
+        cache_key = f"tickets_{column_id}"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return JsonResponse(cached_data, safe=False)
+
         query_set = Ticket.objects.filter(columnid=column_id).order_by("order")
         serializer = TicketSerializer(query_set, many=True)
+        cache.set(cache_key, serializer.data, 60 * 3)
         return JsonResponse(serializer.data, safe=False)
 
 
@@ -153,6 +161,8 @@ def update_ticket(request, ticket_id):
 
     try:
         ticket = Ticket.objects.get(pk=ticket_id)
+        cache.delete(f"tickets_{ticket.columnid.columnid}")
+
     except Ticket.DoesNotExist:
         raise Http404("Ticket not found")
 
@@ -245,6 +255,13 @@ def users_on_board(request, board_id):
 
 @api_view(["GET", "POST", "DELETE"])
 def users_on_ticket(request, ticket_id):
+    try:
+        ticket = Ticket.objects.get(pk=ticket_id)
+        cache.delete(f"tickets_{ticket.columnid.columnid}")
+
+    except Ticket.DoesNotExist:
+        raise Http404("Ticket not found")
+
     if request.method == "GET":
         users = User.objects.filter(tickets__ticketid=ticket_id)
         serializer = UserSerializer(users, many=True)
