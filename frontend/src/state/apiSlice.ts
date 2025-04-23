@@ -9,6 +9,7 @@ import {
   fetchBaseQuery
 } from "@reduxjs/toolkit/query/react"
 
+import Column from "@/components/board/Column"
 import { cacheTagTypes } from "@/constants"
 import {
   Action,
@@ -34,7 +35,6 @@ import { getAdminPassword, getAuth, getIsInReadMode, logOutOfBoard, setToken } f
 import { setNotification } from "./notification"
 import { RootState } from "./store"
 import { webSocketContainer } from "./websocket"
-import Column from "@/components/board/Column"
 
 const isLoggedInWithReadOnly = (
   api: MutationLifecycleApi<unknown, BaseQueryFn, unknown, "boardsApi"> | BaseQueryApi
