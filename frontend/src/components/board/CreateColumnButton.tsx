@@ -22,6 +22,7 @@ const CreateColumnButton: React.FC<CreateColumnButtonProps> = ({ boardId }) => {
   }
 
   const handleSubmit = async (data: ColumnData) => {
+    setOpen(false)
     const column = {
       columnid: getId(),
       title: data.columnTitle,
@@ -29,7 +30,6 @@ const CreateColumnButton: React.FC<CreateColumnButtonProps> = ({ boardId }) => {
       swimlane: data.swimlane
     }
     await addColumn({ boardId: boardId, column: column })
-    setOpen(false)
   }
   return (
     <Box>

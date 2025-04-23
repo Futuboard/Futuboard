@@ -103,6 +103,8 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board, ha
   const handleSubmit = async (data: FormData) => {
     //task object cant be give type Task yet- problem with caretaker types
     //the object creation should be refactored to the TaskCreationForm component
+    setDefaultValues(null)
+    setOpen(false)
     const taskId = getId()
     const taskObject = {
       ticketid: taskId,
@@ -132,9 +134,6 @@ const CreateTaskButton: React.FC<CreateTaskButtonProps> = ({ columnid, board, ha
         await createAction({ action })
       })
     }
-
-    setOpen(false)
-    setDefaultValues(null)
   }
   return (
     <Box>

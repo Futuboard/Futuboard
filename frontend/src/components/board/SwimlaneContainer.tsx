@@ -1,4 +1,4 @@
-import { Box, Skeleton, Typography } from "@mui/material"
+import { Box, Skeleton, TextField } from "@mui/material"
 import Paper from "@mui/material/Paper"
 import { useEffect, useState } from "react"
 
@@ -46,24 +46,23 @@ const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }>
   }
 
   return (
-    <Box onDoubleClick={handleDoubleClick}>
-      {isEditing ? (
-        <Box sx={{ display: "flex", justifyContent: "center", textAlign: "center" }}>
-          <input
-            name="swimlaneColumnTitle"
-            autoFocus
-            value={currentTitle}
-            onKeyDown={handleKeyDown}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            style={{ width: "100%", fontSize: "1.5rem", backgroundColor: "transparent", color: "black" }}
-          />
-        </Box>
-      ) : (
-        <Typography variant={"h5"} noWrap gutterBottom>
-          {currentTitle}
-        </Typography>
-      )}
+    <Box
+      onClick={handleDoubleClick}
+      sx={{ width: 210, height: 45, display: "flex", justifyContent: "center", alignItems: "center" }}
+    >
+      <TextField
+        variant="standard"
+        name="swimlaneColumnTitle"
+        value={currentTitle}
+        onKeyDown={handleKeyDown}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        InputProps={{
+          disableUnderline: !isEditing,
+          sx: { fontSize: "1.5rem" },
+          inputProps: { style: { textAlign: "center" } }
+        }}
+      />
     </Box>
   )
 }

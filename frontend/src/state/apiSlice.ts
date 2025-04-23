@@ -14,7 +14,6 @@ import {
   Action,
   Board,
   CacheInvalidationTag,
-  Column,
   NewAction,
   NewTask,
   SwimlaneColumn,
@@ -35,6 +34,7 @@ import { getAdminPassword, getAuth, getIsInReadMode, logOutOfBoard, setToken } f
 import { setNotification } from "./notification"
 import { RootState } from "./store"
 import { webSocketContainer } from "./websocket"
+import Column from "@/components/board/Column"
 
 const isLoggedInWithReadOnly = (
   api: MutationLifecycleApi<unknown, BaseQueryFn, unknown, "boardsApi"> | BaseQueryApi
@@ -290,7 +290,25 @@ export const boardsApi = createApi({
         method: "POST",
         body: column
       }),
-      invalidatesTags: () => invalidateRemoteCache(["Columns"])
+      onQueryStarted({ column }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
+        const invalidationTags: CacheInvalidationTag[] = [{ type: "Columns" }]
+        updateCache(
+          "getColumnsByBoardId",
+          invalidationTags,
+          (draft) => {
+            const columns = draft as Column[]
+            columns.push(column)
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(invalidationTags)
+          apiActions.dispatch(boardsApi.util.invalidateTags(invalidationTags))
+        })
+      }
     }),
 
     addTask: builder.mutation<Task, { columnId: string; task: NewTask }>({
@@ -299,11 +317,28 @@ export const boardsApi = createApi({
         method: "POST",
         body: task
       }),
-      invalidatesTags: (_result, _error, { columnId }) =>
-        invalidateRemoteCache([
-          { type: "Columns", id: columnId },
-          { type: "Ticket", id: "LIST" }
-        ])
+      onQueryStarted({ task }, apiActions) {
+        if (isLoggedInWithReadOnly(apiActions)) return
+
+        const invalidationTags: CacheInvalidationTag[] = [
+          { type: "Ticket", id: "LIST" },
+          { type: "Columns", id: task.columnid }
+        ]
+        updateCache(
+          "getTaskListByColumnId",
+          invalidationTags,
+          (draft) => {
+            const taskList = draft as Task[]
+            taskList.unshift({ ...task, users: [], scopes: [], size: task.size || 0 })
+          },
+          apiActions
+        )
+
+        apiActions.queryFulfilled.finally(() => {
+          invalidateRemoteCache(invalidationTags)
+          apiActions.dispatch(boardsApi.util.invalidateTags(invalidationTags))
+        })
+      }
     }),
 
     updateTask: builder.mutation<Task, { task: NewTask }>({

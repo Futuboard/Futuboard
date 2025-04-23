@@ -101,7 +101,7 @@ const Scope: React.FC<ScopeProps> = (props) => {
   )
 
   const handleSubmitTitle = async () => {
-    if (title !== "") {
+    if (title !== "" && title != scope.title) {
       await setScopeTitle({ scopeid: scope.scopeid, title: title })
     }
   }
