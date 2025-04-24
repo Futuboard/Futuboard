@@ -425,21 +425,23 @@ export const boardsApi = createApi({
           { type: "Ticket", id: "LIST" },
           { type: "Scopes", id: "LIST" }
         ]
-
-        const patchResult = apiActions.dispatch(
-          boardsApi.util.updateQueryData("getTaskListByColumnId", { columnId }, () => {
-            return tasks.map((task) => ({
+        updateCache(
+          "getTaskListByColumnId",
+          tagsToInvalidate,
+          () => {
+            const updatedTasks = tasks.map((task) => ({
               ...task,
               columnid: columnId
             }))
-          })
+            return updatedTasks
+          },
+          apiActions
         )
         try {
           await apiActions.queryFulfilled
           invalidateRemoteCache([...tagsToInvalidate])
           apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Scopes", id: "LIST" }]))
         } catch {
-          patchResult.undo()
           apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         }
       }
@@ -482,7 +484,7 @@ export const boardsApi = createApi({
         body: { userid }
       }),
       //update optimistically
-      onQueryStarted({ ticketId, userid }, apiActions) {
+      async onQueryStarted({ ticketId, userid }, apiActions) {
         if (isLoggedInWithReadOnly(apiActions)) return
 
         const tagsToInvalidate: CacheInvalidationTag[] = [
@@ -519,10 +521,12 @@ export const boardsApi = createApi({
           apiActions
         )
 
-        apiActions.queryFulfilled.finally(() => {
+        try {
+          await apiActions.queryFulfilled
           invalidateRemoteCache(tagsToInvalidate)
+        } catch {
           apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
-        })
+        }
       }
     }),
 
@@ -533,7 +537,7 @@ export const boardsApi = createApi({
         body: { userid }
       }),
       //update optimistically
-      onQueryStarted({ ticketId, userid }, apiActions) {
+      async onQueryStarted({ ticketId, userid }, apiActions) {
         if (isLoggedInWithReadOnly(apiActions)) return
 
         const tagsToInvalidate: CacheInvalidationTag[] = [
@@ -568,10 +572,12 @@ export const boardsApi = createApi({
           apiActions
         )
 
-        apiActions.queryFulfilled.finally(() => {
+        try {
+          await apiActions.queryFulfilled
           invalidateRemoteCache(tagsToInvalidate)
+        } catch {
           apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
-        })
+        }
       }
     }),
 
@@ -582,7 +588,7 @@ export const boardsApi = createApi({
         body: { userid }
       }),
       //update optimistically
-      onQueryStarted({ actionId, userid }, apiActions) {
+      async onQueryStarted({ actionId, userid }, apiActions) {
         if (isLoggedInWithReadOnly(apiActions)) return
 
         const tagsToInvalidate: CacheInvalidationTag[] = [
@@ -620,10 +626,12 @@ export const boardsApi = createApi({
           apiActions
         )
 
-        apiActions.queryFulfilled.finally(() => {
+        try {
+          await apiActions.queryFulfilled
           invalidateRemoteCache(tagsToInvalidate)
+        } catch {
           apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
-        })
+        }
       }
     }),
 
@@ -634,7 +642,7 @@ export const boardsApi = createApi({
         body: { userid }
       }),
       //update optimistically
-      onQueryStarted({ actionId, userid }, apiActions) {
+      async onQueryStarted({ actionId, userid }, apiActions) {
         if (isLoggedInWithReadOnly(apiActions)) return
 
         const tagsToInvalidate: CacheInvalidationTag[] = [
@@ -669,10 +677,12 @@ export const boardsApi = createApi({
           apiActions
         )
 
-        apiActions.queryFulfilled.finally(() => {
+        try {
+          await apiActions.queryFulfilled
           invalidateRemoteCache(tagsToInvalidate)
+        } catch {
           apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
-        })
+        }
       }
     }),
 
@@ -783,8 +793,10 @@ export const boardsApi = createApi({
 
         const invalidationTags: CacheInvalidationTag[] = [{ type: "Action", id: columnid }]
 
-        const patchResult = apiActions.dispatch(
-          boardsApi.util.updateQueryData("getActionsByColumnId", columnid, (draft) => {
+        updateCache(
+          "getActionsByColumnId",
+          invalidationTags,
+          (draft) => {
             const oldActions = draft as Action[]
 
             const oldActionsWithoutNewActions = oldActions.filter(
@@ -797,13 +809,14 @@ export const boardsApi = createApi({
             }))
 
             return [...oldActionsWithoutNewActions, ...newActionsWithCorrectIds]
-          })
+          },
+          apiActions
         )
+
         try {
           await apiActions.queryFulfilled
           invalidateRemoteCache(invalidationTags)
         } catch {
-          patchResult.undo()
           apiActions.dispatch(boardsApi.util.invalidateTags(invalidationTags))
         }
       }
@@ -941,7 +954,7 @@ export const boardsApi = createApi({
         body: { ticketid }
       }),
       //update optimistically
-      onQueryStarted({ ticketid, scope }, apiActions) {
+      async onQueryStarted({ ticketid, scope }, apiActions) {
         if (isLoggedInWithReadOnly(apiActions)) return
 
         const tagsToInvalidate: CacheInvalidationTag[] = [{ type: "Ticket", id: ticketid }]
@@ -958,12 +971,15 @@ export const boardsApi = createApi({
           apiActions
         )
 
-        tagsToInvalidate.push("Scopes")
+        tagsToInvalidate.push({ type: "Scopes", id: "LIST" })
 
-        apiActions.queryFulfilled.finally(() => {
-          invalidateRemoteCache(tagsToInvalidate)
+        try {
+          await apiActions.queryFulfilled
+          invalidateRemoteCache([...tagsToInvalidate])
+          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Scopes", id: "LIST" }]))
+        } catch {
           apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
-        })
+        }
       }
     }),
 
