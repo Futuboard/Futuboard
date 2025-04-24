@@ -9,6 +9,11 @@ from decouple import config
 from futuboard.models import Action, Board, Column, Swimlanecolumn, Ticket
 from django.conf import settings
 
+import time
+import logging
+
+logger = logging.getLogger(__name__)
+
 ph = PasswordHasher()
 
 
@@ -56,19 +61,31 @@ def decode_token(token: str):
 
 
 def check_if_access_token_incorrect(board_id, request):
+    time_1 = time.time()
     # Check if the token checking is disabled in settings, this can be done for testing purposes
     if hasattr(settings, "DISABLE_AUTH_TOKEN_CHECKING") and settings.DISABLE_AUTH_TOKEN_CHECKING:
         return None
 
     try:
         token = get_token_from_request(request)
+        time_4 = time.time()
         if token is None:
             return JsonResponse({"message": "Access token missing"}, status=401)
 
         decoded_token = decode_token(token)
 
+        time_5 = time.time()
+
         if decoded_token["board_id"] != str(board_id):
             return JsonResponse({"message": "Access token to wrong board"}, status=405)
+
+        time_6 = time.time()
+
+        logger.info("Time taken for each step:")
+        logger.info(f"AUTH: Get token from request: {time_4 - time_1} seconds")
+        logger.info(f"AUTH: Decode token: {time_5 - time_4} seconds")
+        logger.info(f"AUTH: Check if token is correct: {time_6 - time_5} seconds")
+        logger.info(f"AUTH: Total time taken: {time_6 - time_1} seconds")
 
         # Token is valid, return None to indicate no error
         return None
