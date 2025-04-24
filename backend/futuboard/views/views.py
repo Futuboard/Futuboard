@@ -151,7 +151,7 @@ def tickets_on_column(request, column_id):
 
         query_set = Ticket.objects.filter(columnid=column_id).order_by("order")
         serializer = TicketSerializer(query_set, many=True)
-        cache.set(cache_key, serializer.data, 60 * 3)
+        cache.set(cache_key, serializer.data)
         return JsonResponse(serializer.data, safe=False)
 
 

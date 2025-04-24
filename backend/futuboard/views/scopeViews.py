@@ -21,7 +21,7 @@ def scopes_on_board(request: rest_framework.request.Request, board_id: str):
         board = Board.objects.get(boardid=board_id)
         query_set = Scope.objects.filter(boardid=board)
         serializer = ScopeSerializerWithRelationInfo(query_set, many=True)
-        cache.set(cache_key, serializer.data, 60 * 3)
+        cache.set(cache_key, serializer.data)
         return JsonResponse(serializer.data, safe=False)
 
     if request.method == "POST":

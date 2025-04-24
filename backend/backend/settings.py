@@ -16,3 +16,7 @@ DATABASES = {
         "PORT": config("DB_PORT"),
     }
 }
+
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "TIMEOUT": 60 * 15, "MAX_ENTRIES": 1000}
+}
