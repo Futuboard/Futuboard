@@ -9,12 +9,12 @@ import {
   fetchBaseQuery
 } from "@reduxjs/toolkit/query/react"
 
-import Column from "@/components/board/Column"
 import { cacheTagTypes } from "@/constants"
 import {
   Action,
   Board,
   CacheInvalidationTag,
+  Column,
   NewAction,
   NewTask,
   SwimlaneColumn,
