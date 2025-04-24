@@ -326,7 +326,7 @@ const Column: React.FC<ColumnProps> = ({ column, index }) => {
         })
       } else {
         tasks.forEach((task: TaskType) => {
-          addTaskToScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
+          addTaskToScope({ scope: selectedScope as SimpleScope, ticket: task })
         })
       }
     }

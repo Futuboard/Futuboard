@@ -129,7 +129,7 @@ const Task: React.FC<TaskProps> = ({ task, templateDescription }) => {
   const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (isScopeSelected) {
       if (!isTaskInSelectedScope) {
-        addTaskToScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
+        addTaskToScope({ scope: selectedScope as SimpleScope, ticket: task })
       } else {
         deleteTaskFromScope({ scope: selectedScope as SimpleScope, ticketid: task.ticketid })
       }
