@@ -94,6 +94,7 @@ This README includes instructions for setting up a development environment, info
 
 - Board has shared notes area for every board user to edit and read.
 - Frontpage has a list of visited boards.
+- Board can be accessed in read-only mode with a shared link. With a link and a password, the board can be accessed for editing.
 
 ## Instructions for local development
 
