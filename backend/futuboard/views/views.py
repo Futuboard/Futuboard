@@ -258,7 +258,6 @@ def users_on_board(request, board_id):
 def users_on_ticket(request, ticket_id):
     try:
         ticket = Ticket.objects.get(pk=ticket_id)
-        cache.delete(f"tickets_{ticket.columnid.columnid}")
 
     except Ticket.DoesNotExist:
         raise Http404("Ticket not found")
@@ -267,6 +266,8 @@ def users_on_ticket(request, ticket_id):
         users = User.objects.filter(tickets__ticketid=ticket_id)
         serializer = UserSerializer(users, many=True)
         return JsonResponse(serializer.data, safe=False)
+
+    cache.delete(f"tickets_{ticket.columnid.columnid}")
 
     if request.method == "POST":
         if token_incorrect := check_if_acces_token_incorrect_using_other_id(Ticket, ticket_id, request):
@@ -293,7 +294,10 @@ def update_user(request, user_id):
     if request.method == "DELETE":
         user = User.objects.get(pk=user_id)
         response = "Successfully deleted user: {}".format(user_id)
+        for ticket in user.tickets.all():
+            cache.delete(f"tickets_{ticket.columnid.columnid}")
         user.delete()
+
         return HttpResponse(response)
 
 
