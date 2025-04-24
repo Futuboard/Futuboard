@@ -368,7 +368,7 @@ const ToolBar = ({ title, boardId, taskTemplate, boardBackgroundColor, chartTool
       </Toolbar>
       {isReadOnly && (
         <div
-          title="You are currently in read-only mode. Log out and log back in with the board password to edit."
+          title="You are currently in read-only mode. Exit the board and enter the board password to edit."
           style={{
             position: "fixed",
             top: "65px",

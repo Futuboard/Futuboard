@@ -67,12 +67,12 @@ const AccessBoardForm: React.FC<AccessBoardFormProps> = ({ board, tryLogin, hand
         <Card sx={{ display: "flex", flexDirection: "column", gap: 4, textAlign: "center", padding: 8 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Typography variant="body1" fontSize={20}>
-              Log in to edit
+              Enter password to edit
             </Typography>
             <PasswordField register={register("password")} errorText={errors.password?.message} />
             <Box sx={{ display: "flex", flexDirection: "row", gap: 1, justifyContent: "center" }}>
               <Button type="submit" color="primary" variant="contained">
-                Log in
+                Edit board
               </Button>
             </Box>
           </Box>
