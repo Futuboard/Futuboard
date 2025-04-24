@@ -802,10 +802,11 @@ export const boardsApi = createApi({
           apiActions
         )
 
-        apiActions.queryFulfilled.finally(() => {
-          invalidateRemoteCache(invalidationTags)
-          apiActions.dispatch(boardsApi.util.invalidateTags(invalidationTags))
-        })
+        apiActions.queryFulfilled
+          .finally(() => {
+            invalidateRemoteCache(invalidationTags)
+          })
+          .catch(() => apiActions.dispatch(boardsApi.util.invalidateTags(invalidationTags)))
       }
     }),
 
