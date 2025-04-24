@@ -32,24 +32,6 @@ const dropStyle = (style: DraggableStyle | undefined, snapshot: DraggableStateSn
   }
 }
 
-const AcceptanceCriteria: React.FC<{ description: string }> = ({ description }) => {
-  const all = parseAcceptanceCriteriaFromDescription(description)
-  let done = 0
-  all.forEach((line) => {
-    if (line.charAt(3) == "x") done += 1
-  })
-
-  if (all.length <= 0) return null
-
-  const progress = Math.round((done / all.length) * 100)
-
-  return (
-    <Typography
-      sx={{ fontSize: "13px", fontWeight: "bold", marginBottom: "-4px", color: "#7f7f80" }}
-    >{`${progress}%`}</Typography>
-  )
-}
-
 const TaskUserList: React.FC<{ users: UserWithoutTicketsOrActions[]; taskid: string }> = ({ users, taskid }) => {
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
@@ -156,6 +138,12 @@ const Task: React.FC<TaskProps> = ({ task, templateDescription }) => {
       setAnchorEl(e.currentTarget)
     }
   }
+
+  const all = parseAcceptanceCriteriaFromDescription(task.description)
+  let done = 0
+  all.forEach((line) => {
+    if (line.charAt(3) == "x") done += 1
+  })
 
   return (
     <Droppable droppableId={task.ticketid + "/ticket"} type="user" direction="horizontal">
@@ -284,8 +272,12 @@ const Task: React.FC<TaskProps> = ({ task, templateDescription }) => {
                 >
                   {task.size}
                 </Typography>
-                <AcceptanceCriteria description={task.description || ""} />
-                {task.description != "" && task.description != templateDescription && (
+                {all.length > 0 && (
+                  <Typography sx={{ fontSize: "13px", fontWeight: "bold", marginBottom: "-4px", color: "#7f7f80" }}>
+                    {`${Math.round((done / all.length) * 100)}%`}
+                  </Typography>
+                )}
+                {((task.description != "" && task.description != templateDescription) || all.length > 0) && (
                   <Subject fontSize="small" color="disabled" />
                 )}
               </Box>
