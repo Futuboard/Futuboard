@@ -9,7 +9,7 @@ Cypress.Commands.add("createBoard", ({ title, password }) => {
 Cypress.Commands.add("loginToBoard", (password) => {
   cy.get(".MuiTypography-root", { timeout: 10000 }).should("contain", "Log in to edit")
   cy.get('input[name="password"]').type(password)
-  cy.get("button").contains("Log in").click()
+  cy.get("button").contains("Edit board").click()
 })
 
 Cypress.Commands.add("createColumn", ({ title, swimlane = false }) => {
