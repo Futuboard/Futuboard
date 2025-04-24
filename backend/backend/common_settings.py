@@ -80,6 +80,10 @@ TEMPLATES = [
     },
 ]
 
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "TIMEOUT": 60 * 15, "MAX_ENTRIES": 1000}
+}
+
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
 WSGI_APPLICATION = "backend.wsgi.application"
