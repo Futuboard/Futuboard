@@ -34,15 +34,16 @@ const ScopeCreationForm: React.FC<ScopeCreationFormProps> = (props) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} direction="column" sx={{ width: 350 }}>
         <Grid item xs={12}>
           <Typography gutterBottom variant="h6">
             Create Scope
           </Typography>
           <Divider />
         </Grid>
-        <Grid item xs={12}>
+        <Grid item>
           <TextField
+            fullWidth
             inputRef={inputRef}
             label={
               <span>
@@ -59,11 +60,13 @@ const ScopeCreationForm: React.FC<ScopeCreationFormProps> = (props) => {
             })}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
           <Button type="submit" color="primary" variant="contained">
             Submit
           </Button>
-          <Button onClick={onCancel}>Cancel</Button>
+          <Button onClick={onCancel} variant="outlined" sx={{ marginLeft: 1 }}>
+            Cancel
+          </Button>
         </Grid>
       </Grid>
     </form>

@@ -490,7 +490,6 @@ export const boardsApi = createApi({
           { type: "Users", id: userid },
           { type: "Users", id: "ALL_USERS" }
         ]
-
         let userName = ""
 
         updateCache(
@@ -779,14 +778,13 @@ export const boardsApi = createApi({
         body: actions
       }),
       //update optimistically
-      onQueryStarted({ columnid, swimlaneColumnId, actions: newActions }, apiActions) {
+      async onQueryStarted({ columnid, swimlaneColumnId, actions: newActions }, apiActions) {
         if (isLoggedInWithReadOnly(apiActions)) return
 
         const invalidationTags: CacheInvalidationTag[] = [{ type: "Action", id: columnid }]
-        updateCache(
-          "getActionsByColumnId",
-          invalidationTags,
-          (draft) => {
+
+        const patchResult = apiActions.dispatch(
+          boardsApi.util.updateQueryData("getActionsByColumnId", columnid, (draft) => {
             const oldActions = draft as Action[]
 
             const oldActionsWithoutNewActions = oldActions.filter(
@@ -799,15 +797,15 @@ export const boardsApi = createApi({
             }))
 
             return [...oldActionsWithoutNewActions, ...newActionsWithCorrectIds]
-          },
-          apiActions
-        )
-
-        apiActions.queryFulfilled
-          .finally(() => {
-            invalidateRemoteCache(invalidationTags)
           })
-          .catch(() => apiActions.dispatch(boardsApi.util.invalidateTags(invalidationTags)))
+        )
+        try {
+          await apiActions.queryFulfilled
+          invalidateRemoteCache(invalidationTags)
+        } catch {
+          patchResult.undo()
+          apiActions.dispatch(boardsApi.util.invalidateTags(invalidationTags))
+        }
       }
     }),
 
