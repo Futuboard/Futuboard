@@ -48,8 +48,8 @@ const DeleteTaskButton: React.FC<DeleteTaskButtonProps> = ({ task }) => {
   }
 
   const handleDelete = () => {
-    deleteTask({ task: task })
     setOpen(false)
+    deleteTask({ task: task })
   }
 
   return (
