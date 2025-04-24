@@ -67,7 +67,6 @@ def tickets_on_column(request, column_id):
     if request.method == "PUT":
         if token_incorrect := check_if_acces_token_incorrect_using_other_id(Column, column_id, request):
             return token_incorrect
-
         try:
             tickets_data = request.data
             cache.delete(f"tickets_{column_id}")
@@ -92,6 +91,7 @@ def tickets_on_column(request, column_id):
                     ticket_move_event.save()
                     ticket_move_event.old_scopes.set(ticket_from_database.scope_set.all())
                     ticket_move_event.new_scopes.set(ticket_from_database.scope_set.all())
+                    cache.delete(f"tickets_{old_column.columnid}")
 
             # update order of tickets
             for index, ticket_data in enumerate(tickets_data):
