@@ -1,4 +1,4 @@
-import { Box, GlobalStyles } from "@mui/material"
+import { Box, CircularProgress, GlobalStyles } from "@mui/material"
 import { useEffect, useReducer, useState } from "react"
 import { useDispatch } from "react-redux"
 import { useParams } from "react-router-dom"
@@ -11,6 +11,8 @@ import { getAuth, getIsInReadMode, setBoardId, setIsInReadMode } from "@/state/a
 import { setNotification } from "@/state/notification"
 import { webSocketContainer } from "@/state/websocket"
 import { Board } from "@/types"
+
+import LogoIcon from "../board/LogoIcon"
 
 type LoggedInContainerProps = {
   children: ({ board }: { board: Board }) => React.ReactNode
@@ -73,14 +75,14 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
   }
 
   if (isLoading || !board || !id) {
-    return null
+    return <LoadingPage />
   }
 
   const shouldShowContent = hasAuth || loginTryData?.success || isInReadMode
 
   // This is to prevent "flashing" the access form when board password is empty
   if (!shouldShowContent && !board.needs_password) {
-    return null
+    return <LoadingPage />
   }
 
   return (
@@ -96,3 +98,23 @@ const LoggedInContainer: React.FC<LoggedInContainerProps> = ({ children, titlePr
 }
 
 export default LoggedInContainer
+
+const LoadingPage = () => {
+  return (
+    <Box sx={{ height: "100vh", width: "100vw", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <Box sx={{ position: "relative", padding: 6 }}>
+        <LogoIcon sx={{ transform: "scale(2)" }} />
+        <CircularProgress
+          sx={{
+            position: "absolute",
+            top: 9,
+            left: 8,
+            color: "#97d44e"
+          }}
+          size={100}
+          thickness={3}
+        />
+      </Box>
+    </Box>
+  )
+}
