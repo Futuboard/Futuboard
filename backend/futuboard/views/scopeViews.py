@@ -8,6 +8,10 @@ from ..serializers import ScopeSerializerWithRelationInfo
 import rest_framework.request
 from django.utils.timezone import now
 from django.core.cache import cache
+import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(["GET", "POST", "DELETE"])
@@ -51,13 +55,20 @@ def scopes_on_board(request: rest_framework.request.Request, board_id: str):
 
 @api_view(["POST", "DELETE"])
 def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
+    time_1 = time.time()
     scope = Scope.objects.get(scopeid=scopeid)
+
+    time_2 = time.time()
 
     board_id = scope.boardid.boardid
     if token_incorrect := check_if_access_token_incorrect(board_id, request):
         return token_incorrect
 
+    time_3 = time.time()
+
     ticket = Ticket.objects.get(ticketid=request.data["ticketid"])
+
+    time_4 = time.time()
 
     if request.method == "POST":
         ticket_add_to_scope_event = TicketEvent(
@@ -71,6 +82,8 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
         )
         ticket_add_to_scope_event.save()
 
+        time_5 = time.time()
+
         ticket_scopes = list(ticket.scope_set.all())
 
         ticket_add_to_scope_event.old_scopes.set(ticket_scopes)
@@ -79,7 +92,21 @@ def tickets_in_scope(request: rest_framework.request.Request, scopeid: str):
         ticket_scopes.append(scope)
 
         ticket_add_to_scope_event.new_scopes.set(ticket_scopes)
+
+        time_6 = time.time()
+
         cache.delete_many([f"tickets_{ticket.columnid.columnid}", f"scopes_{board_id}"])
+
+        time_7 = time.time()
+
+        logger.info("Time taken for each step:")
+        logger.info(f"Time taken to get scope: {time_2 - time_1:.4f} seconds")
+        logger.info(f"Time taken to auth: {time_3 - time_2:.4f} seconds")
+        logger.info(f"Time taken to get ticket: {time_4 - time_3:.4f} seconds")
+        logger.info(f"Time taken to create event: {time_5 - time_4:.4f} seconds")
+        logger.info(f"Time taken to set scopes: {time_6 - time_5:.4f} seconds")
+        logger.info(f"Time taken to edit cache: {time_7 - time_6:.4f} seconds")
+
         return JsonResponse({"success": True})
 
     if request.method == "DELETE":
