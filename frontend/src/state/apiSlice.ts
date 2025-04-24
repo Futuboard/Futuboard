@@ -437,6 +437,7 @@ export const boardsApi = createApi({
         try {
           await apiActions.queryFulfilled
           invalidateRemoteCache([...tagsToInvalidate])
+          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Scopes", id: "LIST" }]))
         } catch {
           patchResult.undo()
           apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
