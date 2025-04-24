@@ -60,12 +60,6 @@ def check_if_access_token_incorrect(board_id, request):
     if hasattr(settings, "DISABLE_AUTH_TOKEN_CHECKING") and settings.DISABLE_AUTH_TOKEN_CHECKING:
         return None
 
-    board = Board.objects.get(boardid=board_id)
-
-    if check_if_password_hash_is_empty(board.passwordhash):
-        # If the board has no password, we don't need to check the token
-        return None
-
     try:
         token = get_token_from_request(request)
         if token is None:

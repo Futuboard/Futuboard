@@ -2,7 +2,7 @@ import Charts from "@/components/charts/Charts"
 import LoggedInContainer from "@/components/general/LoggedInContainer"
 import ToolBar from "@/components/general/Toolbar"
 
-const ChartsContainer = () => {
+const ChartsPage = () => {
   return (
     <LoggedInContainer titlePrefix="Charts">
       {(props) => (
@@ -15,4 +15,4 @@ const ChartsContainer = () => {
   )
 }
 
-export default ChartsContainer
+export default ChartsPage

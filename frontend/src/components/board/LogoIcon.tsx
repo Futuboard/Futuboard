@@ -1,8 +1,12 @@
-import { SvgIcon } from "@mui/material"
+import { SvgIcon, SxProps, Theme } from "@mui/material"
 
-const LogoIcon = () => {
+type Props = {
+  sx?: SxProps<Theme>
+}
+
+const LogoIcon = ({ sx }: Props) => {
   return (
-    <SvgIcon>
+    <SvgIcon sx={sx}>
       <svg
         version="1.1"
         id="Layer_1"
