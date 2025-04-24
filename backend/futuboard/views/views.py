@@ -92,6 +92,7 @@ def tickets_on_column(request, column_id):
                     ticket_move_event.old_scopes.set(ticket_from_database.scope_set.all())
                     ticket_move_event.new_scopes.set(ticket_from_database.scope_set.all())
                     cache.delete(f"tickets_{old_column.columnid}")
+                    cache.delete(f"scopes_{column.boardid.boardid}")
 
             # update order of tickets
             for index, ticket_data in enumerate(tickets_data):
@@ -161,7 +162,7 @@ def update_ticket(request, ticket_id):
 
     try:
         ticket = Ticket.objects.get(pk=ticket_id)
-        cache.delete(f"tickets_{ticket.columnid.columnid}")
+        cache.delete_many([f"tickets_{ticket.columnid.columnid}", f"scopes_{ticket.columnid.boardid.boardid}"])
 
     except Ticket.DoesNotExist:
         raise Http404("Ticket not found")
