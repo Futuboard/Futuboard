@@ -293,7 +293,7 @@ export const boardsApi = createApi({
       onQueryStarted({ column }, apiActions) {
         if (isLoggedInWithReadOnly(apiActions)) return
 
-        const invalidationTags: CacheInvalidationTag[] = [{ type: "Columns" }]
+        const invalidationTags: CacheInvalidationTag[] = [{ type: "Columns", id: "LIST" }]
         updateCache(
           "getColumnsByBoardId",
           invalidationTags,
@@ -407,7 +407,7 @@ export const boardsApi = createApi({
         url: `columns/${column.columnid}/`,
         method: "DELETE"
       }),
-      invalidatesTags: () => invalidateRemoteCache(["Columns"])
+      invalidatesTags: () => invalidateRemoteCache([{ type: "Columns", id: "LIST" }])
     }),
 
     updateTaskListByColumnId: builder.mutation<Task[], { columnId: string; tasks: Task[] }>({
