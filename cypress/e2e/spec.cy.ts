@@ -397,7 +397,7 @@ describe("When working with multiple users", () => {
     })
 
     for (let i = 0; i < concurrentUsers; i++) {
-      cy.contains(`To Do (${i})`, { timeout: 10_000 })
+      cy.contains(`To Do (${i})`, { timeout: 3_000 })
     }
 
     // Test own updates are responsive, when board in use
