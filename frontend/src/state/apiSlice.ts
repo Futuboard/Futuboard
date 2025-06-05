@@ -423,7 +423,8 @@ export const boardsApi = createApi({
         const tagsToInvalidate: CacheInvalidationTag[] = [
           { type: "Columns", id: columnId },
           { type: "Ticket", id: "LIST" },
-          { type: "Scopes", id: "LIST" }
+          { type: "Scopes", id: "LIST" },
+          { type: "Action", id: columnId }
         ]
         updateCache(
           "getTaskListByColumnId",
@@ -440,7 +441,12 @@ export const boardsApi = createApi({
         try {
           await apiActions.queryFulfilled
           invalidateRemoteCache([...tagsToInvalidate])
-          apiActions.dispatch(boardsApi.util.invalidateTags([{ type: "Scopes", id: "LIST" }]))
+          apiActions.dispatch(
+            boardsApi.util.invalidateTags([
+              { type: "Scopes", id: "LIST" },
+              { type: "Action", id: columnId }
+            ])
+          )
         } catch {
           apiActions.dispatch(boardsApi.util.invalidateTags(tagsToInvalidate))
         }
