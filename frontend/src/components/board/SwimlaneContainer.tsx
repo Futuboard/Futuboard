@@ -1,4 +1,5 @@
-import { Box, Skeleton, TextField } from "@mui/material"
+import { UnfoldLess, UnfoldMore } from "@mui/icons-material"
+import { Box, IconButton, Skeleton, TextField, Tooltip } from "@mui/material"
 import Paper from "@mui/material/Paper"
 import { useEffect, useState } from "react"
 
@@ -10,7 +11,8 @@ import {
 } from "@/state/apiSlice"
 import type { Column, SwimlaneColumn } from "@/types"
 
-import Swimlane from "./Swimlane"
+import Swimlane, { SwimlaneFit } from "./Swimlane"
+import { DEFAULT_ROW_HEIGHT } from "./swimlaneRowFit"
 
 const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }> = ({ swimlanecolumn }) => {
   const [updateSwimlaneColumn] = useUpdateSwimlaneColumnMutation()
@@ -75,11 +77,70 @@ const SwimlaneColumnTitleComponent: React.FC<{ swimlanecolumn: SwimlaneColumn }>
   )
 }
 
-interface SwimlaneContainerProps {
-  column: Column
+/** The fit-all button at the top right of the swimlane board (see swimlaneRowFit.ts). */
+export interface SwimlaneFitAll {
+  active: boolean
+  onClick: (buttonElement: HTMLElement) => void
 }
 
-const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
+/**
+ * Small button lined up with the swimlane column titles (vertically) and the right edge of the row cells
+ * (horizontally).
+ */
+const FitAllRowsButton: React.FC<{ fitAll: SwimlaneFitAll }> = ({ fitAll }) => {
+  const { active } = fitAll
+  const title = active ? "Back to the default row heights" : "Fit all rows and their actions on screen"
+  return (
+    <Box
+      sx={{
+        position: "absolute",
+        right: "25px", // the rows' right padding: the button's right edge meets the cells' right edge
+        // centred on the letters of the titles: their box is 45px high from 25px down, but the letters sit
+        // 4px above its middle (the box also holds descenders and the input's bottom padding)
+        top: "21px",
+        height: "45px",
+        display: "flex",
+        alignItems: "center"
+      }}
+    >
+      <Tooltip title={title} describeChild>
+        <IconButton
+          aria-label={title}
+          onClick={(event) => fitAll.onClick(event.currentTarget)}
+          sx={{
+            width: "20px",
+            height: "20px",
+            padding: 0,
+            borderRadius: "3px",
+            backgroundColor: active ? "rgba(22, 95, 199, 0.9)" : "rgba(255, 255, 255, 0.95)",
+            color: active ? "white" : "rgba(0, 0, 0, 0.7)",
+            border: "1px solid rgba(0, 0, 0, 0.25)",
+            "&:hover": { backgroundColor: active ? "rgb(22, 95, 199)" : "white" }
+          }}
+        >
+          {active ? <UnfoldLess sx={{ fontSize: "16px" }} /> : <UnfoldMore sx={{ fontSize: "16px" }} />}
+        </IconButton>
+      </Tooltip>
+    </Box>
+  )
+}
+
+/** Row layout owned by the Column, so backlog cards and swimlane rows share the same heights. */
+export interface SwimlaneRowLayout {
+  rowHeights: Record<string, number>
+  onNeededHeightChange: (ticketId: string, neededHeight: number) => void
+  /** a button at the end of the scrollbar of cells hiding content fits that row */
+  fit: SwimlaneFit
+  /** a button at the top right of the board fits all rows on screen */
+  fitAll: SwimlaneFitAll
+}
+
+interface SwimlaneContainerProps {
+  column: Column
+  rowLayout: SwimlaneRowLayout
+}
+
+const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column, rowLayout }) => {
   const { data: swimlaneColumns, isSuccess } = useGetSwimlaneColumnsByColumnIdQuery(column.columnid)
   const { data: taskList } = useGetTaskListByColumnIdQuery({ columnId: column.columnid })
   const tasks = taskList
@@ -89,6 +150,7 @@ const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
     <>
       <Paper
         elevation={4}
+        data-swimlane-container
         sx={{
           minHeight: "85vh",
           backgroundColor: "#E5DBD9",
@@ -105,7 +167,8 @@ const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
             paddingLeft: "25px",
             paddingRight: "25px",
             paddingTop: "25px",
-            paddingBottom: "23px"
+            paddingBottom: "23px",
+            position: "relative"
           }}
         >
           {isSuccess ? (
@@ -116,21 +179,27 @@ const SwimlaneContainer: React.FC<SwimlaneContainerProps> = ({ column }) => {
           ) : (
             <Skeleton variant="rectangular" width="96%" height={44} />
           )}
+          <FitAllRowsButton fitAll={rowLayout.fitAll} />
         </Box>
 
         {tasks && tasks.length ? (
           isSuccess && actions ? (
-            tasks.map((task) => (
-              <Swimlane
-                key={task.ticketid}
-                task={task}
-                swimlaneColumns={swimlaneColumns}
-                columnid={column.columnid}
-                actions={actions.filter((a) => a.ticketid == task.ticketid)}
-              />
-            ))
+            <div data-swimlane-rows>
+              {tasks.map((task) => (
+                <Swimlane
+                  key={task.ticketid}
+                  task={task}
+                  swimlaneColumns={swimlaneColumns}
+                  columnid={column.columnid}
+                  actions={actions.filter((a) => a.ticketid == task.ticketid)}
+                  rowHeight={rowLayout.rowHeights[task.ticketid]}
+                  onNeededHeightChange={rowLayout.onNeededHeightChange}
+                  fit={rowLayout.fit}
+                />
+              ))}
+            </div>
           ) : (
-            <Skeleton variant="rectangular" width="100%" height={tasks.length * (120 + 18)} />
+            <Skeleton variant="rectangular" width="100%" height={tasks.length * DEFAULT_ROW_HEIGHT} />
           )
         ) : (
           <div style={{ textAlign: "center", paddingTop: "15px", color: "#2D3748" }}>No cards yet</div>

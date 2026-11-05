@@ -6,9 +6,10 @@ import { useSelector } from "react-redux"
 
 import Board from "@/components/board/Board"
 import ToolBar from "@/components/general/Toolbar"
+import { setDragInProgress } from "@/services/dragState"
 import { setNotification } from "@/state/notification"
 import { RootState, store } from "@/state/store"
-import { Action, Task, User, Board as BoardType } from "@/types"
+import { Action, Column, Task, User, Board as BoardType } from "@/types"
 
 import {
   boardsApi,
@@ -22,6 +23,8 @@ import {
 } from "../../state/apiSlice"
 
 import BoardNotes from "./BoardNotes"
+import { DOCKED_EDITOR_DRAGGABLE_ID, dockedEditorIndex, useTicketEditorDockState } from "./ticketEditorDock"
+import { TicketEditorDockProvider } from "./TicketEditorFrames"
 
 type BoardProps = {
   board: BoardType
@@ -36,6 +39,7 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
   const [deleteUserFromTicket] = useDeleteUserFromTicketMutation()
   const [deleteUserFromAction] = useDeleteUserFromActionMutation()
   const [isNotesOpen, setIsNotesOpen] = useState(false)
+  const ticketEditorDock = useTicketEditorDockState(isNotesOpen)
   const selectedScope = useSelector((state: RootState) => state.scope)
   const isScopeSelected = Boolean(selectedScope)
 
@@ -46,6 +50,7 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
   const selectColumns = boardsApi.endpoints.getColumnsByBoardId.select(boardId)
 
   const handleOnDragEnd = async (result: DropResult) => {
+    setDragInProgress(false)
     const { source, destination, type, draggableId } = result
 
     if (!destination) return
@@ -213,12 +218,23 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
       }
     }
     //reordering columns
+    //reordering columns, or moving the docked ticket editor between them
     if (type === "COLUMN") {
       if (destination.index === source.index) return
       //select columns from state
       const columns = selectColumns(state).data || []
-      const dataCopy = [...columns]
-      const newOrdered = reorder(dataCopy, source.index, destination.index) //reorder column list
+      const { docked, moveDock } = ticketEditorDock.dockValue
+      // the indexes count the docked editor too, at its place among the columns
+      const items: (Column | typeof DOCKED_EDITOR_DRAGGABLE_ID)[] = [...columns]
+      if (docked) items.splice(dockedEditorIndex(columns, docked), 0, DOCKED_EDITOR_DRAGGABLE_ID)
+      const reordered = reorder(items, source.index, destination.index)
+      if (docked) {
+        // the editor stays where it ended up: after the item before it
+        const before = reordered[reordered.indexOf(DOCKED_EDITOR_DRAGGABLE_ID) - 1]
+        moveDock(before && before !== DOCKED_EDITOR_DRAGGABLE_ID ? before.columnid : null)
+      }
+      if (draggableId === DOCKED_EDITOR_DRAGGABLE_ID) return
+      const newOrdered = reordered.filter((item): item is Column => item !== DOCKED_EDITOR_DRAGGABLE_ID)
       await updateColumns({ boardId, columns: newOrdered })
     }
   }
@@ -232,31 +248,33 @@ const BoardContainer: React.FC<BoardProps> = ({ board }) => {
   }
 
   return (
-    <DragDropContext onDragEnd={handleOnDragEnd}>
-      <Box
-        sx={{
-          height: "100%",
-          width: "100%",
-          overflow: "scroll" //checklist in ticket descriptions break if removed.
-        }}
-      >
-        <Backdrop open={isScopeSelected} sx={{ backgroundColor: "rgba(0, 0, 0, 0.3)", zIndex: -999 }} />
-        <ToolBar
-          boardId={boardId}
-          title={board.title}
-          taskTemplate={taskTemplateValues}
-          boardBackgroundColor={board.background_color}
-        />
-        <Board isBoardNotesOpen={isNotesOpen} />
-        <BoardNotes
-          content={board.notes}
-          boardId={board.boardid}
-          open={isNotesOpen}
-          handleSetOpen={(value) => {
-            setIsNotesOpen(value)
+    <DragDropContext onDragStart={() => setDragInProgress(true)} onDragEnd={handleOnDragEnd}>
+      <TicketEditorDockProvider state={ticketEditorDock}>
+        <Box
+          sx={{
+            height: "100%",
+            width: "100%",
+            overflow: "scroll" //checklist in ticket descriptions break if removed.
           }}
-        />
-      </Box>
+        >
+          <Backdrop open={isScopeSelected} sx={{ backgroundColor: "rgba(0, 0, 0, 0.3)", zIndex: -999 }} />
+          <ToolBar
+            boardId={boardId}
+            title={board.title}
+            taskTemplate={taskTemplateValues}
+            boardBackgroundColor={board.background_color}
+          />
+          <Board isBoardNotesOpen={isNotesOpen} />
+          <BoardNotes
+            content={board.notes}
+            boardId={board.boardid}
+            open={isNotesOpen}
+            handleSetOpen={(value) => {
+              setIsNotesOpen(value)
+            }}
+          />
+        </Box>
+      </TicketEditorDockProvider>
     </DragDropContext>
   )
 }
