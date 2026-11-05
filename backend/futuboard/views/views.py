@@ -192,6 +192,9 @@ def update_ticket(request, ticket_id):
         ticket.size = request.data.get("size", ticket.size)
         ticket.cornernote = request.data.get("cornernote", ticket.cornernote)
         ticket.save()
+        # Again after saving: a ticket list fetched while this request ran (e.g. another screen refreshing
+        # after a websocket update) would otherwise stay cached with the old ticket
+        cache.delete_many([f"tickets_{ticket.columnid.columnid}", f"scopes_{ticket.columnid.boardid.boardid}"])
 
         if old_size != ticket.size or old_title != ticket.title:
             ticket_update_event = TicketEvent(
