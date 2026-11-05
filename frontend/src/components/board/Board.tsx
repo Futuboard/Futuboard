@@ -2,12 +2,32 @@ import { Droppable } from "@hello-pangea/dnd"
 import { Box, Typography } from "@mui/material"
 import { useParams } from "react-router"
 
+import { BOARD_NOTES_OFFSET, BOARD_NOTES_TRANSITION_MS } from "@/constants"
+import { Column as ColumnType } from "@/types"
+
 import { useGetColumnsByBoardIdQuery } from "../../state/apiSlice"
 import { AddMagnetButton } from "../general/Toolbar"
 
 import Column from "./Column"
 import CreateColumnButton from "./CreateColumnButton"
 import ShareButton from "./ShareButton"
+import { DOCKED_EDITOR_DRAGGABLE_ID, dockedEditorIndex, useTicketEditorDock } from "./ticketEditorDock"
+import { DockedEditorDraggable } from "./TicketEditorFrames"
+
+/** The columns, with the docked ticket editor (if any) at its place among them; indexes count both. */
+const boardItems = (columns: ColumnType[], editorIndex: number | null) => {
+  const items = columns.map((column, index) => (
+    <Column
+      key={column.columnid}
+      column={column}
+      index={editorIndex !== null && index >= editorIndex ? index + 1 : index}
+    />
+  ))
+  if (editorIndex !== null) {
+    items.splice(editorIndex, 0, <DockedEditorDraggable key={DOCKED_EDITOR_DRAGGABLE_ID} index={editorIndex} />)
+  }
+  return items
+}
 
 interface BoardProps {
   isBoardNotesOpen: boolean
@@ -16,6 +36,7 @@ interface BoardProps {
 const Board: React.FC<BoardProps> = ({ isBoardNotesOpen }) => {
   const { id = "default-id" } = useParams()
   const { data: columns, isLoading, isSuccess } = useGetColumnsByBoardIdQuery(id)
+  const { docked } = useTicketEditorDock()
 
   if (isLoading) {
     return <Typography>Loading columns...</Typography>
@@ -57,11 +78,11 @@ const Board: React.FC<BoardProps> = ({ isBoardNotesOpen }) => {
           ref={provided.innerRef}
           sx={{
             display: "inline-flex",
-            margin: isBoardNotesOpen ? "25px 620px 25px 545px" : "25px 620px 25px 25px",
-            transition: "0.4s"
+            margin: `25px 620px 25px ${25 + (isBoardNotesOpen ? BOARD_NOTES_OFFSET : 0)}px`,
+            transition: `${BOARD_NOTES_TRANSITION_MS}ms ease`
           }}
         >
-          {isSuccess && columns.map((column, index) => <Column key={column.columnid} column={column} index={index} />)}
+          {isSuccess && boardItems(columns, docked ? dockedEditorIndex(columns, docked) : null)}
           {provided.placeholder}
         </Box>
       )}

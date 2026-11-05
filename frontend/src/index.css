@@ -60,9 +60,12 @@ button:focus-visible {
   z-index: 9999;
 }
 
+/* The description grows with its content and then scrolls. Inside a dialog its limits are set from
+   the space the dialog has left (DescriptionEditField.tsx), so only the editor scrolls. */
 .md-editor-contenteditable-description {
   overflow-y: auto;
-  height: 330px;
+  min-height: 330px;
+  max-height: 60vh;
 }
 
 .md-editor-contenteditable-notes {

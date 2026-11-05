@@ -1,4 +1,4 @@
-import { DeleteForever } from "@mui/icons-material"
+import { Close, DeleteForever, VerticalSplit } from "@mui/icons-material"
 import {
   Box,
   Button,
@@ -29,6 +29,12 @@ import { useDeleteTaskMutation } from "@/state/apiSlice"
 import { Task, Task as TaskType, User, TaskTemplate, SimpleScope } from "@/types"
 
 import DescriptionEditField from "./DescriptionEditField"
+import {
+  KEEP_TICKET_EDITOR_OPEN_ATTRIBUTE,
+  TICKET_EDITOR_DRAG_HANDLE_ATTRIBUTE,
+  TicketEditorPlacement,
+  useTicketEditorDragHandle
+} from "./ticketEditorDock"
 
 interface DeleteTaskButtonProps {
   task: Task
@@ -134,6 +140,12 @@ interface TaskFormProps {
   onCancel: () => void
   onClose: (data: FormData | null) => void
   defaultValues: TaskType | TaskTemplate | null
+  /** Ticket editor only: where the form is shown. Docked forms don't close when clicked away. */
+  placement?: TicketEditorPlacement
+  /** Ticket editor only: docks the floating form into the board. */
+  onDock?: () => void
+  /** Ticket editor only: when this number changes, the form closes as if clicked away. */
+  closeSignal?: number
 }
 
 interface FormData {
@@ -146,7 +158,8 @@ interface FormData {
 }
 
 const TaskForm: React.FC<TaskFormProps> = (props) => {
-  const { formTitle, formType, onSubmit, onCancel, onClose, defaultValues } = props
+  const { formTitle, formType, onSubmit, onCancel, onClose, defaultValues, placement, onDock, closeSignal } = props
+  const dockDragHandle = useTicketEditorDragHandle()
 
   const initialFormValues = {
     taskTitle: defaultValues?.title || "",
@@ -192,6 +205,25 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
     }
   }
 
+  const handleClickAway = (event: MouseEvent | TouchEvent) => {
+    // A docked editor stays open next to the board; the board notes can be used beside a floating one
+    if (placement === "docked") return
+    // (the notes' own link and table popups live in MDXEditor's popup container)
+    if (
+      event.target instanceof Element &&
+      event.target.closest(`[${KEEP_TICKET_EDITOR_OPEN_ATTRIBUTE}], .mdxeditor-popup-container`)
+    ) {
+      return
+    }
+    closeModule()
+  }
+
+  const closeModuleRef = useRef(closeModule)
+  closeModuleRef.current = closeModule
+  useEffect(() => {
+    if (closeSignal) closeModuleRef.current()
+  }, [closeSignal])
+
   const handleFormSubmit = (data: FormData) => {
     onSubmit(data)
   }
@@ -206,11 +238,18 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
   }, [isTaskCreationForm])
 
   return (
-    <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={closeModule}>
+    <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={handleClickAway}>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              {...{ [TICKET_EDITOR_DRAG_HANDLE_ATTRIBUTE]: "" }}
+              // docked: the title row moves the editor between the columns, like a column header
+              {...(placement === "docked" && dockDragHandle ? dockDragHandle : {})}
+            >
               <Typography
                 gutterBottom
                 variant="h6"
@@ -225,6 +264,22 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
               >
                 {formTitle}
               </Typography>
+              {placement === "docked" ? (
+                <Tooltip title="Close">
+                  <IconButton size="small" aria-label="close card" onClick={closeModule} sx={{ marginLeft: 1 }}>
+                    <Close fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              ) : (
+                placement === "floating" &&
+                onDock && (
+                  <Tooltip title="Place beside the board">
+                    <IconButton size="small" aria-label="dock card editor" onClick={onDock} sx={{ marginLeft: 1 }}>
+                      <VerticalSplit fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )
+              )}
             </Box>
             <Divider />
             {defaultValues && isTaskEditForm && <TicketScopeList task={defaultValues as Task} />}
@@ -289,6 +344,7 @@ const TaskForm: React.FC<TaskFormProps> = (props) => {
             <DescriptionEditField
               description={defaultValues?.description || ""}
               onChange={(markdown) => setValue("description", markdown)}
+              layoutKey={placement}
             />
           </Grid>
           <Grid item xs={12}>

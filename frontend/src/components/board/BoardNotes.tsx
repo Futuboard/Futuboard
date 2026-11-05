@@ -22,7 +22,10 @@ import CloseIcon from "@mui/icons-material/Close"
 import { Box, Button, ButtonGroup, Divider, Fab, Fade, Paper, Slide, Tooltip } from "@mui/material"
 import { useEffect, useState } from "react"
 
+import { BOARD_NOTES_TRANSITION_MS } from "@/constants"
 import { useUpdateBoardNotesMutation } from "@/state/apiSlice"
+
+import { KEEP_TICKET_EDITOR_OPEN_ATTRIBUTE } from "./ticketEditorDock"
 
 interface BoardNotesProps {
   boardId: string
@@ -67,13 +70,14 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleS
             }}
             onClick={() => handleSetOpen(true)}
             color="info"
+            {...{ [KEEP_TICKET_EDITOR_OPEN_ATTRIBUTE]: "" }}
           >
             <StickyNote2 />
           </Fab>
         </Tooltip>
       </Fade>
 
-      <Slide in={open} unmountOnExit direction="right" timeout={400} easing={"ease"}>
+      <Slide in={open} unmountOnExit direction="right" timeout={BOARD_NOTES_TRANSITION_MS} easing={"ease"}>
         <Paper
           sx={{
             width: "520px",
@@ -86,6 +90,7 @@ const BoardNotes: React.FC<BoardNotesProps> = ({ boardId, content, open, handleS
             zIndex: 1100
           }}
           variant="outlined"
+          {...{ [KEEP_TICKET_EDITOR_OPEN_ATTRIBUTE]: "" }}
         >
           <Box>
             <MDXEditor
